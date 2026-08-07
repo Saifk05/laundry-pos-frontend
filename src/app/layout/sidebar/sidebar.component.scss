@@ -1,0 +1,205 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebar {
+  width: 270px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border-right: 1px solid var(--app-border);
+}
+
+/* Brand */
+
+.sidebar-brand {
+  min-height: 86px;
+
+  padding: 20px 24px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  border-bottom: 1px solid var(--app-border);
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: var(--app-primary);
+
+  color: #ffffff;
+
+  font-family: var(--app-font-heading);
+
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.brand-text strong {
+  font-family: var(--app-font-heading);
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.brand-text span {
+  color: var(--app-text-muted);
+
+  font-size: 10px;
+}
+
+/* Menu */
+
+.sidebar-menu {
+  flex: 1;
+
+  padding: 16px 14px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  overflow-y: auto;
+
+  scrollbar-width: none;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-item {
+  position: relative;
+
+  min-height: 52px;
+
+  padding: 0 15px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  border-radius: 7px;
+
+  color: #343b3d;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.menu-item ion-icon {
+  width: 25px;
+
+  flex-shrink: 0;
+
+  color: #686f71;
+
+  font-size: 24px;
+}
+
+.menu-item:hover {
+  background: #f5f8f8;
+}
+
+.menu-item.active {
+  background: rgba(18, 183, 214, 0.12);
+
+  color: var(--app-primary-dark);
+}
+
+.menu-item.active ion-icon {
+  color: var(--app-primary);
+}
+
+.new-badge {
+  margin-left: auto;
+
+  padding: 4px 6px;
+
+  border-radius: 4px;
+
+  background: #2ac98b;
+
+  color: #ffffff;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 0.03em;
+}
+
+/* Footer */
+
+.sidebar-footer {
+  padding: 14px;
+
+  border-top: 1px solid var(--app-border);
+}
+
+.logout-button {
+  width: 100%;
+  min-height: 48px;
+
+  padding: 0 15px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: var(--app-text-secondary);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.logout-button ion-icon {
+  font-size: 23px;
+}
+
+.logout-button:hover {
+  background: rgba(214, 69, 69, 0.08);
+
+  color: var(--app-danger);
+}

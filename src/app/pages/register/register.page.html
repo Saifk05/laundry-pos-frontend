@@ -1,0 +1,270 @@
+<ion-content [fullscreen]="true">
+
+  <main class="auth-page">
+
+    <section class="auth-brand">
+
+      <a
+        class="back-link"
+        routerLink="/">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Back to home
+      </a>
+
+      <div class="brand">
+        Laundry<span>Flow</span>
+      </div>
+
+      <div class="brand-content">
+
+        <span class="eyebrow">
+          Laundry POS
+        </span>
+
+        <h1>
+          Everything you need to
+          run your laundry business.
+        </h1>
+
+        <p>
+          Start managing customers, orders and
+          laundry operations from one simple,
+          professional workspace.
+        </p>
+
+        <div class="brand-points">
+
+          <div>
+            <span>01</span>
+
+            <div>
+              <strong>Create orders quickly</strong>
+
+              <p>
+                Find customers, select services and
+                create orders in seconds.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <span>02</span>
+
+            <div>
+              <strong>Keep everything organized</strong>
+
+              <p>
+                Track your customer's laundry through
+                every stage of the process.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <span>03</span>
+
+            <div>
+              <strong>Simple by design</strong>
+
+              <p>
+                No complicated workflows or unnecessary
+                screens for your staff.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="auth-form-section">
+
+      <div class="auth-form-wrapper">
+
+        <div class="mobile-brand">
+          Laundry<span>Flow</span>
+        </div>
+
+        <div class="form-heading">
+
+          <span class="eyebrow">
+            Get started
+          </span>
+
+          <h2>
+            Create your account
+          </h2>
+
+          <p>
+            Enter your information to create your account.
+          </p>
+
+        </div>
+
+
+        <div
+          class="error-message"
+          *ngIf="errorMessage">
+
+          {{ errorMessage }}
+
+        </div>
+
+
+        <form
+          [formGroup]="registerForm"
+          (ngSubmit)="register()">
+
+          <div class="name-grid">
+
+            <div class="form-group">
+
+              <label>
+                First name
+              </label>
+
+              <ion-input
+                type="text"
+                formControlName="firstName"
+                placeholder="First name">
+              </ion-input>
+
+              <small
+                *ngIf="
+                  registerForm.get('firstName')?.touched &&
+                  registerForm.get('firstName')?.invalid
+                ">
+                First name is required.
+              </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Last name
+              </label>
+
+              <ion-input
+                type="text"
+                formControlName="lastName"
+                placeholder="Last name">
+              </ion-input>
+
+              <small
+                *ngIf="
+                  registerForm.get('lastName')?.touched &&
+                  registerForm.get('lastName')?.invalid
+                ">
+                Last name is required.
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Email address
+            </label>
+
+            <ion-input
+              type="email"
+              formControlName="email"
+              placeholder="Enter your email">
+            </ion-input>
+
+            <small
+              *ngIf="
+                registerForm.get('email')?.touched &&
+                registerForm.get('email')?.invalid
+              ">
+              Enter a valid email address.
+            </small>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Password
+            </label>
+
+            <div class="password-field">
+
+              <ion-input
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Create a password">
+              </ion-input>
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()">
+
+                <ion-icon
+                  [name]="
+                    showPassword
+                      ? 'eye-off-outline'
+                      : 'eye-outline'
+                  ">
+                </ion-icon>
+
+              </button>
+
+            </div>
+
+            <small
+              *ngIf="
+                registerForm.get('password')?.touched &&
+                registerForm.get('password')?.invalid
+              ">
+              Password must contain at least 6 characters.
+            </small>
+
+          </div>
+
+
+          <ion-button
+            type="submit"
+            expand="block"
+            [disabled]="loading">
+
+            {{
+              loading
+                ? 'Creating account...'
+                : 'Create Account'
+            }}
+
+          </ion-button>
+
+        </form>
+
+
+        <div class="auth-switch">
+
+          <span>
+            Already have an account?
+          </span>
+
+          <a routerLink="/login">
+            Login
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</ion-content>
