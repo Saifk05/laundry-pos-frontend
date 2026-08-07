@@ -1,13 +1,273 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dashboard</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="dashboard-page">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
+  <!-- DASHBOARD TITLE -->
+  <header class="dashboard-toolbar">
+
+    <div class="toolbar-title">
+      <h1>Delivery Dashboard</h1>
+
+      <p>
+        Orders grouped by delivery date
+      </p>
+    </div>
+
+  </header>
+
+
+  <!-- DELIVERY BOARD -->
+  <section class="delivery-board">
+
+    <div class="board-scroll">
+
+      <div
+        class="board-grid"
+        [style.--day-count]="deliveryDays.length">
+
+
+        <!-- DELIVERY DATE -->
+
+        <div class="row-label header-label">
+          Delivery Date
+        </div>
+
+        @for (
+          day of deliveryDays;
+          track day.date;
+          let index = $index
+        ) {
+
+          <div
+            class="day-header"
+            [class.current-day]="index === deliveryDays.length - 1">
+
+            {{ day.date }}
+
+          </div>
+
+        }
+
+
+        <!-- TOTAL -->
+
+        <div class="row-label total-label">
+          Total
+        </div>
+
+        @for (day of deliveryDays; track day.date) {
+
+          <div class="summary-cell total-cell">
+
+            <strong>
+              {{ day.totalOrders }}
+            </strong>
+
+            <span>-</span>
+
+            <strong>
+              {{ day.totalPieces }} pc
+            </strong>
+
+          </div>
+
+        }
+
+
+        <!-- PROCESSING -->
+
+        <div class="row-label processing-label">
+          Processing
+        </div>
+
+        @for (day of deliveryDays; track day.date) {
+
+          <div class="summary-cell processing-cell">
+
+            <strong>
+              {{ day.processingOrders }}
+            </strong>
+
+            <span>-</span>
+
+            <strong>
+              {{ day.processingPieces }} pc
+            </strong>
+
+          </div>
+
+        }
+
+
+        <!-- READY -->
+
+        <div class="row-label ready-label">
+          Ready
+        </div>
+
+        @for (day of deliveryDays; track day.date) {
+
+          <div class="summary-cell ready-cell">
+
+            <strong>
+              {{ day.readyOrders }}
+            </strong>
+
+            <span>-</span>
+
+            <strong>
+              {{ day.readyPieces }} pc
+            </strong>
+
+          </div>
+
+        }
+
+
+        <!-- ORDERS LABEL -->
+
+        <div class="orders-label">
+          Orders
+        </div>
+
+
+        <!-- ORDER COLUMNS -->
+
+        @for (day of deliveryDays; track day.date) {
+
+          <div class="day-orders">
+
+            @if (day.orders.length === 0) {
+
+              <div class="empty-orders">
+                No orders
+              </div>
+
+            } @else {
+
+              @for (
+                order of day.orders;
+                track order.orderNumber
+              ) {
+
+                <article
+                  class="order-row"
+                  [class.highlighted]="order.highlighted"
+                  [class.order-ready]="order.ready">
+
+
+                  <div class="order-sequence">
+                    {{ order.sequence }}.
+                  </div>
+
+
+                  <div class="order-information">
+
+                    <div class="order-main">
+
+                      <strong class="order-number">
+                        {{ order.orderNumber }}
+                      </strong>
+
+                      <span class="separator">
+                        -
+                      </span>
+
+                      <span class="pieces">
+                        {{ order.pieces }} pc
+                      </span>
+
+                      <span class="separator">
+                        -
+                      </span>
+
+                      <span class="amount">
+                        ₹{{ order.amount }}
+                      </span>
+
+                      <span class="separator">
+                        -
+                      </span>
+
+                      <span class="delivery-time">
+                        {{ order.deliveryTime }}
+                      </span>
+
+                    </div>
+
+
+                    <div class="customer">
+
+                      <span class="phone-icon">
+                        ☎
+                      </span>
+
+                      <span class="customer-name">
+                        {{ order.customerName }}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+                  <div class="order-status">
+
+                    @if (order.ready) {
+
+                      <span
+                        class="ready-check"
+                        title="Ready">
+
+                        ✓
+
+                      </span>
+
+                    } @else {
+
+                      <span
+                        class="processing-dot"
+                        title="Processing">
+                      </span>
+
+                    }
+
+                  </div>
+
+                </article>
+
+              }
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LEGEND -->
+
+  <footer class="dashboard-legend">
+
+    <div>
+      <span class="legend-color processing"></span>
+      Processing
+    </div>
+
+    <div>
+      <span class="legend-color ready"></span>
+      Ready
+    </div>
+
+    <div>
+      <span class="legend-color highlighted"></span>
+      Ready Order
+    </div>
+
+  </footer>
+
+</div>

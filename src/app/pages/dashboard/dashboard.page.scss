@@ -1,0 +1,505 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard-page {
+  width: 100%;
+  min-height: 100%;
+
+  padding: 18px;
+
+  background: #f5f7f8;
+  color: var(--app-text-primary);
+}
+
+/* =========================================
+   DASHBOARD TITLE
+========================================= */
+
+.dashboard-toolbar {
+  margin-bottom: 14px;
+}
+
+.toolbar-title h1 {
+  margin: 0;
+
+  font-family: var(--app-font-heading);
+
+  font-size: 24px;
+  font-weight: 800;
+
+  letter-spacing: -0.03em;
+}
+
+.toolbar-title p {
+  margin: 4px 0 0;
+
+  color: var(--app-text-secondary);
+
+  font-size: 11px;
+}
+
+/* =========================================
+   DELIVERY BOARD
+========================================= */
+
+.delivery-board {
+  width: 100%;
+
+  border: 1px solid #dfe4e6;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  overflow: hidden;
+
+  box-shadow: var(--app-shadow-sm);
+}
+
+.board-scroll {
+  width: 100%;
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.board-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.board-grid {
+  --day-count: 6;
+
+  min-width: 1250px;
+
+  display: grid;
+
+  grid-template-columns:
+    125px
+    repeat(var(--day-count), minmax(170px, 1fr));
+
+  align-items: stretch;
+}
+
+/* =========================================
+   COMMON CELLS
+========================================= */
+
+.row-label,
+.day-header,
+.summary-cell,
+.orders-label,
+.day-orders {
+  border-right: 1px solid #dfe4e6;
+  border-bottom: 1px solid #dfe4e6;
+}
+
+.row-label,
+.orders-label {
+  position: sticky;
+
+  left: 0;
+
+  z-index: 5;
+}
+
+.row-label {
+  min-height: 44px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+
+  background: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================================
+   DATE HEADER
+========================================= */
+
+.header-label {
+  min-height: 52px;
+
+  background: #2f3336;
+  color: #ffffff;
+
+  font-size: 12px;
+}
+
+.day-header {
+  min-height: 52px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #5f2ea6;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: center;
+}
+
+.day-header.current-day {
+  background: #dd4848;
+}
+
+/* =========================================
+   SUMMARY ROWS
+========================================= */
+
+.total-label {
+  background: #d7eff7;
+}
+
+.processing-label {
+  background: #fff3c4;
+}
+
+.ready-label {
+  background: #d9f2df;
+}
+
+.summary-cell {
+  min-height: 44px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.summary-cell span {
+  color: #80878a;
+}
+
+.total-cell {
+  background: #eaf6fb;
+}
+
+.processing-cell {
+  background: #fff8db;
+}
+
+.ready-cell {
+  background: #e9f7ed;
+}
+
+/* =========================================
+   ORDER COLUMNS
+========================================= */
+
+.orders-label {
+  padding: 14px;
+
+  background: #2f3336;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.day-orders {
+  min-height: 500px;
+
+  background: #ffffff;
+}
+
+.empty-orders {
+  min-height: 90px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--app-text-muted);
+
+  font-size: 10px;
+}
+
+/* =========================================
+   ORDER ROW
+========================================= */
+
+.order-row {
+  min-height: 82px;
+
+  padding: 10px 9px;
+
+  display: grid;
+
+  grid-template-columns:
+    22px
+    minmax(0, 1fr)
+    24px;
+
+  gap: 7px;
+
+  border-bottom: 1px solid #e6eaec;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.order-row:hover {
+  position: relative;
+
+  z-index: 2;
+
+  background: #f8fbfc;
+
+  box-shadow: inset 0 0 0 1px rgba(18, 183, 214, 0.2);
+}
+
+.order-row.highlighted {
+  background: #83dca0;
+}
+
+.order-row.highlighted:hover {
+  background: #72d493;
+}
+
+.order-row.order-ready:not(.highlighted) {
+  background: #eef9f1;
+}
+
+/* =========================================
+   ORDER CONTENT
+========================================= */
+
+.order-sequence {
+  padding-top: 2px;
+
+  color: #545b5e;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.order-information {
+  min-width: 0;
+}
+
+.order-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 3px;
+
+  line-height: 1.5;
+}
+
+.order-number {
+  color: #1d2325;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.separator {
+  color: #969da0;
+
+  font-size: 9px;
+}
+
+.pieces,
+.amount,
+.delivery-time {
+  color: #343b3d;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.customer {
+  margin-top: 8px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.phone-icon {
+  color: #208445;
+
+  font-size: 10px;
+}
+
+.customer-name {
+  overflow: hidden;
+
+  color: #252b2d;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================
+   ORDER STATUS
+========================================= */
+
+.order-status {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.ready-check {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #20b963;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.processing-dot {
+  width: 9px;
+  height: 9px;
+
+  margin-top: 5px;
+
+  border-radius: 50%;
+
+  background: #e5a000;
+
+  box-shadow:
+    0 0 0 3px rgba(229, 160, 0, 0.12);
+}
+
+/* =========================================
+   LEGEND
+========================================= */
+
+.dashboard-legend {
+  margin-top: 12px;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 18px;
+
+  color: var(--app-text-secondary);
+
+  font-size: 10px;
+}
+
+.dashboard-legend > div {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.legend-color {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 2px;
+}
+
+.legend-color.processing {
+  background: #fff3c4;
+
+  border: 1px solid #e5a000;
+}
+
+.legend-color.ready {
+  background: #d9f2df;
+
+  border: 1px solid #2ebf65;
+}
+
+.legend-color.highlighted {
+  background: #83dca0;
+
+  border: 1px solid #59bf7a;
+}
+
+/* =========================================
+   LOAD ANIMATION
+========================================= */
+
+@keyframes boardFadeIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delivery-board {
+  animation: boardFadeIn 0.3s ease both;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .dashboard-page {
+    padding: 14px;
+  }
+
+  .board-grid {
+    min-width: 1180px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .dashboard-page {
+    padding: 12px;
+  }
+
+  .toolbar-title h1 {
+    font-size: 21px;
+  }
+
+  .board-grid {
+    min-width: 1120px;
+  }
+}

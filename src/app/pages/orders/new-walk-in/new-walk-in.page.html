@@ -1,0 +1,844 @@
+<div class="walkin-page">
+
+  <!-- LEFT SIDE -->
+  <section class="order-panel">
+
+    <!-- CUSTOMER -->
+    <div class="customer-section">
+
+      <div class="section-title">
+        <div>
+          <h2>New Walk-in</h2>
+          <p>Create a new laundry order</p>
+        </div>
+      </div>
+
+      <div class="customer-grid">
+
+        <div class="field-group">
+          <label>Customer Name</label>
+
+          <input
+            type="text"
+            [(ngModel)]="customerName"
+            placeholder="Enter customer name">
+        </div>
+
+        <div class="field-group">
+
+          <label>Phone Number</label>
+
+          <input
+            type="tel"
+            [(ngModel)]="customerPhone"
+            (ngModelChange)="onPhoneChange()"
+            maxlength="10"
+            inputmode="numeric"
+            placeholder="Enter phone number">
+
+          @if (customerMessage) {
+
+            <div
+              class="customer-status"
+              [class.customer-found]="customerFound"
+              [class.customer-new]="newCustomer">
+
+              {{ customerMessage }}
+
+            </div>
+
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ORDER ITEMS -->
+    <div class="items-section">
+
+      <div class="section-title">
+
+        <div>
+
+          <h3>Order Items</h3>
+
+          <p>
+            {{ totalPieces }} pieces added
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (orderItems.length === 0) {
+
+        <div class="empty-items">
+
+          <div class="empty-icon">
+            🧺
+          </div>
+
+          <h4>No items added</h4>
+
+          <p>
+            Select a product and service from the right side.
+          </p>
+
+        </div>
+
+      } @else {
+
+        <div class="order-items-list">
+
+          @for (
+            item of orderItems;
+            track item.productId + '-' + item.serviceId
+          ) {
+
+            <article class="order-item">
+
+              <div class="item-main">
+
+                <div>
+
+                  <strong>
+                    {{ item.productName }}
+                  </strong>
+
+                  <span>
+                    {{ item.serviceName }}
+                  </span>
+
+                </div>
+
+                <button
+                  type="button"
+                  class="remove-item"
+                  (click)="removeItem(item)">
+                  ×
+                </button>
+
+              </div>
+
+
+              <div class="item-bottom">
+
+                <div class="quantity-control">
+
+                  <button
+                    type="button"
+                    (click)="decreaseQuantity(item)">
+                    −
+                  </button>
+
+                  <span>
+                    {{ item.quantity }}
+                  </span>
+
+                  <button
+                    type="button"
+                    (click)="increaseQuantity(item)">
+                    +
+                  </button>
+
+                </div>
+
+
+                <div class="item-price">
+
+                  <small>
+                    ₹{{ item.price }} each
+                  </small>
+
+                  <strong>
+                    ₹{{ item.total }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </div>
+
+
+    <!-- ORDER OPTIONS -->
+    <div class="order-options">
+
+      <div class="section-title">
+
+        <div>
+
+          <h3>Order Options</h3>
+
+          <p>
+            Delivery and processing preferences
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="options-grid">
+
+        <div class="field-group">
+
+          <label>Delivery Date</label>
+
+          <input
+            type="date"
+            [(ngModel)]="deliveryDate">
+
+        </div>
+
+
+        <div class="field-group">
+
+          <label>Delivery Time</label>
+
+          <select [(ngModel)]="deliveryTime">
+
+            <option value="09:00 AM - 12:00 PM">
+              09:00 AM - 12:00 PM
+            </option>
+
+            <option value="12:00 PM - 03:00 PM">
+              12:00 PM - 03:00 PM
+            </option>
+
+            <option value="03:00 PM - 06:00 PM">
+              03:00 PM - 06:00 PM
+            </option>
+
+            <option value="06:00 PM - 09:00 PM">
+              06:00 PM - 09:00 PM
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- DELIVERY OPTIONS -->
+      <div class="toggle-row">
+
+        <label class="toggle-option">
+
+          <input
+            type="checkbox"
+            [(ngModel)]="homeDelivery">
+
+          <span class="toggle-box"></span>
+
+          <div>
+
+            <strong>
+              Home Delivery
+            </strong>
+
+            <small>
+              Deliver order to customer
+            </small>
+
+          </div>
+
+        </label>
+
+
+        <label class="toggle-option">
+
+          <input
+            type="checkbox"
+            [(ngModel)]="expressDelivery">
+
+          <span class="toggle-box"></span>
+
+          <div>
+
+            <strong>
+              Express
+            </strong>
+
+            <small>
+              Additional ₹100
+            </small>
+
+          </div>
+
+        </label>
+
+      </div>
+
+
+      <!-- PROCESSING AREA -->
+      <div class="processing-area-section">
+
+        <span class="processing-area-label">
+          Processing Area
+        </span>
+
+        <div class="area-options">
+
+          <label
+            class="area-option"
+            [class.selected]="washingArea">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="washingArea">
+
+            <span class="area-check">
+              ✓
+            </span>
+
+            <span>
+              Washing Area
+            </span>
+
+          </label>
+
+
+          <label
+            class="area-option"
+            [class.selected]="pressingArea">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="pressingArea">
+
+            <span class="area-check">
+              ✓
+            </span>
+
+            <span>
+              Pressing Area
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ORDER SUMMARY -->
+    <div class="summary-section">
+
+      <div class="section-title">
+
+        <div>
+
+          <h3>Order Summary</h3>
+
+          <p>
+            Review the final order amount
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary-row">
+
+        <span>
+          Total Pieces
+        </span>
+
+        <strong>
+          {{ totalPieces }}
+        </strong>
+
+      </div>
+
+
+      <div class="summary-row">
+
+        <span>
+          Subtotal
+        </span>
+
+        <strong>
+          ₹{{ subtotal }}
+        </strong>
+
+      </div>
+
+
+      <!-- COUPON -->
+      <div class="coupon-section">
+
+        <div class="coupon-title-row">
+
+          <span>
+            Coupon
+          </span>
+
+          @if (couponApplied) {
+
+            <button
+              type="button"
+              class="remove-coupon-button"
+              (click)="removeCoupon()">
+
+              Remove
+
+            </button>
+
+          }
+
+        </div>
+
+
+        <div class="coupon-dropdown">
+
+          <button
+            type="button"
+            class="coupon-dropdown-trigger"
+            [class.open]="couponDropdownOpen"
+            [class.has-coupon]="couponApplied"
+            (click)="toggleCouponDropdown()">
+
+            <div class="coupon-trigger-content">
+
+              @if (couponApplied) {
+
+                <div class="selected-coupon-info">
+
+                  <strong>
+                    {{ couponCode }}
+                  </strong>
+
+                  <span>
+                    ₹{{ couponDiscount }} discount
+                  </span>
+
+                </div>
+
+              } @else {
+
+                <span class="coupon-placeholder">
+                  Select Coupon
+                </span>
+
+              }
+
+            </div>
+
+            <span
+              class="dropdown-arrow"
+              [class.rotate]="couponDropdownOpen">
+
+              ▾
+
+            </span>
+
+          </button>
+
+
+          @if (couponDropdownOpen) {
+
+            <div class="coupon-dropdown-menu">
+
+              @for (
+                coupon of coupons;
+                track coupon.code
+              ) {
+
+                <button
+                  type="button"
+                  class="coupon-dropdown-item"
+                  [class.inactive]="!coupon.active"
+                  [class.selected]="
+                    couponApplied &&
+                    couponCode === coupon.code
+                  "
+                  [disabled]="!coupon.active"
+                  (click)="selectCoupon(coupon)">
+
+                  <div class="coupon-item-left">
+
+                    <span class="coupon-circle">
+
+                      @if (
+                        couponApplied &&
+                        couponCode === coupon.code
+                      ) {
+
+                        ✓
+
+                      }
+
+                    </span>
+
+                    <div>
+
+                      <strong>
+                        {{ coupon.code }}
+                      </strong>
+
+                      <span>
+                        Flat ₹{{ coupon.amount }} off
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+                  <div class="coupon-item-right">
+
+                    @if (coupon.active) {
+
+                      <span class="coupon-active">
+                        Active
+                      </span>
+
+                    } @else {
+
+                      <span class="coupon-inactive">
+                        Inactive
+                      </span>
+
+                    }
+
+                    <strong>
+                      -₹{{ coupon.amount }}
+                    </strong>
+
+                  </div>
+
+                </button>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+
+        @if (couponMessage) {
+
+          <div
+            class="coupon-message"
+            [class.coupon-success]="couponApplied"
+            [class.coupon-error]="!couponApplied">
+
+            {{ couponMessage }}
+
+          </div>
+
+        }
+
+      </div>
+
+
+      @if (couponDiscount > 0) {
+
+        <div class="summary-row coupon-discount-row">
+
+          <span>
+            Coupon Discount
+          </span>
+
+          <strong>
+            -₹{{ couponDiscount }}
+          </strong>
+
+        </div>
+
+      }
+
+
+      @if (expressDelivery) {
+
+        <div class="summary-row">
+
+          <span>
+            Express Charge
+          </span>
+
+          <strong>
+            +₹100
+          </strong>
+
+        </div>
+
+      }
+
+
+      <div class="summary-row total-row">
+
+        <span>
+          Grand Total
+        </span>
+
+        <strong>
+          ₹{{ grandTotal }}
+        </strong>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="create-order-button"
+        [disabled]="creatingOrder"
+        (click)="createOrder()">
+
+        @if (creatingOrder) {
+
+          Creating Order...
+
+        } @else {
+
+          Create Order
+
+        }
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- RIGHT SIDE -->
+  <section class="products-panel">
+
+    <!-- SEARCH -->
+    <div class="product-header">
+
+      <div>
+
+        <h2>
+          Select Product
+        </h2>
+
+        <p>
+          Choose garment and service
+        </p>
+
+      </div>
+
+
+      <div class="search-box">
+
+        <span>
+          ⌕
+        </span>
+
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search product">
+
+      </div>
+
+    </div>
+
+
+    <!-- CATEGORY FILTER -->
+    <div class="category-tabs">
+
+      @for (
+        category of categories;
+        track category
+      ) {
+
+        <button
+          type="button"
+          [class.active]="selectedCategory === category"
+          (click)="selectCategory(category)">
+
+          {{ category }}
+
+        </button>
+
+      }
+
+    </div>
+
+
+    <!-- PRODUCT GRID -->
+    <div class="product-grid">
+
+      @if (loadingProducts) {
+
+        <div class="products-state">
+          Loading products...
+        </div>
+
+      } @else if (filteredProducts.length === 0) {
+
+        <div class="products-state">
+          No products found
+        </div>
+
+      } @else {
+
+        @for (
+          product of filteredProducts;
+          track product.id
+        ) {
+
+          <article class="product-card">
+
+            <div class="product-top">
+
+              <div class="product-icon">
+                {{ product.icon }}
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ product.name }}
+                </strong>
+
+                <span>
+                  {{ product.category }}
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="service-list">
+
+              @for (
+                service of product.services;
+                track service.serviceId
+              ) {
+
+                <button
+                  type="button"
+                  class="service-option"
+                  (click)="addProduct(product, service)">
+
+                  <div>
+
+                    <span>
+                      {{ service.name }}
+                    </span>
+
+                    <small>
+                      ₹{{ service.price }}
+                    </small>
+
+                  </div>
+
+                  <span class="add-service">
+                    +
+                  </span>
+
+                </button>
+
+              }
+
+            </div>
+
+          </article>
+
+        }
+
+      }
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- ORDER SUCCESS MODAL -->
+@if (orderCreated) {
+
+  <div class="order-success-overlay">
+
+    <div class="order-success-modal">
+
+      <div class="order-success-content">
+
+        <h2>
+          Order #{{ createdOrderNumber }}
+        </h2>
+
+        <p>
+          Order created successfully.
+        </p>
+
+        <p>
+          Print the receipt and give one copy to the customer.
+        </p>
+
+      </div>
+
+
+      <div class="order-success-actions">
+
+        <button
+          type="button"
+          class="modal-action close"
+          (click)="closeOrderModal()">
+
+          Close
+
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-action"
+          (click)="printReceipt()">
+
+          Print Receipt
+
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-action primary"
+          (click)="printTag()">
+
+          Print Tag
+
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-action"
+          (click)="printQrTag()">
+
+          Print QR Tag
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
