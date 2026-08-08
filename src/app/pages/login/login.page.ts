@@ -116,7 +116,7 @@ export class LoginPage implements OnInit {
 
         this.loading = false;
 
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/app/dashboard']);
       },
       error: (error) => {
 
