@@ -1,5 +1,6 @@
 <aside class="sidebar">
 
+  <!-- BRAND -->
   <div class="sidebar-brand">
 
     <div class="brand-mark">
@@ -7,15 +8,24 @@
     </div>
 
     <div class="brand-text">
-      <strong>LaundryFlow</strong>
-      <span>Laundry POS</span>
+
+      <strong>
+        LaundryFlow
+      </strong>
+
+      <span>
+        Laundry POS
+      </span>
+
     </div>
 
   </div>
 
 
+  <!-- MENU -->
   <nav class="sidebar-menu">
 
+    <!-- HOME -->
     <a
       routerLink="/app/dashboard"
       routerLinkActive="active"
@@ -31,6 +41,7 @@
     </a>
 
 
+    <!-- NEW WALK-IN -->
     <a
       routerLink="/app/new-walk-in"
       routerLinkActive="active"
@@ -45,6 +56,7 @@
     </a>
 
 
+    <!-- PICKUP / DROP -->
     <a
       routerLink="/app/pickup-drop"
       routerLinkActive="active"
@@ -63,6 +75,7 @@
     </a>
 
 
+    <!-- B2C ORDER -->
     <a
       routerLink="/app/b2c-orders"
       routerLinkActive="active"
@@ -77,6 +90,7 @@
     </a>
 
 
+    <!-- VENDOR ORDER -->
     <a
       routerLink="/app/vendor-orders"
       routerLinkActive="active"
@@ -91,6 +105,7 @@
     </a>
 
 
+    <!-- CLIENT ORDER -->
     <a
       routerLink="/app/client-orders"
       routerLinkActive="active"
@@ -105,6 +120,7 @@
     </a>
 
 
+    <!-- FAB CREDIT -->
     <a
       routerLink="/app/fab-credit"
       routerLinkActive="active"
@@ -119,6 +135,7 @@
     </a>
 
 
+    <!-- SETTLEMENT -->
     <a
       routerLink="/app/settlement"
       routerLinkActive="active"
@@ -133,6 +150,7 @@
     </a>
 
 
+    <!-- BILL -->
     <a
       routerLink="/app/bill"
       routerLinkActive="active"
@@ -147,6 +165,7 @@
     </a>
 
 
+    <!-- PAYMENT -->
     <a
       routerLink="/app/payments"
       routerLinkActive="active"
@@ -161,6 +180,7 @@
     </a>
 
 
+    <!-- CHECK RZP PAYMENT -->
     <a
       routerLink="/app/check-payment"
       routerLinkActive="active"
@@ -177,14 +197,29 @@
   </nav>
 
 
+  <!-- FOOTER -->
   <div class="sidebar-footer">
 
-    <button class="logout-button">
+    <button
+      type="button"
+      class="logout-button"
+      [disabled]="loggingOut"
+      (click)="logout()">
 
       <ion-icon name="log-out-outline"></ion-icon>
 
       <span>
-        Logout
+
+        @if (loggingOut) {
+
+          Logging out...
+
+        } @else {
+
+          Logout
+
+        }
+
       </span>
 
     </button>

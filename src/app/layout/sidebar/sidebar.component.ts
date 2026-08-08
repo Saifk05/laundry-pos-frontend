@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+
 import {
+  Router,
   RouterLink,
   RouterLinkActive
 } from '@angular/router';
+
 import { IonIcon } from '@ionic/angular/standalone';
+
 import { addIcons } from 'ionicons';
+
 import {
   homeOutline,
   walkOutline,
@@ -19,6 +24,8 @@ import {
   logOutOutline
 } from 'ionicons/icons';
 
+import { ApiService } from '../../../core/services/api.service';
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -30,9 +37,15 @@ import {
     IonIcon
   ]
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent {
 
-  constructor() {
+  loggingOut = false;
+
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly router: Router
+  ) {
+
     addIcons({
       homeOutline,
       walkOutline,
@@ -48,7 +61,38 @@ export class SidebarComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  logout(): void {
+
+    if (this.loggingOut) {
+      return;
+    }
+
+    this.loggingOut = true;
+
+    this.apiService
+      .logout()
+      .subscribe({
+        next: () => {
+
+          this.clearSession();
+
+          this.router.navigateByUrl('/');
+        },
+
+        error: () => {
+
+          this.clearSession();
+
+          this.router.navigateByUrl('/');
+        }
+      });
   }
 
+  private clearSession(): void {
+
+    localStorage.removeItem('activeToken');
+    localStorage.removeItem('refreshToken');
+
+    this.loggingOut = false;
+  }
 }
