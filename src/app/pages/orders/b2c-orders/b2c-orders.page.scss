@@ -1,0 +1,624 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.b2c-page {
+  width: 100%;
+  min-height: 100%;
+
+  padding: var(--app-space-lg);
+
+  background: var(--app-background);
+  color: var(--app-text-primary);
+}
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.page-header {
+  margin-bottom: var(--app-space-lg);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--app-space-md);
+}
+
+.page-header h1 {
+  margin: 0;
+
+  font-family: var(--app-font-heading);
+  font-size: var(--app-font-size-xl);
+  font-weight: 800;
+
+  letter-spacing: -0.03em;
+
+  color: var(--app-text-primary);
+}
+
+.page-header p {
+  margin: var(--app-space-xs) 0 0;
+
+  color: var(--app-text-secondary);
+
+  font-size: var(--app-font-size-xs);
+}
+
+/* =========================================
+   STATUS SECTION
+========================================= */
+
+.status-section {
+  margin-bottom: var(--app-space-md);
+}
+
+.status-tabs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: var(--app-space-sm);
+}
+
+.status-tab {
+  min-height: 34px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-round);
+
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-xs);
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background var(--app-transition),
+    color var(--app-transition),
+    border-color var(--app-transition),
+    transform var(--app-transition);
+}
+
+.status-tab:hover {
+  border-color: var(--app-primary);
+
+  color: var(--app-primary-dark);
+
+  transform: translateY(-1px);
+}
+
+.status-tab.active {
+  border-color: var(--app-primary);
+
+  background: var(--app-primary);
+  color: var(--app-text-light);
+}
+
+/* =========================================
+   FILTER SECTION
+========================================= */
+
+.filter-section {
+  margin-bottom: var(--app-space-md);
+
+  padding: var(--app-space-md);
+
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  gap: var(--app-space-md);
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+
+  background: var(--app-surface);
+}
+
+.filter-field {
+  min-width: 220px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--app-space-sm);
+}
+
+.filter-field label {
+  color: var(--app-text-primary);
+
+  font-size: var(--app-font-size-xs);
+  font-weight: 700;
+}
+
+.filter-field input {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+
+  background: var(--app-background-soft);
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-sm);
+
+  outline: none;
+
+  transition:
+    border-color var(--app-transition),
+    box-shadow var(--app-transition),
+    background var(--app-transition);
+}
+
+.filter-field input::placeholder {
+  color: var(--app-text-muted);
+}
+
+.filter-field input:focus {
+  border-color: var(--app-primary);
+
+  background: var(--app-surface);
+
+  box-shadow:
+    0 0 0 3px rgba(18, 183, 214, 0.08);
+}
+
+.clear-button {
+  min-width: 90px;
+  height: 42px;
+
+  padding: 0 16px;
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-xs);
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    border-color var(--app-transition),
+    color var(--app-transition),
+    background var(--app-transition);
+}
+
+.clear-button:hover {
+  border-color: var(--app-primary);
+
+  background: var(--app-background-soft);
+  color: var(--app-primary-dark);
+}
+
+/* =========================================
+   RESULT INFO
+========================================= */
+
+.result-info {
+  margin-bottom: var(--app-space-sm);
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  color: var(--app-text-secondary);
+
+  font-size: var(--app-font-size-xs);
+  font-weight: 600;
+}
+
+/* =========================================
+   TABLE WRAPPER
+========================================= */
+
+.orders-table-wrapper {
+  width: 100%;
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+
+  background: var(--app-surface);
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  scrollbar-width: none;
+}
+
+.orders-table-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.orders-table {
+  width: 100%;
+  min-width: 2200px;
+
+  border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 13px 14px;
+
+  border-bottom: 1px solid var(--app-border);
+
+  text-align: left;
+  vertical-align: middle;
+
+  white-space: nowrap;
+}
+
+.orders-table th {
+  background: var(--app-background-dark);
+  color: var(--app-text-light);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-xs);
+  font-weight: 700;
+}
+
+.orders-table td {
+  background: var(--app-surface);
+
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-xs);
+  font-weight: 500;
+}
+
+.orders-table tbody tr {
+  transition: background var(--app-transition);
+}
+
+.orders-table tbody tr:hover td {
+  background: var(--app-background-soft);
+}
+
+.orders-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================================
+   ACTIONS COLUMN
+========================================= */
+
+.actions-column {
+  min-width: 520px;
+}
+
+.actions-cell {
+  min-width: 520px;
+
+  position: relative;
+}
+
+.actions-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+
+  gap: var(--app-space-sm);
+}
+
+.action-button {
+  min-height: 32px;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--app-primary);
+  border-radius: var(--app-radius-sm);
+
+  background: var(--app-primary);
+  color: var(--app-text-light);
+
+  font-family: var(--app-font-body);
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background var(--app-transition),
+    border-color var(--app-transition),
+    transform var(--app-transition);
+}
+
+.action-button:hover {
+  background: var(--app-primary-dark);
+  border-color: var(--app-primary-dark);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   MORE MENU
+========================================= */
+
+.more-wrapper {
+  position: relative;
+
+  flex-shrink: 0;
+}
+
+.more-button {
+  min-width: 72px;
+  height: 32px;
+
+  padding: 0 12px;
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-xs);
+  font-weight: 700;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background var(--app-transition),
+    border-color var(--app-transition),
+    color var(--app-transition);
+}
+
+.more-button:hover {
+  border-color: var(--app-primary);
+
+  background: var(--app-background-soft);
+  color: var(--app-primary-dark);
+}
+
+.more-menu {
+  position: absolute;
+
+  top: calc(100% + 8px);
+  right: 0;
+
+  z-index: 50;
+
+  width: 250px;
+
+  padding: var(--app-space-sm);
+
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+
+  background: var(--app-surface);
+
+  box-shadow: var(--app-shadow-lg);
+}
+
+.more-menu button {
+  width: 100%;
+  min-height: 42px;
+
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+
+  border: 0;
+  border-radius: var(--app-radius-sm);
+
+  background: transparent;
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-body);
+  font-size: var(--app-font-size-xs);
+  font-weight: 600;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background var(--app-transition),
+    color var(--app-transition);
+}
+
+.more-menu button:hover {
+  background: var(--app-background-soft);
+  color: var(--app-primary-dark);
+}
+
+/* =========================================
+   ORDER NUMBER
+========================================= */
+
+.order-number {
+  color: var(--app-primary-dark);
+
+  font-weight: 800;
+}
+
+/* =========================================
+   CUSTOMER
+========================================= */
+
+.customer-address {
+  min-width: 220px;
+  max-width: 280px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================
+   STATUS BADGE
+========================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 28px;
+
+  padding: 0 10px;
+
+  border-radius: var(--app-radius-round);
+
+  background: var(--app-surface-soft);
+  color: var(--app-text-secondary);
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status-badge.status-new {
+  background: var(--app-primary-light);
+  color: var(--app-primary-dark);
+}
+
+.status-badge.status-pickup {
+  background: var(--app-secondary-light);
+  color: var(--app-warning);
+}
+
+.status-badge.status-processing {
+  background: var(--app-background-yellow);
+  color: var(--app-warning);
+}
+
+.status-badge.status-ready {
+  background: rgba(34, 160, 107, 0.12);
+  color: var(--app-success);
+}
+
+.status-badge.status-delivery {
+  background: rgba(22, 138, 173, 0.12);
+  color: var(--app-info);
+}
+
+.status-badge.status-delivered {
+  background: rgba(34, 160, 107, 0.14);
+  color: var(--app-success);
+}
+
+.status-badge.status-cancelled {
+  background: rgba(214, 69, 69, 0.1);
+  color: var(--app-danger);
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.empty-orders {
+  min-height: 220px;
+
+  padding: var(--app-space-2xl);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.empty-orders h3 {
+  margin: 0;
+
+  font-family: var(--app-font-heading);
+  font-size: var(--app-font-size-md);
+  font-weight: 700;
+
+  color: var(--app-text-primary);
+}
+
+.empty-orders p {
+  margin: var(--app-space-sm) 0 0;
+
+  color: var(--app-text-muted);
+
+  font-size: var(--app-font-size-xs);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .b2c-page {
+    padding: var(--app-space-md);
+  }
+
+  .filter-section {
+    align-items: stretch;
+  }
+
+  .filter-field {
+    flex: 1 1 220px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+
+  .status-tabs {
+    flex-wrap: nowrap;
+
+    overflow-x: auto;
+
+    padding-bottom: var(--app-space-xs);
+
+    scrollbar-width: none;
+  }
+
+  .status-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .status-tab {
+    flex-shrink: 0;
+  }
+
+  .filter-section {
+    flex-direction: column;
+  }
+
+  .filter-field,
+  .clear-button {
+    width: 100%;
+  }
+}

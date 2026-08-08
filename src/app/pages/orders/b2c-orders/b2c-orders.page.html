@@ -1,0 +1,713 @@
+<div class="b2c-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+
+    <div>
+      <h1>B2C Orders</h1>
+
+      <p>
+        Manage pickup, processing, delivery and customer orders
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- STATUS FILTERS -->
+  <section class="status-section">
+
+    <div class="status-tabs">
+
+      @for (
+        status of statuses;
+        track status
+      ) {
+
+        <button
+          type="button"
+          class="status-tab"
+          [class.active]="selectedStatus === status"
+          (click)="selectStatus(status)">
+
+          {{ status }}
+
+        </button>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <!-- SEARCH FILTERS -->
+  <section class="filter-section">
+
+    <div class="filter-field">
+
+      <label>
+        Order No.
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="orderNumberSearch"
+        placeholder="Search order number">
+
+    </div>
+
+
+    <div class="filter-field">
+
+      <label>
+        Mobile
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="mobileSearch"
+        placeholder="Search mobile number">
+
+    </div>
+
+
+    <button
+      type="button"
+      class="clear-button"
+      (click)="clearFilters()">
+
+      Clear
+
+    </button>
+
+  </section>
+
+
+  <!-- RESULT INFO -->
+  <div class="result-info">
+
+    <span>
+      {{ filteredOrders.length }} orders found
+    </span>
+
+  </div>
+
+
+  <!-- ORDERS TABLE -->
+  <section class="orders-table-wrapper">
+
+    <table class="orders-table">
+
+      <thead>
+
+        <tr>
+
+          <th class="actions-column">
+            Actions
+          </th>
+
+          <th>
+            Order No.
+          </th>
+
+          <th>
+            Order Status
+          </th>
+
+          <th>
+            Customer Name
+          </th>
+
+          <th>
+            Mobile
+          </th>
+
+          <th>
+            Address
+          </th>
+
+          <th>
+            Storage Label
+          </th>
+
+          <th>
+            Pickup Date
+          </th>
+
+          <th>
+            Pickup Timeslot
+          </th>
+
+          <th>
+            Pickup Rider
+          </th>
+
+          <th>
+            Rider Mobile
+          </th>
+
+          <th>
+            Delivery Date
+          </th>
+
+          <th>
+            Delivery Timeslot
+          </th>
+
+          <th>
+            Pieces
+          </th>
+
+          <th>
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        @for (
+          order of filteredOrders;
+          track order.orderNumber
+        ) {
+
+          <tr>
+
+            <!-- ACTIONS -->
+            <td class="actions-cell">
+
+              <div class="actions-list">
+
+                <!-- UNASSIGNED PICKUP -->
+                @if (order.status === 'Unassigned Pickup') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="assignRider(order)">
+
+                    🚲 Assign Rider
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="tagOrder(order)">
+
+                    🏷 Tag
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+                }
+
+
+                <!-- TAGGED -->
+                @if (order.status === 'Tagged') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="processAtStore(order)">
+
+                    Process At Store
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="processAtVendor(order)">
+
+                    Process At Vendor
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markDelivered(order)">
+
+                    ♥ Mark Delivered
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="retagOrder(order)">
+
+                    🏷 Re-Tag
+
+                  </button>
+
+                }
+
+
+                <!-- PROCESSING AT STORE -->
+                @if (order.status === 'Processing At Store') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markReady(order)">
+
+                    Mark Ready
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markDelivered(order)">
+
+                    ♥ Mark Delivered
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="retagOrder(order)">
+
+                    🏷 Re-Tag
+
+                  </button>
+
+                }
+
+
+                <!-- PROCESSING AT VENDOR -->
+                @if (order.status === 'Processing At Vendor') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markReady(order)">
+
+                    Mark Ready
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markDelivered(order)">
+
+                    ♥ Mark Delivered
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="retagOrder(order)">
+
+                    🏷 Re-Tag
+
+                  </button>
+
+                }
+
+
+                <!-- READY ORDER -->
+                @if (order.status === 'Ready Order') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markDelivered(order)">
+
+                    ♥ Mark Delivered
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="assignRider(order)">
+
+                    🚲 Assign Rider
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="showPaymentQr(order)">
+
+                    Show Payment QR Code
+
+                  </button>
+
+                }
+
+
+                <!-- ASSIGNED PICKUP -->
+                @if (order.status === 'Assigned Pickup') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+                }
+
+
+                <!-- OUT FOR PICKUP -->
+                @if (order.status === 'Out For Pickup') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+                }
+
+
+                <!-- OUT FOR DELIVERY -->
+                @if (order.status === 'Out For Delivery') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="markDelivered(order)">
+
+                    ♥ Mark Delivered
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="callCustomer(order)">
+
+                    ☎ Call
+
+                  </button>
+
+                }
+
+
+                <!-- DELIVERED -->
+                @if (order.status === 'Delivered') {
+
+                  <button
+                    type="button"
+                    class="action-button"
+                    (click)="viewOrder(order)">
+
+                    View
+
+                  </button>
+
+                }
+
+
+                <!-- MORE -->
+                <div class="more-wrapper">
+
+                  <button
+                    type="button"
+                    class="more-button"
+                    (click)="toggleMore(order)">
+
+                    ⋮ More
+
+                  </button>
+
+
+                  @if (order.moreOpen) {
+
+                    <div class="more-menu">
+
+                      <button
+                        type="button"
+                        (click)="reschedule(order)">
+
+                        ↻ Reschedule
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        (click)="billReceipt(order)">
+
+                        ▣ Bill Receipt
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        (click)="changeReadyStatus(order)">
+
+                        Change CLT Ready Status
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        (click)="pickupSlips(order)">
+
+                        Pickup Slips
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        (click)="settleOrder(order)">
+
+                        Settle Order
+
+                      </button>
+
+
+                      <button
+                        type="button"
+                        (click)="smsPaymentLink(order)">
+
+                        SMS Payment Link
+
+                      </button>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <!-- ORDER NUMBER -->
+            <td>
+
+              <strong class="order-number">
+                {{ order.orderNumber }}
+              </strong>
+
+            </td>
+
+
+            <!-- STATUS -->
+            <td>
+
+              <span
+                class="status-badge"
+                [class.status-new]="order.status === 'New Order'"
+                [class.status-pickup]="
+                  order.status === 'Unassigned Pickup' ||
+                  order.status === 'Assigned Pickup' ||
+                  order.status === 'Out For Pickup'
+                "
+                [class.status-processing]="
+                  order.status === 'Processing At Store' ||
+                  order.status === 'Processing At Vendor'
+                "
+                [class.status-ready]="
+                  order.status === 'Ready Order'
+                "
+                [class.status-delivery]="
+                  order.status === 'Assigned Delivery' ||
+                  order.status === 'Out For Delivery'
+                "
+                [class.status-delivered]="
+                  order.status === 'Delivered'
+                "
+                [class.status-cancelled]="
+                  order.status === 'Cancelled' ||
+                  order.status === 'Cancelled By Store'
+                ">
+
+                {{ order.status }}
+
+              </span>
+
+            </td>
+
+
+            <!-- CUSTOMER -->
+            <td>
+              {{ order.customerName }}
+            </td>
+
+
+            <!-- MOBILE -->
+            <td>
+              {{ order.mobile }}
+            </td>
+
+
+            <!-- ADDRESS -->
+            <td class="customer-address">
+
+              {{ order.address }}
+
+            </td>
+
+
+            <!-- STORAGE -->
+            <td>
+              {{ order.storageLabel }}
+            </td>
+
+
+            <!-- PICKUP DATE -->
+            <td>
+              {{ order.pickupDate }}
+            </td>
+
+
+            <!-- PICKUP SLOT -->
+            <td>
+              {{ order.pickupSlot }}
+            </td>
+
+
+            <!-- RIDER -->
+            <td>
+              {{ order.pickupRiderName }}
+            </td>
+
+
+            <!-- RIDER MOBILE -->
+            <td>
+              {{ order.pickupRiderMobile }}
+            </td>
+
+
+            <!-- DELIVERY DATE -->
+            <td>
+              {{ order.deliveryDate }}
+            </td>
+
+
+            <!-- DELIVERY SLOT -->
+            <td>
+              {{ order.deliverySlot }}
+            </td>
+
+
+            <!-- PIECES -->
+            <td>
+              {{ order.pieces }}
+            </td>
+
+
+            <!-- AMOUNT -->
+            <td>
+
+              <strong>
+                ₹{{ order.amount }}
+              </strong>
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+
+    <!-- EMPTY STATE -->
+    @if (filteredOrders.length === 0) {
+
+      <div class="empty-orders">
+
+        <h3>
+          No orders found
+        </h3>
+
+        <p>
+          Try changing the status or search filters.
+        </p>
+
+      </div>
+
+    }
+
+  </section>
+
+</div>

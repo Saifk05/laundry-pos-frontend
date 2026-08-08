@@ -1,0 +1,214 @@
+<div class="payments-page">
+
+  <!-- PAGE TITLE -->
+  <div class="page-heading">
+    <h1>Payments</h1>
+  </div>
+
+
+  <!-- FILTER BAR -->
+  <section class="filter-bar">
+
+    <!-- DATE RANGE -->
+    <div class="date-range">
+
+      <input
+        type="date"
+        [(ngModel)]="startDate">
+
+      <span>
+        ~
+      </span>
+
+      <input
+        type="date"
+        [(ngModel)]="endDate">
+
+    </div>
+
+
+    <!-- DEEP CLEAN FILTER -->
+    <label class="clean-toggle">
+
+      <input
+        type="checkbox"
+        [(ngModel)]="deepCleanOnly">
+
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+
+      <span>
+        Deep Clean Only
+      </span>
+
+    </label>
+
+
+    <!-- REFRESH -->
+    <button
+      type="button"
+      class="refresh-button"
+      title="Refresh"
+      (click)="refresh()">
+
+      ↻
+
+    </button>
+
+  </section>
+
+
+  <!-- PAYMENTS TABLE -->
+  <section class="payments-table">
+
+    <!-- HEADER -->
+    <div class="table-header">
+
+      <div></div>
+
+      <div>
+        Date
+      </div>
+
+      <div>
+        Total: {{ totalAmount }}
+      </div>
+
+      <div>
+        UPI (GPay, BHIM, PhonePe, Paytm, etc): {{ totalUpi }}
+      </div>
+
+      <div>
+        Cash @ Store: {{ totalCash }}
+      </div>
+
+    </div>
+
+
+    <!-- DATA ROWS -->
+    @for (
+      payment of filteredPayments;
+      track payment.date
+    ) {
+
+      <div
+        class="payment-row"
+        (click)="toggleRow(payment)">
+
+        <!-- EXPAND -->
+        <div class="expand-icon">
+
+          @if (payment.expanded) {
+            ⌃
+          } @else {
+            ⌄
+          }
+
+        </div>
+
+
+        <!-- DATE -->
+        <div class="payment-date">
+
+          {{ payment.date }}
+
+        </div>
+
+
+        <!-- TOTAL -->
+        <div class="payment-value">
+
+          {{ getDisplayTotal(payment) }}
+
+        </div>
+
+
+        <!-- UPI -->
+        <div class="payment-value">
+
+          {{ getDisplayUpi(payment) }}
+
+        </div>
+
+
+        <!-- CASH -->
+        <div class="payment-value">
+
+          {{ getDisplayCash(payment) }}
+
+        </div>
+
+      </div>
+
+
+      <!-- EXPANDED DETAILS -->
+      @if (payment.expanded) {
+
+        <div class="payment-details">
+
+          <div>
+
+            <span>
+              Total Collections
+            </span>
+
+            <strong>
+              ₹{{ getDisplayTotal(payment) }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              UPI Payments
+            </span>
+
+            <strong>
+              ₹{{ getDisplayUpi(payment) }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Cash Payments
+            </span>
+
+            <strong>
+              ₹{{ getDisplayCash(payment) }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      }
+
+    }
+
+
+    <!-- EMPTY STATE -->
+    @if (filteredPayments.length === 0) {
+
+      <div class="payments-empty">
+
+        <h3>
+          No payment data found
+        </h3>
+
+        <p>
+          Try changing the selected date range.
+        </p>
+
+      </div>
+
+    }
+
+  </section>
+
+</div>

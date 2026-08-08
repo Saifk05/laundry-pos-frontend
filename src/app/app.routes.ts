@@ -19,7 +19,6 @@ export const routes: Routes = [
       import('./pages/register/register.page')
         .then((m) => m.RegisterPage),
   },
-
   {
     path: 'app',
     loadComponent: () =>
@@ -40,14 +39,26 @@ export const routes: Routes = [
       },
       {
         path: 'new-walk-in',
-        loadComponent: () => import('./pages/orders/new-walk-in/new-walk-in.page').then( m => m.NewWalkInPage)
+        loadComponent: () =>
+          import('./pages/orders/new-walk-in/new-walk-in.page')
+            .then((m) => m.NewWalkInPage),
+      },
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./pages/payments/payments.page')
+            .then((m) => m.PaymentsPage),
+      },
+      {
+        path: 'b2c-orders',
+        loadComponent: () => 
+          import('./pages/orders/b2c-orders/b2c-orders.page')
+            .then( m => m.B2cOrdersPage)
       },
     ],
   },
-
   {
     path: '**',
     redirectTo: '',
   },
-
 ];
