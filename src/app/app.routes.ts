@@ -55,6 +55,12 @@ export const routes: Routes = [
           import('./pages/orders/b2c-orders/b2c-orders.page')
             .then( m => m.B2cOrdersPage)
       },
+      {
+        path: 'bill',
+        loadComponent: () => 
+          import('./pages/bill/bill.page')
+            .then( m => m.BillPage)
+      },
     ],
   },
   {

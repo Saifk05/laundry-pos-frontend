@@ -1,0 +1,545 @@
+<div class="bill-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Invoices [{{ filteredInvoices.length }}]
+      </h1>
+
+      <p>
+        Manage bills, receipts and invoice settlements
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- FILTERS -->
+  <section class="invoice-filters">
+
+    <!-- B2C -->
+    <label class="filter-toggle">
+
+      <input
+        type="checkbox"
+        [(ngModel)]="b2cOnly">
+
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+
+      <span>
+        B2C Only
+      </span>
+
+    </label>
+
+
+    <!-- DEEP CLEAN -->
+    <label class="filter-toggle">
+
+      <input
+        type="checkbox"
+        [(ngModel)]="deepCleanOnly">
+
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+
+      <span>
+        Deep Clean Only
+      </span>
+
+    </label>
+
+
+    <!-- CLIENT -->
+    <label class="filter-toggle">
+
+      <input
+        type="checkbox"
+        [(ngModel)]="clientOnly">
+
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+
+      <span>
+        Client Only
+      </span>
+
+    </label>
+
+
+    <!-- CLIENT -->
+    <div class="filter-field">
+
+      <label>
+        Client
+      </label>
+
+      <select [(ngModel)]="selectedClient">
+
+        @for (
+          client of clients;
+          track client
+        ) {
+
+          <option [value]="client">
+            {{ client }}
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+
+    <!-- ORDER ID -->
+    <div class="filter-field">
+
+      <label>
+        Order ID
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="orderIdSearch"
+        placeholder="Order ID">
+
+    </div>
+
+
+    <!-- CREATED DATE -->
+    <div class="filter-field">
+
+      <label>
+        Created Date
+      </label>
+
+      <input
+        type="date"
+        [(ngModel)]="createdDate">
+
+    </div>
+
+
+    <!-- DELIVERED DATE -->
+    <div class="filter-field">
+
+      <label>
+        Delivered Date
+      </label>
+
+      <input
+        type="date"
+        [(ngModel)]="deliveredDate">
+
+    </div>
+
+
+    <!-- STATUS -->
+    <div class="filter-field">
+
+      <label>
+        Invoice Status
+      </label>
+
+      <select [(ngModel)]="invoiceStatus">
+
+        @for (
+          status of statuses;
+          track status
+        ) {
+
+          <option [value]="status">
+            {{ status }}
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+
+    <!-- SORT -->
+    <div class="filter-field">
+
+      <label>
+        Sort By
+      </label>
+
+      <select [(ngModel)]="sortBy">
+
+        @for (
+          option of sortOptions;
+          track option
+        ) {
+
+          <option [value]="option">
+            {{ option }}
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+  </section>
+
+
+  <!-- BUTTONS -->
+  <section class="invoice-actions">
+
+    <button
+      type="button"
+      class="load-button"
+      (click)="loadInvoices()">
+
+      Load Invoices
+
+    </button>
+
+
+    <button
+      type="button"
+      class="clear-button"
+      (click)="clearFilters()">
+
+      Clear Filters
+
+    </button>
+
+  </section>
+
+
+  <!-- TABLE -->
+  <section class="invoice-table-wrapper">
+
+    <table class="invoice-table">
+
+      <thead>
+
+        <tr>
+
+          <th>#</th>
+
+          <th>
+            Actions
+          </th>
+
+          <th>
+            Status
+          </th>
+
+          <th>
+            Invoice No.
+          </th>
+
+          <th>
+            Order No.
+          </th>
+
+          <th>
+            Paid Amt
+          </th>
+
+          <th>
+            Due Amt
+          </th>
+
+          <th>
+            Total
+          </th>
+
+          <th>
+            Tax
+          </th>
+
+          <th>
+            Taxable Amt
+          </th>
+
+          <th>
+            Express Amt
+          </th>
+
+          <th>
+            Discount Amt
+          </th>
+
+          <th>
+            Gross Total
+          </th>
+
+          <th>
+            Created At
+          </th>
+
+          <th>
+            Deleted At
+          </th>
+
+          <th>
+            Paid At
+          </th>
+
+          <th>
+            Delivered At
+          </th>
+
+          <th>
+            Store
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <!-- TOTAL ROW -->
+        <tr class="summary-row">
+
+          <td></td>
+
+          <td></td>
+
+          <td></td>
+
+          <td></td>
+
+          <td>
+            Total
+          </td>
+
+          <td>
+            {{ totalPaid }}
+          </td>
+
+          <td>
+            {{ totalDue }}
+          </td>
+
+          <td>
+            {{ totalAmount }}
+          </td>
+
+          <td>
+            {{ totalTax }}
+          </td>
+
+          <td>
+            {{ totalTaxable }}
+          </td>
+
+          <td>
+            {{ totalExpress }}
+          </td>
+
+          <td>
+            {{ totalDiscount }}
+          </td>
+
+          <td>
+            {{ grossTotal }}
+          </td>
+
+          <td></td>
+
+          <td></td>
+
+          <td></td>
+
+          <td></td>
+
+          <td></td>
+
+        </tr>
+
+
+        @for (
+          invoice of filteredInvoices;
+          track invoice.id;
+          let index = $index
+        ) {
+
+          <tr>
+
+            <td>
+              {{ index + 1 }}
+            </td>
+
+
+            <!-- ACTIONS -->
+            <td>
+
+              <div class="row-actions">
+
+                <button
+                  type="button"
+                  class="receipt-button"
+                  (click)="receipt(invoice)">
+
+                  Receipt
+
+                </button>
+
+
+                @if (
+                  invoice.status !== 'Deleted' &&
+                  invoice.dueAmount > 0
+                ) {
+
+                  <button
+                    type="button"
+                    class="settle-button"
+                    (click)="settle(invoice)">
+
+                    Settle
+
+                  </button>
+
+                }
+
+              </div>
+
+            </td>
+
+
+            <!-- STATUS -->
+            <td>
+
+              <span
+                class="invoice-status"
+                [class.status-draft]="
+                  invoice.status === 'Draft'
+                "
+                [class.status-paid]="
+                  invoice.status === 'Paid'
+                "
+                [class.status-partial]="
+                  invoice.status === 'Partially Paid'
+                "
+                [class.status-deleted]="
+                  invoice.status === 'Deleted'
+                ">
+
+                {{ invoice.status }}
+
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <strong class="invoice-number">
+                {{ invoice.invoiceNumber }}
+              </strong>
+
+            </td>
+
+
+            <td>
+
+              <strong class="order-number">
+                {{ invoice.orderNumber }}
+              </strong>
+
+            </td>
+
+
+            <td>
+              {{ invoice.paidAmount }}
+            </td>
+
+            <td>
+              {{ invoice.dueAmount }}
+            </td>
+
+            <td>
+              {{ invoice.total }}
+            </td>
+
+            <td>
+              {{ invoice.tax }}
+            </td>
+
+            <td>
+              {{ invoice.taxableAmount }}
+            </td>
+
+            <td>
+              {{ invoice.expressAmount }}
+            </td>
+
+            <td>
+              {{ invoice.discountAmount }}
+            </td>
+
+            <td>
+
+              <strong>
+                {{ invoice.grossTotal }}
+              </strong>
+
+            </td>
+
+
+            <td>
+              {{ invoice.createdAt }}
+            </td>
+
+            <td>
+              {{ invoice.deletedAt }}
+            </td>
+
+            <td>
+              {{ invoice.paidAt }}
+            </td>
+
+            <td>
+              {{ invoice.deliveredAt }}
+            </td>
+
+            <td>
+              {{ invoice.store }}
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+
+    @if (filteredInvoices.length === 0) {
+
+      <div class="empty-invoices">
+
+        <h3>
+          No invoices found
+        </h3>
+
+        <p>
+          Try changing the invoice filters.
+        </p>
+
+      </div>
+
+    }
+
+  </section>
+
+</div>
