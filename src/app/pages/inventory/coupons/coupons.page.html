@@ -217,13 +217,37 @@
         %
       </div>
 
-      <h3>
-        No coupons found
-      </h3>
+      @if (loading) {
 
-      <p>
-        Try changing your search or status filter.
-      </p>
+        <h3>
+          Loading coupons...
+        </h3>
+
+        <p>
+          Please wait while coupons are being loaded.
+        </p>
+
+      } @else if (coupons.length === 0) {
+
+        <h3>
+          No coupons available
+        </h3>
+
+        <p>
+          Create your first coupon using the Add Coupon button.
+        </p>
+
+      } @else {
+
+        <h3>
+          No coupons found
+        </h3>
+
+        <p>
+          Try changing your search or status filter.
+        </p>
+
+      }
 
     </div>
 
@@ -275,6 +299,7 @@
             type="button"
             class="close-button"
             aria-label="Close"
+            [disabled]="loading"
             (click)="closeCouponForm()">
 
             ×
@@ -474,6 +499,7 @@
               type="button"
               class="toggle-switch"
               [class.enabled]="couponForm.controls.active.value"
+              [disabled]="loading"
               (click)="
                 couponForm.controls.active.setValue(
                   !couponForm.controls.active.value
@@ -494,6 +520,7 @@
             <button
               type="button"
               class="cancel-button"
+              [disabled]="loading"
               (click)="closeCouponForm()">
 
               Cancel
@@ -503,13 +530,22 @@
 
             <button
               type="submit"
-              class="save-button">
+              class="save-button"
+              [disabled]="loading">
 
-              {{
-                editingCouponId !== null
-                  ? 'Update Coupon'
-                  : 'Save Coupon'
-              }}
+              @if (loading) {
+
+                Saving...
+
+              } @else {
+
+                {{
+                  editingCouponId !== null
+                    ? 'Update Coupon'
+                    : 'Save Coupon'
+                }}
+
+              }
 
             </button>
 

@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import {
   FormControl,
   FormGroup,
@@ -7,13 +12,13 @@ import {
   Validators
 } from '@angular/forms';
 
+import { ApiService } from '../../../../../src/core/services/api.service';
 
-interface ExtraCharge {
-  id: number;
-  name: string;
-  percentage: number;
-  active: boolean;
-}
+import {
+  ExpressCharge,
+  ExpressChargeListResponse,
+  ExpressChargeRequest
+} from '../../../../core/models/express-charge.model';
 
 
 interface ExtraChargeForm {
@@ -33,49 +38,19 @@ interface ExtraChargeForm {
     ReactiveFormsModule
   ]
 })
-export class ExtraChargesPage {
+export class ExtraChargesPage implements OnInit {
 
   showChargeForm = false;
 
-  editingChargeId: number | null = null;
+  editingChargeId: string | null = null;
 
+  charges: ExpressCharge[] = [];
 
-  /* =========================================
-     DUMMY DATA - UI ONLY
-  ========================================= */
+  loading = false;
 
-  charges: ExtraCharge[] = [
-    {
-      id: 1,
-      name: 'Express Delivery',
-      percentage: 10,
-      active: true
-    },
-    {
-      id: 2,
-      name: 'Express Delivery',
-      percentage: 20,
-      active: true
-    },
-    {
-      id: 3,
-      name: 'Express Delivery',
-      percentage: 30,
-      active: true
-    },
-    {
-      id: 4,
-      name: 'Express Delivery',
-      percentage: 40,
-      active: true
-    },
-    {
-      id: 5,
-      name: 'Express Delivery',
-      percentage: 50,
-      active: true
-    }
-  ];
+  errorMessage = '';
+
+  successMessage = '';
 
 
   chargeForm =
@@ -115,6 +90,61 @@ export class ExtraChargesPage {
     });
 
 
+  constructor(
+    private readonly apiService: ApiService
+  ) {}
+
+
+  ngOnInit(): void {
+
+    this.loadCharges();
+  }
+
+
+  /* =========================================
+     LOAD EXPRESS CHARGES
+  ========================================= */
+
+  loadCharges(): void {
+
+    this.loading = true;
+
+    this.errorMessage = '';
+
+    this.apiService
+      .getExpressCharges()
+      .subscribe({
+
+        next: (
+          response: ExpressChargeListResponse
+        ) => {
+
+          this.charges =
+            response.expressCharges ?? [];
+
+          this.sortCharges();
+
+          this.loading = false;
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to load express charges:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to load express charges';
+
+          this.loading = false;
+        }
+
+      });
+  }
+
+
   /* =========================================
      ACTIVE CHARGES
   ========================================= */
@@ -122,7 +152,8 @@ export class ExtraChargesPage {
   get activeCharges(): number {
 
     return this.charges.filter(
-      charge => charge.active
+      (charge: ExpressCharge) =>
+        charge.active
     ).length;
   }
 
@@ -134,6 +165,10 @@ export class ExtraChargesPage {
   addCharge(): void {
 
     this.editingChargeId = null;
+
+    this.errorMessage = '';
+
+    this.successMessage = '';
 
     this.chargeForm.reset({
       name: 'Express Delivery',
@@ -150,16 +185,27 @@ export class ExtraChargesPage {
   ========================================= */
 
   editCharge(
-    charge: ExtraCharge
+    charge: ExpressCharge
   ): void {
 
     this.editingChargeId =
       charge.id;
 
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
     this.chargeForm.setValue({
-      name: charge.name,
-      percentage: charge.percentage,
-      active: charge.active
+
+      name:
+        charge.name,
+
+      percentage:
+        charge.percentage,
+
+      active:
+        charge.active
+
     });
 
     this.showChargeForm = true;
@@ -167,7 +213,7 @@ export class ExtraChargesPage {
 
 
   /* =========================================
-     CLOSE
+     CLOSE FORM
   ========================================= */
 
   closeChargeForm(): void {
@@ -185,7 +231,7 @@ export class ExtraChargesPage {
 
 
   /* =========================================
-     SAVE - UI ONLY
+     SAVE
   ========================================= */
 
   saveCharge(): void {
@@ -199,124 +245,296 @@ export class ExtraChargesPage {
     const value =
       this.chargeForm.getRawValue();
 
-
     const percentage =
       Number(value.percentage);
 
-
     /*
-     * Do not allow duplicate percentages.
+     * Frontend duplicate check.
+     * Backend also prevents duplicate percentages.
      */
 
     const duplicate =
       this.charges.some(
-        charge =>
-          charge.percentage === percentage &&
-          charge.id !== this.editingChargeId
+        (charge: ExpressCharge) =>
+          Number(charge.percentage) ===
+            percentage &&
+          charge.id !==
+            this.editingChargeId
       );
-
 
     if (duplicate) {
 
-      console.warn(
-        'This express charge percentage already exists.'
+      this.errorMessage =
+        'This express charge percentage already exists.';
+
+      return;
+    }
+
+    const request: ExpressChargeRequest = {
+
+      name:
+        value.name.trim(),
+
+      percentage:
+        percentage,
+
+      active:
+        value.active
+
+    };
+
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
+    if (this.editingChargeId !== null) {
+
+      this.updateCharge(
+        this.editingChargeId,
+        request
       );
 
       return;
     }
 
-
-    if (this.editingChargeId !== null) {
-
-      const index =
-        this.charges.findIndex(
-          charge =>
-            charge.id ===
-            this.editingChargeId
-        );
-
-
-      if (index !== -1) {
-
-        this.charges[index] = {
-
-          id:
-            this.editingChargeId,
-
-          name:
-            value.name.trim(),
-
-          percentage:
-            percentage,
-
-          active:
-            value.active
-
-        };
-
-
-        this.charges = [
-          ...this.charges
-        ];
-      }
-
-    } else {
-
-      const charge: ExtraCharge = {
-
-        id:
-          Date.now(),
-
-        name:
-          value.name.trim(),
-
-        percentage:
-          percentage,
-
-        active:
-          value.active
-
-      };
-
-
-      this.charges = [
-        ...this.charges,
-        charge
-      ];
-
-
-      this.charges.sort(
-        (a, b) =>
-          a.percentage -
-          b.percentage
-      );
-
-
-      console.log(
-        'Extra charge ready to save:',
-        charge
-      );
-    }
-
-
-    this.closeChargeForm();
+    this.createCharge(request);
   }
 
 
   /* =========================================
-     STATUS
+     CREATE
+  ========================================= */
+
+  private createCharge(
+    request: ExpressChargeRequest
+  ): void {
+
+    this.loading = true;
+
+    this.apiService
+      .createExpressCharge(request)
+      .subscribe({
+
+        next: (
+          charge: ExpressCharge
+        ) => {
+
+          this.charges = [
+            ...this.charges,
+            charge
+          ];
+
+          this.sortCharges();
+
+          this.loading = false;
+
+          this.successMessage =
+            'Express charge created successfully';
+
+          this.closeChargeForm();
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to create express charge:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to create express charge';
+
+          this.loading = false;
+        }
+
+      });
+  }
+
+
+  /* =========================================
+     UPDATE
+  ========================================= */
+
+  private updateCharge(
+    chargeId: string,
+    request: ExpressChargeRequest
+  ): void {
+
+    this.loading = true;
+
+    this.apiService
+      .updateExpressCharge(
+        chargeId,
+        request
+      )
+      .subscribe({
+
+        next: (
+          updatedCharge: ExpressCharge
+        ) => {
+
+          this.charges =
+            this.charges.map(
+              (charge: ExpressCharge) =>
+                charge.id ===
+                updatedCharge.id
+                  ? updatedCharge
+                  : charge
+            );
+
+          this.sortCharges();
+
+          this.loading = false;
+
+          this.successMessage =
+            'Express charge updated successfully';
+
+          this.closeChargeForm();
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to update express charge:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to update express charge';
+
+          this.loading = false;
+        }
+
+      });
+  }
+
+
+  /* =========================================
+     ACTIVE / INACTIVE
   ========================================= */
 
   toggleStatus(
-    charge: ExtraCharge
+    charge: ExpressCharge
   ): void {
 
-    charge.active =
+    const newStatus =
       !charge.active;
+
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
+    this.apiService
+      .updateExpressChargeStatus(
+        charge.id,
+        newStatus
+      )
+      .subscribe({
+
+        next: (
+          updatedCharge: ExpressCharge
+        ) => {
+
+          this.charges =
+            this.charges.map(
+              (item: ExpressCharge) =>
+                item.id ===
+                updatedCharge.id
+                  ? updatedCharge
+                  : item
+            );
+
+          this.successMessage =
+            updatedCharge.active
+              ? 'Express charge activated successfully'
+              : 'Express charge deactivated successfully';
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to update express charge status:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to update express charge status';
+        }
+
+      });
+  }
+
+
+  /* =========================================
+     DELETE / DEACTIVATE
+  ========================================= */
+
+  deleteCharge(
+    charge: ExpressCharge
+  ): void {
+
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
+    this.apiService
+      .deleteExpressCharge(
+        charge.id
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.charges =
+            this.charges.map(
+              (item: ExpressCharge) =>
+                item.id === charge.id
+                  ? {
+                      ...item,
+                      active: false
+                    }
+                  : item
+            );
+
+          this.successMessage =
+            'Express charge deactivated successfully';
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to deactivate express charge:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to deactivate express charge';
+        }
+
+      });
+  }
+
+
+  /* =========================================
+     SORT
+  ========================================= */
+
+  private sortCharges(): void {
 
     this.charges = [
       ...this.charges
-    ];
+    ].sort(
+      (
+        a: ExpressCharge,
+        b: ExpressCharge
+      ) =>
+        Number(a.percentage) -
+        Number(b.percentage)
+    );
   }
 
 }

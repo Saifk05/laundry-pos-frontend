@@ -7,7 +7,7 @@
   <div class="page-header">
 
     <div>
-      <h1>Extra Charges</h1>
+      <h1>Express Charges</h1>
 
       <p>
         Manage express delivery charges used during order creation
@@ -17,6 +17,7 @@
     <button
       type="button"
       class="primary-button"
+      [disabled]="loading"
       (click)="addCharge()">
 
       + Add Charge
@@ -183,6 +184,7 @@
                 type="button"
                 class="toggle-switch"
                 [class.enabled]="charge.active"
+                [disabled]="loading"
                 [attr.aria-label]="
                   charge.active
                     ? 'Deactivate charge'
@@ -204,6 +206,7 @@
               <button
                 type="button"
                 class="edit-button"
+                [disabled]="loading"
                 (click)="editCharge(charge)">
 
                 Edit
@@ -226,22 +229,36 @@
           %
         </div>
 
-        <h3>
-          No extra charges
-        </h3>
+        @if (loading) {
 
-        <p>
-          Add an express delivery percentage to get started.
-        </p>
+          <h3>
+            Loading express charges...
+          </h3>
 
-        <button
-          type="button"
-          class="primary-button"
-          (click)="addCharge()">
+          <p>
+            Please wait while express charges are being loaded.
+          </p>
 
-          + Add Charge
+        } @else {
 
-        </button>
+          <h3>
+            No express charges available
+          </h3>
+
+          <p>
+            Add an express delivery percentage to get started.
+          </p>
+
+          <button
+            type="button"
+            class="primary-button"
+            (click)="addCharge()">
+
+            + Add Charge
+
+          </button>
+
+        }
 
       </div>
 
@@ -312,8 +329,8 @@
 
               {{
                 editingChargeId !== null
-                  ? 'Edit Extra Charge'
-                  : 'Add Extra Charge'
+                  ? 'Edit Express Charge'
+                  : 'Add Express Charge'
               }}
 
             </h2>
@@ -336,6 +353,7 @@
             type="button"
             class="close-button"
             aria-label="Close"
+            [disabled]="loading"
             (click)="closeChargeForm()">
 
             ×
@@ -479,6 +497,7 @@
               type="button"
               class="toggle-switch"
               [class.enabled]="chargeForm.controls.active.value"
+              [disabled]="loading"
               (click)="
                 chargeForm.controls.active.setValue(
                   !chargeForm.controls.active.value
@@ -499,6 +518,7 @@
             <button
               type="button"
               class="cancel-button"
+              [disabled]="loading"
               (click)="closeChargeForm()">
 
               Cancel
@@ -508,13 +528,22 @@
 
             <button
               type="submit"
-              class="save-button">
+              class="save-button"
+              [disabled]="loading">
 
-              {{
-                editingChargeId !== null
-                  ? 'Update Charge'
-                  : 'Save Charge'
-              }}
+              @if (loading) {
+
+                Saving...
+
+              } @else {
+
+                {{
+                  editingChargeId !== null
+                    ? 'Update Charge'
+                    : 'Save Charge'
+                }}
+
+              }
 
             </button>
 

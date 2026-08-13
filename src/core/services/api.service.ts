@@ -6,15 +6,26 @@ import { environment } from '../../environments/environment';
 
 import {
   CustomerResponse,
-  CouponResponse,
   WalkInOrderRequest,
   OrderResponse
 } from '../models/walk-in.model';
 
 import {
+  ExpressCharge,
+  ExpressChargeListResponse,
+  ExpressChargeRequest
+} from '../models/express-charge.model';
+
+import {
   ProductRequest,
   ProductResponse
 } from '../models/product.model';
+
+import {
+  Coupon,
+  CouponListResponse,
+  CouponRequest
+} from '../models/coupon.model';
 
 @Injectable({
   providedIn: 'root'
@@ -45,13 +56,55 @@ export class ApiService {
      COUPONS
   ========================================= */
 
-  getCoupons(): Observable<CouponResponse[]> {
+  /* =========================================
+   COUPONS
+========================================= */
 
-    return this.http.get<CouponResponse[]>(
-      `${this.baseUrl}/coupons`
-    );
-  }
+getCoupons(): Observable<CouponListResponse> {
 
+  return this.http.get<CouponListResponse>(
+    `${this.baseUrl}/coupons`
+  );
+}
+
+getCouponById(
+  couponId: string
+): Observable<Coupon> {
+
+  return this.http.get<Coupon>(
+    `${this.baseUrl}/coupons/${couponId}`
+  );
+}
+
+createCoupon(
+  request: CouponRequest
+): Observable<Coupon> {
+
+  return this.http.post<Coupon>(
+    `${this.baseUrl}/coupons`,
+    request
+  );
+}
+
+updateCoupon(
+  couponId: string,
+  request: CouponRequest
+): Observable<Coupon> {
+
+  return this.http.put<Coupon>(
+    `${this.baseUrl}/coupons/${couponId}`,
+    request
+  );
+}
+
+deleteCoupon(
+  couponId: string
+): Observable<void> {
+
+  return this.http.delete<void>(
+    `${this.baseUrl}/coupons/${couponId}`
+  );
+}
   /* =========================================
      PRODUCTS
   ========================================= */
@@ -102,4 +155,70 @@ export class ApiService {
       request
     );
   }
+
+  /* =========================================
+   EXPRESS CHARGES
+========================================= */
+
+getExpressCharges(): Observable<ExpressChargeListResponse> {
+
+  return this.http.get<ExpressChargeListResponse>(
+    `${this.baseUrl}/express-charges`
+  );
+}
+
+getExpressChargeById(
+  expressChargeId: string
+): Observable<ExpressCharge> {
+
+  return this.http.get<ExpressCharge>(
+    `${this.baseUrl}/express-charges/${expressChargeId}`
+  );
+}
+
+createExpressCharge(
+  request: ExpressChargeRequest
+): Observable<ExpressCharge> {
+
+  return this.http.post<ExpressCharge>(
+    `${this.baseUrl}/express-charges`,
+    request
+  );
+}
+
+updateExpressCharge(
+  expressChargeId: string,
+  request: ExpressChargeRequest
+): Observable<ExpressCharge> {
+
+  return this.http.put<ExpressCharge>(
+    `${this.baseUrl}/express-charges/${expressChargeId}`,
+    request
+  );
+}
+
+updateExpressChargeStatus(
+  expressChargeId: string,
+  active: boolean
+): Observable<ExpressCharge> {
+
+  return this.http.patch<ExpressCharge>(
+    `${this.baseUrl}/express-charges/${expressChargeId}/status`,
+    {},
+    {
+      params: {
+        active
+      }
+    }
+  );
+}
+
+deleteExpressCharge(
+  expressChargeId: string
+): Observable<void> {
+
+  return this.http.delete<void>(
+    `${this.baseUrl}/express-charges/${expressChargeId}`
+  );
+}
 }

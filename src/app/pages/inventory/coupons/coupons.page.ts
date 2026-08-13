@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormControl,
@@ -7,16 +7,13 @@ import {
   Validators
 } from '@angular/forms';
 
+import { ApiService } from '../../../../../src/core/services/api.service';
 
-interface Coupon {
-  id: number;
-  code: string;
-  discountType: 'FLAT' | 'PERCENTAGE';
-  discountValue: number;
-  minimumOrderAmount: number;
-  active: boolean;
-}
-
+import {
+  Coupon,
+  CouponListResponse,
+  CouponRequest
+} from '../../../../core/models/coupon.model';
 
 interface CouponForm {
   code: FormControl<string>;
@@ -25,7 +22,6 @@ interface CouponForm {
   minimumOrderAmount: FormControl<number | null>;
   active: FormControl<boolean>;
 }
-
 
 @Component({
   selector: 'app-coupons',
@@ -37,7 +33,7 @@ interface CouponForm {
     ReactiveFormsModule
   ]
 })
-export class CouponsPage {
+export class CouponsPage implements OnInit {
 
   search = '';
 
@@ -46,40 +42,15 @@ export class CouponsPage {
 
   showCouponForm = false;
 
-  editingCouponId: number | null = null;
+  editingCouponId: string | null = null;
 
+  coupons: Coupon[] = [];
 
-  /* =========================================
-     DUMMY DATA - UI ONLY
-  ========================================= */
+  loading = false;
 
-  coupons: Coupon[] = [
-    {
-      id: 1,
-      code: 'WELCOME50',
-      discountType: 'FLAT',
-      discountValue: 50,
-      minimumOrderAmount: 500,
-      active: true
-    },
-    {
-      id: 2,
-      code: 'SAVE10',
-      discountType: 'PERCENTAGE',
-      discountValue: 10,
-      minimumOrderAmount: 1000,
-      active: true
-    },
-    {
-      id: 3,
-      code: 'OLD100',
-      discountType: 'FLAT',
-      discountValue: 100,
-      minimumOrderAmount: 750,
-      active: false
-    }
-  ];
+  errorMessage = '';
 
+  successMessage = '';
 
   couponForm =
     new FormGroup<CouponForm>({
@@ -139,6 +110,53 @@ export class CouponsPage {
 
     });
 
+  constructor(
+    private readonly apiService: ApiService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCoupons();
+  }
+
+  /* =========================================
+     LOAD COUPONS
+  ========================================= */
+
+  loadCoupons(): void {
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.apiService
+      .getCoupons()
+      .subscribe({
+
+        next: (
+          response: CouponListResponse
+        ) => {
+
+          this.coupons =
+            response.coupons ?? [];
+
+          this.loading = false;
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to load coupons:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to load coupons';
+
+          this.loading = false;
+        }
+
+      });
+  }
 
   /* =========================================
      FILTER
@@ -151,16 +169,14 @@ export class CouponsPage {
         .trim()
         .toLowerCase();
 
-
     return this.coupons.filter(
-      coupon => {
+      (coupon: Coupon) => {
 
         const matchesSearch =
           !searchValue ||
           coupon.code
             .toLowerCase()
             .includes(searchValue);
-
 
         const matchesStatus =
           this.selectedStatus === 'ALL' ||
@@ -173,7 +189,6 @@ export class CouponsPage {
             !coupon.active
           );
 
-
         return (
           matchesSearch &&
           matchesStatus
@@ -181,7 +196,6 @@ export class CouponsPage {
       }
     );
   }
-
 
   /* =========================================
      STATUS FILTER
@@ -194,7 +208,6 @@ export class CouponsPage {
     this.selectedStatus = status;
   }
 
-
   /* =========================================
      ADD COUPON
   ========================================= */
@@ -202,6 +215,9 @@ export class CouponsPage {
   addCoupon(): void {
 
     this.editingCouponId = null;
+
+    this.errorMessage = '';
+    this.successMessage = '';
 
     this.couponForm.reset({
       code: '',
@@ -214,7 +230,6 @@ export class CouponsPage {
     this.showCouponForm = true;
   }
 
-
   /* =========================================
      EDIT COUPON
   ========================================= */
@@ -226,6 +241,8 @@ export class CouponsPage {
     this.editingCouponId =
       coupon.id;
 
+    this.errorMessage = '';
+    this.successMessage = '';
 
     this.couponForm.setValue({
 
@@ -246,10 +263,8 @@ export class CouponsPage {
 
     });
 
-
     this.showCouponForm = true;
   }
-
 
   /* =========================================
      CLOSE FORM
@@ -270,122 +285,164 @@ export class CouponsPage {
     });
   }
 
-
   /* =========================================
-     SAVE - UI ONLY
+     SAVE COUPON
   ========================================= */
 
   saveCoupon(): void {
 
     this.couponForm.markAllAsTouched();
 
-
     if (this.couponForm.invalid) {
       return;
     }
 
-
     const value =
       this.couponForm.getRawValue();
 
+    const request: CouponRequest = {
 
-    /*
-     * Temporary frontend-only behavior.
-     * Later this becomes POST / PUT API.
-     */
+      code:
+        value.code
+          .trim()
+          .toUpperCase(),
+
+      discountType:
+        value.discountType,
+
+      discountValue:
+        Number(
+          value.discountValue
+        ),
+
+      minimumOrderAmount:
+        Number(
+          value.minimumOrderAmount ?? 0
+        ),
+
+      active:
+        value.active
+    };
+
+    this.errorMessage = '';
+    this.successMessage = '';
 
     if (this.editingCouponId !== null) {
 
-      const index =
-        this.coupons.findIndex(
-          coupon =>
-            coupon.id ===
-            this.editingCouponId
-        );
-
-
-      if (index !== -1) {
-
-        this.coupons[index] = {
-
-          id:
-            this.editingCouponId,
-
-          code:
-            value.code
-              .trim()
-              .toUpperCase(),
-
-          discountType:
-            value.discountType,
-
-          discountValue:
-            Number(
-              value.discountValue
-            ),
-
-          minimumOrderAmount:
-            Number(
-              value.minimumOrderAmount ?? 0
-            ),
-
-          active:
-            value.active
-
-        };
-
-        this.coupons = [
-          ...this.coupons
-        ];
-      }
-
-    } else {
-
-      const coupon: Coupon = {
-
-        id:
-          Date.now(),
-
-        code:
-          value.code
-            .trim()
-            .toUpperCase(),
-
-        discountType:
-          value.discountType,
-
-        discountValue:
-          Number(
-            value.discountValue
-          ),
-
-        minimumOrderAmount:
-          Number(
-            value.minimumOrderAmount ?? 0
-          ),
-
-        active:
-          value.active
-
-      };
-
-
-      this.coupons = [
-        coupon,
-        ...this.coupons
-      ];
-
-
-      console.log(
-        'Coupon ready to save:',
-        coupon
+      this.updateCoupon(
+        this.editingCouponId,
+        request
       );
+
+      return;
     }
 
-
-    this.closeCouponForm();
+    this.createCoupon(request);
   }
 
+  /* =========================================
+     CREATE COUPON
+  ========================================= */
+
+  private createCoupon(
+    request: CouponRequest
+  ): void {
+
+    this.loading = true;
+
+    this.apiService
+      .createCoupon(request)
+      .subscribe({
+
+        next: (
+          coupon: Coupon
+        ) => {
+
+          this.coupons = [
+            coupon,
+            ...this.coupons
+          ];
+
+          this.loading = false;
+
+          this.successMessage =
+            'Coupon created successfully';
+
+          this.closeCouponForm();
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to create coupon:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to create coupon';
+
+          this.loading = false;
+        }
+
+      });
+  }
+
+  /* =========================================
+     UPDATE COUPON
+  ========================================= */
+
+  private updateCoupon(
+    couponId: string,
+    request: CouponRequest
+  ): void {
+
+    this.loading = true;
+
+    this.apiService
+      .updateCoupon(
+        couponId,
+        request
+      )
+      .subscribe({
+
+        next: (
+          updatedCoupon: Coupon
+        ) => {
+
+          this.coupons =
+            this.coupons.map(
+              (coupon: Coupon) =>
+                coupon.id ===
+                updatedCoupon.id
+                  ? updatedCoupon
+                  : coupon
+            );
+
+          this.loading = false;
+
+          this.successMessage =
+            'Coupon updated successfully';
+
+          this.closeCouponForm();
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to update coupon:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to update coupon';
+
+          this.loading = false;
+        }
+
+      });
+  }
 
   /* =========================================
      ACTIVE / INACTIVE
@@ -395,14 +452,110 @@ export class CouponsPage {
     coupon: Coupon
   ): void {
 
-    coupon.active =
-      !coupon.active;
+    const request: CouponRequest = {
 
-    this.coupons = [
-      ...this.coupons
-    ];
+      code:
+        coupon.code,
+
+      discountType:
+        coupon.discountType,
+
+      discountValue:
+        coupon.discountValue,
+
+      minimumOrderAmount:
+        coupon.minimumOrderAmount,
+
+      active:
+        !coupon.active
+    };
+
+    this.apiService
+      .updateCoupon(
+        coupon.id,
+        request
+      )
+      .subscribe({
+
+        next: (
+          updatedCoupon: Coupon
+        ) => {
+
+          this.coupons =
+            this.coupons.map(
+              (item: Coupon) =>
+                item.id ===
+                updatedCoupon.id
+                  ? updatedCoupon
+                  : item
+            );
+
+          this.successMessage =
+            updatedCoupon.active
+              ? 'Coupon activated successfully'
+              : 'Coupon deactivated successfully';
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to update coupon status:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to update coupon status';
+        }
+
+      });
   }
 
+  /* =========================================
+     DELETE / DEACTIVATE
+  ========================================= */
+
+  deleteCoupon(
+    coupon: Coupon
+  ): void {
+
+    this.apiService
+      .deleteCoupon(
+        coupon.id
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.coupons =
+            this.coupons.map(
+              (item: Coupon) =>
+                item.id === coupon.id
+                  ? {
+                      ...item,
+                      active: false
+                    }
+                  : item
+            );
+
+          this.successMessage =
+            'Coupon deactivated successfully';
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to deactivate coupon:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to deactivate coupon';
+        }
+
+      });
+  }
 
   /* =========================================
      DISPLAY HELPERS
@@ -420,17 +573,16 @@ export class CouponsPage {
       return `${coupon.discountValue}% OFF`;
     }
 
-
     return `₹${coupon.discountValue} OFF`;
   }
 
-
   get discountPrefix(): string {
 
-    return this.couponForm.controls
-      .discountType.value === 'FLAT'
+    return this.couponForm
+      .controls
+      .discountType
+      .value === 'FLAT'
       ? '₹'
       : '%';
   }
-
 }
