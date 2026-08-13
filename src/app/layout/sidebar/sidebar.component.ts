@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 
 import {
-  Router,
   RouterLink,
   RouterLinkActive
 } from '@angular/router';
@@ -21,10 +20,8 @@ import {
   checkmarkDoneOutline,
   receiptOutline,
   cardOutline,
-  logOutOutline
+  cubeOutline
 } from 'ionicons/icons';
-
-import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -39,12 +36,7 @@ import { ApiService } from '../../../core/services/api.service';
 })
 export class SidebarComponent {
 
-  loggingOut = false;
-
-  constructor(
-    private readonly apiService: ApiService,
-    private readonly router: Router
-  ) {
+  constructor() {
 
     addIcons({
       homeOutline,
@@ -57,42 +49,7 @@ export class SidebarComponent {
       checkmarkDoneOutline,
       receiptOutline,
       cardOutline,
-      logOutOutline
+      cubeOutline
     });
-  }
-
-  logout(): void {
-
-    if (this.loggingOut) {
-      return;
-    }
-
-    this.loggingOut = true;
-
-    this.apiService
-      .logout()
-      .subscribe({
-        next: () => {
-
-          this.clearSession();
-
-          this.router.navigateByUrl('/');
-        },
-
-        error: () => {
-
-          this.clearSession();
-
-          this.router.navigateByUrl('/');
-        }
-      });
-  }
-
-  private clearSession(): void {
-
-    localStorage.removeItem('activeToken');
-    localStorage.removeItem('refreshToken');
-
-    this.loggingOut = false;
   }
 }

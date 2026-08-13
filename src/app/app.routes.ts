@@ -7,18 +7,7 @@ export const routes: Routes = [
       import('./pages/landing/landing.page')
         .then((m) => m.LandingPage),
   },
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./pages/login/login.page')
-        .then((m) => m.LoginPage),
-  },
-  {
-    path: 'register',
-    loadComponent: () =>
-      import('./pages/register/register.page')
-        .then((m) => m.RegisterPage),
-  },
+
   {
     path: 'app',
     loadComponent: () =>
@@ -31,38 +20,78 @@ export const routes: Routes = [
         redirectTo: 'dashboard',
         pathMatch: 'full',
       },
+
       {
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/dashboard/dashboard.page')
             .then((m) => m.DashboardPage),
       },
+
       {
         path: 'new-walk-in',
         loadComponent: () =>
           import('./pages/orders/new-walk-in/new-walk-in.page')
             .then((m) => m.NewWalkInPage),
       },
+
       {
         path: 'payments',
         loadComponent: () =>
           import('./pages/payments/payments.page')
             .then((m) => m.PaymentsPage),
       },
+
       {
         path: 'b2c-orders',
-        loadComponent: () => 
+        loadComponent: () =>
           import('./pages/orders/b2c-orders/b2c-orders.page')
-            .then( m => m.B2cOrdersPage)
+            .then((m) => m.B2cOrdersPage),
       },
+
       {
         path: 'bill',
-        loadComponent: () => 
+        loadComponent: () =>
           import('./pages/bill/bill.page')
-            .then( m => m.BillPage)
+            .then((m) => m.BillPage),
+      },
+
+      {
+        path: 'inventory',
+        loadComponent: () =>
+          import('./pages/inventory/inventory.component')
+            .then((m) => m.InventoryComponent),
+      },
+
+      {
+        path: 'inventory/services',
+        loadComponent: () =>
+          import('./pages/inventory/services/services.page')
+            .then((m) => m.ServicesPage),
+      },
+
+      {
+        path: 'inventory/coupons',
+        loadComponent: () =>
+          import('./pages/inventory/coupons/coupons.page')
+            .then((m) => m.CouponsPage),
+      },
+
+      {
+        path: 'inventory/extra-charges',
+        loadComponent: () =>
+          import('./pages/inventory/extra-charges/extra-charges.page')
+            .then((m) => m.ExtraChargesPage),
+      },
+      {
+      path: 'inventory/add-product',
+        loadComponent: () => 
+          import('./pages/inventory/add-product/add-product.page')
+            .then( m => m.AddProductPage)
       },
     ],
   },
+
   {
     path: '**',
     redirectTo: '',

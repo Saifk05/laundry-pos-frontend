@@ -503,3 +503,188 @@
     min-width: 1120px;
   }
 }
+
+.customer {
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  border: 0;
+
+  background: transparent;
+  color: inherit;
+
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+
+  cursor: pointer;
+}
+
+.customer:hover .customer-name {
+  color: var(--app-primary-dark);
+
+  text-decoration: underline;
+}
+
+.call-modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 3000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.call-modal {
+  width: min(730px, 100%);
+
+  border-radius: 4px;
+
+  background: var(--app-surface);
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.22);
+
+  overflow: hidden;
+}
+
+.call-modal-header {
+  padding: 28px 32px 20px;
+}
+
+.call-modal-header h2 {
+  margin: 0;
+
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-heading);
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.call-modal-header p {
+  margin: 4px 0 0;
+
+  color: var(--app-text-secondary);
+
+  font-size: 16px;
+}
+
+.call-modal-body {
+  padding: 8px 32px 12px;
+}
+
+.call-modal-body h3 {
+  margin: 0 0 10px;
+
+  padding-bottom: 8px;
+
+  border-bottom: 1px solid var(--app-border);
+
+  color: var(--app-text-secondary);
+
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.how-it-works p {
+  margin: 5px 0;
+
+  color: var(--app-text-secondary);
+
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.how-it-works strong {
+  color: var(--app-text-primary);
+
+  font-weight: 600;
+}
+
+.call-modal-footer {
+  padding: 20px 32px 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 24px;
+}
+
+.modal-close-button,
+.modal-call-button {
+  min-width: 100px;
+  height: 42px;
+
+  padding: 0 16px;
+
+  border: 0;
+  border-radius: var(--app-radius-sm);
+
+  background: transparent;
+
+  font-family: var(--app-font-body);
+  font-size: 14px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+}
+
+.modal-close-button {
+  color: var(--app-text-primary);
+}
+
+.modal-call-button {
+  color: var(--app-primary);
+}
+
+.modal-close-button:hover {
+  background: var(--app-background-soft);
+}
+
+.modal-call-button:hover {
+  background: rgba(18, 183, 214, 0.08);
+}
+
+@media (max-width: 600px) {
+
+  .call-modal {
+    width: 100%;
+  }
+
+  .call-modal-header {
+    padding: 22px 20px 16px;
+  }
+
+  .call-modal-header h2 {
+    font-size: 21px;
+  }
+
+  .call-modal-header p,
+  .how-it-works p {
+    font-size: 14px;
+  }
+
+  .call-modal-body {
+    padding: 6px 20px 10px;
+  }
+
+  .call-modal-footer {
+    padding: 16px 20px 20px;
+
+    gap: 12px;
+  }
+}

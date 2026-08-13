@@ -1,0 +1,434 @@
+<div class="add-product-page">
+
+  <!-- PAGE HEADER -->
+
+  <div class="page-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-button"
+        (click)="cancel()">
+        ←
+      </button>
+
+      <div>
+        <h1>Add Product</h1>
+
+        <p>
+          Create a laundry product and configure its services
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FORM -->
+
+  <form
+    class="product-form"
+    [formGroup]="productForm"
+    (ngSubmit)="saveProduct()">
+
+
+    <!-- =========================================
+         PRODUCT DETAILS
+    ========================================== -->
+
+    <section class="form-card">
+
+      <div class="section-header">
+
+        <div>
+          <h2>Product Details</h2>
+
+          <p>
+            Basic information about the laundry product
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-content">
+
+
+        <!-- PRODUCT NAME -->
+
+        <div class="form-group full-width">
+
+          <label for="productName">
+            Product Name
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="productName"
+            type="text"
+            formControlName="name"
+            placeholder="Example: Shirt">
+
+          @if (
+            productForm.get('name')?.touched &&
+            productForm.get('name')?.hasError('required')
+          ) {
+
+            <small class="error-text">
+              Product name is required.
+            </small>
+
+          }
+
+        </div>
+
+
+        <!-- CATEGORY + UNIT -->
+
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label for="category">
+              Category
+              <span class="required">*</span>
+            </label>
+
+            <select
+              id="category"
+              formControlName="category">
+
+              <option
+                value=""
+                disabled>
+                Select category
+              </option>
+
+              @for (
+                category of categories;
+                track category
+              ) {
+
+                <option [value]="category">
+                  {{ category }}
+                </option>
+
+              }
+
+            </select>
+
+            @if (
+              productForm.get('category')?.touched &&
+              productForm.get('category')?.hasError('required')
+            ) {
+
+              <small class="error-text">
+                Category is required.
+              </small>
+
+            }
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="unit">
+              Pricing Unit
+              <span class="required">*</span>
+            </label>
+
+            <select
+              id="unit"
+              formControlName="unit">
+
+              @for (
+                unit of units;
+                track unit.value
+              ) {
+
+                <option [value]="unit.value">
+                  {{ unit.label }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         PRODUCT TYPES
+    ========================================== -->
+
+    <section class="form-card">
+
+      <div class="section-header">
+
+        <div>
+          <h2>Product Types</h2>
+
+          <p>
+            Add the types customers can choose in New Walk-in
+          </p>
+        </div>
+
+        <span class="optional-label">
+          Optional
+        </span>
+
+      </div>
+
+
+      <div class="form-content">
+
+        @if (types.length > 0) {
+
+          <div class="type-list">
+
+            @for (
+              typeControl of types.controls;
+              track $index;
+              let i = $index
+            ) {
+
+              <div class="type-chip">
+
+                <span>
+                  {{ typeControl.value }}
+                </span>
+
+                <button
+                  type="button"
+                  aria-label="Remove product type"
+                  (click)="removeType(i)">
+                  ×
+                </button>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+
+        <div class="add-type-row">
+
+          <input
+            type="text"
+            [(ngModel)]="newType"
+            [ngModelOptions]="{ standalone: true }"
+            (keydown)="onTypeKeydown($event)"
+            placeholder="Example: Kids, Cotton, Formal">
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="!newType.trim()"
+            (click)="addType()">
+
+            + Add Type
+
+          </button>
+
+        </div>
+
+
+        <p class="field-help">
+          Examples: Kids, Silk, Cotton, Casual, Formal, Leather,
+          Single, Double.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SERVICES & PRICING
+    ========================================== -->
+
+    <section class="form-card">
+
+      <div class="section-header">
+
+        <div>
+          <h2>Services & Pricing</h2>
+
+          <p>
+            Configure the services available for this product
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-content">
+
+        <div class="service-table-header">
+
+          <span>Service Name</span>
+
+          <span>Price</span>
+
+          <span></span>
+
+        </div>
+
+
+        <div
+          class="service-list"
+          formArrayName="services">
+
+          @for (
+            serviceGroup of services.controls;
+            track $index;
+            let i = $index
+          ) {
+
+            <div
+              class="service-row"
+              [formGroupName]="i">
+
+
+              <!-- SERVICE NAME -->
+
+              <div class="service-field">
+
+                <input
+                  type="text"
+                  formControlName="name"
+                  placeholder="Example: Dry Clean">
+
+                @if (
+                  serviceGroup.get('name')?.touched &&
+                  serviceGroup.get('name')?.hasError('required')
+                ) {
+
+                  <small class="error-text">
+                    Service name is required.
+                  </small>
+
+                }
+
+              </div>
+
+
+              <!-- PRICE -->
+
+              <div class="service-field">
+
+                <div class="price-input">
+
+                  <span class="currency-symbol">
+                    ₹
+                  </span>
+
+                  <input
+                    type="number"
+                    formControlName="price"
+                    min="0"
+                    step="1"
+                    placeholder="0">
+
+                </div>
+
+                @if (
+                  serviceGroup.get('price')?.touched &&
+                  serviceGroup.get('price')?.hasError('required')
+                ) {
+
+                  <small class="error-text">
+                    Price is required.
+                  </small>
+
+                }
+
+                @if (
+                  serviceGroup.get('price')?.touched &&
+                  serviceGroup.get('price')?.hasError('min')
+                ) {
+
+                  <small class="error-text">
+                    Price cannot be negative.
+                  </small>
+
+                }
+
+              </div>
+
+
+              <!-- DELETE -->
+
+              <button
+                type="button"
+                class="delete-service-button"
+                aria-label="Remove service"
+                [disabled]="services.length === 1"
+                (click)="removeService(i)">
+
+                ×
+
+              </button>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <button
+          type="button"
+          class="add-service-button"
+          (click)="addService()">
+
+          + Add Another Service
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         ACTIONS
+    ========================================== -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="cancel-button"
+        (click)="cancel()">
+
+        Cancel
+
+      </button>
+
+
+      <button
+        type="submit"
+        class="save-button">
+
+        Save Product
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>

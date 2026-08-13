@@ -1,31 +1,49 @@
-<aside class="sidebar">
+<div class="sidebar">
 
-  <!-- BRAND -->
-  <div class="sidebar-brand">
+  <!-- =========================================
+       PROFILE
+  ========================================== -->
 
-    <div class="brand-mark">
-      L
+  <div class="sidebar-profile">
+
+    <div class="profile-avatar">
+      <ion-icon name="person"></ion-icon>
     </div>
 
-    <div class="brand-text">
+    <div class="profile-info">
 
-      <strong>
-        LaundryFlow
+      <strong class="profile-name">
+        Gayitri dharmadas
       </strong>
 
-      <span>
-        Laundry POS
+      <span class="profile-code">
+        FAB-HUBLI-89510
       </span>
+
+      <div class="profile-rating">
+
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+
+      </div>
 
     </div>
 
   </div>
 
 
-  <!-- MENU -->
+  <!-- =========================================
+       MENU
+  ========================================== -->
+
   <nav class="sidebar-menu">
 
+
     <!-- HOME -->
+
     <a
       routerLink="/app/dashboard"
       routerLinkActive="active"
@@ -42,6 +60,7 @@
 
 
     <!-- NEW WALK-IN -->
+
     <a
       routerLink="/app/new-walk-in"
       routerLinkActive="active"
@@ -56,26 +75,8 @@
     </a>
 
 
-    <!-- PICKUP / DROP -->
-    <a
-      routerLink="/app/pickup-drop"
-      routerLinkActive="active"
-      class="menu-item">
-
-      <ion-icon name="bicycle-outline"></ion-icon>
-
-      <span>
-        Pickup / Drop
-      </span>
-
-      <span class="new-badge">
-        NEW
-      </span>
-
-    </a>
-
-
     <!-- B2C ORDER -->
+
     <a
       routerLink="/app/b2c-orders"
       routerLinkActive="active"
@@ -90,52 +91,24 @@
     </a>
 
 
-    <!-- VENDOR ORDER -->
+    <!-- INVENTORY -->
+
     <a
-      routerLink="/app/vendor-orders"
+      routerLink="/app/inventory"
       routerLinkActive="active"
       class="menu-item">
 
-      <ion-icon name="cart-sharp"></ion-icon>
+      <ion-icon name="cube-outline"></ion-icon>
 
       <span>
-        As Vendor Order
-      </span>
-
-    </a>
-
-
-    <!-- CLIENT ORDER -->
-    <a
-      routerLink="/app/client-orders"
-      routerLinkActive="active"
-      class="menu-item">
-
-      <ion-icon name="person-add-outline"></ion-icon>
-
-      <span>
-        Client Order
-      </span>
-
-    </a>
-
-
-    <!-- FAB CREDIT -->
-    <a
-      routerLink="/app/fab-credit"
-      routerLinkActive="active"
-      class="menu-item">
-
-      <ion-icon name="wallet-outline"></ion-icon>
-
-      <span>
-        Fab Credit
+        Inventory
       </span>
 
     </a>
 
 
     <!-- SETTLEMENT -->
+
     <a
       routerLink="/app/settlement"
       routerLinkActive="active"
@@ -151,6 +124,7 @@
 
 
     <!-- BILL -->
+
     <a
       routerLink="/app/bill"
       routerLinkActive="active"
@@ -166,6 +140,7 @@
 
 
     <!-- PAYMENT -->
+
     <a
       routerLink="/app/payments"
       routerLinkActive="active"
@@ -179,51 +154,6 @@
 
     </a>
 
-
-    <!-- CHECK RZP PAYMENT -->
-    <a
-      routerLink="/app/check-payment"
-      routerLinkActive="active"
-      class="menu-item">
-
-      <ion-icon name="card-outline"></ion-icon>
-
-      <span>
-        Check RZP Payment
-      </span>
-
-    </a>
-
   </nav>
 
-
-  <!-- FOOTER -->
-  <div class="sidebar-footer">
-
-    <button
-      type="button"
-      class="logout-button"
-      [disabled]="loggingOut"
-      (click)="logout()">
-
-      <ion-icon name="log-out-outline"></ion-icon>
-
-      <span>
-
-        @if (loggingOut) {
-
-          Logging out...
-
-        } @else {
-
-          Logout
-
-        }
-
-      </span>
-
-    </button>
-
-  </div>
-
-</aside>
+</div>

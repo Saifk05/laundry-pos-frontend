@@ -5,18 +5,16 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 import {
-  AuthResponse,
-  LoginRequest,
-  RegisterRequest
-} from '../models/auth.model';
-
-import {
   CustomerResponse,
   CouponResponse,
-  ProductResponse,
   WalkInOrderRequest,
   OrderResponse
 } from '../models/walk-in.model';
+
+import {
+  ProductRequest,
+  ProductResponse
+} from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -26,44 +24,9 @@ export class ApiService {
   private readonly baseUrl =
     `${environment.clientUrl}/api`;
 
-  private readonly authUrl =
-    `${this.baseUrl}/auth`;
-
   constructor(
     private readonly http: HttpClient
   ) {}
-
-  /* =========================================
-     AUTH
-  ========================================= */
-
-  register(
-    request: RegisterRequest
-  ): Observable<AuthResponse> {
-
-    return this.http.post<AuthResponse>(
-      `${this.authUrl}/register`,
-      request
-    );
-  }
-
-  login(
-    request: LoginRequest
-  ): Observable<AuthResponse> {
-
-    return this.http.post<AuthResponse>(
-      `${this.authUrl}/login`,
-      request
-    );
-  }
-
-  logout(): Observable<AuthResponse> {
-
-    return this.http.post<AuthResponse>(
-      `${this.authUrl}/logout`,
-      {}
-    );
-  }
 
   /* =========================================
      CUSTOMER
@@ -97,6 +60,32 @@ export class ApiService {
 
     return this.http.get<ProductResponse[]>(
       `${this.baseUrl}/products`
+    );
+  }
+
+  createProduct(
+    request: ProductRequest
+  ): Observable<ProductResponse> {
+
+    return this.http.post<ProductResponse>(
+      `${this.baseUrl}/products`,
+      request
+    );
+  }
+
+  updateProductStatus(
+    productId: string,
+    active: boolean
+  ): Observable<void> {
+
+    return this.http.patch<void>(
+      `${this.baseUrl}/products/${productId}/status`,
+      {},
+      {
+        params: {
+          active
+        }
+      }
     );
   }
 

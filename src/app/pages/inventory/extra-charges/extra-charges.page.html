@@ -1,0 +1,531 @@
+<div class="extra-charges-page">
+
+  <!-- =========================================
+       PAGE HEADER
+  ========================================== -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>Extra Charges</h1>
+
+      <p>
+        Manage express delivery charges used during order creation
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="primary-button"
+      (click)="addCharge()">
+
+      + Add Charge
+
+    </button>
+
+  </div>
+
+
+  <!-- =========================================
+       SUMMARY
+  ========================================== -->
+
+  <section class="summary-row">
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        %
+      </div>
+
+      <div>
+        <span>Total Charges</span>
+
+        <strong>
+          {{ charges.length }}
+        </strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        ✓
+      </div>
+
+      <div>
+        <span>Active Charges</span>
+
+        <strong>
+          {{ activeCharges }}
+        </strong>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       EXPRESS DELIVERY SECTION
+  ========================================== -->
+
+  <section class="charges-section">
+
+    <div class="section-header">
+
+      <div>
+
+        <h2>
+          Express Delivery
+        </h2>
+
+        <p>
+          Percentage added to the order total when express delivery is selected
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================================
+         CHARGES TABLE
+    ========================================== -->
+
+    @if (charges.length > 0) {
+
+      <div class="charges-table">
+
+        <div class="table-header">
+
+          <span>
+            Charge Name
+          </span>
+
+          <span>
+            Percentage
+          </span>
+
+          <span>
+            Status
+          </span>
+
+          <span>
+            Action
+          </span>
+
+        </div>
+
+
+        @for (
+          charge of charges;
+          track charge.id
+        ) {
+
+          <div class="charge-row">
+
+            <!-- NAME -->
+
+            <div class="charge-name">
+
+              <div class="charge-icon">
+                ⚡
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ charge.name }}
+                </strong>
+
+                <span>
+                  Express order charge
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- PERCENTAGE -->
+
+            <div class="percentage-column">
+
+              <strong class="percentage-value">
+                +{{ charge.percentage }}%
+              </strong>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="status-column">
+
+              <span
+                class="status-badge"
+                [class.active]="charge.active"
+                [class.inactive]="!charge.active">
+
+                {{
+                  charge.active
+                    ? 'Active'
+                    : 'Inactive'
+                }}
+
+              </span>
+
+
+              <button
+                type="button"
+                class="toggle-switch"
+                [class.enabled]="charge.active"
+                [attr.aria-label]="
+                  charge.active
+                    ? 'Deactivate charge'
+                    : 'Activate charge'
+                "
+                (click)="toggleStatus(charge)">
+
+                <span class="toggle-knob"></span>
+
+              </button>
+
+            </div>
+
+
+            <!-- ACTION -->
+
+            <div class="action-column">
+
+              <button
+                type="button"
+                class="edit-button"
+                (click)="editCharge(charge)">
+
+                Edit
+
+              </button>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    } @else {
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          %
+        </div>
+
+        <h3>
+          No extra charges
+        </h3>
+
+        <p>
+          Add an express delivery percentage to get started.
+        </p>
+
+        <button
+          type="button"
+          class="primary-button"
+          (click)="addCharge()">
+
+          + Add Charge
+
+        </button>
+
+      </div>
+
+    }
+
+  </section>
+
+
+  <!-- =========================================
+       INFORMATION
+  ========================================== -->
+
+  <section class="info-card">
+
+    <div class="info-icon">
+      i
+    </div>
+
+    <div>
+
+      <strong>
+        How express charges work
+      </strong>
+
+      <p>
+        Active percentages will appear in the Express Delivery dropdown
+        on the New Walk-in page.
+      </p>
+
+      <div class="example">
+
+        Example:
+
+        <strong>
+          ₹1,000 order + 20% express charge = ₹1,200
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       ADD / EDIT MODAL
+  ========================================== -->
+
+  @if (showChargeForm) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeChargeForm()">
+
+
+      <div
+        class="charge-modal"
+        (click)="$event.stopPropagation()">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+
+              {{
+                editingChargeId !== null
+                  ? 'Edit Extra Charge'
+                  : 'Add Extra Charge'
+              }}
+
+            </h2>
+
+
+            <p>
+
+              {{
+                editingChargeId !== null
+                  ? 'Update the express delivery charge'
+                  : 'Create a new express delivery percentage'
+              }}
+
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close"
+            (click)="closeChargeForm()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <!-- =========================================
+             FORM
+        ========================================== -->
+
+        <form
+          class="charge-form"
+          [formGroup]="chargeForm"
+          (ngSubmit)="saveCharge()">
+
+
+          <!-- CHARGE NAME -->
+
+          <div class="form-group">
+
+            <label for="chargeName">
+
+              Charge Name
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+
+            <input
+              id="chargeName"
+              type="text"
+              formControlName="name"
+              placeholder="Example: Express Delivery">
+
+
+            @if (
+              chargeForm.controls.name.touched &&
+              chargeForm.controls.name.hasError('required')
+            ) {
+
+              <small class="error-text">
+                Charge name is required.
+              </small>
+
+            }
+
+          </div>
+
+
+          <!-- PERCENTAGE -->
+
+          <div class="form-group">
+
+            <label for="percentage">
+
+              Charge Percentage
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+
+            <div class="percentage-input">
+
+              <input
+                id="percentage"
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                formControlName="percentage"
+                placeholder="Example: 20">
+
+              <span>
+                %
+              </span>
+
+            </div>
+
+
+            @if (
+              chargeForm.controls.percentage.touched &&
+              chargeForm.controls.percentage.hasError('required')
+            ) {
+
+              <small class="error-text">
+                Charge percentage is required.
+              </small>
+
+            }
+
+
+            @if (
+              chargeForm.controls.percentage.touched &&
+              (
+                chargeForm.controls.percentage.hasError('min') ||
+                chargeForm.controls.percentage.hasError('max')
+              )
+            ) {
+
+              <small class="error-text">
+                Percentage must be between 1 and 100.
+              </small>
+
+            }
+
+
+            <small class="helper-text">
+              Example: Enter 20 for a 20% express delivery charge.
+            </small>
+
+          </div>
+
+
+          <!-- STATUS -->
+
+          <div class="status-setting">
+
+            <div>
+
+              <strong>
+                Active Charge
+              </strong>
+
+              <p>
+                Active charges will be available on the New Walk-in page.
+              </p>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.enabled]="chargeForm.controls.active.value"
+              (click)="
+                chargeForm.controls.active.setValue(
+                  !chargeForm.controls.active.value
+                )
+              ">
+
+              <span class="toggle-knob"></span>
+
+            </button>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="closeChargeForm()">
+
+              Cancel
+
+            </button>
+
+
+            <button
+              type="submit"
+              class="save-button">
+
+              {{
+                editingChargeId !== null
+                  ? 'Update Charge'
+                  : 'Save Charge'
+              }}
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

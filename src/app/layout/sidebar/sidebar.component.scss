@@ -3,186 +3,186 @@
   height: 100%;
 }
 
+/* =========================================
+   SIDEBAR
+========================================= */
+
 .sidebar {
-  width: 270px;
+  width: 210px;
   height: 100vh;
 
   display: flex;
   flex-direction: column;
 
+  overflow: hidden;
+
   background: #ffffff;
 
-  border-right: 1px solid var(--app-border);
+  border-right: 1px solid #e3e8eb;
 }
 
-/* Brand */
 
-.sidebar-brand {
-  min-height: 86px;
+/* =========================================
+   PROFILE
+========================================= */
 
-  padding: 20px 24px;
+.sidebar-profile {
+  min-height: 108px;
+
+  padding: 18px 14px;
 
   display: flex;
   align-items: center;
 
   gap: 12px;
 
-  border-bottom: 1px solid var(--app-border);
+  flex-shrink: 0;
+
+  border-bottom: 1px solid #e3e8eb;
+
+  background: #ffffff;
 }
 
-.brand-mark {
-  width: 42px;
-  height: 42px;
+
+/* =========================================
+   PROFILE AVATAR
+========================================= */
+
+.profile-avatar {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 12px;
+  border-radius: 50%;
 
-  background: var(--app-primary);
+  background: #f1f4f5;
 
-  color: #ffffff;
-
-  font-family: var(--app-font-heading);
-
-  font-size: 19px;
-  font-weight: 800;
+  color: #111111;
 }
 
-.brand-text {
+.profile-avatar ion-icon {
+  font-size: 29px;
+}
+
+
+/* =========================================
+   PROFILE INFO
+========================================= */
+
+.profile-info {
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
-
-  gap: 2px;
 }
 
-.brand-text strong {
-  font-family: var(--app-font-heading);
+.profile-name {
+  max-width: 125px;
 
-  font-size: 15px;
-  font-weight: 800;
+  overflow: hidden;
+
+  color: #263238;
+
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.brand-text span {
-  color: var(--app-text-muted);
+.profile-code {
+  max-width: 125px;
 
-  font-size: 10px;
+  margin-top: 1px;
+
+  overflow: hidden;
+
+  color: #5f747d;
+
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 500;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Menu */
+
+/* =========================================
+   RATING
+========================================= */
+
+.profile-rating {
+  margin-top: 4px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+}
+
+.profile-rating ion-icon {
+  color: #25c7a1;
+
+  font-size: 12px;
+}
+
+
+/* =========================================
+   MENU
+========================================= */
 
 .sidebar-menu {
   flex: 1;
 
-  padding: 16px 14px;
+  padding: 14px 10px;
 
   display: flex;
   flex-direction: column;
 
-  gap: 5px;
+  gap: 4px;
 
+  overflow-x: hidden;
   overflow-y: auto;
 
   scrollbar-width: none;
+
+  background: #ffffff;
 }
 
 .sidebar-menu::-webkit-scrollbar {
   display: none;
 }
 
+
+/* =========================================
+   MENU ITEM
+========================================= */
+
 .menu-item {
   position: relative;
 
-  min-height: 52px;
+  width: 100%;
+  min-height: 50px;
 
-  padding: 0 15px;
+  padding: 0 13px;
 
   display: flex;
   align-items: center;
 
-  gap: 15px;
+  gap: 13px;
 
-  border-radius: 7px;
+  border-radius: 8px;
 
-  color: #343b3d;
+  color: #606b70;
 
   text-decoration: none;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.menu-item ion-icon {
-  width: 25px;
-
-  flex-shrink: 0;
-
-  color: #686f71;
-
-  font-size: 24px;
-}
-
-.menu-item:hover {
-  background: #f5f8f8;
-}
-
-.menu-item.active {
-  background: rgba(18, 183, 214, 0.12);
-
-  color: var(--app-primary-dark);
-}
-
-.menu-item.active ion-icon {
-  color: var(--app-primary);
-}
-
-.new-badge {
-  margin-left: auto;
-
-  padding: 4px 6px;
-
-  border-radius: 4px;
-
-  background: #2ac98b;
-
-  color: #ffffff;
-
-  font-size: 8px;
-  font-weight: 800;
-
-  letter-spacing: 0.03em;
-}
-
-/* Footer */
-
-.sidebar-footer {
-  padding: 14px;
-
-  border-top: 1px solid var(--app-border);
-}
-
-.logout-button {
-  width: 100%;
-  min-height: 48px;
-
-  padding: 0 15px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 15px;
-
-  border: none;
-  border-radius: 7px;
-
-  background: transparent;
-
-  color: var(--app-text-secondary);
 
   font-size: 14px;
   font-weight: 600;
@@ -190,16 +190,250 @@
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    background 0.18s ease,
+    color 0.18s ease;
 }
 
-.logout-button ion-icon {
+
+/* =========================================
+   MENU ICON
+========================================= */
+
+.menu-item ion-icon {
+  width: 24px;
+
+  flex-shrink: 0;
+
+  color: #909b9f;
+
   font-size: 23px;
+
+  transition: color 0.18s ease;
 }
 
-.logout-button:hover {
-  background: rgba(214, 69, 69, 0.08);
 
-  color: var(--app-danger);
+/* =========================================
+   MENU LABEL
+========================================= */
+
+.menu-item span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   MENU HOVER
+========================================= */
+
+.menu-item:hover {
+  background: #f4f8f9;
+
+  color: #29383e;
+}
+
+.menu-item:hover ion-icon {
+  color: #4f626a;
+}
+
+
+/* =========================================
+   ACTIVE MENU
+========================================= */
+
+.menu-item.active {
+  background: #dff5fa;
+
+  color: #069fbd;
+
+  font-weight: 700;
+}
+
+.menu-item.active ion-icon {
+  color: #0bb5d3;
+}
+
+
+/* Small active indicator */
+
+.menu-item.active::before {
+  content: '';
+
+  position: absolute;
+
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+
+  width: 3px;
+
+  border-radius: 0 3px 3px 0;
+
+  background: #0bb5d3;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .sidebar {
+    width: 190px;
+  }
+
+  .sidebar-profile {
+    padding: 16px 12px;
+
+    gap: 10px;
+  }
+
+  .profile-avatar {
+    width: 43px;
+    height: 43px;
+  }
+
+  .profile-avatar ion-icon {
+    font-size: 26px;
+  }
+
+  .profile-name {
+    max-width: 105px;
+
+    font-size: 12px;
+  }
+
+  .profile-code {
+    max-width: 105px;
+
+    font-size: 9px;
+  }
+
+  .menu-item {
+    min-height: 48px;
+
+    padding: 0 11px;
+
+    gap: 11px;
+
+    font-size: 13px;
+  }
+
+  .menu-item ion-icon {
+    width: 22px;
+
+    font-size: 21px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  :host {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    z-index: 1000;
+
+    width: 0;
+    height: 100vh;
+  }
+
+  .sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: min(82vw, 290px);
+    height: 100dvh;
+
+    z-index: 1001;
+
+    transform: translateX(-100%);
+
+    box-shadow:
+      10px 0 30px rgba(0, 0, 0, 0.12);
+
+    transition:
+      transform 0.25s ease;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-profile {
+    min-height: 100px;
+
+    padding: 15px 16px;
+  }
+
+  .profile-avatar {
+    width: 45px;
+    height: 45px;
+  }
+
+  .profile-avatar ion-icon {
+    font-size: 27px;
+  }
+
+  .profile-name {
+    max-width: 170px;
+
+    font-size: 13px;
+  }
+
+  .profile-code {
+    max-width: 170px;
+
+    font-size: 10px;
+  }
+
+  .profile-rating ion-icon {
+    font-size: 11px;
+  }
+
+  .sidebar-menu {
+    padding: 12px 10px;
+  }
+
+  .menu-item {
+    min-height: 47px;
+
+    padding: 0 12px;
+
+    gap: 12px;
+
+    font-size: 13px;
+  }
+
+  .menu-item ion-icon {
+    font-size: 21px;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 420px) {
+
+  .sidebar {
+    width: 88vw;
+    max-width: 285px;
+  }
+
 }

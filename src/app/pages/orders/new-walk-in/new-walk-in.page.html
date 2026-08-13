@@ -1,53 +1,43 @@
 <div class="walkin-page">
 
-  <!-- LEFT SIDE -->
+  <!-- =====================================
+       LEFT - CURRENT ORDER
+  ====================================== -->
+
   <section class="order-panel">
 
     <!-- CUSTOMER -->
+
     <div class="customer-section">
 
-      <div class="section-title">
-        <div>
-          <h2>New Walk-in</h2>
-          <p>Create a new laundry order</p>
-        </div>
-      </div>
+      <div class="customer-fields">
 
-      <div class="customer-grid">
+        <div class="customer-input">
 
-        <div class="field-group">
-          <label>Customer Name</label>
-
-          <input
-            type="text"
-            [(ngModel)]="customerName"
-            placeholder="Enter customer name">
-        </div>
-
-        <div class="field-group">
-
-          <label>Phone Number</label>
+          <span class="input-icon">
+            ☎
+          </span>
 
           <input
             type="tel"
             [(ngModel)]="customerPhone"
-            (ngModelChange)="onPhoneChange()"
             maxlength="10"
             inputmode="numeric"
-            placeholder="Enter phone number">
+            placeholder="Mobile">
 
-          @if (customerMessage) {
+        </div>
 
-            <div
-              class="customer-status"
-              [class.customer-found]="customerFound"
-              [class.customer-new]="newCustomer">
 
-              {{ customerMessage }}
+        <div class="customer-input">
 
-            </div>
+          <span class="input-icon">
+            ●
+          </span>
 
-          }
+          <input
+            type="text"
+            [(ngModel)]="customerName"
+            placeholder="Name">
 
         </div>
 
@@ -56,64 +46,52 @@
     </div>
 
 
-    <!-- ORDER ITEMS -->
-    <div class="items-section">
+    <!-- =====================================
+         CART
+    ====================================== -->
 
-      <div class="section-title">
-
-        <div>
-
-          <h3>Order Items</h3>
-
-          <p>
-            {{ totalPieces }} pieces added
-          </p>
-
-        </div>
-
-      </div>
-
+    <div class="cart-section">
 
       @if (orderItems.length === 0) {
 
-        <div class="empty-items">
+        <div class="empty-cart">
 
-          <div class="empty-icon">
-            🧺
+          <div class="empty-cart-icon">
+            🛒
           </div>
 
-          <h4>No items added</h4>
-
-          <p>
-            Select a product and service from the right side.
-          </p>
+          <div class="empty-title">
+            No Product Added
+          </div>
 
         </div>
 
       } @else {
 
-        <div class="order-items-list">
+        <div class="cart-items">
 
-          @for (
-            item of orderItems;
-            track item.productId + '-' + item.serviceId
-          ) {
+          @for (item of orderItems; track item.id) {
 
-            <article class="order-item">
+            <article class="cart-item">
 
-              <div class="item-main">
+              <div class="cart-item-top">
 
-                <div>
+                <div class="cart-product-info">
 
                   <strong>
                     {{ item.productName }}
                   </strong>
 
-                  <span>
-                    {{ item.serviceName }}
-                  </span>
+                  @if (item.type) {
+
+                    <span class="cart-type">
+                      {{ item.type }}
+                    </span>
+
+                  }
 
                 </div>
+
 
                 <button
                   type="button"
@@ -125,7 +103,52 @@
               </div>
 
 
-              <div class="item-bottom">
+              <div class="cart-services">
+
+                @for (
+                  serviceName of item.serviceNames;
+                  track serviceName
+                ) {
+
+                  <span>
+                    {{ serviceName }}
+                  </span>
+
+                }
+
+              </div>
+
+
+              @if (item.preferences.length > 0) {
+
+                <div class="cart-preferences">
+
+                  @for (
+                    preference of item.preferences;
+                    track preference
+                  ) {
+
+                    <span>
+                      {{ preference }}
+                    </span>
+
+                  }
+
+                </div>
+
+              }
+
+
+              @if (item.comment) {
+
+                <p class="cart-comment">
+                  {{ item.comment }}
+                </p>
+
+              }
+
+
+              <div class="cart-item-bottom">
 
                 <div class="quantity-control">
 
@@ -148,10 +171,10 @@
                 </div>
 
 
-                <div class="item-price">
+                <div class="cart-price">
 
                   <small>
-                    ₹{{ item.price }} each
+                    ₹{{ item.unitPrice }}/{{ item.unit }}
                   </small>
 
                   <strong>
@@ -173,192 +196,68 @@
     </div>
 
 
-    <!-- ORDER OPTIONS -->
-    <div class="order-options">
+    <!-- =====================================
+         SUMMARY
+    ====================================== -->
 
-      <div class="section-title">
+    <div class="left-summary">
 
-        <div>
-
-          <h3>Order Options</h3>
-
-          <p>
-            Delivery and processing preferences
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="options-grid">
-
-        <div class="field-group">
-
-          <label>Delivery Date</label>
-
-          <input
-            type="date"
-            [(ngModel)]="deliveryDate">
-
-        </div>
-
-
-        <div class="field-group">
-
-          <label>Delivery Time</label>
-
-          <select [(ngModel)]="deliveryTime">
-
-            <option value="09:00 AM - 12:00 PM">
-              09:00 AM - 12:00 PM
-            </option>
-
-            <option value="12:00 PM - 03:00 PM">
-              12:00 PM - 03:00 PM
-            </option>
-
-            <option value="03:00 PM - 06:00 PM">
-              03:00 PM - 06:00 PM
-            </option>
-
-            <option value="06:00 PM - 09:00 PM">
-              06:00 PM - 09:00 PM
-            </option>
-
-          </select>
-
-        </div>
-
-      </div>
-
-
-      <!-- DELIVERY OPTIONS -->
-      <div class="toggle-row">
-
-        <label class="toggle-option">
-
-          <input
-            type="checkbox"
-            [(ngModel)]="homeDelivery">
-
-          <span class="toggle-box"></span>
-
-          <div>
-
-            <strong>
-              Home Delivery
-            </strong>
-
-            <small>
-              Deliver order to customer
-            </small>
-
-          </div>
-
-        </label>
-
-
-        <label class="toggle-option">
-
-          <input
-            type="checkbox"
-            [(ngModel)]="expressDelivery">
-
-          <span class="toggle-box"></span>
-
-          <div>
-
-            <strong>
-              Express
-            </strong>
-
-            <small>
-              Additional ₹100
-            </small>
-
-          </div>
-
-        </label>
-
-      </div>
-
-
-      <!-- PROCESSING AREA -->
-      <div class="processing-area-section">
-
-        <span class="processing-area-label">
-          Processing Area
-        </span>
-
-        <div class="area-options">
-
-          <label
-            class="area-option"
-            [class.selected]="washingArea">
-
-            <input
-              type="checkbox"
-              [(ngModel)]="washingArea">
-
-            <span class="area-check">
-              ✓
-            </span>
-
-            <span>
-              Washing Area
-            </span>
-
-          </label>
-
-
-          <label
-            class="area-option"
-            [class.selected]="pressingArea">
-
-            <input
-              type="checkbox"
-              [(ngModel)]="pressingArea">
-
-            <span class="area-check">
-              ✓
-            </span>
-
-            <span>
-              Pressing Area
-            </span>
-
-          </label>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ORDER SUMMARY -->
-    <div class="summary-section">
-
-      <div class="section-title">
-
-        <div>
-
-          <h3>Order Summary</h3>
-
-          <p>
-            Review the final order amount
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="summary-row">
+      <div class="summary-line">
 
         <span>
-          Total Pieces
+          Gross Total:
+        </span>
+
+        <strong>
+          ₹{{ grossTotal }}
+        </strong>
+
+      </div>
+
+
+      <div class="summary-line">
+
+        <span>
+          Discount Amount:
+        </span>
+
+        <strong>
+          ₹{{ totalDiscount }}
+        </strong>
+
+      </div>
+
+
+      <div class="summary-line">
+
+        <span>
+
+          Express Amount:
+
+          @if (
+            expressDelivery &&
+            expressPercentage > 0
+          ) {
+
+            <small>
+              ({{ expressPercentage }}%)
+            </small>
+
+          }
+
+        </span>
+
+        <strong>
+          ₹{{ expressAmount }}
+        </strong>
+
+      </div>
+
+
+      <div class="summary-line">
+
+        <span>
+          Total Count:
         </span>
 
         <strong>
@@ -368,227 +267,10 @@
       </div>
 
 
-      <div class="summary-row">
+      <div class="summary-line total">
 
         <span>
-          Subtotal
-        </span>
-
-        <strong>
-          ₹{{ subtotal }}
-        </strong>
-
-      </div>
-
-
-      <!-- COUPON -->
-      <div class="coupon-section">
-
-        <div class="coupon-title-row">
-
-          <span>
-            Coupon
-          </span>
-
-          @if (couponApplied) {
-
-            <button
-              type="button"
-              class="remove-coupon-button"
-              (click)="removeCoupon()">
-
-              Remove
-
-            </button>
-
-          }
-
-        </div>
-
-
-        <div class="coupon-dropdown">
-
-          <button
-            type="button"
-            class="coupon-dropdown-trigger"
-            [class.open]="couponDropdownOpen"
-            [class.has-coupon]="couponApplied"
-            (click)="toggleCouponDropdown()">
-
-            <div class="coupon-trigger-content">
-
-              @if (couponApplied) {
-
-                <div class="selected-coupon-info">
-
-                  <strong>
-                    {{ couponCode }}
-                  </strong>
-
-                  <span>
-                    ₹{{ couponDiscount }} discount
-                  </span>
-
-                </div>
-
-              } @else {
-
-                <span class="coupon-placeholder">
-                  Select Coupon
-                </span>
-
-              }
-
-            </div>
-
-            <span
-              class="dropdown-arrow"
-              [class.rotate]="couponDropdownOpen">
-
-              ▾
-
-            </span>
-
-          </button>
-
-
-          @if (couponDropdownOpen) {
-
-            <div class="coupon-dropdown-menu">
-
-              @for (
-                coupon of coupons;
-                track coupon.code
-              ) {
-
-                <button
-                  type="button"
-                  class="coupon-dropdown-item"
-                  [class.inactive]="!coupon.active"
-                  [class.selected]="
-                    couponApplied &&
-                    couponCode === coupon.code
-                  "
-                  [disabled]="!coupon.active"
-                  (click)="selectCoupon(coupon)">
-
-                  <div class="coupon-item-left">
-
-                    <span class="coupon-circle">
-
-                      @if (
-                        couponApplied &&
-                        couponCode === coupon.code
-                      ) {
-
-                        ✓
-
-                      }
-
-                    </span>
-
-                    <div>
-
-                      <strong>
-                        {{ coupon.code }}
-                      </strong>
-
-                      <span>
-                        Flat ₹{{ coupon.amount }} off
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  <div class="coupon-item-right">
-
-                    @if (coupon.active) {
-
-                      <span class="coupon-active">
-                        Active
-                      </span>
-
-                    } @else {
-
-                      <span class="coupon-inactive">
-                        Inactive
-                      </span>
-
-                    }
-
-                    <strong>
-                      -₹{{ coupon.amount }}
-                    </strong>
-
-                  </div>
-
-                </button>
-
-              }
-
-            </div>
-
-          }
-
-        </div>
-
-
-        @if (couponMessage) {
-
-          <div
-            class="coupon-message"
-            [class.coupon-success]="couponApplied"
-            [class.coupon-error]="!couponApplied">
-
-            {{ couponMessage }}
-
-          </div>
-
-        }
-
-      </div>
-
-
-      @if (couponDiscount > 0) {
-
-        <div class="summary-row coupon-discount-row">
-
-          <span>
-            Coupon Discount
-          </span>
-
-          <strong>
-            -₹{{ couponDiscount }}
-          </strong>
-
-        </div>
-
-      }
-
-
-      @if (expressDelivery) {
-
-        <div class="summary-row">
-
-          <span>
-            Express Charge
-          </span>
-
-          <strong>
-            +₹100
-          </strong>
-
-        </div>
-
-      }
-
-
-      <div class="summary-row total-row">
-
-        <span>
-          Grand Total
+          Total Amount:
         </span>
 
         <strong>
@@ -597,22 +279,301 @@
 
       </div>
 
+    </div>
+
+
+    <!-- =====================================
+         DELIVERY / ORDER OPTIONS
+    ====================================== -->
+
+    <div class="bottom-options">
+
+      <div class="delivery-options">
+
+
+        <!-- DELIVERY DATE -->
+
+        <div class="delivery-option-row">
+
+          <div class="delivery-option-icon">
+            📅
+          </div>
+
+
+          <div class="delivery-control">
+
+            <input
+              type="date"
+              [(ngModel)]="deliveryDate"
+              [min]="minimumDeliveryDate"
+              aria-label="Delivery Date">
+
+          </div>
+
+        </div>
+
+
+        <!-- DELIVERY TIME SLOT -->
+
+        <div class="delivery-option-row">
+
+          <div class="delivery-option-icon">
+            ◷
+          </div>
+
+
+          <div class="delivery-control">
+
+            <select
+              [(ngModel)]="deliveryTime"
+              aria-label="Delivery Timeslot">
+
+              <option
+                value=""
+                disabled>
+                Delivery Timeslot
+              </option>
+
+
+              @for (
+                slot of deliveryTimeSlots;
+                track slot
+              ) {
+
+                <option [value]="slot">
+                  {{ slot }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- HOME DELIVERY -->
+
+        <div class="delivery-option-row toggle-row">
+
+          <div class="delivery-option-icon"></div>
+
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="homeDelivery">
+
+            <span class="switch-slider"></span>
+
+          </label>
+
+
+          <span class="toggle-label">
+            Home Delivery
+          </span>
+
+        </div>
+
+
+        <!-- EXPRESS DELIVERY -->
+
+        <div class="delivery-option-row express-row">
+
+          <div class="delivery-option-icon"></div>
+
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="expressDelivery"
+              (ngModelChange)="onExpressDeliveryChange()">
+
+            <span class="switch-slider"></span>
+
+          </label>
+
+
+          <span class="toggle-label">
+            Express Delivery
+          </span>
+
+
+          @if (expressDelivery) {
+
+            <select
+              class="express-select"
+              [(ngModel)]="expressPercentage">
+
+              <option
+                [ngValue]="0"
+                disabled>
+                Add Express
+              </option>
+
+
+              @for (
+                percentage of expressPercentages;
+                track percentage
+              ) {
+
+                <option [ngValue]="percentage">
+                  {{ percentage }}%
+                </option>
+
+              }
+
+            </select>
+
+          }
+
+        </div>
+
+
+        <!-- EXPRESS INFO -->
+
+        @if (
+          expressDelivery &&
+          expressPercentage > 0
+        ) {
+
+          <div class="express-info">
+
+            <span>
+              Express charge
+              ({{ expressPercentage }}%)
+            </span>
+
+            <strong>
+              +₹{{ expressAmount }}
+            </strong>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- =====================================
+           COUPON
+      ====================================== -->
+
+      <div class="coupon-area">
+
+        <button
+          type="button"
+          class="coupon-trigger"
+          (click)="toggleCouponDropdown()">
+
+          @if (couponApplied) {
+
+            <span>
+              Coupon: {{ couponCode }}
+            </span>
+
+            <strong>
+              -₹{{ couponDiscount }}
+            </strong>
+
+          } @else {
+
+            <span>
+              Select Coupon
+            </span>
+
+            <span>
+              ▾
+            </span>
+
+          }
+
+        </button>
+
+
+        @if (couponDropdownOpen) {
+
+          <div class="coupon-menu">
+
+            @for (
+              coupon of coupons;
+              track coupon.code
+            ) {
+
+              <button
+                type="button"
+                [disabled]="!coupon.active"
+                [class.disabled]="!coupon.active"
+                (click)="selectCoupon(coupon)">
+
+                <div>
+
+                  <strong>
+                    {{ coupon.code }}
+                  </strong>
+
+                  <small>
+                    ₹{{ coupon.amount }} OFF
+                  </small>
+
+                </div>
+
+
+                <span>
+                  {{
+                    coupon.active
+                      ? 'Apply'
+                      : 'Inactive'
+                  }}
+                </span>
+
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+
+        @if (couponApplied) {
+
+          <button
+            type="button"
+            class="remove-coupon"
+            (click)="removeCoupon()">
+
+            Remove Coupon
+
+          </button>
+
+        }
+
+      </div>
+
+
+      <!-- CREATE ORDER -->
 
       <button
         type="button"
         class="create-order-button"
-        [disabled]="creatingOrder"
+        [disabled]="
+          !customerName.trim() ||
+          !customerPhone.trim() ||
+          !deliveryDate ||
+          !deliveryTime ||
+          orderItems.length === 0 ||
+          (
+            expressDelivery &&
+            expressPercentage <= 0
+          )
+        "
         (click)="createOrder()">
 
-        @if (creatingOrder) {
-
-          Creating Order...
-
-        } @else {
-
-          Create Order
-
-        }
+        Create Order
 
       </button>
 
@@ -621,55 +582,34 @@
   </section>
 
 
-  <!-- RIGHT SIDE -->
+  <!-- =====================================
+       RIGHT - PRODUCTS
+  ====================================== -->
+
   <section class="products-panel">
 
-    <!-- SEARCH -->
-    <div class="product-header">
 
-      <div>
+    <!-- ALPHABET -->
 
-        <h2>
-          Select Product
-        </h2>
-
-        <p>
-          Choose garment and service
-        </p>
-
-      </div>
-
-
-      <div class="search-box">
-
-        <span>
-          ⌕
-        </span>
-
-        <input
-          type="text"
-          [(ngModel)]="searchText"
-          placeholder="Search product">
-
-      </div>
-
-    </div>
-
-
-    <!-- CATEGORY FILTER -->
-    <div class="category-tabs">
+    <div class="alphabet-filter">
 
       @for (
-        category of categories;
-        track category
+        letter of letters;
+        track letter
       ) {
 
         <button
           type="button"
-          [class.active]="selectedCategory === category"
-          (click)="selectCategory(category)">
+          [class.active]="
+            selectedLetter === letter
+          "
+          (click)="selectLetter(letter)">
 
-          {{ category }}
+          {{
+            letter === 'ALL'
+              ? 'All'
+              : letter
+          }}
 
         </button>
 
@@ -678,18 +618,31 @@
     </div>
 
 
-    <!-- PRODUCT GRID -->
-    <div class="product-grid">
+    <!-- SEARCH -->
 
-      @if (loadingProducts) {
+    <div class="product-search">
 
-        <div class="products-state">
-          Loading products...
-        </div>
+      <span>
+        ⌕
+      </span>
 
-      } @else if (filteredProducts.length === 0) {
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search products">
 
-        <div class="products-state">
+    </div>
+
+
+    <!-- PRODUCT LIST -->
+
+    <div class="product-list">
+
+      @if (
+        filteredProducts.length === 0
+      ) {
+
+        <div class="no-products">
           No products found
         </div>
 
@@ -702,58 +655,76 @@
 
           <article class="product-card">
 
-            <div class="product-top">
 
-              <div class="product-icon">
-                {{ product.icon }}
-              </div>
+            <div class="product-content">
 
-              <div>
+              <h3>
+                {{ product.name }}
+              </h3>
 
-                <strong>
-                  {{ product.name }}
-                </strong>
 
-                <span>
-                  {{ product.category }}
-                </span>
+              @if (
+                product.types.length > 0
+              ) {
+
+                <div class="product-types">
+
+                  @for (
+                    type of product.types;
+                    track type
+                  ) {
+
+                    <span>
+                      {{ type }}
+                    </span>
+
+                  }
+
+                </div>
+
+              }
+
+
+              <div class="product-services">
+
+                @for (
+                  service of product.services;
+                  track service.id
+                ) {
+
+                  <div class="product-service">
+
+                    <span>
+                      {{ service.name }}
+                    </span>
+
+                    <strong>
+                      ₹{{ service.price }}/{{ service.unit }}
+                    </strong>
+
+                  </div>
+
+                }
 
               </div>
 
             </div>
 
 
-            <div class="service-list">
+            <div class="product-actions">
 
-              @for (
-                service of product.services;
-                track service.serviceId
-              ) {
+              <div class="product-icon">
+                {{ product.icon }}
+              </div>
 
-                <button
-                  type="button"
-                  class="service-option"
-                  (click)="addProduct(product, service)">
+              <button
+                type="button"
+                class="add-product-button"
+                (click)="openProduct(product)">
 
-                  <div>
+                Add
 
-                    <span>
-                      {{ service.name }}
-                    </span>
-
-                    <small>
-                      ₹{{ service.price }}
-                    </small>
-
-                  </div>
-
-                  <span class="add-service">
-                    +
-                  </span>
-
-                </button>
-
-              }
+              </button>
 
             </div>
 
@@ -770,45 +741,245 @@
 </div>
 
 
-<!-- ORDER SUCCESS MODAL -->
-@if (orderCreated) {
+<!-- =====================================
+     PRODUCT CONFIGURATION MODAL
+====================================== -->
 
-  <div class="order-success-overlay">
+@if (
+  productModalOpen &&
+  selectedProduct
+) {
 
-    <div class="order-success-modal">
+  <div
+    class="product-modal-overlay"
+    (click)="closeProductModal()">
 
-      <div class="order-success-content">
+
+    <div
+      class="product-modal"
+      (click)="$event.stopPropagation()">
+
+
+      <!-- HEADER -->
+
+      <div class="product-modal-header">
+
+        <button
+          type="button"
+          class="close-modal"
+          (click)="closeProductModal()">
+
+          ×
+
+        </button>
+
 
         <h2>
-          Order #{{ createdOrderNumber }}
+          {{ selectedProduct.name }}
         </h2>
-
-        <p>
-          Order created successfully.
-        </p>
-
-        <p>
-          Print the receipt and give one copy to the customer.
-        </p>
 
       </div>
 
 
-      <div class="order-success-actions">
+      <!-- BODY -->
+
+      <div class="product-modal-body">
+
+
+        <!-- PRODUCT TYPE -->
+
+        @if (
+          selectedProduct.types.length > 0
+        ) {
+
+          <div class="modal-section">
+
+            <label class="modal-label">
+
+              Select
+              {{ selectedProduct.name }}
+              Type
+
+            </label>
+
+
+            <div class="selection-buttons">
+
+              @for (
+                type of selectedProduct.types;
+                track type
+              ) {
+
+                <button
+                  type="button"
+                  [class.selected]="
+                    selectedProductType === type
+                  "
+                  (click)="selectProductType(type)">
+
+                  {{ type }}
+
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- SERVICES -->
+
+        <div class="modal-section">
+
+          <label class="modal-label">
+
+            Select one or more services
+
+            <span class="required">
+              *
+            </span>
+
+          </label>
+
+
+          <div class="service-selection">
+
+            @for (
+              service of selectedProduct.services;
+              track service.id
+            ) {
+
+              <button
+                type="button"
+                [class.selected]="
+                  isServiceSelected(service.id)
+                "
+                (click)="toggleService(service.id)">
+
+                {{ service.name }}
+
+                [
+                ₹{{ service.price }}/{{ service.unit }}
+                ]
+
+              </button>
+
+            }
+
+          </div>
+
+        </div>
+
+        <!-- QUANTITY -->
+
+        <div
+          class="
+            modal-section
+            modal-quantity-section
+          ">
+
+          <label class="modal-label">
+            Quantity
+          </label>
+
+
+          <div class="modal-quantity">
+
+            <button
+              type="button"
+              (click)="decreaseModalQuantity()">
+
+              −
+
+            </button>
+
+            <strong>
+              {{ modalQuantity }}
+            </strong>
+
+            <button
+              type="button"
+              (click)="increaseModalQuantity()">
+
+              +
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="product-modal-footer">
 
         <button
           type="button"
-          class="modal-action close"
-          (click)="closeOrderModal()">
+          class="cancel-modal-button"
+          (click)="closeProductModal()">
 
-          Close
+          Cancel
 
         </button>
 
 
         <button
           type="button"
-          class="modal-action"
+          class="confirm-product-button"
+          [disabled]="
+            selectedServiceIds.length === 0
+          "
+          (click)="addConfiguredProduct()">
+
+          Add Product
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- =====================================
+     ORDER CREATED MODAL
+====================================== -->
+
+@if (orderCreated) {
+
+  <div class="success-overlay">
+
+    <div class="success-modal">
+
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+
+      <h2>
+        Order #{{ createdOrderNumber }}
+      </h2>
+
+
+      <p>
+        Order created successfully.
+      </p>
+
+
+      <div class="success-actions">
+
+        <button
+          type="button"
           (click)="printReceipt()">
 
           Print Receipt
@@ -818,7 +989,6 @@
 
         <button
           type="button"
-          class="modal-action primary"
           (click)="printTag()">
 
           Print Tag
@@ -828,7 +998,6 @@
 
         <button
           type="button"
-          class="modal-action"
           (click)="printQrTag()">
 
           Print QR Tag
@@ -836,6 +1005,26 @@
         </button>
 
       </div>
+
+
+      <button
+        type="button"
+        class="new-order-button"
+        (click)="startNewOrder()">
+
+        New Walk-in
+
+      </button>
+
+
+      <button
+        type="button"
+        class="close-success"
+        (click)="closeOrderModal()">
+
+        Close
+
+      </button>
 
     </div>
 

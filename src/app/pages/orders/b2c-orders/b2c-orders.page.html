@@ -124,10 +124,6 @@
           </th>
 
           <th>
-            Address
-          </th>
-
-          <th>
             Storage Label
           </th>
 
@@ -139,13 +135,7 @@
             Pickup Timeslot
           </th>
 
-          <th>
-            Pickup Rider
-          </th>
 
-          <th>
-            Rider Mobile
-          </th>
 
           <th>
             Delivery Date
@@ -230,14 +220,14 @@
                   </button>
 
 
-                  <button
+                  <!-- <button
                     type="button"
                     class="action-button"
                     (click)="processAtVendor(order)">
 
                     Process At Vendor
 
-                  </button>
+                  </button> -->
 
 
                   <button
@@ -512,13 +502,13 @@
                       </button>
 
 
-                      <button
+                      <!-- <button
                         type="button"
                         (click)="changeReadyStatus(order)">
 
                         Change CLT Ready Status
 
-                      </button>
+                      </button> -->
 
 
                       <button
@@ -539,13 +529,13 @@
                       </button>
 
 
-                      <button
+                      <!-- <button
                         type="button"
                         (click)="smsPaymentLink(order)">
 
                         SMS Payment Link
 
-                      </button>
+                      </button> -->
 
                     </div>
 
@@ -573,12 +563,7 @@
 
               <span
                 class="status-badge"
-                [class.status-new]="order.status === 'New Order'"
-                [class.status-pickup]="
-                  order.status === 'Unassigned Pickup' ||
-                  order.status === 'Assigned Pickup' ||
-                  order.status === 'Out For Pickup'
-                "
+                
                 [class.status-processing]="
                   order.status === 'Processing At Store' ||
                   order.status === 'Processing At Vendor'
@@ -586,10 +571,7 @@
                 [class.status-ready]="
                   order.status === 'Ready Order'
                 "
-                [class.status-delivery]="
-                  order.status === 'Assigned Delivery' ||
-                  order.status === 'Out For Delivery'
-                "
+                
                 [class.status-delivered]="
                   order.status === 'Delivered'
                 "

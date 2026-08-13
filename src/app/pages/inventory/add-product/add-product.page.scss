@@ -1,0 +1,779 @@
+
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.add-product-page {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  padding: 30px 32px 50px;
+  background: #ffffff;
+  color: #111827;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.page-header {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.back-button {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #dce3e7;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #4b5563;
+
+  font-size: 21px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.back-button:hover {
+  border-color: #18b6d2;
+  background: #f1fbfd;
+  color: #0da5c1;
+}
+
+.page-header h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #111111;
+}
+
+.page-header p {
+  margin: 6px 0 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: #68737d;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.product-form {
+  width: 100%;
+  max-width: 1100px;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.form-card {
+  width: 100%;
+
+  overflow: hidden;
+
+  border: 1px solid #dfe6e9;
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+.section-header {
+  min-height: 84px;
+
+  padding: 20px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #e7ecee;
+}
+
+.section-header h2 {
+  margin: 0;
+
+  color: #111111;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.section-header p {
+  margin: 5px 0 0;
+
+  color: #73808a;
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.optional-label {
+  flex-shrink: 0;
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  background: #f1f4f5;
+
+  color: #6b747b;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.form-content {
+  padding: 24px;
+}
+
+
+/* =====================================================
+   FORM LAYOUT
+===================================================== */
+
+.form-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 20px;
+}
+
+.form-group {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.form-group.full-width {
+  width: 100%;
+
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  color: #30383e;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.required {
+  color: #dc3545;
+}
+
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.form-group input,
+.form-group select,
+.add-type-row input,
+.service-field > input {
+  width: 100%;
+  height: 48px;
+
+  padding: 0 14px;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #242b30;
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder,
+.add-type-row input::placeholder,
+.service-field > input::placeholder {
+  color: #a1a9ae;
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.add-type-row input:hover,
+.service-field > input:hover {
+  border-color: #b7c2c7;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.add-type-row input:focus,
+.service-field > input:focus {
+  border-color: #17b4d0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 180, 208, 0.08);
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   VALIDATION
+===================================================== */
+
+.error-text {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #dc3545;
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.field-help {
+  margin: 10px 0 0;
+
+  color: #8a949b;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* =====================================================
+   PRODUCT TYPES
+===================================================== */
+
+.type-list {
+  margin-bottom: 16px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 9px;
+}
+
+.type-chip {
+  min-height: 34px;
+
+  padding: 5px 7px 5px 13px;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  border: 1px solid #bfeef5;
+  border-radius: 18px;
+
+  background: #eafafd;
+
+  color: #0799b4;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.type-chip button {
+  width: 22px;
+  height: 22px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #0799b4;
+
+  font-size: 17px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.type-chip button:hover {
+  background: #cef4f9;
+}
+
+.add-type-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    135px;
+
+  gap: 10px;
+}
+
+.secondary-button {
+  height: 48px;
+
+  padding: 0 16px;
+
+  border: 1px solid #17b4d0;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #0da5c1;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #ecfafc;
+}
+
+.secondary-button:disabled {
+  border-color: #d9e0e3;
+
+  background: #f7f8f8;
+
+  color: #adb5ba;
+
+  cursor: not-allowed;
+}
+
+
+/* =====================================================
+   SERVICES TABLE
+===================================================== */
+
+.service-table-header {
+  padding: 0 0 9px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(240px, 1fr)
+    230px
+    44px;
+
+  gap: 12px;
+
+  color: #68737b;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.service-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.service-row {
+  padding: 14px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(240px, 1fr)
+    230px
+    44px;
+
+  align-items: start;
+
+  gap: 12px;
+
+  border: 1px solid #e1e7ea;
+  border-radius: 8px;
+
+  background: #fafcfc;
+}
+
+.service-field {
+  min-width: 0;
+}
+
+.service-field > input {
+  background: #ffffff;
+}
+
+
+/* =====================================================
+   PRICE INPUT
+===================================================== */
+
+.price-input {
+  width: 100%;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.price-input:focus-within {
+  border-color: #17b4d0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 180, 208, 0.08);
+}
+
+.currency-symbol {
+  height: 100%;
+
+  padding: 0 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-right: 1px solid #e1e6e8;
+
+  background: #f5f8f9;
+
+  color: #59636a;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.price-input input {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+
+  padding: 0 12px;
+
+  border: none;
+  outline: none;
+
+  background: #ffffff;
+
+  color: #242b30;
+
+  font-size: 14px;
+}
+
+.price-input input::-webkit-inner-spin-button,
+.price-input input::-webkit-outer-spin-button {
+  margin: 0;
+}
+
+
+/* =====================================================
+   DELETE SERVICE
+===================================================== */
+
+.delete-service-button {
+  width: 42px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e1e6e8;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #d84b4b;
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.delete-service-button:hover:not(:disabled) {
+  border-color: #f1bcbc;
+
+  background: #fff4f4;
+}
+
+.delete-service-button:disabled {
+  color: #c6cccf;
+
+  background: #f5f6f6;
+
+  cursor: not-allowed;
+}
+
+
+/* =====================================================
+   ADD SERVICE
+===================================================== */
+
+.add-service-button {
+  height: 42px;
+
+  margin-top: 14px;
+
+  padding: 0 15px;
+
+  border: 1px dashed #17b4d0;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #079db9;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.add-service-button:hover {
+  border-color: #079db9;
+
+  background: #effbfd;
+}
+
+
+/* =====================================================
+   FORM ACTIONS
+===================================================== */
+
+.form-actions {
+  padding: 18px 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+}
+
+.cancel-button,
+.save-button {
+  min-width: 120px;
+  height: 46px;
+
+  padding: 0 22px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cancel-button {
+  border: 1px solid #d5dde1;
+
+  background: #ffffff;
+
+  color: #515b62;
+}
+
+.cancel-button:hover {
+  background: #f6f8f9;
+
+  border-color: #bdc7cc;
+}
+
+.save-button {
+  border: 1px solid #16b2cf;
+
+  background: #18b5d2;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 4px 12px rgba(24, 181, 210, 0.16);
+}
+
+.save-button:hover {
+  border-color: #0fa5c1;
+
+  background: #0faac7;
+}
+
+
+/* =====================================================
+   RESPONSIVE - TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .add-product-page {
+    padding: 24px 20px 40px;
+  }
+
+  .service-table-header {
+    grid-template-columns:
+      minmax(180px, 1fr)
+      180px
+      44px;
+  }
+
+  .service-row {
+    grid-template-columns:
+      minmax(180px, 1fr)
+      180px
+      44px;
+  }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+===================================================== */
+
+@media (max-width: 650px) {
+
+  .add-product-page {
+    padding: 18px 12px 32px;
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+  }
+
+  .page-header h1 {
+    font-size: 23px;
+  }
+
+  .back-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .section-header {
+    min-height: auto;
+
+    padding: 18px;
+
+    align-items: flex-start;
+  }
+
+  .form-content {
+    padding: 18px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .add-type-row {
+    grid-template-columns: 1fr;
+  }
+
+  .secondary-button {
+    width: 100%;
+  }
+
+  .service-table-header {
+    display: none;
+  }
+
+  .service-row {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-service-button {
+    width: 100%;
+    height: 40px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .save-button {
+    width: 100%;
+  }
+
+}

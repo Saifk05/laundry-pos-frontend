@@ -7,6 +7,7 @@ interface DashboardOrder {
   amount: number;
   deliveryTime: string;
   customerName: string;
+  phone: string;
   ready: boolean;
   highlighted: boolean;
 }
@@ -34,6 +35,10 @@ interface DeliveryDay {
 })
 export class DashboardPage implements OnInit {
 
+  staffPhone = '9663280710';
+
+  selectedOrder: DashboardOrder | null = null;
+
   deliveryDays: DeliveryDay[] = [
     {
       date: 'Sat 8 Aug',
@@ -55,6 +60,7 @@ export class DashboardPage implements OnInit {
           amount: 540,
           deliveryTime: '08:00 PM',
           customerName: 'Rahul',
+          phone: '9876543210',
           ready: false,
           highlighted: false
         },
@@ -65,6 +71,7 @@ export class DashboardPage implements OnInit {
           amount: 380,
           deliveryTime: '08:30 PM',
           customerName: 'Anita',
+          phone: '9123456789',
           ready: true,
           highlighted: true
         },
@@ -75,6 +82,7 @@ export class DashboardPage implements OnInit {
           amount: 760,
           deliveryTime: '09:00 PM',
           customerName: 'Kiran',
+          phone: '9988123456',
           ready: false,
           highlighted: false
         },
@@ -85,6 +93,7 @@ export class DashboardPage implements OnInit {
           amount: 610,
           deliveryTime: '09:00 PM',
           customerName: 'Sneha',
+          phone: '8899776655',
           ready: true,
           highlighted: true
         }
@@ -111,6 +120,7 @@ export class DashboardPage implements OnInit {
           amount: 890,
           deliveryTime: '07:30 PM',
           customerName: 'Ajay',
+          phone: '9898981212',
           ready: true,
           highlighted: true
         },
@@ -121,6 +131,7 @@ export class DashboardPage implements OnInit {
           amount: 325,
           deliveryTime: '08:00 PM',
           customerName: 'Pooja',
+          phone: '9012345678',
           ready: false,
           highlighted: false
         },
@@ -131,6 +142,7 @@ export class DashboardPage implements OnInit {
           amount: 1050,
           deliveryTime: '08:30 PM',
           customerName: 'Vijay',
+          phone: '9000012345',
           ready: false,
           highlighted: false
         },
@@ -141,6 +153,7 @@ export class DashboardPage implements OnInit {
           amount: 720,
           deliveryTime: '09:00 PM',
           customerName: 'Deepa',
+          phone: '7788996655',
           ready: true,
           highlighted: true
         }
@@ -167,6 +180,7 @@ export class DashboardPage implements OnInit {
           amount: 480,
           deliveryTime: '07:00 PM',
           customerName: 'Ramesh',
+          phone: '9988772211',
           ready: false,
           highlighted: false
         },
@@ -177,6 +191,7 @@ export class DashboardPage implements OnInit {
           amount: 810,
           deliveryTime: '08:00 PM',
           customerName: 'Nisha',
+          phone: '9345678123',
           ready: true,
           highlighted: true
         },
@@ -187,6 +202,7 @@ export class DashboardPage implements OnInit {
           amount: 410,
           deliveryTime: '08:30 PM',
           customerName: 'Suresh',
+          phone: '9445566778',
           ready: false,
           highlighted: false
         },
@@ -197,6 +213,7 @@ export class DashboardPage implements OnInit {
           amount: 530,
           deliveryTime: '09:00 PM',
           customerName: 'Asha',
+          phone: '9556677889',
           ready: true,
           highlighted: true
         }
@@ -223,6 +240,7 @@ export class DashboardPage implements OnInit {
           amount: 1180,
           deliveryTime: '07:30 PM',
           customerName: 'Santosh',
+          phone: '9667788990',
           ready: false,
           highlighted: false
         },
@@ -233,6 +251,7 @@ export class DashboardPage implements OnInit {
           amount: 690,
           deliveryTime: '08:00 PM',
           customerName: 'Meena',
+          phone: '8877665544',
           ready: true,
           highlighted: true
         },
@@ -243,6 +262,7 @@ export class DashboardPage implements OnInit {
           amount: 920,
           deliveryTime: '08:30 PM',
           customerName: 'Naveen',
+          phone: '9786543210',
           ready: false,
           highlighted: false
         },
@@ -253,6 +273,7 @@ export class DashboardPage implements OnInit {
           amount: 1120,
           deliveryTime: '09:00 PM',
           customerName: 'Kavya',
+          phone: '9867543210',
           ready: true,
           highlighted: true
         }
@@ -279,6 +300,7 @@ export class DashboardPage implements OnInit {
           amount: 840,
           deliveryTime: '07:30 PM',
           customerName: 'Manoj',
+          phone: '9765432101',
           ready: true,
           highlighted: true
         },
@@ -289,6 +311,7 @@ export class DashboardPage implements OnInit {
           amount: 590,
           deliveryTime: '08:00 PM',
           customerName: 'Rekha',
+          phone: '9678901234',
           ready: false,
           highlighted: false
         },
@@ -299,6 +322,7 @@ export class DashboardPage implements OnInit {
           amount: 740,
           deliveryTime: '08:30 PM',
           customerName: 'Harish',
+          phone: '9567890123',
           ready: false,
           highlighted: false
         },
@@ -309,6 +333,7 @@ export class DashboardPage implements OnInit {
           amount: 980,
           deliveryTime: '09:00 PM',
           customerName: 'Neha',
+          phone: '9456789012',
           ready: true,
           highlighted: true
         }
@@ -334,7 +359,8 @@ export class DashboardPage implements OnInit {
           pieces: 21,
           amount: 1882,
           deliveryTime: '08:00 PM',
-          customerName: 'Komal',
+          customerName: 'Komal Katawe',
+          phone: '9110417574',
           ready: false,
           highlighted: false
         },
@@ -345,6 +371,7 @@ export class DashboardPage implements OnInit {
           amount: 1154,
           deliveryTime: '09:00 PM',
           customerName: 'Manjunath',
+          phone: '9345678901',
           ready: false,
           highlighted: false
         },
@@ -355,6 +382,7 @@ export class DashboardPage implements OnInit {
           amount: 688,
           deliveryTime: '09:00 PM',
           customerName: 'Ritu',
+          phone: '9234567890',
           ready: false,
           highlighted: false
         },
@@ -365,6 +393,7 @@ export class DashboardPage implements OnInit {
           amount: 1228,
           deliveryTime: '09:00 PM',
           customerName: 'Khushi',
+          phone: '9123456701',
           ready: false,
           highlighted: false
         }
@@ -377,4 +406,21 @@ export class DashboardPage implements OnInit {
   ngOnInit(): void {
   }
 
+  openCallPopup(order: DashboardOrder): void {
+    this.selectedOrder = order;
+  }
+
+  closeCallPopup(): void {
+    this.selectedOrder = null;
+  }
+
+  callNow(): void {
+
+    if (!this.selectedOrder) {
+      return;
+    }
+
+    window.location.href =
+      `tel:${this.selectedOrder.phone}`;
+  }
 }

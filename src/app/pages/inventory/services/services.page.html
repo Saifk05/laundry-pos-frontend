@@ -1,0 +1,209 @@
+<div class="services-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Services
+      </h1>
+
+      <p>
+        Manage laundry products, services and pricing
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="primary-button"
+      (click)="addProduct()">
+
+      + Add Product
+
+    </button>
+
+  </div>
+
+
+  <section class="filters">
+
+    <div class="search-field">
+
+      <input
+        type="text"
+        [(ngModel)]="search"
+        placeholder="Search product">
+
+    </div>
+
+
+    <div class="category-tabs">
+
+      @for (
+        category of categories;
+        track category
+      ) {
+
+        <button
+          type="button"
+          class="category-button"
+          [class.active]="selectedCategory === category"
+          (click)="selectCategory(category)">
+
+          {{ category }}
+
+        </button>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  @if (loading) {
+
+    <div class="loading-state">
+
+      <p>
+        Loading products...
+      </p>
+
+    </div>
+
+  } @else {
+
+    <section class="product-grid">
+
+      @for (
+        product of filteredProducts;
+        track product.id
+      ) {
+
+        <article class="product-card">
+
+
+          <div class="product-card-header">
+
+            <div class="product-identity">
+
+              <div class="product-icon">
+                {{ product.icon }}
+              </div>
+
+
+              <div>
+
+                <h2>
+                  {{ product.name }}
+                </h2>
+
+                <p class="product-category">
+                  {{ product.category }}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="edit-product-button"
+              (click)="editProduct(product)">
+
+              Edit
+
+            </button>
+
+          </div>
+
+
+          <div class="product-section">
+
+            <div class="section-heading">
+
+              <h3>
+                Services & Pricing
+              </h3>
+
+              <button
+                type="button"
+                class="text-button"
+                (click)="manageServices(product)">
+
+                Manage
+
+              </button>
+
+            </div>
+
+
+            @if (product.services.length > 0) {
+
+              <div class="service-list">
+
+                @for (
+                  service of product.services;
+                  track service.serviceId
+                ) {
+
+                  <div class="service-row">
+
+                    <div class="service-info">
+
+                      <span class="service-name">
+                        {{ service.name }}
+                      </span>
+
+                    </div>
+
+
+                    <strong class="service-price">
+                      ₹{{ service.price }}
+                    </strong>
+
+                  </div>
+
+                }
+
+              </div>
+
+            } @else {
+
+              <p class="empty-text">
+                No services configured
+              </p>
+
+            }
+
+          </div>
+
+
+        </article>
+
+      }
+
+    </section>
+
+
+    @if (filteredProducts.length === 0) {
+
+      <div class="empty-state">
+
+        <h3>
+          No products found
+        </h3>
+
+        <p>
+          Try changing the search or category filter.
+        </p>
+
+      </div>
+
+    }
+
+  }
+
+</div>

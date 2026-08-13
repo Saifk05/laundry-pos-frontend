@@ -1,0 +1,526 @@
+<div class="coupons-page">
+
+  <!-- =========================================
+       PAGE HEADER
+  ========================================== -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>Coupons</h1>
+
+      <p>
+        Manage discounts available during order creation
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="primary-button"
+      (click)="addCoupon()">
+
+      + Add Coupon
+
+    </button>
+
+  </div>
+
+
+  <!-- =========================================
+       FILTERS
+  ========================================== -->
+
+  <section class="filters">
+
+    <div class="search-field">
+
+      <span class="search-icon">
+        ⌕
+      </span>
+
+      <input
+        type="text"
+        [value]="search"
+        (input)="search = $any($event.target).value"
+        placeholder="Search coupon">
+
+    </div>
+
+
+    <div class="status-tabs">
+
+      <button
+        type="button"
+        class="status-button"
+        [class.active]="selectedStatus === 'ALL'"
+        (click)="selectStatus('ALL')">
+
+        All
+
+      </button>
+
+      <button
+        type="button"
+        class="status-button"
+        [class.active]="selectedStatus === 'ACTIVE'"
+        (click)="selectStatus('ACTIVE')">
+
+        Active
+
+      </button>
+
+      <button
+        type="button"
+        class="status-button"
+        [class.active]="selectedStatus === 'INACTIVE'"
+        (click)="selectStatus('INACTIVE')">
+
+        Inactive
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       COUPON LIST
+  ========================================== -->
+
+  @if (filteredCoupons.length > 0) {
+
+    <section class="coupon-grid">
+
+      @for (
+        coupon of filteredCoupons;
+        track coupon.id
+      ) {
+
+        <article class="coupon-card">
+
+          <!-- CARD HEADER -->
+
+          <div class="coupon-card-header">
+
+            <div class="coupon-code-section">
+
+              <div class="coupon-icon">
+                %
+              </div>
+
+              <div>
+
+                <h2>
+                  {{ coupon.code }}
+                </h2>
+
+                <span
+                  class="status-badge"
+                  [class.active]="coupon.active"
+                  [class.inactive]="!coupon.active">
+
+                  {{
+                    coupon.active
+                      ? 'Active'
+                      : 'Inactive'
+                  }}
+
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="edit-button"
+              (click)="editCoupon(coupon)">
+
+              Edit
+
+            </button>
+
+          </div>
+
+
+          <!-- DISCOUNT -->
+
+          <div class="coupon-body">
+
+            <div class="discount-section">
+
+              <span class="discount-label">
+                Discount
+              </span>
+
+              <strong class="discount-value">
+                {{ getDiscountLabel(coupon) }}
+              </strong>
+
+            </div>
+
+
+            <div class="minimum-order">
+
+              <span>
+                Minimum Order
+              </span>
+
+              <strong>
+                ₹{{ coupon.minimumOrderAmount }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- CARD FOOTER -->
+
+          <div class="coupon-footer">
+
+            <span>
+              Coupon Status
+            </span>
+
+
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.enabled]="coupon.active"
+              [attr.aria-label]="
+                coupon.active
+                  ? 'Deactivate coupon'
+                  : 'Activate coupon'
+              "
+              (click)="toggleCouponStatus(coupon)">
+
+              <span class="toggle-knob"></span>
+
+            </button>
+
+          </div>
+
+        </article>
+
+      }
+
+    </section>
+
+  } @else {
+
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        %
+      </div>
+
+      <h3>
+        No coupons found
+      </h3>
+
+      <p>
+        Try changing your search or status filter.
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- =========================================
+       ADD / EDIT COUPON MODAL
+  ========================================== -->
+
+  @if (showCouponForm) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeCouponForm()">
+
+
+      <div
+        class="coupon-modal"
+        (click)="$event.stopPropagation()">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+              {{
+                editingCouponId !== null
+                  ? 'Edit Coupon'
+                  : 'Add Coupon'
+              }}
+            </h2>
+
+            <p>
+              {{
+                editingCouponId !== null
+                  ? 'Update coupon details and availability'
+                  : 'Create a discount for laundry orders'
+              }}
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close"
+            (click)="closeCouponForm()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+          class="coupon-form"
+          [formGroup]="couponForm"
+          (ngSubmit)="saveCoupon()">
+
+
+          <!-- COUPON CODE -->
+
+          <div class="form-group">
+
+            <label for="couponCode">
+
+              Coupon Code
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+
+            <input
+              id="couponCode"
+              type="text"
+              formControlName="code"
+              placeholder="Example: WELCOME50">
+
+
+            @if (
+              couponForm.controls.code.touched &&
+              couponForm.controls.code.hasError('required')
+            ) {
+
+              <small class="error-text">
+                Coupon code is required.
+              </small>
+
+            }
+
+          </div>
+
+
+          <!-- TYPE + VALUE -->
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="discountType">
+
+                Discount Type
+
+                <span class="required">
+                  *
+                </span>
+
+              </label>
+
+
+              <select
+                id="discountType"
+                formControlName="discountType">
+
+                <option value="FLAT">
+                  Flat Amount
+                </option>
+
+                <option value="PERCENTAGE">
+                  Percentage
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="discountValue">
+
+                Discount Value
+
+                <span class="required">
+                  *
+                </span>
+
+              </label>
+
+
+              <div class="amount-input">
+
+                <span>
+                  {{ discountPrefix }}
+                </span>
+
+                <input
+                  id="discountValue"
+                  type="number"
+                  min="0"
+                  step="1"
+                  formControlName="discountValue"
+                  placeholder="0">
+
+              </div>
+
+
+              @if (
+                couponForm.controls.discountValue.touched &&
+                couponForm.controls.discountValue.hasError('required')
+              ) {
+
+                <small class="error-text">
+                  Discount value is required.
+                </small>
+
+              }
+
+
+              @if (
+                couponForm.controls.discountValue.touched &&
+                couponForm.controls.discountValue.hasError('min')
+              ) {
+
+                <small class="error-text">
+                  Enter a valid discount value.
+                </small>
+
+              }
+
+            </div>
+
+          </div>
+
+
+          <!-- MINIMUM ORDER -->
+
+          <div class="form-group">
+
+            <label for="minimumOrder">
+              Minimum Order Amount
+            </label>
+
+
+            <div class="amount-input">
+
+              <span>
+                ₹
+              </span>
+
+              <input
+                id="minimumOrder"
+                type="number"
+                min="0"
+                step="1"
+                formControlName="minimumOrderAmount"
+                placeholder="0">
+
+            </div>
+
+
+            <small class="helper-text">
+              Leave as 0 if there is no minimum order requirement.
+            </small>
+
+          </div>
+
+
+          <!-- STATUS -->
+
+          <div class="status-setting">
+
+            <div>
+
+              <strong>
+                Active Coupon
+              </strong>
+
+              <p>
+                Active coupons will be available during order creation.
+              </p>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.enabled]="couponForm.controls.active.value"
+              (click)="
+                couponForm.controls.active.setValue(
+                  !couponForm.controls.active.value
+                )
+              ">
+
+              <span class="toggle-knob"></span>
+
+            </button>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="closeCouponForm()">
+
+              Cancel
+
+            </button>
+
+
+            <button
+              type="submit"
+              class="save-button">
+
+              {{
+                editingCouponId !== null
+                  ? 'Update Coupon'
+                  : 'Save Coupon'
+              }}
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

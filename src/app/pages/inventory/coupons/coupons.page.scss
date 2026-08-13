@@ -1,0 +1,1074 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.coupons-page {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+
+  padding: 30px 32px 50px;
+
+  background: #ffffff;
+  color: #111827;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.page-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #111111;
+}
+
+.page-header p {
+  margin: 6px 0 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: #68737d;
+}
+
+.primary-button {
+  min-width: 130px;
+  height: 44px;
+
+  padding: 0 18px;
+
+  border: 1px solid #16b2cf;
+  border-radius: 7px;
+
+  background: #18b5d2;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 12px rgba(24, 181, 210, 0.15);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.primary-button:hover {
+  background: #0faac7;
+  border-color: #0fa5c1;
+}
+
+
+/* =====================================================
+   FILTERS
+===================================================== */
+
+.filters {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 16px 18px;
+  margin-bottom: 22px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.search-field {
+  position: relative;
+
+  width: 100%;
+  max-width: 380px;
+}
+
+.search-field input {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 14px 0 42px;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #252c31;
+
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-field input::placeholder {
+  color: #9ba5ab;
+}
+
+.search-field input:focus {
+  border-color: #17b4d0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 180, 208, 0.08);
+}
+
+.search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 14px;
+
+  transform: translateY(-50%);
+
+  color: #89949a;
+
+  font-size: 18px;
+
+  pointer-events: none;
+}
+
+
+/* =====================================================
+   STATUS FILTER
+===================================================== */
+
+.status-tabs {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 4px;
+
+  border: 1px solid #e0e5e8;
+  border-radius: 8px;
+
+  background: #f7f9fa;
+}
+
+.status-button {
+  height: 34px;
+
+  padding: 0 15px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #6b747b;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.status-button:hover {
+  color: #079db9;
+}
+
+.status-button.active {
+  background: #ffffff;
+  color: #079db9;
+
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =====================================================
+   COUPON GRID
+===================================================== */
+
+.coupon-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+
+/* =====================================================
+   COUPON CARD
+===================================================== */
+
+.coupon-card {
+  min-width: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #dfe6e9;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.coupon-card:hover {
+  border-color: #c8d7dc;
+
+  box-shadow:
+    0 5px 18px rgba(17, 24, 39, 0.06);
+
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.coupon-card-header {
+  padding: 18px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+.coupon-code-section {
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+.coupon-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #eafafd;
+  color: #0ba5c0;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.coupon-code-section h2 {
+  max-width: 190px;
+
+  margin: 0 0 7px;
+
+  overflow: hidden;
+
+  color: #20272c;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =====================================================
+   STATUS BADGE
+===================================================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 23px;
+
+  padding: 3px 9px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #e9f8ef;
+  color: #228b4b;
+}
+
+.status-badge.inactive {
+  background: #f1f3f4;
+  color: #777f84;
+}
+
+
+/* =====================================================
+   EDIT BUTTON
+===================================================== */
+
+.edit-button {
+  flex-shrink: 0;
+
+  height: 32px;
+
+  padding: 0 12px;
+
+  border: 1px solid #d8e0e3;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #5c666c;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.edit-button:hover {
+  border-color: #17b4d0;
+
+  background: #f0fbfd;
+  color: #079db9;
+}
+
+
+/* =====================================================
+   COUPON BODY
+===================================================== */
+
+.coupon-body {
+  padding: 20px 18px;
+}
+
+.discount-section {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  margin-bottom: 20px;
+}
+
+.discount-label {
+  color: #7b858b;
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.discount-value {
+  color: #0aa4bf;
+
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.minimum-order {
+  padding-top: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  border-top: 1px solid #edf0f2;
+}
+
+.minimum-order span {
+  color: #737d83;
+
+  font-size: 12px;
+}
+
+.minimum-order strong {
+  color: #333b40;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   CARD FOOTER
+===================================================== */
+
+.coupon-footer {
+  min-height: 54px;
+
+  padding: 10px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  border-top: 1px solid #edf0f2;
+
+  background: #fafcfc;
+}
+
+.coupon-footer > span {
+  color: #737d83;
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+
+/* =====================================================
+   TOGGLE
+===================================================== */
+
+.toggle-switch {
+  position: relative;
+
+  width: 42px;
+  height: 23px;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 20px;
+
+  background: #cbd2d6;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.toggle-switch.enabled {
+  background: #18b5d2;
+}
+
+.toggle-knob {
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 17px;
+  height: 17px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.18);
+
+  transition: transform 0.2s ease;
+}
+
+.toggle-switch.enabled .toggle-knob {
+  transform: translateX(19px);
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-state {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  border: 1px dashed #d8e0e3;
+  border-radius: 10px;
+
+  background: #fafcfc;
+
+  text-align: center;
+}
+
+.empty-icon {
+  width: 52px;
+  height: 52px;
+
+  margin-bottom: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eafafd;
+  color: #0aa4bf;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.empty-state h3 {
+  margin: 0 0 6px;
+
+  color: #333b40;
+
+  font-size: 16px;
+}
+
+.empty-state p {
+  margin: 0;
+
+  color: #7c868c;
+
+  font-size: 13px;
+}
+
+
+/* =====================================================
+   MODAL BACKDROP
+===================================================== */
+
+.modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(20, 29, 34, 0.42);
+
+  overflow-y: auto;
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.coupon-modal {
+  width: 100%;
+  max-width: 620px;
+
+  max-height: calc(100vh - 48px);
+
+  overflow-y: auto;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =====================================================
+   MODAL HEADER
+===================================================== */
+
+.modal-header {
+  padding: 21px 24px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #e7ecee;
+}
+
+.modal-header h2 {
+  margin: 0;
+
+  color: #151a1d;
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.modal-header p {
+  margin: 5px 0 0;
+
+  color: #78838a;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.close-button {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e0e5e8;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #69747a;
+
+  font-size: 21px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background: #f6f8f9;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.coupon-form {
+  padding: 24px;
+}
+
+.form-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 16px;
+}
+
+.form-group {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  color: #323a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.required {
+  color: #dc3545;
+}
+
+
+/* =====================================================
+   FORM INPUTS
+===================================================== */
+
+.form-group > input,
+.form-group select {
+  width: 100%;
+  height: 46px;
+
+  padding: 0 13px;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #252c31;
+
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group > input::placeholder {
+  color: #a1a9ae;
+}
+
+.form-group > input:focus,
+.form-group select:focus {
+  border-color: #17b4d0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 180, 208, 0.08);
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   AMOUNT INPUT
+===================================================== */
+
+.amount-input {
+  width: 100%;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.amount-input:focus-within {
+  border-color: #17b4d0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 180, 208, 0.08);
+}
+
+.amount-input > span {
+  height: 100%;
+
+  min-width: 42px;
+
+  padding: 0 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-right: 1px solid #e1e6e8;
+
+  background: #f5f8f9;
+  color: #59636a;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.amount-input input {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+
+  padding: 0 12px;
+
+  border: none;
+  outline: none;
+
+  background: #ffffff;
+  color: #252c31;
+
+  font-size: 13px;
+}
+
+
+/* =====================================================
+   HELP / ERROR TEXT
+===================================================== */
+
+.error-text {
+  display: block;
+
+  color: #dc3545;
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.helper-text {
+  color: #89939a;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+
+/* =====================================================
+   STATUS SETTING
+===================================================== */
+
+.status-setting {
+  min-height: 72px;
+
+  padding: 14px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 8px;
+
+  background: #fafcfc;
+}
+
+.status-setting strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #323a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-setting p {
+  margin: 0;
+
+  color: #838d93;
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+
+/* =====================================================
+   MODAL ACTIONS
+===================================================== */
+
+.modal-actions {
+  margin-top: 24px;
+  padding-top: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  border-top: 1px solid #edf0f2;
+}
+
+.cancel-button,
+.save-button {
+  min-width: 110px;
+  height: 43px;
+
+  padding: 0 18px;
+
+  border-radius: 7px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-button {
+  border: 1px solid #d5dde1;
+
+  background: #ffffff;
+  color: #515b62;
+}
+
+.cancel-button:hover {
+  background: #f6f8f9;
+}
+
+.save-button {
+  border: 1px solid #16b2cf;
+
+  background: #18b5d2;
+  color: #ffffff;
+}
+
+.save-button:hover {
+  background: #0faac7;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+  .coupon-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 750px) {
+
+  .coupons-page {
+    padding: 22px 18px 40px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-field {
+    max-width: none;
+  }
+
+  .status-tabs {
+    width: fit-content;
+  }
+
+  .coupon-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 520px) {
+
+  .coupons-page {
+    padding: 18px 12px 30px;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .primary-button {
+    width: 100%;
+  }
+
+  .status-tabs {
+    width: 100%;
+  }
+
+  .status-button {
+    flex: 1;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .coupon-modal {
+    max-height: calc(100vh - 24px);
+  }
+
+  .modal-header,
+  .coupon-form {
+    padding: 18px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .save-button {
+    width: 100%;
+  }
+
+}
