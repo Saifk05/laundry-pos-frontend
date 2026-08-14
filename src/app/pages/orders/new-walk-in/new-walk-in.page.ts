@@ -1,49 +1,51 @@
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
-interface LaundryService {
-  id: string;
-  name: string;
-  price: number;
-  unit: 'pc' | 'kg';
-}
+import {
+  CommonModule
+} from '@angular/common';
 
-interface LaundryProduct {
-  id: string;
-  name: string;
-  icon: string;
-  types: string[];
-  services: LaundryService[];
-}
+import {
+  FormsModule
+} from '@angular/forms';
+
+import {
+  ApiService
+} from '../../../../core/services/api.service';
+
+import {
+  CustomerResponse,
+  WalkInCoupon,
+  WalkInExpressCharge,
+  WalkInOrderRequest,
+  WalkInProduct,
+  WalkInProductType,
+  WalkInServicePrice,
+  WalkInSetupResponse,
+  OrderResponse,
+  PricingUnit
+} from '../../../../core/models/walk-in.model';
+
 
 interface SelectedOrderItem {
   id: string;
-
   productId: string;
   productName: string;
-
-  type: string;
-
+  typeId: string;
+  typeName: string;
   serviceIds: string[];
   serviceNames: string[];
-
+  services: WalkInServicePrice[];
   unitPrice: number;
   quantity: number;
-
-  unit: 'pc' | 'kg';
-
+  unit: PricingUnit;
   preferences: string[];
-
   comment: string;
-
   total: number;
 }
 
-interface Coupon {
-  code: string;
-  amount: number;
-  active: boolean;
-}
 
 @Component({
   selector: 'app-new-walk-in',
@@ -51,96 +53,65 @@ interface Coupon {
   templateUrl: './new-walk-in.page.html',
   styleUrls: ['./new-walk-in.page.scss'],
   imports: [
+    CommonModule,
     FormsModule
   ]
 })
-export class NewWalkInPage implements OnInit {
+export class NewWalkInPage
+  implements OnInit {
 
-  /* =========================================
-     CUSTOMER
-  ========================================= */
+  loading = false;
+
+  creatingOrder = false;
 
   customerName = '';
 
   customerPhone = '';
 
+  customerId: string | null = null;
 
-  /* =========================================
-     PRODUCT SEARCH
-  ========================================= */
+  customerExists = false;
+
+  checkingCustomer = false;
+
+  customerMessage = '';
 
   searchText = '';
 
-  selectedLetter = 'ALL';
-
-  letters: string[] = [
-    'ALL',
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z'
-  ];
-
-
-  /* =========================================
-     PRODUCT MODAL
-  ========================================= */
+  products: WalkInProduct[] = [];
 
   productModalOpen = false;
 
-  selectedProduct: LaundryProduct | null = null;
+  editingOrderItemId:
+    string | null = null;
 
-  selectedProductType = '';
+  selectedProduct:
+    WalkInProduct | null = null;
 
-  selectedServiceIds: string[] = [];
+  selectedProductType:
+    WalkInProductType | null = null;
 
-  selectedPreferences: string[] = [];
+  selectedServiceIds:
+    string[] = [];
+
+  selectedPreferences:
+    string[] = [];
 
   productComment = '';
 
   modalQuantity = 1;
 
-  availablePreferences: string[] = [
-    'Normal Wash',
-    'Softener',
-    'No Perfume',
-    'Extra Care',
-    'Remove Stains'
-  ];
+  availablePreferences:
+    string[] = [
+      'Normal Wash',
+      'Softener',
+      'No Perfume',
+      'Extra Care',
+      'Remove Stains'
+    ];
 
-
-  /* =========================================
-     ORDER
-  ========================================= */
-
-  orderItems: SelectedOrderItem[] = [];
-
-
-  /* =========================================
-     DELIVERY
-  ========================================= */
+  orderItems:
+    SelectedOrderItem[] = [];
 
   deliveryDate = '';
 
@@ -150,299 +121,236 @@ export class NewWalkInPage implements OnInit {
 
   expressDelivery = false;
 
+  selectedExpressChargeId:
+    string | null = null;
+
   expressPercentage = 0;
 
-  readonly expressPercentages: number[] = [
-    10,
-    20,
-    30,
-    40,
-    50
-  ];
+  expressCharges:
+    WalkInExpressCharge[] = [];
 
-  readonly deliveryTimeSlots: string[] = [
-    '09:00 AM - 10:00 AM',
-    '10:00 AM - 11:00 AM',
-    '11:00 AM - 12:00 PM',
-    '12:00 PM - 01:00 PM',
-    '01:00 PM - 02:00 PM',
-    '02:00 PM - 03:00 PM',
-    '03:00 PM - 04:00 PM',
-    '04:00 PM - 05:00 PM',
-    '05:00 PM - 06:00 PM',
-    '06:00 PM - 07:00 PM',
-    '07:00 PM - 08:00 PM',
-    '08:00 PM - 09:00 PM'
-  ];
-
-
-  /* =========================================
-     DISCOUNT / COUPON
-  ========================================= */
+  readonly deliveryTimeSlots:
+    string[] = [
+      '09:00 AM - 10:00 AM',
+      '10:00 AM - 11:00 AM',
+      '11:00 AM - 12:00 PM',
+      '12:00 PM - 01:00 PM',
+      '01:00 PM - 02:00 PM',
+      '02:00 PM - 03:00 PM',
+      '03:00 PM - 04:00 PM',
+      '04:00 PM - 05:00 PM',
+      '05:00 PM - 06:00 PM',
+      '06:00 PM - 07:00 PM',
+      '07:00 PM - 08:00 PM',
+      '08:00 PM - 09:00 PM'
+    ];
 
   discountAmount = 0;
+
+  coupons:
+    WalkInCoupon[] = [];
 
   couponDropdownOpen = false;
 
   couponApplied = false;
 
+  selectedCouponId:
+    string | null = null;
+
   couponCode = '';
 
   couponDiscount = 0;
-
-
-  /* =========================================
-     ORDER SUCCESS
-  ========================================= */
 
   orderCreated = false;
 
   createdOrderNumber = '';
 
+  createdOrder:
+    OrderResponse | null = null;
 
-  /* =========================================
-     DUMMY COUPONS
-  ========================================= */
-
-  coupons: Coupon[] = [
-    {
-      code: 'WELCOME50',
-      amount: 50,
-      active: true
-    },
-    {
-      code: 'FAB100',
-      amount: 100,
-      active: true
-    },
-    {
-      code: 'OLD50',
-      amount: 50,
-      active: false
-    }
-  ];
+  errorMessage = '';
 
 
-  /* =========================================
-     DUMMY PRODUCTS
-  ========================================= */
+  constructor(
+    private readonly apiService:
+      ApiService
+  ) {}
 
-  products: LaundryProduct[] = [
-
-    {
-      id: 'laundry-weight',
-
-      name: 'Laundry By Weight',
-
-      icon: '🧺',
-
-      types: [],
-
-      services: [
-        {
-          id: 'wash-fold',
-          name: 'Wash & Fold',
-          price: 109,
-          unit: 'kg'
-        },
-        {
-          id: 'wash-iron',
-          name: 'Wash & Iron',
-          price: 135,
-          unit: 'kg'
-        },
-        {
-          id: 'premium-laundry',
-          name: 'Premium Laundry',
-          price: 275,
-          unit: 'kg'
-        }
-      ]
-    },
-
-    {
-      id: 'shirt',
-
-      name: 'Shirt',
-
-      icon: '👔',
-
-      types: [
-        'Kids',
-        'Silk',
-        'Cotton'
-      ],
-
-      services: [
-        {
-          id: 'shirt-dry-clean',
-          name: 'Dry Clean',
-          price: 80,
-          unit: 'pc'
-        },
-        {
-          id: 'shirt-steam',
-          name: 'Steam Press',
-          price: 15,
-          unit: 'pc'
-        },
-        {
-          id: 'shirt-starch',
-          name: 'Starching',
-          price: 20,
-          unit: 'pc'
-        }
-      ]
-    },
-
-    {
-      id: 'tshirt',
-
-      name: 'T-Shirt',
-
-      icon: '👕',
-
-      types: [
-        'Kids',
-        'Cotton',
-        'Long Sleeves'
-      ],
-
-      services: [
-        {
-          id: 'tshirt-dry-clean',
-          name: 'Dry Clean',
-          price: 70,
-          unit: 'pc'
-        },
-        {
-          id: 'tshirt-steam',
-          name: 'Steam Press',
-          price: 15,
-          unit: 'pc'
-        },
-        {
-          id: 'tshirt-starch',
-          name: 'Starching',
-          price: 20,
-          unit: 'pc'
-        }
-      ]
-    },
-
-    {
-      id: 'trouser',
-
-      name: 'Trouser / Jeans',
-
-      icon: '👖',
-
-      types: [
-        'Kids',
-        'Jeans',
-        'Track',
-        'Casual',
-        'Formal'
-      ],
-
-      services: [
-        {
-          id: 'trouser-dry-clean',
-          name: 'Dry Clean',
-          price: 90,
-          unit: 'pc'
-        },
-        {
-          id: 'trouser-steam',
-          name: 'Steam Press',
-          price: 20,
-          unit: 'pc'
-        },
-        {
-          id: 'trouser-starch',
-          name: 'Starching',
-          price: 25,
-          unit: 'pc'
-        }
-      ]
-    },
-
-    {
-      id: 'blazer',
-
-      name: 'Blazer',
-
-      icon: '🥼',
-
-      types: [
-        'Men',
-        'Women'
-      ],
-
-      services: [
-        {
-          id: 'blazer-dry-clean',
-          name: 'Dry Clean',
-          price: 250,
-          unit: 'pc'
-        },
-        {
-          id: 'blazer-steam',
-          name: 'Steam Press',
-          price: 70,
-          unit: 'pc'
-        }
-      ]
-    },
-
-    {
-      id: 'bedsheet',
-
-      name: 'Bedsheet',
-
-      icon: '🛏️',
-
-      types: [
-        'Single',
-        'Double',
-        'King'
-      ],
-
-      services: [
-        {
-          id: 'bedsheet-wash',
-          name: 'Wash',
-          price: 120,
-          unit: 'pc'
-        },
-        {
-          id: 'bedsheet-dry',
-          name: 'Dry Clean',
-          price: 180,
-          unit: 'pc'
-        }
-      ]
-    }
-
-  ];
-
-
-  /* =========================================
-     INIT
-  ========================================= */
 
   ngOnInit(): void {
 
     this.setDefaultDeliveryDate();
 
+    this.loadWalkInSetup();
   }
 
 
-  /* =========================================
-     PRODUCT FILTER
-  ========================================= */
+  loadWalkInSetup(): void {
 
-  get filteredProducts(): LaundryProduct[] {
+    this.loading = true;
+
+    this.errorMessage = '';
+
+    this.apiService
+      .getWalkInSetup()
+      .subscribe({
+
+        next: (
+          response:
+            WalkInSetupResponse
+        ) => {
+
+          this.products =
+            response.products ?? [];
+
+          this.coupons =
+            response.coupons ?? [];
+
+          this.expressCharges =
+            response.expressCharges ?? [];
+
+          this.loading = false;
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Walk-in setup error',
+            error
+          );
+
+          this.errorMessage =
+            'Unable to load walk-in setup';
+
+          this.loading = false;
+        }
+
+      });
+  }
+
+
+  checkCustomer(): void {
+
+    const phone =
+      this.customerPhone.trim();
+
+    if (!phone) {
+
+      this.resetCustomerLookup();
+
+      return;
+    }
+
+    if (phone.length !== 10) {
+
+      this.customerMessage =
+        'Enter valid 10 digit mobile number';
+
+      return;
+    }
+
+    this.checkingCustomer = true;
+
+    this.customerMessage = '';
+
+    this.apiService
+      .getCustomerByPhone(phone)
+      .subscribe({
+
+        next: (
+          response:
+            CustomerResponse
+        ) => {
+
+          this.checkingCustomer =
+            false;
+
+          this.customerExists =
+            response.exists;
+
+          this.customerId =
+            response.id;
+
+          if (
+            response.exists &&
+            response.name
+          ) {
+
+            this.customerName =
+              response.name;
+
+            this.customerMessage =
+              'Existing customer found';
+
+          } else {
+
+            this.customerId =
+              null;
+
+            this.customerExists =
+              false;
+
+            this.customerName =
+              '';
+
+            this.customerMessage =
+              'New customer';
+          }
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Customer lookup error',
+            error
+          );
+
+          this.checkingCustomer =
+            false;
+
+          this.customerExists =
+            false;
+
+          this.customerId =
+            null;
+
+          if (
+            error.status === 404
+          ) {
+
+            this.customerName =
+              '';
+
+            this.customerMessage =
+              'New customer';
+
+            return;
+          }
+
+          this.customerMessage =
+            'Unable to check customer';
+        }
+
+      });
+  }
+
+
+  private resetCustomerLookup():
+    void {
+
+    this.customerId =
+      null;
+
+    this.customerExists =
+      false;
+
+    this.customerMessage =
+      '';
+  }
+
+
+  get filteredProducts():
+    WalkInProduct[] {
 
     const search =
       this.searchText
@@ -450,47 +358,26 @@ export class NewWalkInPage implements OnInit {
         .toLowerCase();
 
     return this.products.filter(
-      product => {
+      (
+        product:
+          WalkInProduct
+      ) =>
 
-        const matchesSearch =
-          !search ||
-          product.name
-            .toLowerCase()
-            .includes(search);
-
-        const matchesLetter =
-          this.selectedLetter === 'ALL' ||
-          product.name
-            .toUpperCase()
-            .startsWith(
-              this.selectedLetter
-            );
-
-        return (
-          matchesSearch &&
-          matchesLetter
-        );
-      }
+        !search ||
+        product.name
+          .toLowerCase()
+          .includes(search)
     );
   }
 
 
-  selectLetter(
-    letter: string
-  ): void {
-
-    this.selectedLetter =
-      letter;
-  }
-
-
-  /* =========================================
-     OPEN PRODUCT MODAL
-  ========================================= */
-
   openProduct(
-    product: LaundryProduct
+    product:
+      WalkInProduct
   ): void {
+
+    this.editingOrderItemId =
+      null;
 
     this.selectedProduct =
       product;
@@ -498,50 +385,101 @@ export class NewWalkInPage implements OnInit {
     this.selectedProductType =
       product.types.length > 0
         ? product.types[0]
-        : '';
+        : null;
 
-    this.selectedServiceIds = [];
+    this.selectedServiceIds =
+      [];
 
-    this.selectedPreferences = [];
+    this.selectedPreferences =
+      [];
 
-    this.productComment = '';
+    this.productComment =
+      '';
 
-    this.modalQuantity = 1;
+    this.modalQuantity =
+      1;
 
-    this.productModalOpen = true;
+    this.productModalOpen =
+      true;
   }
 
 
   closeProductModal(): void {
 
-    this.productModalOpen = false;
+    this.productModalOpen =
+      false;
 
-    this.selectedProduct = null;
+    this.editingOrderItemId =
+      null;
 
-    this.selectedProductType = '';
+    this.selectedProduct =
+      null;
 
-    this.selectedServiceIds = [];
+    this.selectedProductType =
+      null;
 
-    this.selectedPreferences = [];
+    this.selectedServiceIds =
+      [];
 
-    this.productComment = '';
+    this.selectedPreferences =
+      [];
 
-    this.modalQuantity = 1;
+    this.productComment =
+      '';
+
+    this.modalQuantity =
+      1;
   }
 
 
   selectProductType(
-    type: string
+    type:
+      WalkInProductType
   ): void {
 
     this.selectedProductType =
       type;
+
+    this.selectedServiceIds =
+      [];
   }
 
 
-  /* =========================================
-     SERVICE SELECTION
-  ========================================= */
+  get availableServices():
+    WalkInServicePrice[] {
+
+    if (
+      !this.selectedProduct
+    ) {
+
+      return [];
+    }
+
+    if (
+      this.selectedProductType
+    ) {
+
+      return (
+        this.selectedProductType
+          .services ?? []
+      );
+    }
+
+    if (
+      this.selectedProduct
+        .types.length === 1
+    ) {
+
+      return (
+        this.selectedProduct
+          .types[0]
+          .services ?? []
+      );
+    }
+
+    return [];
+  }
+
 
   toggleService(
     serviceId: string
@@ -549,15 +487,22 @@ export class NewWalkInPage implements OnInit {
 
     const exists =
       this.selectedServiceIds
-        .includes(serviceId);
+        .includes(
+          serviceId
+        );
 
     if (exists) {
 
       this.selectedServiceIds =
-        this.selectedServiceIds.filter(
-          id =>
-            id !== serviceId
-        );
+        this.selectedServiceIds
+          .filter(
+            (
+              id:
+                string
+            ) =>
+              id !==
+              serviceId
+          );
 
       return;
     }
@@ -574,29 +519,35 @@ export class NewWalkInPage implements OnInit {
   ): boolean {
 
     return this.selectedServiceIds
-      .includes(serviceId);
+      .includes(
+        serviceId
+      );
   }
 
 
-  /* =========================================
-     PREFERENCES
-  ========================================= */
-
   togglePreference(
-    preference: string
+    preference:
+      string
   ): void {
 
     const exists =
       this.selectedPreferences
-        .includes(preference);
+        .includes(
+          preference
+        );
 
     if (exists) {
 
       this.selectedPreferences =
-        this.selectedPreferences.filter(
-          item =>
-            item !== preference
-        );
+        this.selectedPreferences
+          .filter(
+            (
+              item:
+                string
+            ) =>
+              item !==
+              preference
+          );
 
       return;
     }
@@ -609,25 +560,26 @@ export class NewWalkInPage implements OnInit {
 
 
   isPreferenceSelected(
-    preference: string
+    preference:
+      string
   ): boolean {
 
     return this.selectedPreferences
-      .includes(preference);
+      .includes(
+        preference
+      );
   }
 
 
-  /* =========================================
-     MODAL QUANTITY
-  ========================================= */
-
-  increaseModalQuantity(): void {
+  increaseModalQuantity():
+    void {
 
     this.modalQuantity++;
   }
 
 
-  decreaseModalQuantity(): void {
+  decreaseModalQuantity():
+    void {
 
     if (
       this.modalQuantity > 1
@@ -638,47 +590,76 @@ export class NewWalkInPage implements OnInit {
   }
 
 
-  /* =========================================
-     ADD CONFIGURED PRODUCT
-  ========================================= */
+  addConfiguredProduct():
+    void {
 
-  addConfiguredProduct(): void {
+    if (
+      !this.selectedProduct
+    ) {
 
-    if (!this.selectedProduct) {
       return;
     }
 
     if (
-      this.selectedServiceIds.length === 0
+      !this.selectedProductType
     ) {
+
+      return;
+    }
+
+    if (
+      this.selectedServiceIds
+        .length === 0
+    ) {
+
       return;
     }
 
     const selectedServices =
-      this.selectedProduct.services.filter(
-        service =>
-          this.selectedServiceIds
-            .includes(service.id)
-      );
+      this.availableServices
+        .filter(
+          (
+            service:
+              WalkInServicePrice
+          ) =>
+            this.selectedServiceIds
+              .includes(
+                service.id
+              )
+        );
+
+    if (
+      selectedServices.length === 0
+    ) {
+
+      return;
+    }
 
     const unitPrice =
-      selectedServices.reduce(
-        (
-          total,
-          service
-        ) =>
-          total + service.price,
-        0
-      );
+      selectedServices
+        .reduce(
+          (
+            total:
+              number,
+            service:
+              WalkInServicePrice
+          ) =>
+            total +
+            Number(
+              service.price
+            ),
+          0
+        );
 
-    const unit =
-      selectedServices[0]?.unit ??
-      'pc';
+    const itemId =
+      this.editingOrderItemId ??
+      `${Date.now()}-${Math.random()}`;
 
-    const item: SelectedOrderItem = {
+    const item:
+      SelectedOrderItem = {
 
       id:
-        `${Date.now()}-${Math.random()}`,
+        itemId,
 
       productId:
         this.selectedProduct.id,
@@ -686,32 +667,45 @@ export class NewWalkInPage implements OnInit {
       productName:
         this.selectedProduct.name,
 
-      type:
-        this.selectedProductType,
+      typeId:
+        this.selectedProductType.id,
+
+      typeName:
+        this.selectedProductType.name,
 
       serviceIds:
         selectedServices.map(
-          service =>
+          (
+            service:
+              WalkInServicePrice
+          ) =>
             service.id
         ),
 
       serviceNames:
         selectedServices.map(
-          service =>
+          (
+            service:
+              WalkInServicePrice
+          ) =>
             service.name
         ),
 
-      unitPrice,
+      services:
+        selectedServices,
+
+      unitPrice:
+        unitPrice,
 
       quantity:
         this.modalQuantity,
 
-      unit,
+      unit:
+        this.selectedProduct.unit,
 
-      preferences:
-        [
-          ...this.selectedPreferences
-        ],
+      preferences: [
+        ...this.selectedPreferences
+      ],
 
       comment:
         this.productComment
@@ -722,21 +716,37 @@ export class NewWalkInPage implements OnInit {
         this.modalQuantity
     };
 
-    this.orderItems = [
-      ...this.orderItems,
-      item
-    ];
+    if (
+      this.editingOrderItemId
+    ) {
+
+      this.orderItems =
+        this.orderItems.map(
+          (
+            existingItem:
+              SelectedOrderItem
+          ) =>
+            existingItem.id ===
+            this.editingOrderItemId
+              ? item
+              : existingItem
+        );
+
+    } else {
+
+      this.orderItems = [
+        ...this.orderItems,
+        item
+      ];
+    }
 
     this.closeProductModal();
   }
 
 
-  /* =========================================
-     CART QUANTITY
-  ========================================= */
-
   increaseQuantity(
-    item: SelectedOrderItem
+    item:
+      SelectedOrderItem
   ): void {
 
     item.quantity++;
@@ -748,14 +758,17 @@ export class NewWalkInPage implements OnInit {
 
 
   decreaseQuantity(
-    item: SelectedOrderItem
+    item:
+      SelectedOrderItem
   ): void {
 
     if (
       item.quantity <= 1
     ) {
 
-      this.removeItem(item);
+      this.removeItem(
+        item
+      );
 
       return;
     }
@@ -769,48 +782,60 @@ export class NewWalkInPage implements OnInit {
 
 
   removeItem(
-    item: SelectedOrderItem
+    item:
+      SelectedOrderItem
   ): void {
 
     this.orderItems =
       this.orderItems.filter(
-        orderItem =>
-          orderItem.id !== item.id
+        (
+          orderItem:
+            SelectedOrderItem
+        ) =>
+          orderItem.id !==
+          item.id
       );
   }
 
 
-  /* =========================================
-     TOTALS
-  ========================================= */
+  get totalPieces():
+    number {
 
-  get totalPieces(): number {
-
-    return this.orderItems.reduce(
-      (
-        total,
-        item
-      ) =>
-        total + item.quantity,
-      0
-    );
+    return this.orderItems
+      .reduce(
+        (
+          total:
+            number,
+          item:
+            SelectedOrderItem
+        ) =>
+          total +
+          item.quantity,
+        0
+      );
   }
 
 
-  get grossTotal(): number {
+  get grossTotal():
+    number {
 
-    return this.orderItems.reduce(
-      (
-        total,
-        item
-      ) =>
-        total + item.total,
-      0
-    );
+    return this.orderItems
+      .reduce(
+        (
+          total:
+            number,
+          item:
+            SelectedOrderItem
+        ) =>
+          total +
+          item.total,
+        0
+      );
   }
 
 
-  get expressAmount(): number {
+  get expressAmount():
+    number {
 
     if (
       !this.expressDelivery ||
@@ -820,8 +845,16 @@ export class NewWalkInPage implements OnInit {
       return 0;
     }
 
-    return Math.round(
-      this.grossTotal *
+    const afterDiscount =
+      Math.max(
+        this.grossTotal -
+        this.couponDiscount -
+        this.discountAmount,
+        0
+      );
+
+    return (
+      afterDiscount *
       (
         this.expressPercentage /
         100
@@ -830,7 +863,8 @@ export class NewWalkInPage implements OnInit {
   }
 
 
-  get totalDiscount(): number {
+  get totalDiscount():
+    number {
 
     return (
       this.discountAmount +
@@ -839,12 +873,13 @@ export class NewWalkInPage implements OnInit {
   }
 
 
-  get grandTotal(): number {
+  get grandTotal():
+    number {
 
     const amount =
-      this.grossTotal +
-      this.expressAmount -
-      this.totalDiscount;
+      this.grossTotal -
+      this.totalDiscount +
+      this.expressAmount;
 
     return Math.max(
       amount,
@@ -853,11 +888,8 @@ export class NewWalkInPage implements OnInit {
   }
 
 
-  /* =========================================
-     DELIVERY
-  ========================================= */
-
-  get minimumDeliveryDate(): string {
+  get minimumDeliveryDate():
+    string {
 
     const today =
       new Date();
@@ -868,30 +900,121 @@ export class NewWalkInPage implements OnInit {
   }
 
 
-  onExpressDeliveryChange(): void {
+  onExpressDeliveryChange():
+    void {
 
-    if (!this.expressDelivery) {
+    if (
+      !this.expressDelivery
+    ) {
 
-      this.expressPercentage = 0;
+      this.selectedExpressChargeId =
+        null;
 
+      this.expressPercentage =
+        0;
     }
   }
 
 
-  selectExpressPercentage(
-    percentage: number
+  selectExpressCharge(
+    charge:
+      WalkInExpressCharge
   ): void {
 
+    if (
+      !charge.active
+    ) {
+
+      return;
+    }
+
+    this.expressDelivery =
+      true;
+
+    this.selectedExpressChargeId =
+      charge.id;
+
     this.expressPercentage =
-      percentage;
+      Number(
+        charge.percentage
+      );
   }
 
 
-  /* =========================================
-     COUPON
-  ========================================= */
+  onExpressChargeSelected(
+    expressChargeId:
+      string
+  ): void {
 
-  toggleCouponDropdown(): void {
+    const charge =
+      this.expressCharges.find(
+        (
+          item:
+            WalkInExpressCharge
+        ) =>
+          item.id ===
+          expressChargeId
+      );
+
+    if (
+      !charge
+    ) {
+
+      this.selectedExpressChargeId =
+        null;
+
+      this.expressPercentage =
+        0;
+
+      return;
+    }
+
+    this.selectExpressCharge(
+      charge
+    );
+  }
+
+
+  selectExpressPercentage(
+    percentage:
+      number
+  ): void {
+
+    const charge =
+      this.expressCharges.find(
+        (
+          item:
+            WalkInExpressCharge
+        ) =>
+          Number(
+            item.percentage
+          ) ===
+          Number(
+            percentage
+          )
+      );
+
+    if (
+      !charge
+    ) {
+
+      this.selectedExpressChargeId =
+        null;
+
+      this.expressPercentage =
+        0;
+
+      return;
+    }
+
+    this.selectExpressCharge(
+      charge
+    );
+  }
+
+
+  toggleCouponDropdown():
+    void {
 
     this.couponDropdownOpen =
       !this.couponDropdownOpen;
@@ -899,137 +1022,999 @@ export class NewWalkInPage implements OnInit {
 
 
   selectCoupon(
-    coupon: Coupon
+    coupon:
+      WalkInCoupon
   ): void {
 
-    if (!coupon.active) {
-      return;
-    }
-
-    this.couponApplied = true;
-
-    this.couponCode =
-      coupon.code;
-
-    this.couponDiscount =
-      coupon.amount;
-
-    this.couponDropdownOpen =
-      false;
-  }
-
-
-  removeCoupon(): void {
-
-    this.couponApplied = false;
-
-    this.couponCode = '';
-
-    this.couponDiscount = 0;
-
-    this.couponDropdownOpen =
-      false;
-  }
-
-
-  /* =========================================
-     CREATE ORDER - UI ONLY
-  ========================================= */
-
-  createOrder(): void {
-
     if (
-      !this.customerName.trim() ||
-      !this.customerPhone.trim() ||
-      this.orderItems.length === 0
+      !coupon.active
     ) {
 
       return;
     }
 
-    if (!this.deliveryDate) {
+    if (
+      this.grossTotal <
+      Number(
+        coupon.minimumOrderAmount
+      )
+    ) {
+
+      this.errorMessage =
+        `Minimum order amount for ${coupon.code} is ₹${coupon.minimumOrderAmount}`;
+
       return;
     }
 
-    if (!this.deliveryTime) {
+    this.errorMessage =
+      '';
+
+    this.couponApplied =
+      true;
+
+    this.selectedCouponId =
+      coupon.id;
+
+    this.couponCode =
+      coupon.code;
+
+    if (
+      coupon.discountType ===
+      'PERCENTAGE'
+    ) {
+
+      this.couponDiscount =
+        (
+          this.grossTotal *
+          Number(
+            coupon.discountValue
+          )
+        ) / 100;
+
+    } else {
+
+      this.couponDiscount =
+        Number(
+          coupon.discountValue
+        );
+    }
+
+    this.couponDiscount =
+      Math.min(
+        this.couponDiscount,
+        this.grossTotal
+      );
+
+    this.couponDropdownOpen =
+      false;
+  }
+
+
+  removeCoupon():
+    void {
+
+    this.couponApplied =
+      false;
+
+    this.selectedCouponId =
+      null;
+
+    this.couponCode =
+      '';
+
+    this.couponDiscount =
+      0;
+
+    this.couponDropdownOpen =
+      false;
+  }
+
+
+  createOrder():
+    void {
+
+    this.errorMessage =
+      '';
+
+    if (
+      !this.customerPhone
+        .trim()
+    ) {
+
+      this.errorMessage =
+        'Customer phone is required';
+
+      return;
+    }
+
+    if (
+      this.customerPhone
+        .trim()
+        .length !== 10
+    ) {
+
+      this.errorMessage =
+        'Enter valid 10 digit mobile number';
+
+      return;
+    }
+
+    if (
+      !this.customerName
+        .trim()
+    ) {
+
+      this.errorMessage =
+        'Customer name is required';
+
+      return;
+    }
+
+    if (
+      this.orderItems
+        .length === 0
+    ) {
+
+      this.errorMessage =
+        'Add at least one product';
+
+      return;
+    }
+
+    if (
+      !this.deliveryDate
+    ) {
+
+      this.errorMessage =
+        'Delivery date is required';
+
+      return;
+    }
+
+    if (
+      !this.deliveryTime
+    ) {
+
+      this.errorMessage =
+        'Delivery time is required';
+
       return;
     }
 
     if (
       this.expressDelivery &&
-      this.expressPercentage <= 0
+      !this.selectedExpressChargeId
     ) {
+
+      this.errorMessage =
+        'Select an express charge';
 
       return;
     }
 
+    const items:
+      WalkInOrderRequest['items'] =
+      [];
+
+    for (
+      const item
+      of this.orderItems
+    ) {
+
+      for (
+        const service
+        of item.services
+      ) {
+
+        items.push({
+
+          productId:
+            item.productId,
+
+          typeId:
+            item.typeId,
+
+          serviceId:
+            service.id,
+
+          quantity:
+            item.quantity
+
+        });
+      }
+    }
+
+const request:
+  WalkInOrderRequest = {
+
+  customer: {
+
+    name:
+      this.customerName
+        .trim(),
+
+    phone:
+      this.customerPhone
+        .trim()
+
+  },
+
+  items:
+    items,
+
+  couponId:
+    this.selectedCouponId,
+
+  expressChargeId:
+    this.expressDelivery
+      ? this.selectedExpressChargeId
+      : null,
+
+  deliveryDate:
+    this.deliveryDate,
+
+  deliveryTime:
+    this.deliveryTime,
+
+  homeDelivery:
+    this.homeDelivery
+
+};
+
+    this.creatingOrder =
+      true;
+
+    this.apiService
+      .createWalkInOrder(
+        request
+      )
+      .subscribe({
+
+        next: (
+          response:
+            OrderResponse
+        ) => {
+
+          this.creatingOrder =
+            false;
+
+          this.createdOrder =
+            response;
+
+          this.createdOrderNumber =
+            response.orderNumber;
+
+          this.orderCreated =
+            true;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Create walk-in order error',
+            error
+          );
+
+          this.creatingOrder =
+            false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to create order';
+        }
+
+      });
+  }
+
+
+  closeOrderModal():
+    void {
+
+    this.orderCreated =
+      false;
+  }
+
+
+printReceipt(): void {
+
+  if (!this.createdOrder) {
+    return;
+  }
+
+  const order =
+    this.createdOrder;
+
+  const itemsHtml =
+    order.items
+      .map(
+        item => `
+          <tr>
+            <td>
+              ${item.productName}
+              ${item.typeName ? ` (${item.typeName})` : ''}
+              <br>
+              <small>
+                ${item.serviceName}
+              </small>
+            </td>
+
+            <td style="text-align:center;">
+              ${item.quantity}
+            </td>
+
+            <td style="text-align:right;">
+              ₹${Number(item.unitPrice).toFixed(2)}
+            </td>
+
+            <td style="text-align:right;">
+              ₹${Number(item.lineTotal).toFixed(2)}
+            </td>
+          </tr>
+        `
+      )
+      .join('');
+
+  const printWindow =
+    window.open(
+      '',
+      '_blank',
+      'width=420,height=700'
+    );
+
+  if (!printWindow) {
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Receipt</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            padding: 12px;
+            font-family: Arial, sans-serif;
+            color: #111;
+            background: #fff;
+          }
+
+          .receipt {
+            width: 80mm;
+            margin: 0 auto;
+            font-size: 12px;
+          }
+
+          .center {
+            text-align: center;
+          }
+
+          .shop-name {
+            font-size: 18px;
+            font-weight: 700;
+          }
+
+          .muted {
+            color: #555;
+            font-size: 11px;
+          }
+
+          .divider {
+            margin: 8px 0;
+            border-top: 1px dashed #000;
+          }
+
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 3px 0;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+          }
+
+          th,
+          td {
+            padding: 5px 2px;
+            vertical-align: top;
+            border-bottom: 1px dashed #bbb;
+          }
+
+          th {
+            text-align: left;
+            font-size: 11px;
+          }
+
+          td {
+            font-size: 11px;
+          }
+
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+          }
+
+          .grand-total {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #000;
+            font-size: 15px;
+            font-weight: 700;
+          }
+
+          .footer {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 11px;
+          }
+
+          @media print {
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+
+            body {
+              padding: 4mm;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <div class="receipt">
+
+          <div class="center">
+
+            <div class="shop-name">
+              Laundry POS
+            </div>
+
+            <div class="muted">
+              Laundry Service Receipt
+            </div>
+
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="info-row">
+            <span>Order</span>
+            <strong>
+              #${order.orderNumber}
+            </strong>
+          </div>
+
+          <div class="info-row">
+            <span>Customer</span>
+            <strong>
+              ${order.customer.name}
+            </strong>
+          </div>
+
+          <div class="info-row">
+            <span>Mobile</span>
+            <strong>
+              ${order.customer.phone}
+            </strong>
+          </div>
+
+          <div class="info-row">
+            <span>Date</span>
+            <strong>
+              ${new Date(order.createdAt).toLocaleString()}
+            </strong>
+          </div>
+
+          <div class="divider"></div>
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th style="text-align:center;">
+                  Qty
+                </th>
+                <th style="text-align:right;">
+                  Rate
+                </th>
+                <th style="text-align:right;">
+                  Total
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+
+          </table>
+
+          <div class="divider"></div>
+
+          <div class="total-row">
+            <span>Subtotal</span>
+            <strong>
+              ₹${Number(order.subtotal).toFixed(2)}
+            </strong>
+          </div>
+
+          <div class="total-row">
+            <span>Discount</span>
+            <strong>
+              -₹${Number(order.discountAmount).toFixed(2)}
+            </strong>
+          </div>
+
+          <div class="total-row">
+            <span>Express Charge</span>
+            <strong>
+              +₹${Number(order.expressChargeAmount).toFixed(2)}
+            </strong>
+          </div>
+
+          <div class="total-row grand-total">
+            <span>Total</span>
+            <strong>
+              ₹${Number(order.totalAmount).toFixed(2)}
+            </strong>
+          </div>
+
+          <div class="footer">
+
+            Thank you!
+
+            <br>
+
+            Please keep this receipt
+            until collection.
+
+          </div>
+
+        </div>
+
+        <script>
+          window.onload = function () {
+            window.print();
+          };
+        </script>
+
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+}
+
+
+printTag(): void {
+
+  if (!this.createdOrder) {
+    return;
+  }
+
+  const order =
+    this.createdOrder;
+
+  const orderNumber =
+    order.orderNumber;
+
+  const createdDate =
+    new Date(
+      order.createdAt
+    );
+
+  const formattedDate =
+    createdDate
+      .toLocaleDateString(
+        'en-GB',
+        {
+          weekday: 'short',
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }
+      );
+
+  let tagsHtml = '';
+
+  for (
+    const item of order.items
+  ) {
+
+    const typeName =
+      item.typeName &&
+      item.typeName
+        .toLowerCase() !==
+        'default'
+        ? item.typeName
+        : '';
+
+    const productDisplay =
+      typeName
+        ? `${item.productName} [${typeName}]`
+        : item.productName;
+
+    const serviceCode =
+      item.serviceName
+        .split(' ')
+        .map(
+          word =>
+            word
+              .charAt(0)
+              .toUpperCase()
+        )
+        .join('');
+
+    if (
+      item.unit === 'PC'
+    ) {
+
+      const quantity =
+        Math.max(
+          1,
+          Math.floor(
+            Number(
+              item.quantity
+            )
+          )
+        );
+
+      for (
+        let index = 1;
+        index <= quantity;
+        index++
+      ) {
+
+        tagsHtml += `
+          <div class="tag">
+
+            <div class="store">
+              FAB-HUBLI-89510
+            </div>
+
+            <div class="customer">
+              ${order.customer.name}
+            </div>
+
+            <div class="order-number">
+              #${orderNumber}
+            </div>
+
+            <div class="date">
+              ${formattedDate}
+            </div>
+
+            <div class="service-box">
+              ${serviceCode}
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="product">
+              ${productDisplay}
+            </div>
+
+            <div class="service">
+              ${item.serviceName}
+            </div>
+
+            <div class="piece">
+              ${index} / ${quantity}
+            </div>
+
+          </div>
+        `;
+      }
+
+    } else {
+
+      tagsHtml += `
+        <div class="tag">
+
+          <div class="store">
+            FAB-HUBLI-89510
+          </div>
+
+          <div class="customer">
+            ${order.customer.name}
+          </div>
+
+          <div class="order-number">
+            #${orderNumber}
+          </div>
+
+          <div class="date">
+            ${formattedDate}
+          </div>
+
+          <div class="service-box">
+            ${serviceCode}
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="product">
+            ${productDisplay}
+          </div>
+
+          <div class="service">
+            ${item.serviceName}
+          </div>
+
+          <div class="piece">
+            ${item.quantity} KG
+          </div>
+
+        </div>
+      `;
+    }
+  }
+
+  const printWindow =
+    window.open(
+      '',
+      '_blank',
+      'width=360,height=700'
+    );
+
+  if (!printWindow) {
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+
+    <html>
+
+      <head>
+
+        <title>
+          Laundry Tags
+        </title>
+
+        <style>
+
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+          }
+
+          body {
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+
+            color: #000000;
+          }
+
+          .tags {
+            width: 50mm;
+            margin: 0 auto;
+          }
+
+          .tag {
+            width: 50mm;
+            min-height: 70mm;
+
+            padding:
+              4mm
+              3mm;
+
+            text-align: center;
+
+            page-break-after: always;
+
+            overflow: hidden;
+          }
+
+          .tag:last-child {
+            page-break-after: auto;
+          }
+
+          .store {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+          }
+
+          .customer {
+            margin-top: 5px;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+          }
+
+          .order-number {
+            margin-top: 3px;
+
+            font-size: 20px;
+            font-weight: 700;
+          }
+
+          .date {
+            margin-top: 7px;
+
+            font-size: 12px;
+          }
+
+          .service-box {
+            width: 28px;
+            height: 28px;
+
+            margin:
+              8px
+              auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 2px solid #000000;
+
+            font-size: 10px;
+            font-weight: 700;
+          }
+
+          .divider {
+            margin:
+              7px
+              0;
+
+            border-top:
+              1px dashed
+              #000000;
+          }
+
+          .product {
+            font-size: 14px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            word-break: break-word;
+          }
+
+          .service {
+            margin-top: 4px;
+
+            font-size: 11px;
+            font-weight: 600;
+
+            text-transform: uppercase;
+          }
+
+          .piece {
+            margin-top: 5px;
+
+            font-size: 11px;
+            font-weight: 700;
+          }
+
+          @media print {
+
+            @page {
+              size: 50mm 70mm;
+              margin: 0;
+            }
+
+            .tags {
+              width: 50mm;
+            }
+
+            .tag {
+              width: 50mm;
+              height: 70mm;
+            }
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="tags">
+
+          ${tagsHtml}
+
+        </div>
+
+        <script>
+
+          window.onload = function () {
+
+            window.print();
+
+          };
+
+        </script>
+
+      </body>
+
+    </html>
+  `);
+
+  printWindow
+    .document
+    .close();
+}
+
+  startNewOrder():
+    void {
+
+    this.orderCreated =
+      false;
+
     this.createdOrderNumber =
-      `WLK-${Date.now()
-        .toString()
-        .slice(-6)}`;
+      '';
 
-    this.orderCreated = true;
-  }
+    this.createdOrder =
+      null;
 
+    this.customerName =
+      '';
 
-  /* =========================================
-     ORDER SUCCESS
-  ========================================= */
+    this.customerPhone =
+      '';
 
-  closeOrderModal(): void {
+    this.customerId =
+      null;
 
-    this.orderCreated = false;
-  }
+    this.customerExists =
+      false;
 
+    this.customerMessage =
+      '';
 
-  printReceipt(): void {
+    this.orderItems =
+      [];
 
-    console.log(
-      'UI only - Print Receipt',
-      this.createdOrderNumber
-    );
-  }
+    this.homeDelivery =
+      false;
 
+    this.expressDelivery =
+      false;
 
-  printTag(): void {
+    this.selectedExpressChargeId =
+      null;
 
-    console.log(
-      'UI only - Print Tag',
-      this.createdOrderNumber
-    );
-  }
+    this.expressPercentage =
+      0;
 
+    this.deliveryTime =
+      '';
 
-  printQrTag(): void {
+    this.discountAmount =
+      0;
 
-    console.log(
-      'UI only - Print QR Tag',
-      this.createdOrderNumber
-    );
-  }
-
-
-  startNewOrder(): void {
-
-    this.orderCreated = false;
-
-    this.createdOrderNumber = '';
-
-    this.customerName = '';
-
-    this.customerPhone = '';
-
-    this.orderItems = [];
-
-    this.homeDelivery = false;
-
-    this.expressDelivery = false;
-
-    this.expressPercentage = 0;
-
-    this.deliveryTime = '';
-
-    this.discountAmount = 0;
+    this.errorMessage =
+      '';
 
     this.removeCoupon();
 
@@ -1037,11 +2022,8 @@ export class NewWalkInPage implements OnInit {
   }
 
 
-  /* =========================================
-     DEFAULT DELIVERY DATE
-  ========================================= */
-
-  private setDefaultDeliveryDate(): void {
+  private setDefaultDeliveryDate():
+    void {
 
     const date =
       new Date();
@@ -1054,6 +2036,72 @@ export class NewWalkInPage implements OnInit {
       date
         .toISOString()
         .split('T')[0];
+  }
+
+  editOrderItem(
+    item:
+      SelectedOrderItem
+  ): void {
+
+    const product =
+      this.products.find(
+        (
+          currentProduct:
+            WalkInProduct
+        ) =>
+          currentProduct.id ===
+          item.productId
+      );
+
+    if (
+      !product
+    ) {
+
+      return;
+    }
+
+    const productType =
+      product.types.find(
+        (
+          type:
+            WalkInProductType
+        ) =>
+          type.id ===
+          item.typeId
+      );
+
+    if (
+      !productType
+    ) {
+
+      return;
+    }
+
+    this.editingOrderItemId =
+      item.id;
+
+    this.selectedProduct =
+      product;
+
+    this.selectedProductType =
+      productType;
+
+    this.selectedServiceIds = [
+      ...item.serviceIds
+    ];
+
+    this.selectedPreferences = [
+      ...item.preferences
+    ];
+
+    this.productComment =
+      item.comment;
+
+    this.modalQuantity =
+      item.quantity;
+
+    this.productModalOpen =
+      true;
   }
 
 }

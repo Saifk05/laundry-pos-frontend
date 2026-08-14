@@ -9,7 +9,7 @@
       </h1>
 
       <p>
-        Manage laundry products, services and pricing
+        Manage laundry products, types, services and pricing
       </p>
 
     </div>
@@ -17,6 +17,7 @@
     <button
       type="button"
       class="primary-button"
+      [disabled]="loading"
       (click)="addProduct()">
 
       + Add Product
@@ -40,29 +41,44 @@
 
     <div class="category-tabs">
 
-      @for (
-        category of categories;
-        track category
-      ) {
+      <button
+        type="button"
+        class="category-button"
+        [class.active]="selectedUnit === 'ALL'"
+        (click)="selectUnit('ALL')">
 
-        <button
-          type="button"
-          class="category-button"
-          [class.active]="selectedCategory === category"
-          (click)="selectCategory(category)">
+        All
 
-          {{ category }}
+      </button>
 
-        </button>
 
-      }
+      <button
+        type="button"
+        class="category-button"
+        [class.active]="selectedUnit === 'PC'"
+        (click)="selectUnit('PC')">
+
+        Per Piece
+
+      </button>
+
+
+      <button
+        type="button"
+        class="category-button"
+        [class.active]="selectedUnit === 'KG'"
+        (click)="selectUnit('KG')">
+
+        Per KG
+
+      </button>
 
     </div>
 
   </section>
 
 
-  @if (loading) {
+  @if (loading && products.length === 0) {
 
     <div class="loading-state">
 
@@ -74,121 +90,271 @@
 
   } @else {
 
-    <section class="product-grid">
+    @if (filteredProducts.length > 0) {
 
-      @for (
-        product of filteredProducts;
-        track product.id
-      ) {
+      <section class="product-grid">
 
-        <article class="product-card">
+        @for (
+          product of filteredProducts;
+          track product.id
+        ) {
+
+          <article class="product-card">
+
+            <div class="product-card-header">
+
+              <div class="product-identity">
+
+                <div class="product-icon">
+
+                  @if (product.unit === 'KG') {
+                    ⚖
+                  } @else {
+                    👕
+                  }
+
+                </div>
 
 
-          <div class="product-card-header">
+                <div>
 
-            <div class="product-identity">
+                  <h2>
+                    {{ product.name }}
+                  </h2>
 
-              <div class="product-icon">
-                {{ product.icon }}
+                  <p class="product-category">
+                    {{ getUnitLabel(product) }}
+                  </p>
+
+
+                  <span
+                    class="status-badge"
+                    [class.active]="product.active"
+                    [class.inactive]="!product.active">
+
+                    {{
+                      product.active
+                        ? 'Active'
+                        : 'Inactive'
+                    }}
+
+                  </span>
+
+                </div>
+
               </div>
 
-
-              <div>
-
-                <h2>
-                  {{ product.name }}
-                </h2>
-
-                <p class="product-category">
-                  {{ product.category }}
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <button
-              type="button"
-              class="edit-product-button"
-              (click)="editProduct(product)">
-
-              Edit
-
-            </button>
-
-          </div>
-
-
-          <div class="product-section">
-
-            <div class="section-heading">
-
-              <h3>
-                Services & Pricing
-              </h3>
 
               <button
                 type="button"
-                class="text-button"
-                (click)="manageServices(product)">
+                class="edit-product-button"
+                [disabled]="loading"
+                (click)="editProduct(product)">
 
-                Manage
+                Edit
 
               </button>
 
             </div>
 
 
-            @if (product.services.length > 0) {
+            <div class="product-section">
 
-              <div class="service-list">
+              <div class="section-heading">
 
-                @for (
-                  service of product.services;
-                  track service.serviceId
-                ) {
+                <h3>
+                  Types & Pricing
+                </h3>
 
-                  <div class="service-row">
+                <button
+                  type="button"
+                  class="text-button"
+                  [disabled]="loading"
+                  (click)="manageServices(product)">
 
-                    <div class="service-info">
+                  Manage
 
-                      <span class="service-name">
-                        {{ service.name }}
-                      </span>
-
-                    </div>
-
-
-                    <strong class="service-price">
-                      ₹{{ service.price }}
-                    </strong>
-
-                  </div>
-
-                }
+                </button>
 
               </div>
 
-            } @else {
 
-              <p class="empty-text">
-                No services configured
-              </p>
+              @if (product.types.length > 0) {
 
-            }
+                <div class="product-types-list">
 
-          </div>
+                  @for (
+                    type of product.types;
+                    track type.id;
+                    let typeIndex = $index
+                  ) {
+
+                    @if (
+                      typeIndex === 0 ||
+                      isProductExpanded(product.id)
+                    ) {
+
+                      @if (
+                        product.unit === 'KG' &&
+                        isDefaultType(type.name)
+                      ) {
+
+                        <div
+                          class="product-type-block default-type-block">
+
+                          <div class="service-list">
+
+                            @for (
+                              service of type.services;
+                              track service.id
+                            ) {
+
+                              <div class="service-row">
+
+                                <div class="service-info">
+
+                                  <span class="service-name">
+                                    {{ service.name }}
+                                  </span>
+
+                                </div>
 
 
-        </article>
+                                <strong class="service-price">
 
-      }
+                                  ₹{{ service.price }}
 
-    </section>
+                                  <small>
+                                    /kg
+                                  </small>
+
+                                </strong>
+
+                              </div>
+
+                            }
+
+                          </div>
+
+                        </div>
+
+                      } @else {
+
+                        <div class="product-type-block">
+
+                          <div class="product-type-header">
+
+                            <strong>
+                              {{ type.name }}
+                            </strong>
+
+                          </div>
 
 
-    @if (filteredProducts.length === 0) {
+                          @if (type.services.length > 0) {
+
+                            <div class="service-list">
+
+                              @for (
+                                service of type.services;
+                                track service.id
+                              ) {
+
+                                <div class="service-row">
+
+                                  <div class="service-info">
+
+                                    <span class="service-name">
+                                      {{ service.name }}
+                                    </span>
+
+                                  </div>
+
+
+                                  <strong class="service-price">
+
+                                    ₹{{ service.price }}
+
+                                    <small>
+                                      /
+                                      {{
+                                        product.unit === 'KG'
+                                          ? 'kg'
+                                          : 'pc'
+                                      }}
+                                    </small>
+
+                                  </strong>
+
+                                </div>
+
+                              }
+
+                            </div>
+
+                          } @else {
+
+                            <p class="empty-text">
+                              No services configured
+                            </p>
+
+                          }
+
+                        </div>
+
+                      }
+
+                    }
+
+                  }
+
+                </div>
+
+
+                @if (product.types.length > 1) {
+
+                  <button
+                    type="button"
+                    class="view-more-button"
+                    (click)="toggleProductDetails(product.id)">
+
+                    {{
+                      isProductExpanded(product.id)
+                        ? 'View less'
+                        : 'View more'
+                    }}
+
+                    <span
+                      class="view-more-arrow"
+                      [class.expanded]="
+                        isProductExpanded(product.id)
+                      ">
+
+                      ↓
+
+                    </span>
+
+                  </button>
+
+                }
+
+              } @else {
+
+                <p class="empty-text">
+                  No product types configured
+                </p>
+
+              }
+
+            </div>
+
+          </article>
+
+        }
+
+      </section>
+
+    } @else {
 
       <div class="empty-state">
 
@@ -196,13 +362,424 @@
           No products found
         </h3>
 
-        <p>
-          Try changing the search or category filter.
-        </p>
+
+        @if (products.length === 0) {
+
+          <p>
+            Add your first laundry product and configure its pricing.
+          </p>
+
+          <button
+            type="button"
+            class="primary-button"
+            (click)="addProduct()">
+
+            + Add Product
+
+          </button>
+
+        } @else {
+
+          <p>
+            Try changing the search or pricing-unit filter.
+          </p>
+
+        }
 
       </div>
 
     }
+
+  }
+
+
+  @if (showProductForm) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeProductForm()">
+
+      <div
+        class="product-modal"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+
+              {{
+                editingProductId !== null
+                  ? 'Edit Product'
+                  : 'Add Product'
+              }}
+
+            </h2>
+
+            <p>
+
+              {{
+                editingProductId !== null
+                  ? 'Update product types, services and pricing'
+                  : 'Create a new laundry product'
+              }}
+
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close"
+            [disabled]="loading"
+            (click)="closeProductForm()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <div class="product-form">
+
+          <div class="form-group">
+
+            <label for="productName">
+
+              Product Name
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+            <input
+              id="productName"
+              type="text"
+              [(ngModel)]="productForm.name"
+              placeholder="Example: Shirt">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="pricingUnit">
+
+              Pricing Unit
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+            <select
+              id="pricingUnit"
+              [(ngModel)]="productForm.unit">
+
+              <option value="PC">
+                Per Piece (PC)
+              </option>
+
+              <option value="KG">
+                Per Kilogram (KG)
+              </option>
+
+            </select>
+
+
+            <small class="helper-text">
+
+              {{
+                productForm.unit === 'KG'
+                  ? 'Prices will be charged per kilogram.'
+                  : 'Prices will be charged per piece.'
+              }}
+
+            </small>
+
+          </div>
+
+
+          <div class="types-editor">
+
+            <div class="services-editor-header">
+
+              <div>
+
+                <h3>
+                  Product Types & Pricing
+                </h3>
+
+                <p>
+                  Add product types and configure services with separate prices.
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                class="add-service-button"
+                [disabled]="loading"
+                (click)="addType()">
+
+                + Add Type
+
+              </button>
+
+            </div>
+
+
+            @for (
+              type of productForm.types;
+              track $index;
+              let typeIndex = $index
+            ) {
+
+              <div class="type-editor-card">
+
+                <div class="type-editor-header">
+
+                  <div class="form-group type-name-field">
+
+                    <label>
+                      Product Type
+                    </label>
+
+                    <input
+                      type="text"
+                      [(ngModel)]="type.name"
+                      [placeholder]="
+                        productForm.unit === 'KG'
+                          ? 'Example: Default'
+                          : 'Example: Kids, Cotton, Silk'
+                      ">
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    class="remove-type-button"
+                    [disabled]="
+                      loading ||
+                      productForm.types.length === 1
+                    "
+                    (click)="removeType(typeIndex)">
+
+                    Remove Type
+
+                  </button>
+
+                </div>
+
+
+                <div class="type-services-section">
+
+                  <div class="type-services-header">
+
+                    <div>
+
+                      <strong>
+                        Services & Pricing
+                      </strong>
+
+                      <p>
+                        Pricing for {{ type.name || 'this type' }}
+                      </p>
+
+                    </div>
+
+
+                    <button
+                      type="button"
+                      class="add-service-button"
+                      [disabled]="loading"
+                      (click)="addServiceRow(typeIndex)">
+
+                      + Add Service
+
+                    </button>
+
+                  </div>
+
+
+                  <div class="service-editor-list">
+
+                    @for (
+                      service of type.services;
+                      track $index;
+                      let serviceIndex = $index
+                    ) {
+
+                      <div class="service-editor-row">
+
+                        <div class="form-group">
+
+                          <label>
+                            Service Name
+                          </label>
+
+                          <input
+                            type="text"
+                            [(ngModel)]="service.name"
+                            placeholder="Example: Dry Clean">
+
+                        </div>
+
+
+                        <div class="form-group price-field">
+
+                          <label>
+
+                            Price
+
+                            <span class="price-unit-label">
+
+                              {{
+                                productForm.unit === 'KG'
+                                  ? '/ KG'
+                                  : '/ PC'
+                              }}
+
+                            </span>
+
+                          </label>
+
+
+                          <div class="price-input">
+
+                            <span>
+                              ₹
+                            </span>
+
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              [(ngModel)]="service.price"
+                              placeholder="0">
+
+                          </div>
+
+                        </div>
+
+
+                        <button
+                          type="button"
+                          class="remove-service-button"
+                          aria-label="Remove service"
+                          [disabled]="
+                            loading ||
+                            type.services.length === 1
+                          "
+                          (click)="
+                            removeServiceRow(
+                              typeIndex,
+                              serviceIndex
+                            )
+                          ">
+
+                          ×
+
+                        </button>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+
+          @if (productForm.unit === 'KG') {
+
+            <div class="info-note">
+
+              <strong>
+                Per KG Product
+              </strong>
+
+              <p>
+                For products such as Laundry By Weight,
+                use <strong>Default</strong> as the product type
+                and add services such as Wash & Fold,
+                Wash & Iron and Premium Laundry.
+              </p>
+
+            </div>
+
+          }
+
+
+          @if (errorMessage) {
+
+            <div class="error-text">
+              {{ errorMessage }}
+            </div>
+
+          }
+
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              [disabled]="loading"
+              (click)="closeProductForm()">
+
+              Cancel
+
+            </button>
+
+
+            <button
+              type="button"
+              class="save-button"
+              [disabled]="
+                loading ||
+                !productForm.name.trim()
+              "
+              (click)="saveProduct()">
+
+              @if (loading) {
+
+                Saving...
+
+              } @else {
+
+                {{
+                  editingProductId !== null
+                    ? 'Update Product'
+                    : 'Save Product'
+                }}
+
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
 
   }
 

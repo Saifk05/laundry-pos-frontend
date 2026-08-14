@@ -1,12 +1,6 @@
 <div class="walkin-page">
 
-  <!-- =====================================
-       LEFT - CURRENT ORDER
-  ====================================== -->
-
   <section class="order-panel">
-
-    <!-- CUSTOMER -->
 
     <div class="customer-section">
 
@@ -23,10 +17,10 @@
             [(ngModel)]="customerPhone"
             maxlength="10"
             inputmode="numeric"
-            placeholder="Mobile">
+            placeholder="Mobile"
+            (blur)="checkCustomer()">
 
         </div>
-
 
         <div class="customer-input">
 
@@ -37,18 +31,33 @@
           <input
             type="text"
             [(ngModel)]="customerName"
-            placeholder="Name">
+            placeholder="Name"
+            [readonly]="customerExists">
 
         </div>
 
       </div>
 
+      @if (checkingCustomer) {
+
+        <div class="customer-message">
+          Checking customer...
+        </div>
+
+      } @else if (customerMessage) {
+
+        <div
+          class="customer-message"
+          [class.existing]="customerExists">
+
+          {{ customerMessage }}
+
+        </div>
+
+      }
+
     </div>
 
-
-    <!-- =====================================
-         CART
-    ====================================== -->
 
     <div class="cart-section">
 
@@ -70,116 +79,98 @@
 
         <div class="cart-items">
 
-          @for (item of orderItems; track item.id) {
+          @for (
+            item of orderItems;
+            track item.id
+          ) {
 
-            <article class="cart-item">
+            <article class="compact-cart-item">
 
-              <div class="cart-item-top">
+              <div class="compact-cart-main">
 
-                <div class="cart-product-info">
+                <div class="compact-cart-left">
+
+                  <div class="compact-cart-actions">
+
+                    <button
+                      type="button"
+                      class="compact-edit-button"
+                      title="Edit"
+                      (click)="editOrderItem(item)">
+
+                      ✎
+
+                    </button>
+
+                    <button
+                      type="button"
+                      class="compact-remove-button"
+                      title="Remove"
+                      (click)="removeItem(item)">
+
+                      ×
+
+                    </button>
+
+                  </div>
+
+
+                  <div class="compact-cart-info">
+
+                    <div class="compact-cart-title">
+
+                      <strong>
+                        {{ item.productName }}
+                      </strong>
+
+                      @if (
+                        item.typeName &&
+                        item.typeName.toLowerCase() !== 'default'
+                      ) {
+
+                        <span>
+                          [{{ item.typeName }}]
+                        </span>
+
+                      }
+
+                    </div>
+
+
+                    <div class="compact-cart-services">
+
+                      <span>
+                        Services:
+                      </span>
+
+                      <strong>
+                        {{ item.serviceNames.join(', ') }}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div class="compact-cart-total">
 
                   <strong>
-                    {{ item.productName }}
-                  </strong>
-
-                  @if (item.type) {
-
-                    <span class="cart-type">
-                      {{ item.type }}
-                    </span>
-
-                  }
-
-                </div>
-
-
-                <button
-                  type="button"
-                  class="remove-item"
-                  (click)="removeItem(item)">
-                  ×
-                </button>
-
-              </div>
-
-
-              <div class="cart-services">
-
-                @for (
-                  serviceName of item.serviceNames;
-                  track serviceName
-                ) {
-
-                  <span>
-                    {{ serviceName }}
-                  </span>
-
-                }
-
-              </div>
-
-
-              @if (item.preferences.length > 0) {
-
-                <div class="cart-preferences">
-
-                  @for (
-                    preference of item.preferences;
-                    track preference
-                  ) {
-
-                    <span>
-                      {{ preference }}
-                    </span>
-
-                  }
-
-                </div>
-
-              }
-
-
-              @if (item.comment) {
-
-                <p class="cart-comment">
-                  {{ item.comment }}
-                </p>
-
-              }
-
-
-              <div class="cart-item-bottom">
-
-                <div class="quantity-control">
-
-                  <button
-                    type="button"
-                    (click)="decreaseQuantity(item)">
-                    −
-                  </button>
-
-                  <span>
                     {{ item.quantity }}
-                  </span>
-
-                  <button
-                    type="button"
-                    (click)="increaseQuantity(item)">
-                    +
-                  </button>
-
-                </div>
-
-
-                <div class="cart-price">
-
-                  <small>
-                    ₹{{ item.unitPrice }}/{{ item.unit }}
-                  </small>
-
-                  <strong>
+                    ×
+                    ₹{{ item.unitPrice }}
+                    =
                     ₹{{ item.total }}
                   </strong>
+
+                  <span>
+                    {{
+                      item.unit === 'KG'
+                        ? '/ kg'
+                        : '/ pc'
+                    }}
+                  </span>
 
                 </div>
 
@@ -195,10 +186,6 @@
 
     </div>
 
-
-    <!-- =====================================
-         SUMMARY
-    ====================================== -->
 
     <div class="left-summary">
 
@@ -282,23 +269,15 @@
     </div>
 
 
-    <!-- =====================================
-         DELIVERY / ORDER OPTIONS
-    ====================================== -->
-
     <div class="bottom-options">
 
       <div class="delivery-options">
-
-
-        <!-- DELIVERY DATE -->
 
         <div class="delivery-option-row">
 
           <div class="delivery-option-icon">
             📅
           </div>
-
 
           <div class="delivery-control">
 
@@ -313,14 +292,11 @@
         </div>
 
 
-        <!-- DELIVERY TIME SLOT -->
-
         <div class="delivery-option-row">
 
           <div class="delivery-option-icon">
             ◷
           </div>
-
 
           <div class="delivery-control">
 
@@ -331,9 +307,10 @@
               <option
                 value=""
                 disabled>
-                Delivery Timeslot
-              </option>
 
+                Delivery Timeslot
+
+              </option>
 
               @for (
                 slot of deliveryTimeSlots;
@@ -353,12 +330,9 @@
         </div>
 
 
-        <!-- HOME DELIVERY -->
-
         <div class="delivery-option-row toggle-row">
 
           <div class="delivery-option-icon"></div>
-
 
           <label class="switch">
 
@@ -370,7 +344,6 @@
 
           </label>
 
-
           <span class="toggle-label">
             Home Delivery
           </span>
@@ -378,12 +351,9 @@
         </div>
 
 
-        <!-- EXPRESS DELIVERY -->
-
         <div class="delivery-option-row express-row">
 
           <div class="delivery-option-icon"></div>
-
 
           <label class="switch">
 
@@ -396,7 +366,6 @@
 
           </label>
 
-
           <span class="toggle-label">
             Express Delivery
           </span>
@@ -406,22 +375,29 @@
 
             <select
               class="express-select"
-              [(ngModel)]="expressPercentage">
+              [(ngModel)]="selectedExpressChargeId"
+              (ngModelChange)="onExpressChargeSelected($event)">
 
               <option
-                [ngValue]="0"
+                [ngValue]="null"
                 disabled>
+
                 Add Express
+
               </option>
 
-
               @for (
-                percentage of expressPercentages;
-                track percentage
+                charge of expressCharges;
+                track charge.id
               ) {
 
-                <option [ngValue]="percentage">
-                  {{ percentage }}%
+                <option
+                  [ngValue]="charge.id">
+
+                  {{ charge.name }}
+                  -
+                  {{ charge.percentage }}%
+
                 </option>
 
               }
@@ -432,8 +408,6 @@
 
         </div>
 
-
-        <!-- EXPRESS INFO -->
 
         @if (
           expressDelivery &&
@@ -458,10 +432,6 @@
       </div>
 
 
-      <!-- =====================================
-           COUPON
-      ====================================== -->
-
       <div class="coupon-area">
 
         <button
@@ -472,7 +442,8 @@
           @if (couponApplied) {
 
             <span>
-              Coupon: {{ couponCode }}
+              Coupon:
+              {{ couponCode }}
             </span>
 
             <strong>
@@ -500,7 +471,7 @@
 
             @for (
               coupon of coupons;
-              track coupon.code
+              track coupon.id
             ) {
 
               <button
@@ -516,18 +487,36 @@
                   </strong>
 
                   <small>
-                    ₹{{ coupon.amount }} OFF
+
+                    @if (
+                      coupon.discountType === 'PERCENTAGE'
+                    ) {
+
+                      {{ coupon.discountValue }}% OFF
+
+                    } @else {
+
+                      ₹{{ coupon.discountValue }} OFF
+
+                    }
+
+                  </small>
+
+                  <small>
+                    Minimum order:
+                    ₹{{ coupon.minimumOrderAmount }}
                   </small>
 
                 </div>
 
-
                 <span>
+
                   {{
                     coupon.active
                       ? 'Apply'
                       : 'Inactive'
                   }}
+
                 </span>
 
               </button>
@@ -555,12 +544,20 @@
       </div>
 
 
-      <!-- CREATE ORDER -->
+      @if (errorMessage) {
+
+        <div class="error-text">
+          {{ errorMessage }}
+        </div>
+
+      }
+
 
       <button
         type="button"
         class="create-order-button"
         [disabled]="
+          creatingOrder ||
           !customerName.trim() ||
           !customerPhone.trim() ||
           !deliveryDate ||
@@ -568,12 +565,16 @@
           orderItems.length === 0 ||
           (
             expressDelivery &&
-            expressPercentage <= 0
+            !selectedExpressChargeId
           )
         "
         (click)="createOrder()">
 
-        Create Order
+        {{
+          creatingOrder
+            ? 'Creating Order...'
+            : 'Create Order'
+        }}
 
       </button>
 
@@ -582,43 +583,7 @@
   </section>
 
 
-  <!-- =====================================
-       RIGHT - PRODUCTS
-  ====================================== -->
-
   <section class="products-panel">
-
-
-    <!-- ALPHABET -->
-
-    <div class="alphabet-filter">
-
-      @for (
-        letter of letters;
-        track letter
-      ) {
-
-        <button
-          type="button"
-          [class.active]="
-            selectedLetter === letter
-          "
-          (click)="selectLetter(letter)">
-
-          {{
-            letter === 'ALL'
-              ? 'All'
-              : letter
-          }}
-
-        </button>
-
-      }
-
-    </div>
-
-
-    <!-- SEARCH -->
 
     <div class="product-search">
 
@@ -634,11 +599,15 @@
     </div>
 
 
-    <!-- PRODUCT LIST -->
-
     <div class="product-list">
 
-      @if (
+      @if (loading) {
+
+        <div class="no-products">
+          Loading products...
+        </div>
+
+      } @else if (
         filteredProducts.length === 0
       ) {
 
@@ -655,7 +624,6 @@
 
           <article class="product-card">
 
-
             <div class="product-content">
 
               <h3>
@@ -663,20 +631,24 @@
               </h3>
 
 
-              @if (
-                product.types.length > 0
-              ) {
+              @if (product.types.length > 0) {
 
                 <div class="product-types">
 
                   @for (
                     type of product.types;
-                    track type
+                    track type.id
                   ) {
 
-                    <span>
-                      {{ type }}
-                    </span>
+                    @if (
+                      type.name.toLowerCase() !== 'default'
+                    ) {
+
+                      <span>
+                        {{ type.name }}
+                      </span>
+
+                    }
 
                   }
 
@@ -685,28 +657,43 @@
               }
 
 
-              <div class="product-services">
+              @if (
+                product.types.length > 0 &&
+                product.types[0].services.length > 0
+              ) {
 
-                @for (
-                  service of product.services;
-                  track service.id
-                ) {
+                <div class="product-services">
 
-                  <div class="product-service">
+                  @for (
+                    service of product.types[0].services;
+                    track service.id
+                  ) {
 
-                    <span>
-                      {{ service.name }}
-                    </span>
+                    <div class="product-service">
 
-                    <strong>
-                      ₹{{ service.price }}/{{ service.unit }}
-                    </strong>
+                      <span>
+                        {{ service.name }}
+                      </span>
 
-                  </div>
+                      <strong>
 
-                }
+                        ₹{{ service.price }}
+                        /
+                        {{
+                          product.unit === 'KG'
+                            ? 'kg'
+                            : 'pc'
+                        }}
 
-              </div>
+                      </strong>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              }
 
             </div>
 
@@ -714,8 +701,21 @@
             <div class="product-actions">
 
               <div class="product-icon">
-                {{ product.icon }}
+
+                @if (
+                  product.unit === 'KG'
+                ) {
+
+                  🧺
+
+                } @else {
+
+                  👕
+
+                }
+
               </div>
+
 
               <button
                 type="button"
@@ -741,10 +741,6 @@
 </div>
 
 
-<!-- =====================================
-     PRODUCT CONFIGURATION MODAL
-====================================== -->
-
 @if (
   productModalOpen &&
   selectedProduct
@@ -754,13 +750,9 @@
     class="product-modal-overlay"
     (click)="closeProductModal()">
 
-
     <div
       class="product-modal"
       (click)="$event.stopPropagation()">
-
-
-      <!-- HEADER -->
 
       <div class="product-modal-header">
 
@@ -773,7 +765,6 @@
 
         </button>
 
-
         <h2>
           {{ selectedProduct.name }}
         </h2>
@@ -781,15 +772,14 @@
       </div>
 
 
-      <!-- BODY -->
-
       <div class="product-modal-body">
 
-
-        <!-- PRODUCT TYPE -->
-
         @if (
-          selectedProduct.types.length > 0
+          selectedProduct.types.length > 0 &&
+          !(
+            selectedProduct.types.length === 1 &&
+            selectedProduct.types[0].name.toLowerCase() === 'default'
+          )
         ) {
 
           <div class="modal-section">
@@ -802,22 +792,21 @@
 
             </label>
 
-
             <div class="selection-buttons">
 
               @for (
                 type of selectedProduct.types;
-                track type
+                track type.id
               ) {
 
                 <button
                   type="button"
                   [class.selected]="
-                    selectedProductType === type
+                    selectedProductType?.id === type.id
                   "
                   (click)="selectProductType(type)">
 
-                  {{ type }}
+                  {{ type.name }}
 
                 </button>
 
@@ -829,8 +818,6 @@
 
         }
 
-
-        <!-- SERVICES -->
 
         <div class="modal-section">
 
@@ -844,11 +831,10 @@
 
           </label>
 
-
           <div class="service-selection">
 
             @for (
-              service of selectedProduct.services;
+              service of availableServices;
               track service.id
             ) {
 
@@ -862,7 +848,13 @@
                 {{ service.name }}
 
                 [
-                ₹{{ service.price }}/{{ service.unit }}
+                ₹{{ service.price }}
+                /
+                {{
+                  selectedProduct.unit === 'KG'
+                    ? 'kg'
+                    : 'pc'
+                }}
                 ]
 
               </button>
@@ -873,7 +865,6 @@
 
         </div>
 
-        <!-- QUANTITY -->
 
         <div
           class="
@@ -882,9 +873,14 @@
           ">
 
           <label class="modal-label">
-            Quantity
-          </label>
 
+            {{
+              selectedProduct.unit === 'KG'
+                ? 'Quantity / Weight'
+                : 'Quantity'
+            }}
+
+          </label>
 
           <div class="modal-quantity">
 
@@ -915,8 +911,6 @@
       </div>
 
 
-      <!-- FOOTER -->
-
       <div class="product-modal-footer">
 
         <button
@@ -928,12 +922,12 @@
 
         </button>
 
-
         <button
           type="button"
           class="confirm-product-button"
           [disabled]="
-            selectedServiceIds.length === 0
+            selectedServiceIds.length === 0 ||
+            !selectedProductType
           "
           (click)="addConfiguredProduct()">
 
@@ -950,81 +944,59 @@
 }
 
 
-<!-- =====================================
-     ORDER CREATED MODAL
-====================================== -->
-
 @if (orderCreated) {
 
   <div class="success-overlay">
 
-    <div class="success-modal">
+    <div class="success-modal compact-success-modal">
 
+      <div class="success-content">
 
-      <div class="success-icon">
-        ✓
+        <h2>
+          Order #{{ createdOrder?.orderNumber }}
+        </h2>
+
+        <p>
+          Order created successfully.
+        </p>
+
+        <span class="success-message">
+          Print the receipt and give one copy to the customer.
+        </span>
+
       </div>
 
 
-      <h2>
-        Order #{{ createdOrderNumber }}
-      </h2>
-
-
-      <p>
-        Order created successfully.
-      </p>
-
-
-      <div class="success-actions">
+      <div class="success-actions compact-success-actions">
 
         <button
           type="button"
+          class="success-close-button"
+          (click)="closeOrderModal()">
+
+          Close
+
+        </button>
+
+        <button
+          type="button"
+          class="success-print-button"
           (click)="printReceipt()">
 
           Print Receipt
 
         </button>
 
-
         <button
           type="button"
+          class="success-print-button"
           (click)="printTag()">
 
           Print Tag
 
         </button>
 
-
-        <button
-          type="button"
-          (click)="printQrTag()">
-
-          Print QR Tag
-
-        </button>
-
       </div>
-
-
-      <button
-        type="button"
-        class="new-order-button"
-        (click)="startNewOrder()">
-
-        New Walk-in
-
-      </button>
-
-
-      <button
-        type="button"
-        class="close-success"
-        (click)="closeOrderModal()">
-
-        Close
-
-      </button>
 
     </div>
 

@@ -1,77 +1,45 @@
 export type PricingUnit =
-  | 'PER_PIECE'
-  | 'PER_KG';
+  | 'PC'
+  | 'KG';
 
-
-export interface ProductVariantResponse {
+export interface ProductService {
   id: string;
-  name: string;
-}
-
-
-export interface ProductServiceResponse {
-  serviceId: string;
   name: string;
   price: number;
 }
 
-
-export interface ProductRequirementResponse {
-  requirementId: string;
-  name: string;
-  price: number;
-}
-
-
-export interface ProductResponse {
+export interface ProductType {
   id: string;
-
   name: string;
-
-  category: string;
-
-  icon: string;
-
-  pricingUnit?: PricingUnit;
-
-  active?: boolean;
-
-  variants?: ProductVariantResponse[];
-
-  services: ProductServiceResponse[];
-
-  requirements?: ProductRequirementResponse[];
+  services: ProductService[];
 }
 
-
-/* =========================================
-   CREATE PRODUCT
-========================================= */
+export interface Product {
+  id: string;
+  name: string;
+  unit: PricingUnit;
+  active: boolean;
+  types: ProductType[];
+}
 
 export interface ProductServiceRequest {
   name: string;
   price: number;
 }
 
-
-export interface ProductRequirementRequest {
+export interface ProductTypeRequest {
   name: string;
-  price: number;
+  services: ProductServiceRequest[];
 }
-
 
 export interface ProductRequest {
   name: string;
+  unit: PricingUnit;
+  active: boolean;
+  types: ProductTypeRequest[];
+}
 
-  category: string;
-
-  icon: string;
-
-  pricingUnit: PricingUnit;
-
-  variants: string[];
-
-  services: ProductServiceRequest[];
-
-  requirements?: ProductRequirementRequest[];
+export interface ProductListResponse {
+  message: string;
+  products: Product[];
 }
