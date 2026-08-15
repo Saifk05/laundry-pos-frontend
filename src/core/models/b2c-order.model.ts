@@ -1,5 +1,5 @@
 export type B2COrderStatus =
-  | 'NEW_ORDER'
+  | 'TAGGED'
   | 'PROCESSING_AT_STORE'
   | 'READY_ORDER'
   | 'DELIVERED'

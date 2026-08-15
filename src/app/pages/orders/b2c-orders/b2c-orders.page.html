@@ -120,7 +120,7 @@
 
               <div class="actions-list">
 
-                @if (order.status === 'NEW_ORDER') {
+                @if (order.status === 'TAGGED') {
 
                   <button
                     type="button"
@@ -201,32 +201,6 @@
 
                 }
 
-                @if (order.status === 'DELIVERED') {
-
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="viewOrder(order)">
-                    View
-                  </button>
-
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="billReceipt(order)">
-                    Bill Receipt
-                  </button>
-
-                  <button
-                    type="button"
-                    class="action-button whatsapp-action"
-                    [disabled]="actionLoading"
-                    (click)="sendReceiptWhatsApp(order)">
-                    WhatsApp Receipt
-                  </button>
-
-                }
-
                 @if (order.status === 'CANCELLED') {
 
                   <button
@@ -252,7 +226,6 @@
                     <div class="more-menu">
 
                       @if (
-                        order.status !== 'DELIVERED' &&
                         order.status !== 'CANCELLED'
                       ) {
 
@@ -269,17 +242,6 @@
                         (click)="billReceipt(order)">
                         ▣ Bill Receipt
                       </button>
-
-                      @if (order.status === 'DELIVERED') {
-
-                        <button
-                          type="button"
-                          [disabled]="actionLoading"
-                          (click)="sendReceiptWhatsApp(order)">
-                          WhatsApp Receipt
-                        </button>
-
-                      }
 
                       @if (order.status !== 'CANCELLED') {
 
@@ -306,7 +268,6 @@
                       }
 
                       @if (
-                        order.status !== 'DELIVERED' &&
                         order.status !== 'CANCELLED'
                       ) {
 
@@ -347,10 +308,9 @@
 
               <span
                 class="status-badge"
-                [class.status-new]="order.status === 'NEW_ORDER'"
+                [class.status-new]="order.status === 'TAGGED'"
                 [class.status-processing]="order.status === 'PROCESSING_AT_STORE'"
                 [class.status-ready]="order.status === 'READY_ORDER'"
-                [class.status-delivered]="order.status === 'DELIVERED'"
                 [class.status-cancelled]="order.status === 'CANCELLED'">
 
                 {{ getStatusLabel(order.status) }}

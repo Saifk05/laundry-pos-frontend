@@ -70,10 +70,9 @@ export class B2cOrdersPage
 
   statuses: string[] = [
     'All',
-    'New Order',
+    'Tagged',
     'Processing At Store',
     'Ready Order',
-    'Delivered',
     'Cancelled'
   ];
 
@@ -364,9 +363,9 @@ export class B2cOrdersPage
       this.selectedStatus
     ) {
 
-      case 'New Order':
+      case 'Tagged':
 
-        return 'NEW_ORDER';
+        return 'TAGGED';
 
       case 'Processing At Store':
 
@@ -375,10 +374,6 @@ export class B2cOrdersPage
       case 'Ready Order':
 
         return 'READY_ORDER';
-
-      case 'Delivered':
-
-        return 'DELIVERED';
 
       case 'Cancelled':
 
@@ -399,9 +394,9 @@ export class B2cOrdersPage
       status
     ) {
 
-      case 'NEW_ORDER':
+      case 'TAGGED':
 
-        return 'New Order';
+        return 'Tagged';
 
       case 'PROCESSING_AT_STORE':
 
@@ -565,11 +560,15 @@ export class B2cOrdersPage
             B2COrder
         ) => {
 
-          this.updateLocalOrder(
-            response
-          );
+          this.orders =
+            this.orders.filter(
+              existingOrder =>
+                existingOrder.id !==
+                response.id
+            );
 
-          this.actionLoading = false;
+          this.actionLoading =
+            false;
         },
 
         error: (
@@ -1547,6 +1546,21 @@ export class B2cOrdersPage
       B2COrder
   ): void {
 
+    if (
+      response.status ===
+        'DELIVERED'
+    ) {
+
+      this.orders =
+        this.orders.filter(
+          order =>
+            order.id !==
+              response.id
+        );
+
+      return;
+    }
+
     this.orders =
       this.orders
         .map(
@@ -1557,7 +1571,7 @@ export class B2cOrdersPage
 
             if (
               order.id !==
-              response.id
+                response.id
             ) {
 
               return order;
