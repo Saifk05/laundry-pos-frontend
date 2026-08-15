@@ -54,8 +54,10 @@ import {
   B2COrderListResponse,
   B2COrderStatus,
   OrderStatusRequest,
-  RescheduleOrderRequest
+  RescheduleOrderRequest,
+  RetagOrderRequest
 } from '../models/b2c-order.model';
+
 
 
 @Injectable({
@@ -548,6 +550,17 @@ sendBillReceiptToWhatsApp(
     {
       responseType: 'text'
     }
+  );
+}
+
+retagB2COrder(
+  orderId: string,
+  request: RetagOrderRequest
+): Observable<B2COrderDetails> {
+
+  return this.http.put<B2COrderDetails>(
+    `${this.baseUrl}/orders/${orderId}/retag`,
+    request
   );
 }
 }

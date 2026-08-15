@@ -1302,3 +1302,131 @@ button {
   background:
     rgba(28, 32, 32, 0.42);
 }
+
+.retag-header {
+  flex-shrink: 0;
+  min-height: 86px;
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #dfe6e3;
+  background: #f3fbf8;
+}
+
+.retag-header > div {
+  min-width: 0;
+}
+
+.retag-header h2 {
+  margin: 0;
+  color: #17201d;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.retag-header p {
+  margin: 5px 0 0;
+  color: #69716e;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.retag-header p strong {
+  color: #0b8f69;
+  font-weight: 700;
+}
+
+.retag-cancel-button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #cfd9d5;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #3f4945;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.retag-cancel-button:hover {
+  border-color: #25b78f;
+  background: #f8fffc;
+  color: #14896b;
+}
+
+.customer-input input[readonly] {
+  cursor: default;
+  border-color: #d5dcda;
+  background: #f5f8f7;
+  color: #3f4744;
+}
+
+.retag-header + .customer-section {
+  background: #ffffff;
+}
+
+.retag-header ~ .cart-section .compact-cart-item {
+  border-color: #dce4e1;
+}
+
+.retag-header ~ .cart-section .compact-edit-button {
+  border-radius: 4px;
+}
+
+.retag-header ~ .cart-section .compact-edit-button:hover {
+  background: #eaf8f3;
+}
+
+.modal-quantity button:disabled {
+  cursor: not-allowed;
+  background: #f1f2f2;
+  color: #b3b8b6;
+  opacity: 0.65;
+}
+
+.create-order-button {
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.create-order-button:hover:not(:disabled) {
+  box-shadow:
+    0 5px 14px
+    rgba(39, 189, 150, 0.16);
+}
+
+.create-order-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+@media (max-width: 1050px) {
+
+  .retag-header {
+    padding:
+      16px
+      22px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .retag-header {
+    min-height: auto;
+    padding: 14px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .retag-header h2 {
+    font-size: 18px;
+  }
+
+  .retag-cancel-button {
+    width: 100%;
+  }
+}

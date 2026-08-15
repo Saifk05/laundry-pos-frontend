@@ -141,3 +141,12 @@ export interface B2COrderDetails {
 
   message: string;
 }
+
+export interface RetagOrderItemRequest {
+  orderItemId: string;
+  quantity: number;
+}
+
+export interface RetagOrderRequest {
+  items: RetagOrderItemRequest[];
+}

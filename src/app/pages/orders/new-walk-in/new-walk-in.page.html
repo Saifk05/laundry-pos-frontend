@@ -2,6 +2,29 @@
 
   <section class="order-panel">
 
+    @if (isRetagMode) {
+
+      <div class="retag-header">
+
+        <div>
+          <h2>Re-Tag Order</h2>
+          <p>
+            Update garment quantities for
+            <strong>{{ retagOrderNumber }}</strong>
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="retag-cancel-button"
+          (click)="cancelRetag()">
+          Back to Orders
+        </button>
+
+      </div>
+
+    }
+
     <div class="customer-section">
 
       <div class="customer-fields">
@@ -18,7 +41,8 @@
             maxlength="10"
             inputmode="numeric"
             placeholder="Mobile"
-            (blur)="checkCustomer()">
+            [readonly]="isRetagMode"
+            (blur)="!isRetagMode && checkCustomer()">
 
         </div>
 
@@ -32,7 +56,7 @@
             type="text"
             [(ngModel)]="customerName"
             placeholder="Name"
-            [readonly]="customerExists">
+            [readonly]="customerExists || isRetagMode">
 
         </div>
 
@@ -61,7 +85,15 @@
 
     <div class="cart-section">
 
-      @if (orderItems.length === 0) {
+      @if (loadingRetagOrder) {
+
+        <div class="empty-cart">
+          <div class="empty-title">
+            Loading existing order...
+          </div>
+        </div>
+
+      } @else if (orderItems.length === 0) {
 
         <div class="empty-cart">
 
@@ -553,35 +585,61 @@
       }
 
 
-      <button
-        type="button"
-        class="create-order-button"
-        [disabled]="
-          creatingOrder ||
-          !customerName.trim() ||
-          !customerPhone.trim() ||
-          !deliveryDate ||
-          !deliveryTime ||
-          orderItems.length === 0 ||
-          (
-            expressDelivery &&
-            !selectedExpressChargeId
-          )
-        "
-        (click)="createOrder()">
+      @if (isRetagMode) {
 
-        {{
-          creatingOrder
-            ? 'Creating Order...'
-            : 'Create Order'
-        }}
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            loadingRetagOrder ||
+            orderItems.length === 0
+          "
+          (click)="createOrder()">
 
-      </button>
+          {{
+            creatingOrder
+              ? 'Updating Re-Tag...'
+              : 'Update Re-Tag'
+          }}
+
+        </button>
+
+      } @else {
+
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            !customerName.trim() ||
+            !customerPhone.trim() ||
+            !deliveryDate ||
+            !deliveryTime ||
+            orderItems.length === 0 ||
+            (
+              expressDelivery &&
+              !selectedExpressChargeId
+            )
+          "
+          (click)="createOrder()">
+
+          {{
+            creatingOrder
+              ? 'Creating Order...'
+              : 'Create Order'
+          }}
+
+        </button>
+
+      }
 
     </div>
 
   </section>
 
+
+  @if (!isRetagMode) {
 
   <section class="products-panel">
 
@@ -737,6 +795,8 @@
     </div>
 
   </section>
+
+  }
 
 </div>
 
@@ -898,6 +958,7 @@
 
             <button
               type="button"
+              [disabled]="isRetagMode"
               (click)="increaseModalQuantity()">
 
               +
@@ -931,7 +992,11 @@
           "
           (click)="addConfiguredProduct()">
 
-          Add Product
+          {{
+            isRetagMode
+              ? 'Update Quantity'
+              : 'Add Product'
+          }}
 
         </button>
 

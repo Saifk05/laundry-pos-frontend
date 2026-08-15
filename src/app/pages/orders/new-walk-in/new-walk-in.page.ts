@@ -12,6 +12,11 @@ import {
 } from '@angular/forms';
 
 import {
+  ActivatedRoute,
+  Router
+} from '@angular/router';
+
+import {
   ApiService
 } from '../../../../core/services/api.service';
 
@@ -27,6 +32,11 @@ import {
   OrderResponse,
   PricingUnit
 } from '../../../../core/models/walk-in.model';
+
+import {
+  B2COrderDetails,
+  RetagOrderRequest
+} from '../../../../core/models/b2c-order.model';
 
 
 interface SelectedOrderItem {
@@ -170,14 +180,31 @@ export class NewWalkInPage
 
   errorMessage = '';
 
+  isRetagMode = false;
+
+  retagOrderId:
+    string | null = null;
+
+  retagOrderNumber = '';
+
+  loadingRetagOrder = false;
+
 
   constructor(
     private readonly apiService:
-      ApiService
+      ApiService,
+
+    private readonly route:
+      ActivatedRoute,
+
+    private readonly router:
+      Router
   ) {}
 
 
   ngOnInit(): void {
+
+    this.initializeRetagMode();
 
     this.setDefaultDeliveryDate();
 
@@ -210,6 +237,14 @@ export class NewWalkInPage
             response.expressCharges ?? [];
 
           this.loading = false;
+
+          if (
+            this.isRetagMode &&
+            this.retagOrderId
+          ) {
+
+            this.loadRetagOrder();
+          }
         },
 
         error: (error: any) => {
@@ -226,6 +261,314 @@ export class NewWalkInPage
         }
 
       });
+  }
+
+
+  private initializeRetagMode():
+    void {
+
+    const mode =
+      this.route.snapshot
+        .queryParamMap
+        .get('mode');
+
+    const orderId =
+      this.route.snapshot
+        .queryParamMap
+        .get('orderId');
+
+    this.isRetagMode =
+      mode === 'retag' &&
+      !!orderId;
+
+    this.retagOrderId =
+      this.isRetagMode
+        ? orderId
+        : null;
+  }
+
+
+  private loadRetagOrder():
+    void {
+
+    if (
+      !this.retagOrderId
+    ) {
+
+      return;
+    }
+
+    this.loadingRetagOrder =
+      true;
+
+    this.errorMessage =
+      '';
+
+    this.apiService
+      .getB2COrderById(
+        this.retagOrderId
+      )
+      .subscribe({
+
+        next: (
+          response:
+            B2COrderDetails
+        ) => {
+
+          this.populateRetagOrder(
+            response
+          );
+
+          this.loadingRetagOrder =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Load re-tag order error',
+            error
+          );
+
+          this.loadingRetagOrder =
+            false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to load order for re-tag';
+        }
+
+      });
+  }
+
+
+  private populateRetagOrder(
+    order:
+      B2COrderDetails
+  ): void {
+
+    this.retagOrderNumber =
+      order.orderNumber;
+
+    this.customerId =
+      order.customer.id;
+
+    this.customerName =
+      order.customer.name;
+
+    this.customerPhone =
+      order.customer.phone;
+
+    this.customerExists =
+      true;
+
+    this.customerMessage =
+      'Existing order loaded for re-tag';
+
+    this.deliveryDate =
+      order.deliveryDate ?? '';
+
+    this.deliveryTime =
+      order.deliveryTime ?? '';
+
+    this.homeDelivery =
+      order.homeDelivery;
+
+    this.orderItems =
+      (order.items ?? [])
+        .map(
+          item => {
+
+            const product =
+              this.products.find(
+                currentProduct =>
+                  currentProduct.id ===
+                    item.productId
+              );
+
+            const productType =
+              product?.types.find(
+                currentType =>
+                  currentType.id ===
+                    item.typeId
+              );
+
+            const configuredService =
+              productType?.services.find(
+                service =>
+                  service.id ===
+                    item.serviceId
+              );
+
+            const service =
+              configuredService ??
+              ({
+                id:
+                  item.serviceId,
+
+                name:
+                  item.serviceName,
+
+                price:
+                  Number(
+                    item.unitPrice
+                  ),
+
+                active:
+                  true
+              } as WalkInServicePrice);
+
+            return {
+
+              id:
+                item.id,
+
+              productId:
+                item.productId,
+
+              productName:
+                item.productName,
+
+              typeId:
+                item.typeId,
+
+              typeName:
+                item.typeName,
+
+              serviceIds: [
+                item.serviceId
+              ],
+
+              serviceNames: [
+                item.serviceName
+              ],
+
+              services: [
+                service
+              ],
+
+              unitPrice:
+                Number(
+                  item.unitPrice
+                ),
+
+              quantity:
+                Number(
+                  item.quantity
+                ),
+
+              unit:
+                item.unit,
+
+              preferences:
+                [],
+
+              comment:
+                '',
+
+              total:
+                Number(
+                  item.lineTotal
+                )
+
+            } as SelectedOrderItem;
+          }
+        );
+
+    this.discountAmount =
+      0;
+
+    this.couponApplied =
+      false;
+
+    this.selectedCouponId =
+      null;
+
+    this.couponCode =
+      '';
+
+    this.couponDiscount =
+      0;
+
+    if (
+      order.couponCode
+    ) {
+
+      const coupon =
+        this.coupons.find(
+          currentCoupon =>
+            currentCoupon.code ===
+              order.couponCode
+        );
+
+      this.couponApplied =
+        true;
+
+      this.selectedCouponId =
+        coupon?.id ?? null;
+
+      this.couponCode =
+        order.couponCode;
+
+      this.couponDiscount =
+        Number(
+          order.discountAmount ?? 0
+        );
+
+    } else {
+
+      this.discountAmount =
+        Number(
+          order.discountAmount ?? 0
+        );
+    }
+
+    const expressPercentage =
+      Number(
+        order.expressChargePercentage ??
+        0
+      );
+
+    this.expressDelivery =
+      expressPercentage > 0;
+
+    this.expressPercentage =
+      expressPercentage;
+
+    if (
+      this.expressDelivery
+    ) {
+
+      const expressCharge =
+        this.expressCharges.find(
+          charge =>
+            Number(
+              charge.percentage
+            ) ===
+            expressPercentage
+        );
+
+      this.selectedExpressChargeId =
+        expressCharge?.id ?? null;
+
+    } else {
+
+      this.selectedExpressChargeId =
+        null;
+    }
+  }
+
+
+  cancelRetag():
+    void {
+
+    this.router.navigate(
+      ['/app/b2c-orders']
+    );
   }
 
 
@@ -1117,6 +1460,26 @@ export class NewWalkInPage
       '';
 
     if (
+      this.isRetagMode
+    ) {
+
+      console.log(
+        '[RETAG] createOrder triggered',
+        {
+          orderId:
+            this.retagOrderId,
+
+          items:
+            this.orderItems
+        }
+      );
+
+      this.updateRetagOrder();
+
+      return;
+    }
+
+    if (
       !this.customerPhone
         .trim()
     ) {
@@ -1305,6 +1668,123 @@ const request:
             error?.error?.message ||
             error?.error?.error ||
             'Unable to create order';
+        }
+
+      });
+  }
+
+
+  private updateRetagOrder():
+    void {
+
+    console.log(
+      '[RETAG] updateRetagOrder called'
+    );
+
+    if (
+      !this.retagOrderId
+    ) {
+
+      this.errorMessage =
+        'Re-tag order id is missing';
+
+      console.error(
+        '[RETAG] Missing order id'
+      );
+
+      return;
+    }
+
+    if (
+      this.orderItems.length === 0
+    ) {
+
+      this.errorMessage =
+        'At least one item must remain in the order';
+
+      console.error(
+        '[RETAG] No order items'
+      );
+
+      return;
+    }
+
+    const request:
+      RetagOrderRequest = {
+
+      items:
+        this.orderItems.map(
+          item => ({
+            orderItemId:
+              item.id,
+
+            quantity:
+              item.quantity
+          })
+        )
+    };
+
+    console.log(
+      '[RETAG] Calling retagB2COrder',
+      {
+        orderId:
+          this.retagOrderId,
+
+        request
+      }
+    );
+
+    this.creatingOrder =
+      true;
+
+    this.errorMessage =
+      '';
+
+    this.apiService
+      .retagB2COrder(
+        this.retagOrderId,
+        request
+      )
+      .subscribe({
+
+        next: (
+          response:
+            B2COrderDetails
+        ) => {
+
+          console.log(
+            '[RETAG] API success',
+            response
+          );
+
+          this.creatingOrder =
+            false;
+
+          this.createdOrderNumber =
+            response.orderNumber;
+
+          this.router.navigate(
+            ['/app/b2c-orders']
+          );
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            '[RETAG] API error',
+            error
+          );
+
+          this.creatingOrder =
+            false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to update re-tag order';
         }
 
       });
@@ -1967,6 +2447,17 @@ printTag(): void {
 
   startNewOrder():
     void {
+
+    if (
+      this.isRetagMode
+    ) {
+
+      this.router.navigate(
+        ['/app/new-walk-in']
+      );
+
+      return;
+    }
 
     this.orderCreated =
       false;

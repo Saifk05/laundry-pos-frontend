@@ -8,6 +8,10 @@ import {
 } from '@angular/forms';
 
 import {
+  Router
+} from '@angular/router';
+
+import {
   ApiService
 } from '../../../../core/services/api.service';
 
@@ -122,7 +126,10 @@ export class B2cOrdersPage
 
   constructor(
     private readonly apiService:
-      ApiService
+      ApiService,
+
+    private readonly router:
+      Router
   ) {}
 
   ngOnInit(): void {
@@ -1103,8 +1110,16 @@ export class B2cOrdersPage
       B2cOrderView
   ): void {
 
-    this.updateStorageLabel(
-      order
+    this.closeAllMoreMenus();
+
+    this.router.navigate(
+      ['/app/new-walk-in'],
+      {
+        queryParams: {
+          mode: 'retag',
+          orderId: order.id
+        }
+      }
     );
   }
 
@@ -1542,20 +1557,15 @@ export class B2cOrdersPage
   }
 
   private updateLocalOrder(
-    response:
-      B2COrder
+    response: B2COrder
   ): void {
 
     if (
-      response.status ===
-        'DELIVERED'
+      response.status === 'DELIVERED'
     ) {
 
-      this.orders =
-        this.orders.filter(
-          order =>
-            order.id !==
-              response.id
+      this.orders = this.orders.filter(
+          order =>  order.id !== response.id
         );
 
       return;
