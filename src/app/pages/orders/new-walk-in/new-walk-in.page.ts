@@ -1962,7 +1962,7 @@ printReceipt(): void {
           <div class="center">
 
             <div class="shop-name">
-              Laundry POS
+               Venkateshwara Fabric Works
             </div>
 
             <div class="muted">
@@ -2082,7 +2082,6 @@ printReceipt(): void {
   printWindow.document.close();
 }
 
-
 printTag(): void {
 
   if (!this.createdOrder) {
@@ -2101,16 +2100,15 @@ printTag(): void {
     );
 
   const formattedDate =
-    createdDate
-      .toLocaleDateString(
-        'en-GB',
-        {
-          weekday: 'short',
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric'
-        }
-      );
+    createdDate.toLocaleDateString(
+      'en-GB',
+      {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }
+    );
 
   let tagsHtml = '';
 
@@ -2120,9 +2118,7 @@ printTag(): void {
 
     const typeName =
       item.typeName &&
-      item.typeName
-        .toLowerCase() !==
-        'default'
+      item.typeName.toLowerCase() !== 'default'
         ? item.typeName
         : '';
 
@@ -2136,9 +2132,7 @@ printTag(): void {
         .split(' ')
         .map(
           word =>
-            word
-              .charAt(0)
-              .toUpperCase()
+            word.charAt(0).toUpperCase()
         )
         .join('');
 
@@ -2163,7 +2157,7 @@ printTag(): void {
       ) {
 
         tagsHtml += `
-          <div class="tag">
+          <section class="tag">
 
             <div class="store">
               FAB-HUBLI-89510
@@ -2199,14 +2193,14 @@ printTag(): void {
               ${index} / ${quantity}
             </div>
 
-          </div>
+          </section>
         `;
       }
 
     } else {
 
       tagsHtml += `
-        <div class="tag">
+        <section class="tag">
 
           <div class="store">
             FAB-HUBLI-89510
@@ -2242,7 +2236,7 @@ printTag(): void {
             ${item.quantity} KG
           </div>
 
-        </div>
+        </section>
       `;
     }
   }
@@ -2251,7 +2245,7 @@ printTag(): void {
     window.open(
       '',
       '_blank',
-      'width=360,height=700'
+      'width=300,height=500'
     );
 
   if (!printWindow) {
@@ -2265,11 +2259,18 @@ printTag(): void {
 
       <head>
 
+        <meta charset="UTF-8">
+
         <title>
           Laundry Tags
         </title>
 
         <style>
+
+          @page {
+            size: 50mm 70mm;
+            margin: 0;
+          }
 
           * {
             box-sizing: border-box;
@@ -2277,6 +2278,7 @@ printTag(): void {
 
           html,
           body {
+            width: 50mm;
             margin: 0;
             padding: 0;
             background: #ffffff;
@@ -2293,78 +2295,96 @@ printTag(): void {
 
           .tags {
             width: 50mm;
-            margin: 0 auto;
+            margin: 0;
+            padding: 0;
           }
 
           .tag {
             width: 50mm;
-            min-height: 70mm;
+            height: 70mm;
 
-            padding:
-              4mm
-              3mm;
+            margin: 0;
+            padding: 4mm 3mm;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
 
             text-align: center;
 
-            page-break-after: always;
-
             overflow: hidden;
+
+            break-after: page;
+            page-break-after: always;
           }
 
           .tag:last-child {
+            break-after: auto;
             page-break-after: auto;
           }
 
           .store {
-            font-size: 10px;
+            width: 100%;
+
+            font-size: 9px;
             font-weight: 700;
-            letter-spacing: 0.4px;
+
+            letter-spacing: 0.3px;
+
+            white-space: nowrap;
           }
 
           .customer {
-            margin-top: 5px;
+            width: 100%;
 
-            font-size: 11px;
+            margin-top: 3mm;
+
+            font-size: 10px;
             font-weight: 700;
 
             text-transform: uppercase;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .order-number {
-            margin-top: 3px;
+            margin-top: 1.5mm;
 
-            font-size: 20px;
+            font-size: 18px;
+            line-height: 1;
+
             font-weight: 700;
           }
 
           .date {
-            margin-top: 7px;
+            margin-top: 2.5mm;
 
-            font-size: 12px;
+            font-size: 9px;
+            line-height: 1.2;
           }
 
           .service-box {
-            width: 28px;
-            height: 28px;
+            width: 9mm;
+            height: 9mm;
 
-            margin:
-              8px
-              auto;
+            margin-top: 2.5mm;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            border: 2px solid #000000;
+            border: 1.5px solid #000000;
 
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 700;
           }
 
           .divider {
-            margin:
-              7px
-              0;
+            width: 100%;
+
+            margin: 2.5mm 0;
 
             border-top:
               1px dashed
@@ -2372,45 +2392,73 @@ printTag(): void {
           }
 
           .product {
-            font-size: 14px;
+            width: 100%;
+
+            font-size: 11px;
+            line-height: 1.2;
+
             font-weight: 700;
 
             text-transform: uppercase;
 
+            overflow: hidden;
             word-break: break-word;
           }
 
           .service {
-            margin-top: 4px;
+            width: 100%;
 
-            font-size: 11px;
+            margin-top: 1.5mm;
+
+            font-size: 9px;
+            line-height: 1.2;
+
             font-weight: 600;
 
             text-transform: uppercase;
+
+            overflow: hidden;
           }
 
           .piece {
-            margin-top: 5px;
+            margin-top: auto;
 
-            font-size: 11px;
+            padding-top: 2mm;
+
+            font-size: 10px;
             font-weight: 700;
           }
 
           @media print {
 
-            @page {
-              size: 50mm 70mm;
-              margin: 0;
+            html,
+            body {
+              width: 50mm !important;
+              height: auto !important;
+
+              margin: 0 !important;
+              padding: 0 !important;
             }
 
             .tags {
-              width: 50mm;
+              width: 50mm !important;
             }
 
             .tag {
-              width: 50mm;
-              height: 70mm;
+              width: 50mm !important;
+              height: 70mm !important;
+
+              margin: 0 !important;
+
+              break-after: page;
+              page-break-after: always;
             }
+
+            .tag:last-child {
+              break-after: auto;
+              page-break-after: auto;
+            }
+
           }
 
         </style>
@@ -2429,7 +2477,12 @@ printTag(): void {
 
           window.onload = function () {
 
-            window.print();
+            setTimeout(
+              function () {
+                window.print();
+              },
+              300
+            );
 
           };
 
@@ -2440,9 +2493,7 @@ printTag(): void {
     </html>
   `);
 
-  printWindow
-    .document
-    .close();
+  printWindow.document.close();
 }
 
   startNewOrder():
