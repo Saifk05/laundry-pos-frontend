@@ -1,16 +1,33 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
-interface PaymentDay {
-  date: string;
-  total: number;
-  upi: number;
-  cash: number;
-  deepCleanTotal: number;
-  deepCleanUpi: number;
-  deepCleanCash: number;
+import {
+  CommonModule
+} from '@angular/common';
+
+import {
+  FormsModule
+} from '@angular/forms';
+
+import {
+  ApiService
+} from '../../../core/services/api.service';
+
+import {
+  PaymentReportDate,
+  PaymentReportOrder,
+  PaymentReportResponse
+} from '../../../core/models/payment-report.model';
+
+
+interface PaymentDayView
+  extends PaymentReportDate {
+
   expanded?: boolean;
 }
+
 
 @Component({
   selector: 'app-payments',
@@ -18,195 +35,343 @@ interface PaymentDay {
   templateUrl: './payments.page.html',
   styleUrls: ['./payments.page.scss'],
   imports: [
+    CommonModule,
     FormsModule
   ]
 })
-export class PaymentsPage {
+export class PaymentsPage
+  implements OnInit {
 
-  startDate = '2026-08-01';
-  endDate = '2026-08-08';
+  /* =========================================
+     FILTERS
+  ========================================= */
 
-  deepCleanOnly = false;
+  startDate =
+    '2026-08-01';
 
-  payments: PaymentDay[] = [
-    {
-      date: '2026-08-08',
-      total: 8420,
-      upi: 5120,
-      cash: 3300,
-      deepCleanTotal: 2600,
-      deepCleanUpi: 1700,
-      deepCleanCash: 900
-    },
-    {
-      date: '2026-08-07',
-      total: 12650,
-      upi: 7450,
-      cash: 5200,
-      deepCleanTotal: 3900,
-      deepCleanUpi: 2400,
-      deepCleanCash: 1500
-    },
-    {
-      date: '2026-08-06',
-      total: 9850,
-      upi: 6100,
-      cash: 3750,
-      deepCleanTotal: 3150,
-      deepCleanUpi: 2000,
-      deepCleanCash: 1150
-    },
-    {
-      date: '2026-08-05',
-      total: 14320,
-      upi: 8920,
-      cash: 5400,
-      deepCleanTotal: 4480,
-      deepCleanUpi: 2920,
-      deepCleanCash: 1560
-    },
-    {
-      date: '2026-08-04',
-      total: 11240,
-      upi: 6840,
-      cash: 4400,
-      deepCleanTotal: 3380,
-      deepCleanUpi: 2080,
-      deepCleanCash: 1300
-    },
-    {
-      date: '2026-08-03',
-      total: 3274,
-      upi: 2400,
-      cash: 874,
-      deepCleanTotal: 1250,
-      deepCleanUpi: 900,
-      deepCleanCash: 350
-    },
-    {
-      date: '2026-08-02',
-      total: 17986,
-      upi: 7171,
-      cash: 10815,
-      deepCleanTotal: 5900,
-      deepCleanUpi: 2350,
-      deepCleanCash: 3550
-    },
-    {
-      date: '2026-08-01',
-      total: 10547,
-      upi: 5762,
-      cash: 4785,
-      deepCleanTotal: 3700,
-      deepCleanUpi: 2150,
-      deepCleanCash: 1550
+  endDate =
+    '2026-12-20';
+
+
+  /* =========================================
+     STATE
+  ========================================= */
+
+  loading =
+    false;
+
+  errorMessage =
+    '';
+
+  report:
+    PaymentReportResponse | null =
+      null;
+
+  payments:
+    PaymentDayView[] =
+      [];
+
+
+  constructor(
+    private readonly apiService:
+      ApiService
+  ) {}
+
+
+  /* =========================================
+     INIT
+  ========================================= */
+
+  ngOnInit(): void {
+
+    this.loadPaymentReport();
+  }
+
+
+  /* =========================================
+     LOAD REPORT
+  ========================================= */
+
+  loadPaymentReport(): void {
+
+    if (
+      !this.startDate ||
+      !this.endDate
+    ) {
+
+      this.errorMessage =
+        'Start date and end date are required';
+
+      return;
     }
-  ];
 
-  get filteredPayments(): PaymentDay[] {
+    if (
+      this.startDate >
+      this.endDate
+    ) {
 
-    return this.payments.filter((payment) => {
+      this.errorMessage =
+        'Start date cannot be after end date';
 
-      const paymentDate =
-        new Date(payment.date);
+      return;
+    }
 
-      const start =
-        new Date(this.startDate);
+    this.loading =
+      true;
 
-      const end =
-        new Date(this.endDate);
+    this.errorMessage =
+      '';
 
-      return (
-        paymentDate >= start &&
-        paymentDate <= end
-      );
-    });
+    this.apiService
+      .getPaymentReport(
+        this.startDate,
+        this.endDate
+      )
+      .subscribe({
+
+        next: (
+          response:
+            PaymentReportResponse
+        ) => {
+
+          this.report =
+            response;
+
+          this.payments =
+            (response?.dates ?? [])
+              .map(
+                (
+                  item:
+                    PaymentReportDate
+                ) => ({
+                  ...item,
+                  expanded: false
+                })
+              );
+
+          this.loading =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Payment report error',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to load payment report';
+
+          this.loading =
+            false;
+        }
+
+      });
   }
 
-  get totalAmount(): number {
 
-    return this.filteredPayments.reduce(
-      (total, item) =>
-        total +
-        (
-          this.deepCleanOnly
-            ? item.deepCleanTotal
-            : item.total
-        ),
-      0
+  /* =========================================
+     TOTALS
+  ========================================= */
+
+  get totalAmount():
+    number {
+
+    return Number(
+      this.report
+        ?.totalAmount ?? 0
     );
   }
 
-  get totalUpi(): number {
 
-    return this.filteredPayments.reduce(
-      (total, item) =>
-        total +
-        (
-          this.deepCleanOnly
-            ? item.deepCleanUpi
-            : item.upi
-        ),
-      0
+  get totalUpi():
+    number {
+
+    return Number(
+      this.report
+        ?.upiAmount ?? 0
     );
   }
 
-  get totalCash(): number {
 
-    return this.filteredPayments.reduce(
-      (total, item) =>
-        total +
-        (
-          this.deepCleanOnly
-            ? item.deepCleanCash
-            : item.cash
-        ),
-      0
+  get totalCash():
+    number {
+
+    return Number(
+      this.report
+        ?.cashAmount ?? 0
     );
   }
 
-  getDisplayTotal(
-    payment: PaymentDay
-  ): number {
 
-    return this.deepCleanOnly
-      ? payment.deepCleanTotal
-      : payment.total;
+  get totalCard():
+    number {
+
+    return Number(
+      this.report
+        ?.cardAmount ?? 0
+    );
   }
 
-  getDisplayUpi(
-    payment: PaymentDay
-  ): number {
 
-    return this.deepCleanOnly
-      ? payment.deepCleanUpi
-      : payment.upi;
+  get totalOther():
+    number {
+
+    return Number(
+      this.report
+        ?.otherAmount ?? 0
+    );
   }
 
-  getDisplayCash(
-    payment: PaymentDay
-  ): number {
 
-    return this.deepCleanOnly
-      ? payment.deepCleanCash
-      : payment.cash;
-  }
+  /* =========================================
+     ROW
+  ========================================= */
 
   toggleRow(
-    payment: PaymentDay
+    payment:
+      PaymentDayView
   ): void {
 
     payment.expanded =
       !payment.expanded;
   }
 
+
+  /* =========================================
+     PAYMENT GROUP HELPERS
+  ========================================= */
+
+  hasCashOrders(
+    payment:
+      PaymentDayView
+  ): boolean {
+
+    return (
+      payment.cashOrders
+        ?.length > 0
+    );
+  }
+
+
+  hasUpiOrders(
+    payment:
+      PaymentDayView
+  ): boolean {
+
+    return (
+      payment.upiOrders
+        ?.length > 0
+    );
+  }
+
+
+  hasCardOrders(
+    payment:
+      PaymentDayView
+  ): boolean {
+
+    return (
+      payment.cardOrders
+        ?.length > 0
+    );
+  }
+
+
+  hasOtherOrders(
+    payment:
+      PaymentDayView
+  ): boolean {
+
+    return (
+      payment.otherOrders
+        ?.length > 0
+    );
+  }
+
+
+  /* =========================================
+     PAYMENT COUNT
+  ========================================= */
+
+  getPaymentCount(
+    payment:
+      PaymentDayView
+  ): number {
+
+    return (
+      (payment.cashOrders?.length ?? 0) +
+      (payment.upiOrders?.length ?? 0) +
+      (payment.cardOrders?.length ?? 0) +
+      (payment.otherOrders?.length ?? 0)
+    );
+  }
+
+
+  /* =========================================
+     FORMAT MONEY
+  ========================================= */
+
+  formatAmount(
+    amount:
+      number
+  ): string {
+
+    return Number(
+      amount ?? 0
+    ).toFixed(
+      2
+    );
+  }
+
+
+  /* =========================================
+     ORDER DISPLAY
+  ========================================= */
+
+  getOrderDisplay(
+    order:
+      PaymentReportOrder
+  ): string {
+
+    return order.orderNumber;
+  }
+
+
+  /* =========================================
+     CALL CUSTOMER
+  ========================================= */
+
+  callCustomer(
+    order:
+      PaymentReportOrder
+  ): void {
+
+    if (
+      !order.mobile
+    ) {
+
+      return;
+    }
+
+    window.location.href =
+      `tel:${order.mobile}`;
+  }
+
+
+  /* =========================================
+     REFRESH
+  ========================================= */
+
   refresh(): void {
 
-    console.log({
-      startDate: this.startDate,
-      endDate: this.endDate,
-      deepCleanOnly: this.deepCleanOnly,
-      payments: this.filteredPayments
-    });
+    this.loadPaymentReport();
   }
+
 }

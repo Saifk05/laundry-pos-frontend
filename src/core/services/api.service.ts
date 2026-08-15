@@ -11,6 +11,17 @@ import {
   OrderResponse
 } from '../models/walk-in.model';
 
+import {
+  BillListResponse
+} from '../models/bill.model';
+
+import {
+  PaymentReportResponse
+} from '../models/payment-report.model';
+
+import {
+  DashboardResponse
+} from '../models/dashboard.model';
 
 import {
   SettlementOrder,
@@ -472,6 +483,37 @@ export class ApiService {
 
     return this.http.get<PaymentHistoryResponse>(
       `${this.baseUrl}/settlements/${orderId}/payments`
+    );
+  }
+
+    getDashboard():
+    Observable<DashboardResponse> {
+
+    return this.http.get<DashboardResponse>(
+      `${this.baseUrl}/dashboard`
+    );
+  }
+  getPaymentReport(
+  fromDate: string,
+  toDate: string
+): Observable<PaymentReportResponse> {
+
+  return this.http.get<PaymentReportResponse>(
+    `${this.baseUrl}/payments/report`,
+    {
+      params: {
+        fromDate,
+        toDate
+      }
+    }
+  );
+}
+
+getBills():
+    Observable<BillListResponse> {
+
+    return this.http.get<BillListResponse>(
+      `${this.baseUrl}/bills`
     );
   }
 }

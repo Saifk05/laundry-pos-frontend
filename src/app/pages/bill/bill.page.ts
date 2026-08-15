@@ -1,38 +1,36 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
-interface Invoice {
-  id: number;
+import {
+  CommonModule
+} from '@angular/common';
 
-  invoiceNumber: string;
-  orderNumber: string;
+import {
+  FormsModule
+} from '@angular/forms';
 
-  status: string;
+import {
+  ApiService
+} from '../../../core/services/api.service';
 
-  customerType: 'B2C' | 'CLIENT' | 'DEEP_CLEAN';
+import {
+  Bill,
+  BillListResponse,
+  BillStatus
+} from '../../../core/models/bill.model';
 
-  clientName: string;
+import {
+  B2COrderDetails
+} from '../../../core/models/b2c-order.model';
 
-  paidAmount: number;
-  dueAmount: number;
+import {
+  SettlementOrder,
+  PaymentMethod,
+  PaymentRequest
+} from '../../../core/models/settlement.model';
 
-  total: number;
-  tax: number;
-  taxableAmount: number;
-
-  expressAmount: number;
-  discountAmount: number;
-
-  grossTotal: number;
-
-  createdAt: string;
-  deletedAt: string;
-
-  paidAt: string;
-  deliveredAt: string;
-
-  store: string;
-}
 
 @Component({
   selector: 'app-bill',
@@ -40,438 +38,1009 @@ interface Invoice {
   templateUrl: './bill.page.html',
   styleUrls: ['./bill.page.scss'],
   imports: [
+    CommonModule,
     FormsModule
   ]
 })
-export class BillPage {
+export class BillPage
+  implements OnInit {
 
-  b2cOnly = false;
-  deepCleanOnly = false;
-  clientOnly = false;
+  loading =
+    false;
 
-  selectedClient = 'All';
+  errorMessage =
+    '';
 
-  orderIdSearch = '';
+  response:
+    BillListResponse | null =
+      null;
 
-  createdDate = '';
-  deliveredDate = '';
+  invoices:
+    Bill[] =
+      [];
 
-  invoiceStatus = 'All';
-  sortBy = 'Created Date Desc';
+  receiptOpen =
+    false;
 
-  clients: string[] = [
-    'All',
-    'ABC Technologies',
-    'Hubballi Hospital',
-    'GreenLeaf Hotel',
-    'Prime Residency'
-  ];
+  receiptLoading =
+    false;
 
-  statuses: string[] = [
-    'All',
-    'Draft',
-    'Paid',
-    'Partially Paid',
-    'Deleted'
-  ];
+  receiptError =
+    '';
 
-  sortOptions: string[] = [
-    'Created Date Desc',
-    'Created Date Asc',
-    'Amount High to Low',
-    'Amount Low to High'
-  ];
+  selectedInvoice:
+    Bill | null =
+      null;
 
-  invoices: Invoice[] = [
+  receiptOrder:
+    B2COrderDetails | null =
+      null;
+
+  settlementOpen =
+    false;
+
+  settlementLoading =
+    false;
+
+  paymentSubmitting =
+    false;
+
+  paymentError =
+    '';
+
+  settlementInvoice:
+    Bill | null =
+      null;
+
+  settlementOrder:
+    SettlementOrder | null =
+      null;
+
+  paymentAmount =
+    0;
+
+  paymentMethod:
+    PaymentMethod =
+      'CASH';
+
+  referenceNumber =
+    '';
+
+  orderIdSearch =
+    '';
+
+  createdDate =
+    '';
+
+  deliveredDate =
+    '';
+
+  invoiceStatus =
+    'ALL';
+
+  sortBy =
+    'Created Date Desc';
+
+  statuses:
     {
-      id: 1,
-      invoiceNumber: 'TMP95374290',
-      orderNumber: '2080555',
-      status: 'Deleted',
-      customerType: 'B2C',
-      clientName: '',
-      paidAmount: 0,
-      dueAmount: 870,
-      total: 870,
-      tax: 0,
-      taxableAmount: 0,
-      expressAmount: 0,
-      discountAmount: 0,
-      grossTotal: 870,
-      createdAt: '2026-08-02 03:17 PM',
-      deletedAt: '2026-08-02 03:19 PM',
-      paidAt: '-',
-      deliveredAt: '-',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 2,
-      invoiceNumber: 'TMP24061492',
-      orderNumber: '2080555',
-      status: 'Draft',
-      customerType: 'B2C',
-      clientName: '',
-      paidAmount: 0,
-      dueAmount: 0,
-      total: 0,
-      tax: 0,
-      taxableAmount: 0,
-      expressAmount: 0,
-      discountAmount: 870,
-      grossTotal: 870,
-      createdAt: '2026-08-02 03:17 PM',
-      deletedAt: '-',
-      paidAt: '-',
-      deliveredAt: '-',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 3,
-      invoiceNumber: 'TMP85749520',
-      orderNumber: '2081673',
-      status: 'Draft',
-      customerType: 'B2C',
-      clientName: '',
-      paidAmount: 0,
-      dueAmount: 129,
-      total: 129,
-      tax: 0,
-      taxableAmount: 0,
-      expressAmount: 0,
-      discountAmount: 0,
-      grossTotal: 129,
-      createdAt: '2026-08-03 01:48 PM',
-      deletedAt: '-',
-      paidAt: '-',
-      deliveredAt: '-',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 4,
-      invoiceNumber: 'INV2081721',
-      orderNumber: '2081721',
-      status: 'Paid',
-      customerType: 'B2C',
-      clientName: '',
-      paidAmount: 680,
-      dueAmount: 0,
-      total: 680,
-      tax: 0,
-      taxableAmount: 680,
-      expressAmount: 100,
-      discountAmount: 50,
-      grossTotal: 730,
-      createdAt: '2026-08-04 10:20 AM',
-      deletedAt: '-',
-      paidAt: '2026-08-04 10:22 AM',
-      deliveredAt: '2026-08-06 06:30 PM',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 5,
-      invoiceNumber: 'INV2081790',
-      orderNumber: '2081790',
-      status: 'Partially Paid',
-      customerType: 'DEEP_CLEAN',
-      clientName: '',
-      paidAmount: 800,
-      dueAmount: 450,
-      total: 1250,
-      tax: 0,
-      taxableAmount: 1250,
-      expressAmount: 0,
-      discountAmount: 0,
-      grossTotal: 1250,
-      createdAt: '2026-08-05 12:35 PM',
-      deletedAt: '-',
-      paidAt: '2026-08-05 12:40 PM',
-      deliveredAt: '-',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 6,
-      invoiceNumber: 'INV2081812',
-      orderNumber: '2081812',
-      status: 'Draft',
-      customerType: 'CLIENT',
-      clientName: 'ABC Technologies',
-      paidAmount: 0,
-      dueAmount: 2300,
-      total: 2300,
-      tax: 0,
-      taxableAmount: 2300,
-      expressAmount: 0,
-      discountAmount: 200,
-      grossTotal: 2500,
-      createdAt: '2026-08-06 09:10 AM',
-      deletedAt: '-',
-      paidAt: '-',
-      deliveredAt: '-',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 7,
-      invoiceNumber: 'INV2081844',
-      orderNumber: '2081844',
-      status: 'Paid',
-      customerType: 'CLIENT',
-      clientName: 'Hubballi Hospital',
-      paidAmount: 4750,
-      dueAmount: 0,
-      total: 4750,
-      tax: 0,
-      taxableAmount: 4750,
-      expressAmount: 0,
-      discountAmount: 250,
-      grossTotal: 5000,
-      createdAt: '2026-08-07 11:45 AM',
-      deletedAt: '-',
-      paidAt: '2026-08-07 11:50 AM',
-      deliveredAt: '2026-08-08 09:30 AM',
-      store: 'FAB-HUBLI-89510'
-    },
-    {
-      id: 8,
-      invoiceNumber: 'INV2081901',
-      orderNumber: '2081901',
-      status: 'Draft',
-      customerType: 'DEEP_CLEAN',
-      clientName: '',
-      paidAmount: 0,
-      dueAmount: 1800,
-      total: 1800,
-      tax: 0,
-      taxableAmount: 1800,
-      expressAmount: 100,
-      discountAmount: 100,
-      grossTotal: 1800,
-      createdAt: '2026-08-08 02:15 PM',
-      deletedAt: '-',
-      paidAt: '-',
-      deliveredAt: '-',
-      store: 'FAB-HUBLI-89510'
-    }
-  ];
+      label: string;
+      value: 'ALL' | BillStatus;
+    }[] = [
+      {
+        label: 'All',
+        value: 'ALL'
+      },
+      {
+        label: 'Draft',
+        value: 'DRAFT'
+      },
+      {
+        label: 'Partially Paid',
+        value: 'PARTIALLY_PAID'
+      },
+      {
+        label: 'Paid',
+        value: 'PAID'
+      },
+      {
+        label: 'Cancelled',
+        value: 'CANCELLED'
+      }
+    ];
 
-  get filteredInvoices(): Invoice[] {
+  sortOptions:
+    string[] = [
+      'Created Date Desc',
+      'Created Date Asc',
+      'Amount High to Low',
+      'Amount Low to High'
+    ];
+
+  constructor(
+    private readonly apiService:
+      ApiService
+  ) {
+  }
+
+  ngOnInit(): void {
+
+    this.loadInvoices();
+  }
+
+  loadInvoices(): void {
+
+    this.loading =
+      true;
+
+    this.errorMessage =
+      '';
+
+    this.apiService
+      .getBills()
+      .subscribe({
+
+        next: (
+          response:
+            BillListResponse
+        ) => {
+
+          this.response =
+            response;
+
+          this.invoices =
+            response?.bills ?? [];
+
+          this.loading =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Bills load error',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to load bills';
+
+          this.loading =
+            false;
+        }
+
+      });
+  }
+
+  get filteredInvoices():
+    Bill[] {
 
     let result =
-      this.invoices.filter((invoice) => {
+      this.invoices.filter(
+        (
+          invoice:
+            Bill
+        ) => {
 
-        const matchesB2c =
-          !this.b2cOnly ||
-          invoice.customerType === 'B2C';
+          const orderSearch =
+            this.orderIdSearch
+              .trim()
+              .toLowerCase();
 
-        const matchesDeepClean =
-          !this.deepCleanOnly ||
-          invoice.customerType === 'DEEP_CLEAN';
+          const matchesOrder =
+            !orderSearch ||
 
-        const matchesClient =
-          !this.clientOnly ||
-          invoice.customerType === 'CLIENT';
+            invoice.orderNumber
+              .toLowerCase()
+              .includes(
+                orderSearch
+              ) ||
 
-        const matchesClientName =
-          this.selectedClient === 'All' ||
-          invoice.clientName === this.selectedClient;
+            invoice.invoiceNumber
+              .toLowerCase()
+              .includes(
+                orderSearch
+              );
 
-        const matchesOrder =
-          !this.orderIdSearch ||
-          invoice.orderNumber.includes(
-            this.orderIdSearch.trim()
+          const matchesStatus =
+            this.invoiceStatus ===
+              'ALL' ||
+
+            invoice.status ===
+              this.invoiceStatus;
+
+          const matchesCreatedDate =
+            !this.createdDate ||
+
+            invoice.createdAt
+              .startsWith(
+                this.createdDate
+              );
+
+          const matchesDeliveredDate =
+            !this.deliveredDate ||
+
+            (
+              invoice.deliveredAt !==
+                null &&
+
+              invoice.deliveredAt
+                .startsWith(
+                  this.deliveredDate
+                )
+            );
+
+          return (
+            matchesOrder &&
+            matchesStatus &&
+            matchesCreatedDate &&
+            matchesDeliveredDate
           );
+        }
+      );
 
-        const matchesStatus =
-          this.invoiceStatus === 'All' ||
-          invoice.status.toLowerCase() ===
-          this.invoiceStatus.toLowerCase();
-
-        const matchesCreatedDate =
-          !this.createdDate ||
-          invoice.createdAt.startsWith(
-            this.createdDate
-          );
-
-        const matchesDeliveredDate =
-          !this.deliveredDate ||
-          invoice.deliveredAt.startsWith(
-            this.deliveredDate
-          );
-
-        return (
-          matchesB2c &&
-          matchesDeepClean &&
-          matchesClient &&
-          matchesClientName &&
-          matchesOrder &&
-          matchesStatus &&
-          matchesCreatedDate &&
-          matchesDeliveredDate
-        );
-      });
-
-    result = [...result];
+    result =
+      [...result];
 
     if (
       this.sortBy ===
-      'Amount High to Low'
+        'Amount High to Low'
     ) {
 
       result.sort(
-        (a, b) =>
-          b.grossTotal -
-          a.grossTotal
+        (
+          a:
+            Bill,
+          b:
+            Bill
+        ) =>
+          Number(
+            b.grossTotal
+          ) -
+          Number(
+            a.grossTotal
+          )
       );
 
     } else if (
       this.sortBy ===
-      'Amount Low to High'
+        'Amount Low to High'
     ) {
 
       result.sort(
-        (a, b) =>
-          a.grossTotal -
-          b.grossTotal
+        (
+          a:
+            Bill,
+          b:
+            Bill
+        ) =>
+          Number(
+            a.grossTotal
+          ) -
+          Number(
+            b.grossTotal
+          )
       );
 
     } else if (
       this.sortBy ===
-      'Created Date Asc'
+        'Created Date Asc'
     ) {
 
       result.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() -
-          new Date(b.createdAt).getTime()
+        (
+          a:
+            Bill,
+          b:
+            Bill
+        ) =>
+          new Date(
+            a.createdAt
+          ).getTime() -
+          new Date(
+            b.createdAt
+          ).getTime()
       );
 
     } else {
 
       result.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
+        (
+          a:
+            Bill,
+          b:
+            Bill
+        ) =>
+          new Date(
+            b.createdAt
+          ).getTime() -
+          new Date(
+            a.createdAt
+          ).getTime()
       );
     }
 
     return result;
   }
 
-  get totalPaid(): number {
+  get totalPaid():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.paidAmount,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.paidAmount ?? 0
+        ),
       0
     );
   }
 
-  get totalDue(): number {
+  get totalDue():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.dueAmount,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.dueAmount ?? 0
+        ),
       0
     );
   }
 
-  get totalAmount(): number {
+  get totalAmount():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.total,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.total ?? 0
+        ),
       0
     );
   }
 
-  get totalTax(): number {
+  get totalTax():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.tax,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.tax ?? 0
+        ),
       0
     );
   }
 
-  get totalTaxable(): number {
+  get totalTaxable():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.taxableAmount,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.taxableAmount ?? 0
+        ),
       0
     );
   }
 
-  get totalExpress(): number {
+  get totalExpress():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.expressAmount,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.expressAmount ?? 0
+        ),
       0
     );
   }
 
-  get totalDiscount(): number {
+  get totalDiscount():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.discountAmount,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.discountAmount ?? 0
+        ),
       0
     );
   }
 
-  get grossTotal(): number {
+  get grossTotal():
+    number {
 
     return this.filteredInvoices.reduce(
-      (total, invoice) =>
-        total + invoice.grossTotal,
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.grossTotal ?? 0
+        ),
       0
     );
   }
 
-  loadInvoices(): void {
+  getStatusLabel(
+    status:
+      BillStatus
+  ): string {
 
-    console.log(
-      'Loaded invoices:',
-      this.filteredInvoices
+    switch (
+      status
+    ) {
+
+      case 'DRAFT':
+        return 'Draft';
+
+      case 'PARTIALLY_PAID':
+        return 'Partially Paid';
+
+      case 'PAID':
+        return 'Paid';
+
+      case 'CANCELLED':
+        return 'Cancelled';
+
+      default:
+        return status;
+    }
+  }
+
+  formatAmount(
+    amount:
+      number
+  ): string {
+
+    return Number(
+      amount ?? 0
+    ).toFixed(
+      2
     );
   }
 
   clearFilters(): void {
 
-    this.b2cOnly = false;
-    this.deepCleanOnly = false;
-    this.clientOnly = false;
+    this.orderIdSearch =
+      '';
 
-    this.selectedClient = 'All';
+    this.createdDate =
+      '';
 
-    this.orderIdSearch = '';
+    this.deliveredDate =
+      '';
 
-    this.createdDate = '';
-    this.deliveredDate = '';
-
-    this.invoiceStatus = 'All';
+    this.invoiceStatus =
+      'ALL';
 
     this.sortBy =
       'Created Date Desc';
   }
 
+  refresh(): void {
+
+    this.loadInvoices();
+  }
+
   receipt(
-    invoice: Invoice
+    invoice:
+      Bill
   ): void {
 
-    console.log(
-      'Receipt:',
-      invoice
+    this.selectedInvoice =
+      invoice;
+
+    this.receiptOrder =
+      null;
+
+    this.receiptError =
+      '';
+
+    this.receiptLoading =
+      true;
+
+    this.receiptOpen =
+      true;
+
+    this.apiService
+      .getB2COrderById(
+        invoice.orderId
+      )
+      .subscribe({
+
+        next: (
+          response:
+            B2COrderDetails
+        ) => {
+
+          this.receiptOrder =
+            response;
+
+          this.receiptLoading =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Receipt load error',
+            error
+          );
+
+          this.receiptError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to load receipt';
+
+          this.receiptLoading =
+            false;
+        }
+
+      });
+  }
+
+  closeReceipt(): void {
+
+    this.receiptOpen =
+      false;
+
+    this.receiptLoading =
+      false;
+
+    this.receiptError =
+      '';
+
+    this.selectedInvoice =
+      null;
+
+    this.receiptOrder =
+      null;
+  }
+
+  printReceipt(): void {
+
+    if (
+      !this.selectedInvoice ||
+      !this.receiptOrder
+    ) {
+
+      return;
+    }
+
+    window.print();
+  }
+
+  getReceiptQuantity(
+    quantity:
+      number
+  ): string {
+
+    const value =
+      Number(
+        quantity ?? 0
+      );
+
+    if (
+      Number.isInteger(
+        value
+      )
+    ) {
+
+      return value.toString();
+    }
+
+    return value.toFixed(
+      2
     );
+  }
+
+  getReceiptUnitLabel(
+    unit:
+      string
+  ): string {
+
+    if (
+      unit === 'KG'
+    ) {
+
+      return 'kg';
+    }
+
+    return 'pc';
   }
 
   settle(
-    invoice: Invoice
+    invoice:
+      Bill
   ): void {
 
-    console.log(
-      'Settle invoice:',
-      invoice
+    if (
+      invoice.dueAmount <= 0
+    ) {
+
+      return;
+    }
+
+    this.settlementInvoice =
+      invoice;
+
+    this.settlementOrder =
+      null;
+
+    this.paymentAmount =
+      Number(
+        invoice.dueAmount
+      );
+
+    this.paymentMethod =
+      'CASH';
+
+    this.referenceNumber =
+      '';
+
+    this.paymentError =
+      '';
+
+    this.settlementLoading =
+      true;
+
+    this.settlementOpen =
+      true;
+
+    this.apiService
+      .getSettlementById(
+        invoice.orderId
+      )
+      .subscribe({
+
+        next: (
+          response:
+            SettlementOrder
+        ) => {
+
+          this.settlementOrder =
+            response;
+
+          this.paymentAmount =
+            Number(
+              response.balanceAmount ?? 0
+            );
+
+          this.settlementLoading =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Settlement load error',
+            error
+          );
+
+          this.paymentError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to load settlement';
+
+          this.settlementLoading =
+            false;
+        }
+
+      });
+  }
+
+  closeSettlement(): void {
+
+    if (
+      this.paymentSubmitting
+    ) {
+
+      return;
+    }
+
+    this.settlementOpen =
+      false;
+
+    this.settlementLoading =
+      false;
+
+    this.paymentError =
+      '';
+
+    this.settlementInvoice =
+      null;
+
+    this.settlementOrder =
+      null;
+
+    this.paymentAmount =
+      0;
+
+    this.paymentMethod =
+      'CASH';
+
+    this.referenceNumber =
+      '';
+  }
+
+  selectPaymentMethod(
+    method:
+      PaymentMethod
+  ): void {
+
+    this.paymentMethod =
+      method;
+  }
+
+  payFullBalance(): void {
+
+    if (
+      this.settlementOrder
+    ) {
+
+      this.paymentAmount =
+        Number(
+          this.settlementOrder
+            .balanceAmount ?? 0
+        );
+
+      return;
+    }
+
+    if (
+      this.settlementInvoice
+    ) {
+
+      this.paymentAmount =
+        Number(
+          this.settlementInvoice
+            .dueAmount ?? 0
+        );
+    }
+  }
+
+  get remainingAfterPayment():
+    number {
+
+    const balance =
+      this.settlementOrder
+        ? Number(
+            this.settlementOrder
+              .balanceAmount ?? 0
+          )
+        : Number(
+            this.settlementInvoice
+              ?.dueAmount ?? 0
+          );
+
+    const amount =
+      Number(
+        this.paymentAmount ?? 0
+      );
+
+    return Math.max(
+      0,
+      balance - amount
     );
   }
+
+  get settlementTotalAmount():
+    number {
+
+    if (
+      this.settlementOrder
+    ) {
+
+      return Number(
+        this.settlementOrder
+          .totalAmount ?? 0
+      );
+    }
+
+    return Number(
+      this.settlementInvoice
+        ?.grossTotal ?? 0
+    );
+  }
+
+  get settlementPaidAmount():
+    number {
+
+    if (
+      this.settlementOrder
+    ) {
+
+      return Number(
+        this.settlementOrder
+          .paidAmount ?? 0
+      );
+    }
+
+    return Number(
+      this.settlementInvoice
+        ?.paidAmount ?? 0
+    );
+  }
+
+  get settlementBalanceAmount():
+    number {
+
+    if (
+      this.settlementOrder
+    ) {
+
+      return Number(
+        this.settlementOrder
+          .balanceAmount ?? 0
+      );
+    }
+
+    return Number(
+      this.settlementInvoice
+        ?.dueAmount ?? 0
+    );
+  }
+
+  addPayment(): void {
+
+    if (
+      !this.settlementInvoice
+    ) {
+
+      return;
+    }
+
+    const amount =
+      Number(
+        this.paymentAmount
+      );
+
+    const balance =
+      this.settlementBalanceAmount;
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      this.paymentError =
+        'Enter a valid payment amount';
+
+      return;
+    }
+
+    if (
+      amount > balance
+    ) {
+
+      this.paymentError =
+        'Payment amount cannot be greater than balance';
+
+      return;
+    }
+
+    const request:
+      PaymentRequest = {
+
+        amount,
+
+        paymentMethod:
+          this.paymentMethod,
+
+        referenceNumber:
+          this.referenceNumber
+            .trim() || null
+      };
+
+    this.paymentSubmitting =
+      true;
+
+    this.paymentError =
+      '';
+
+    this.apiService
+      .addSettlementPayment(
+        this.settlementInvoice
+          .orderId,
+        request
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.paymentSubmitting =
+            false;
+
+          this.closeSettlement();
+
+          this.loadInvoices();
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Payment error',
+            error
+          );
+
+          this.paymentError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to add payment';
+
+          this.paymentSubmitting =
+            false;
+        }
+
+      });
+  }
+
+  formatOrderStatus(
+    status: string
+  ): string {
+
+    return status
+      ? status.split('_').join(' ')
+      : '';
+  }
+
 }

@@ -1,400 +1,637 @@
 :host {
   display: block;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
 }
 
 .payments-page {
   width: 100%;
   min-height: 100%;
 
-  padding: var(--app-space-lg);
+  padding: 22px;
 
-  background: var(--app-background);
-  color: var(--app-text-primary);
+  background: #f7f9fa;
+  color: #1f2937;
 }
+
 
 /* =========================================
    PAGE HEADING
 ========================================= */
 
 .page-heading {
-  margin-bottom: var(--app-space-lg);
+  margin-bottom: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .page-heading h1 {
   margin: 0;
 
-  font-family: var(--app-font-heading);
+  font-size: 28px;
+  font-weight: 800;
 
-  font-size: var(--app-font-size-xl);
-  font-weight: 700;
+  color: #111827;
 
   letter-spacing: -0.03em;
-
-  color: var(--app-text-primary);
 }
+
+.page-heading p {
+  margin: 5px 0 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
 
 /* =========================================
    FILTER BAR
 ========================================= */
 
 .filter-bar {
-  width: 100%;
-  min-height: 74px;
+  margin-bottom: 18px;
 
-  padding: var(--app-space-md) var(--app-space-lg);
+  padding: 14px 16px;
 
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: space-between;
 
-  gap: var(--app-space-xl);
+  gap: 16px;
 
-  border-radius: var(--app-radius-sm);
+  border: 1px solid #dfe6ea;
+  border-radius: 12px;
 
-  background: var(--app-primary);
+  background: #ffffff;
 }
-
-/* =========================================
-   DATE RANGE
-========================================= */
 
 .date-range {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 
-  gap: var(--app-space-sm);
+  gap: 12px;
 }
 
-.date-range input {
-  width: 150px;
+.date-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.date-field label {
+  color: #4b5563;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.date-field input {
+  width: 170px;
   height: 40px;
 
   padding: 0 10px;
 
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: var(--app-radius-sm);
+  border: 1px solid #d7e0e5;
+  border-radius: 8px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: #f9fbfc;
+  color: #111827;
 
-  color: var(--app-text-light);
-
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-sm);
-  font-weight: 600;
+  font-size: 12px;
 
   outline: none;
+}
+
+.date-field input:focus {
+  border-color: #13b5d1;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(19, 181, 209, 0.08);
+}
+
+.date-separator {
+  padding-bottom: 9px;
+
+  color: #8a949d;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.refresh-button {
+  height: 40px;
+
+  padding: 0 16px;
+
+  border: 1px solid #13b5d1;
+  border-radius: 8px;
+
+  background: #13b5d1;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 800;
 
   cursor: pointer;
 
-  transition:
-    border-color var(--app-transition),
-    background var(--app-transition);
+  transition: 0.2s ease;
 }
 
-.date-range input:focus {
-  border-color: var(--app-text-light);
+.refresh-button:hover {
+  border-color: #089bb8;
 
-  background: rgba(255, 255, 255, 0.14);
+  background: #089bb8;
 }
 
-.date-range input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-
-  cursor: pointer;
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.date-range > span {
-  color: var(--app-text-light);
 
-  font-size: var(--app-font-size-lg);
+/* =========================================
+   ERROR
+========================================= */
+
+.payment-error {
+  margin-bottom: 16px;
+
+  padding: 10px 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid #efb4b4;
+  border-radius: 9px;
+
+  background: #fff4f4;
+  color: #d63c3c;
+
+  font-size: 11px;
   font-weight: 600;
 }
 
-/* =========================================
-   DEEP CLEAN TOGGLE
-========================================= */
+.payment-error button {
+  border: 0;
 
-.clean-toggle {
-  display: flex;
-  align-items: center;
+  background: transparent;
+  color: #d63c3c;
 
-  gap: 10px;
-
-  color: var(--app-text-light);
-
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-sm);
-  font-weight: 500;
+  font-size: 18px;
 
   cursor: pointer;
-
-  user-select: none;
 }
 
-.clean-toggle input {
-  position: absolute;
-
-  opacity: 0;
-
-  pointer-events: none;
-}
-
-.toggle-track {
-  position: relative;
-
-  width: 44px;
-  height: 24px;
-
-  flex-shrink: 0;
-
-  border-radius: var(--app-radius-round);
-
-  background: rgba(255, 255, 255, 0.32);
-
-  transition: background var(--app-transition);
-}
-
-.toggle-thumb {
-  position: absolute;
-
-  top: 3px;
-  left: 3px;
-
-  width: 18px;
-  height: 18px;
-
-  border-radius: var(--app-radius-round);
-
-  background: var(--app-text-light);
-
-  box-shadow: var(--app-shadow-sm);
-
-  transition: transform var(--app-transition);
-}
-
-.clean-toggle input:checked + .toggle-track {
-  background: var(--app-primary-dark);
-}
-
-.clean-toggle input:checked + .toggle-track .toggle-thumb {
-  transform: translateX(20px);
-}
 
 /* =========================================
-   REFRESH BUTTON
+   SUMMARY
 ========================================= */
 
-.refresh-button {
-  width: 38px;
-  height: 38px;
+.payment-summary {
+  margin-bottom: 18px;
+
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.summary-item {
+  min-height: 86px;
+
+  padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  border: 1px solid #dfe6ea;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 3px 10px rgba(15, 23, 42, 0.04);
+}
+
+.summary-item span {
+  color: #6b7280;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.summary-item strong {
+  color: #111827;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.upi-summary {
+  border-left: 4px solid #0ea5c6;
+}
+
+.cash-summary {
+  border-left: 4px solid #2ea96f;
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.payments-loading {
+  min-height: 220px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 0;
+  border: 1px solid #dfe6ea;
+  border-radius: 12px;
 
-  border: 0;
-  border-radius: var(--app-radius-round);
+  background: #ffffff;
 
-  background: transparent;
-  color: var(--app-text-light);
+  color: #6b7280;
 
-  font-family: var(--app-font-body);
-  font-size: 30px;
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition:
-    background var(--app-transition),
-    transform var(--app-transition);
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.refresh-button:hover {
-  background: rgba(255, 255, 255, 0.12);
-
-  transform: rotate(25deg);
-}
 
 /* =========================================
-   PAYMENTS TABLE
+   TABLE
 ========================================= */
 
 .payments-table {
   width: 100%;
 
-  border-left: 1px solid var(--app-border);
-  border-right: 1px solid var(--app-border);
-  border-bottom: 1px solid var(--app-border);
+  border: 1px solid #dfe6ea;
+  border-radius: 12px;
 
-  background: var(--app-surface);
+  background: #ffffff;
+
+  overflow: hidden;
 }
 
-/* =========================================
-   TABLE HEADER
-========================================= */
-
-.table-header {
-  min-height: 68px;
-
-  padding: 0 var(--app-space-lg);
-
+.table-header,
+.payment-row {
   display: grid;
 
   grid-template-columns:
-    44px
-    200px
-    220px
-    minmax(380px, 1fr)
-    240px;
+    42px
+    150px
+    1fr
+    1fr
+    1fr
+    1fr
+    1fr
+    90px;
 
   align-items: center;
+}
 
-  border-bottom: 1px solid var(--app-border);
+.table-header {
+  min-height: 48px;
 
-  color: var(--app-text-secondary);
+  border-bottom: 1px solid #dfe6ea;
 
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
-  font-weight: 700;
+  background: #f3f5f7;
 }
 
 .table-header > div {
-  min-width: 0;
+  padding: 0 12px;
+
+  color: #4b5563;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: uppercase;
 }
 
-/* =========================================
-   PAYMENT ROW
-========================================= */
-
 .payment-row {
-  min-height: 68px;
+  min-height: 52px;
 
-  padding: 0 var(--app-space-lg);
-
-  display: grid;
-
-  grid-template-columns:
-    44px
-    200px
-    220px
-    minmax(380px, 1fr)
-    240px;
-
-  align-items: center;
-
-  border-bottom: 1px solid var(--app-border);
-
-  background: var(--app-surface);
+  border-bottom: 1px solid #e8edf0;
 
   cursor: pointer;
 
-  transition:
-    background var(--app-transition),
-    box-shadow var(--app-transition);
+  transition: 0.15s ease;
 }
 
 .payment-row:hover {
-  background: var(--app-background-soft);
+  background: #f9fcfd;
+}
+
+.payment-row > div {
+  padding: 0 12px;
 }
 
 .expand-icon {
   display: flex;
   align-items: center;
+  justify-content: center;
 
-  color: var(--app-text-secondary);
+  color: #0c9bb8;
 
-  font-size: var(--app-font-size-lg);
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
 }
 
 .payment-date {
-  color: var(--app-text-primary);
+  color: #1f2937;
 
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-sm);
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .payment-value {
-  color: var(--app-text-primary);
+  color: #374151;
 
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-sm);
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
 }
+
+.total-value {
+  color: #111827;
+
+  font-weight: 800;
+}
+
+.payment-count {
+  min-width: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 5px 8px;
+
+  border-radius: 999px;
+
+  background: #edf7fa;
+  color: #078da8;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
 
 /* =========================================
    EXPANDED DETAILS
 ========================================= */
 
 .payment-details {
-  padding: var(--app-space-lg) var(--app-space-3xl);
+  padding: 14px;
 
-  display: grid;
+  display: flex;
+  flex-direction: column;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  gap: 12px;
 
-  gap: var(--app-space-md);
+  border-bottom: 1px solid #dfe6ea;
 
-  border-bottom: 1px solid var(--app-border);
-
-  background: var(--app-background-soft);
-
-  animation: paymentDetailsIn 0.2s ease;
+  background: #f8fafb;
 }
 
-.payment-details > div {
-  min-height: 58px;
 
-  padding: 12px 14px;
+/* =========================================
+   PAYMENT METHOD SECTION
+========================================= */
+
+.payment-method-section {
+  border: 1px solid #dfe6ea;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  overflow: hidden;
+}
+
+.method-header {
+  min-height: 46px;
+
+  padding: 10px 14px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  gap: var(--app-space-md);
+  gap: 14px;
 
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-sm);
-
-  background: var(--app-surface);
-
-  box-shadow: var(--app-shadow-sm);
+  border-bottom: 1px solid #e6ebee;
 }
 
-.payment-details span {
-  color: var(--app-text-secondary);
+.method-header > div {
+  display: flex;
+  flex-direction: column;
 
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
-  font-weight: 500;
+  gap: 3px;
 }
 
-.payment-details strong {
-  color: var(--app-text-primary);
+.method-header strong {
+  font-size: 12px;
+  font-weight: 800;
+}
 
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-sm);
+.method-header span {
+  color: #6b7280;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.cash-header {
+  border-left: 4px solid #2ea96f;
+}
+
+.upi-header {
+  border-left: 4px solid #0ea5c6;
+}
+
+.card-header {
+  border-left: 4px solid #7c6edb;
+}
+
+.other-header {
+  border-left: 4px solid #9ca3af;
+}
+
+
+/* =========================================
+   METHOD EMPTY
+========================================= */
+
+.method-empty {
+  min-height: 48px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+
+  color: #9ca3af;
+
+  font-size: 10px;
+}
+
+
+/* =========================================
+   ORDER PAYMENT LIST
+========================================= */
+
+.order-payment-list {
+  width: 100%;
+}
+
+.order-payment-row {
+  min-height: 54px;
+
+  padding: 0 14px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 1.3fr)
+    150px
+    minmax(120px, 1fr)
+    180px
+    110px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+.order-payment-row:last-child {
+  border-bottom: none;
+}
+
+.order-payment-row:hover {
+  background: #fbfdfe;
+}
+
+
+/* =========================================
+   ORDER PAYMENT MAIN
+========================================= */
+
+.order-payment-main {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.order-number {
+  color: #078da8;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.customer-name {
+  color: #6b7280;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+.order-payment-mobile button {
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+  color: #078da8;
+
+  font-size: 10px;
   font-weight: 700;
+
+  cursor: pointer;
 }
+
+.order-payment-mobile button:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   REFERENCE
+========================================= */
+
+.order-payment-reference {
+  color: #6b7280;
+
+  font-size: 9px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   TIME
+========================================= */
+
+.order-payment-time {
+  color: #6b7280;
+
+  font-size: 9px;
+}
+
+
+/* =========================================
+   AMOUNT
+========================================= */
+
+.order-payment-amount {
+  color: #111827;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-align: right;
+}
+
 
 /* =========================================
    EMPTY STATE
 ========================================= */
 
 .payments-empty {
-  min-height: 180px;
-
-  padding: var(--app-space-2xl) var(--app-space-lg);
+  min-height: 220px;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
+
+  color: #6b7280;
 
   text-align: center;
 }
@@ -402,38 +639,18 @@
 .payments-empty h3 {
   margin: 0;
 
-  font-family: var(--app-font-heading);
+  color: #111827;
 
-  font-size: var(--app-font-size-md);
-  font-weight: 700;
-
-  color: var(--app-text-primary);
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .payments-empty p {
-  margin: var(--app-space-sm) 0 0;
+  margin: 5px 0 0;
 
-  color: var(--app-text-muted);
-
-  font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 10px;
 }
 
-/* =========================================
-   ANIMATION
-========================================= */
-
-@keyframes paymentDetailsIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* =========================================
    RESPONSIVE
@@ -441,31 +658,74 @@
 
 @media (max-width: 1200px) {
 
-  .payments-page {
-    overflow-x: auto;
+  .payment-summary {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
   }
 
-  .filter-bar,
   .payments-table {
-    min-width: 1100px;
+    overflow-x: auto;
+
+    scrollbar-width: none;
+  }
+
+  .payments-table::-webkit-scrollbar {
+    display: none;
+  }
+
+  .table-header,
+  .payment-row {
+    min-width: 1050px;
+  }
+
+  .order-payment-row {
+    min-width: 900px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
 
   .payments-page {
-    padding: var(--app-space-md);
+    padding: 14px;
   }
 
   .filter-bar {
-    align-items: flex-start;
     flex-direction: column;
-
-    gap: var(--app-space-md);
+    align-items: stretch;
   }
 
-  .filter-bar,
-  .payments-table {
-    min-width: 900px;
+  .date-range {
+    width: 100%;
+
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .date-field input {
+    width: 100%;
+  }
+
+  .date-separator {
+    display: none;
+  }
+
+  .refresh-button {
+    width: 100%;
+  }
+
+  .payment-summary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+
+  .payment-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .page-heading h1 {
+    font-size: 23px;
   }
 }

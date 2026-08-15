@@ -1,334 +1,587 @@
 <div class="dashboard-page">
 
-  <div class="toolbar-title">
+  <!-- =========================================
+       HEADER
+  ========================================== -->
 
-    <h1>
-      Delivery Dashboard
-    </h1>
+  <div class="dashboard-header">
 
-    <p>
-      Orders grouped by delivery date
-    </p>
+    <!-- <div>
+
+      <h1>
+        Delivery Dashboard
+      </h1>
+
+      <p>
+        Track delivery workload by date
+      </p>
+
+    </div> -->
+
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="loadDashboard()">
+
+      {{ loading ? 'Loading...' : '↻ Refresh' }}
+
+    </button>
 
   </div>
 
 
-  <div class="board-scroll">
+  <!-- =========================================
+       ERROR
+  ========================================== -->
 
-    <div
-      class="board-grid"
-      [style.--day-count]="deliveryDays.length">
+  @if (errorMessage) {
 
+    <div class="dashboard-error">
 
-      <!-- DELIVERY DATE -->
+      <span>
+        {{ errorMessage }}
+      </span>
 
-      <div class="row-label header-label">
-        Delivery Date
-      </div>
+      <button
+        type="button"
+        (click)="errorMessage = ''">
 
-      @for (
-        day of deliveryDays;
-        track day.date;
-        let index = $index
-      ) {
+        ×
 
-        <div
-          class="day-header"
-          [class.current-day]="index === deliveryDays.length - 1">
-
-          {{ day.date }}
-
-        </div>
-
-      }
-
-
-      <!-- TOTAL -->
-
-      <div class="row-label total-label">
-        Total
-      </div>
-
-      @for (day of deliveryDays; track day.date) {
-
-        <div class="summary-cell total-cell">
-
-          <strong>
-            {{ day.totalOrders }}
-          </strong>
-
-          <span>-</span>
-
-          <strong>
-            {{ day.totalPieces }} pc
-          </strong>
-
-        </div>
-
-      }
-
-
-      <!-- PROCESSING -->
-
-      <div class="row-label processing-label">
-        Processing
-      </div>
-
-      @for (day of deliveryDays; track day.date) {
-
-        <div class="summary-cell processing-cell">
-
-          <strong>
-            {{ day.processingOrders }}
-          </strong>
-
-          <span>-</span>
-
-          <strong>
-            {{ day.processingPieces }} pc
-          </strong>
-
-        </div>
-
-      }
-
-
-      <!-- READY -->
-
-      <div class="row-label ready-label">
-        Ready
-      </div>
-
-      @for (day of deliveryDays; track day.date) {
-
-        <div class="summary-cell ready-cell">
-
-          <strong>
-            {{ day.readyOrders }}
-          </strong>
-
-          <span>-</span>
-
-          <strong>
-            {{ day.readyPieces }} pc
-          </strong>
-
-        </div>
-
-      }
-
-
-      <!-- ORDERS -->
-
-      <div class="orders-label">
-        Orders
-      </div>
-
-
-      @for (day of deliveryDays; track day.date) {
-
-        <div class="day-orders">
-
-          @if (day.orders.length === 0) {
-
-            <div class="empty-orders">
-              No orders
-            </div>
-
-          } @else {
-
-            @for (
-              order of day.orders;
-              track order.orderNumber
-            ) {
-
-              <article
-                class="order-row"
-                [class.highlighted]="order.highlighted"
-                [class.order-ready]="order.ready">
-
-
-                <div class="order-sequence">
-                  {{ order.sequence }}.
-                </div>
-
-
-                <div class="order-information">
-
-                  <div class="order-main">
-
-                    <strong class="order-number">
-                      {{ order.orderNumber }}
-                    </strong>
-
-                    <span class="separator">
-                      -
-                    </span>
-
-                    <span class="pieces">
-                      {{ order.pieces }} pc
-                    </span>
-
-                    <span class="separator">
-                      -
-                    </span>
-
-                    <span class="amount">
-                      ₹{{ order.amount }}
-                    </span>
-
-                    <span class="separator">
-                      -
-                    </span>
-
-                    <span class="delivery-time">
-                      {{ order.deliveryTime }}
-                    </span>
-
-                  </div>
-
-
-                  <button
-                    type="button"
-                    class="customer"
-                    (click)="openCallPopup(order)">
-
-                    <span class="phone-icon">
-                      ☎
-                    </span>
-
-                    <span class="customer-name">
-                      {{ order.customerName }}
-                    </span>
-
-                  </button>
-
-                </div>
-
-
-                <div class="order-status">
-
-                  @if (order.ready) {
-
-                    <span
-                      class="ready-check"
-                      title="Ready">
-
-                      ✓
-
-                    </span>
-
-                  } @else {
-
-                    <span
-                      class="processing-dot"
-                      title="Processing">
-                    </span>
-
-                  }
-
-                </div>
-
-              </article>
-
-            }
-
-          }
-
-        </div>
-
-      }
+      </button>
 
     </div>
 
-  </div>
+  }
 
 
-  <!-- LEGEND -->
+  <!-- =========================================
+       LOADING
+  ========================================== -->
 
-  <div class="dashboard-legend">
+  @if (loading) {
 
-    <div>
-      <span class="legend-color processing"></span>
-      Processing
+    <div class="dashboard-loading">
+
+      Loading dashboard...
+
     </div>
 
-    <div>
-      <span class="legend-color ready"></span>
-      Ready
+  }
+
+
+  <!-- =========================================
+       EMPTY
+  ========================================== -->
+
+  @if (
+    !loading &&
+    deliveryDays.length === 0
+  ) {
+
+    <div class="dashboard-empty">
+
+      <h3>
+        No active delivery orders
+      </h3>
+
+      <p>
+        Orders with delivery dates will appear here.
+      </p>
+
     </div>
 
-    <div>
-      <span class="legend-color highlighted"></span>
-      Ready Order
-    </div>
-
-  </div>
+  }
 
 
-  <!-- CALL POPUP -->
+  <!-- =========================================
+       DASHBOARD BOARD
+  ========================================== -->
 
-  @if (selectedOrder) {
+  @if (
+    !loading &&
+    deliveryDays.length > 0
+  ) {
 
-    <div
-      class="call-modal-backdrop"
-      (click)="closeCallPopup()">
+    <div class="dashboard-board-wrapper">
 
       <div
-        class="call-modal"
-        (click)="$event.stopPropagation()">
+        class="dashboard-board"
+        [style.--date-count]="deliveryDays.length">
 
 
-        <div class="call-modal-header">
+        <!-- =====================================
+             LABEL COLUMN
+        ====================================== -->
 
-          <h2>
-            Call {{ selectedOrder.customerName }}
-          </h2>
-
-          <p>
-            *Recommended way to connect to the customer
-          </p>
-
-        </div>
+        <div class="dashboard-label-column">
 
 
-        <div class="call-modal-body">
+          <div class="delivery-date-label">
 
-          <h3>
-            How this work?
-          </h3>
+            Delivery Date
 
-          <div class="how-it-works">
+          </div>
 
-            <p>
-              1. You will receive a call on
-              <strong>
-                {{ staffPhone }}
-              </strong>
-              after clicking on call button
-            </p>
 
-            <p>
-              2. Customer will get a call on
-              <strong>
-                {{ selectedOrder.phone }}
-              </strong>
-            </p>
+          <div class="summary-label total-label">
 
-            <p>
-              Once you receive the call, wait for the call to connect to the customer
-            </p>
+            <span>
+              Total
+            </span>
+
+            <small>
+              Orders / Pieces
+            </small>
+
+          </div>
+
+
+          <div class="summary-label processing-label">
+
+            <span>
+              Processing
+            </span>
+
+            <small>
+              Orders / Pieces
+            </small>
+
+          </div>
+
+
+          <div class="summary-label ready-label">
+
+            <span>
+              Ready
+            </span>
+
+            <small>
+              Orders / Pieces
+            </small>
+
+          </div>
+
+
+          <div class="orders-label">
+
+            Orders
 
           </div>
 
         </div>
 
 
-        <div class="call-modal-footer">
+        <!-- =====================================
+             DELIVERY DATE COLUMNS
+        ====================================== -->
+
+        @for (
+          day of deliveryDays;
+          track day.deliveryDate
+        ) {
+
+          <div class="delivery-column">
+
+
+            <!-- DATE -->
+
+            <div class="delivery-date-header">
+
+              <strong>
+                {{ day.dayLabel }}
+              </strong>
+
+              <span>
+                {{ day.deliveryDate | date:'dd MMM yyyy' }}
+              </span>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div class="summary-cell total-cell">
+
+              <div class="summary-number">
+
+                {{ day.totalOrders }}
+
+              </div>
+
+              <div class="summary-pieces">
+
+                {{ formatPieces(day.totalPieces) }} pc
+
+              </div>
+
+            </div>
+
+
+            <!-- PROCESSING -->
+
+            <div class="summary-cell processing-cell">
+
+              <div class="summary-number">
+
+                {{ day.processingOrders }}
+
+              </div>
+
+              <div class="summary-pieces">
+
+                {{
+                  formatPieces(
+                    day.processingPieces
+                  )
+                }} pc
+
+              </div>
+
+            </div>
+
+
+            <!-- READY -->
+
+            <div class="summary-cell ready-cell">
+
+              <div class="summary-number">
+
+                {{ day.readyOrders }}
+
+              </div>
+
+              <div class="summary-pieces">
+
+                {{
+                  formatPieces(
+                    day.readyPieces
+                  )
+                }} pc
+
+              </div>
+
+            </div>
+
+
+            <!-- =================================
+                 ORDERS
+            ================================== -->
+
+            <div class="orders-list">
+
+              @if (
+                day.orders.length === 0
+              ) {
+
+                <div class="no-orders">
+
+                  No orders
+
+                </div>
+
+              }
+
+
+              @for (
+                order of day.orders;
+                track order.id;
+                let index = $index
+              ) {
+
+                <button
+                  type="button"
+                  class="order-card"
+
+                  [class.ready-order]="
+                    isReadyOrder(order)
+                  "
+
+                  [class.processing-order]="
+                    isProcessingOrder(order)
+                  "
+
+                  (click)="openCallPopup(order)">
+
+
+                  <!-- TOP -->
+
+                  <div class="order-card-top">
+
+                    <span class="order-sequence">
+
+                      {{ index + 1 }}.
+
+                    </span>
+
+
+                    <strong class="order-number">
+
+                      {{ order.orderNumber }}
+
+                    </strong>
+
+
+                    <span
+                      class="order-status"
+
+                      [class.status-processing]="
+                        isProcessingOrder(order)
+                      "
+
+                      [class.status-ready]="
+                        isReadyOrder(order)
+                      ">
+
+                      {{ getStatusLabel(order) }}
+
+                    </span>
+
+                  </div>
+
+
+                  <!-- META -->
+
+                  <div class="order-meta">
+
+                    <span>
+
+                      {{
+                        formatPieces(
+                          order.totalPieces
+                        )
+                      }} pc
+
+                    </span>
+
+
+                    <span class="meta-dot">
+                      •
+                    </span>
+
+
+                    <span>
+
+                      ₹{{ formatAmount(
+                        order.totalAmount
+                      ) }}
+
+                    </span>
+
+                  </div>
+
+
+                  <!-- DELIVERY TIME -->
+
+                  <div class="order-time">
+
+                    <span class="time-icon">
+                      ◷
+                    </span>
+
+                    <span>
+
+                      {{
+                        order.deliveryTime ||
+                        'No delivery time'
+                      }}
+
+                    </span>
+
+                  </div>
+
+
+                  <!-- CUSTOMER -->
+
+                  <div class="order-customer">
+
+                    <div class="customer-avatar">
+
+                      {{
+                        order.customerName
+                          ? order.customerName
+                              .charAt(0)
+                              .toUpperCase()
+                          : '?'
+                      }}
+
+                    </div>
+
+
+                    <div class="customer-info">
+
+                      <strong>
+
+                        {{ order.customerName }}
+
+                      </strong>
+
+                      <span>
+
+                        {{ order.mobile }}
+
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- =========================================
+       CALL POPUP
+  ========================================== -->
+
+  @if (selectedOrder) {
+
+    <div
+      class="call-overlay"
+      (click)="closeCallPopup()">
+
+      <div
+        class="call-popup"
+        (click)="$event.stopPropagation()">
+
+
+        <div class="call-popup-header">
+
+          <div>
+
+            <h2>
+              Customer Details
+            </h2>
+
+            <p>
+              {{ selectedOrder.orderNumber }}
+            </p>
+
+          </div>
+
 
           <button
             type="button"
-            class="modal-close-button"
+            class="popup-close"
+            (click)="closeCallPopup()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <div class="call-popup-body">
+
+
+          <div class="call-customer-avatar">
+
+            {{
+              selectedOrder.customerName
+                ? selectedOrder.customerName
+                    .charAt(0)
+                    .toUpperCase()
+                : '?'
+            }}
+
+          </div>
+
+
+          <h3>
+
+            {{ selectedOrder.customerName }}
+
+          </h3>
+
+
+          <p class="call-mobile">
+
+            {{ selectedOrder.mobile }}
+
+          </p>
+
+
+          <div class="call-order-details">
+
+            <div>
+
+              <span>
+                Pieces
+              </span>
+
+              <strong>
+
+                {{
+                  formatPieces(
+                    selectedOrder.totalPieces
+                  )
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div>
+
+              <span>
+                Amount
+              </span>
+
+              <strong>
+
+                ₹{{ formatAmount(
+                  selectedOrder.totalAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+
+            <div>
+
+              <span>
+                Delivery
+              </span>
+
+              <strong>
+
+                {{
+                  selectedOrder.deliveryTime ||
+                  '-'
+                }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="call-popup-footer">
+
+          <button
+            type="button"
+            class="cancel-call-button"
             (click)="closeCallPopup()">
 
             Close
@@ -338,10 +591,10 @@
 
           <button
             type="button"
-            class="modal-call-button"
+            class="call-now-button"
             (click)="callNow()">
 
-            Call Now
+            ☎ Call Customer
 
           </button>
 

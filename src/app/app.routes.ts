@@ -3,9 +3,8 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./pages/landing/landing.page')
-        .then((m) => m.LandingPage),
+    redirectTo: 'app/dashboard',
+    pathMatch: 'full',
   },
 
   {
@@ -102,6 +101,6 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: 'app/dashboard',
   },
 ];

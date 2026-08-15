@@ -1,6 +1,5 @@
 <div class="bill-page">
 
-  <!-- HEADER -->
   <div class="page-header">
 
     <div>
@@ -15,30 +14,37 @@
 
     </div>
 
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="refresh()">
+
+      @if (loading) {
+        Loading...
+      } @else {
+        ↻ Refresh
+      }
+
+    </button>
+
   </div>
 
-
-  <!-- FILTERS -->
   <section class="invoice-filters">
 
-
-
-    <!-- ORDER ID -->
     <div class="filter-field">
 
       <label>
-        Order ID
+        Order / Invoice No.
       </label>
 
       <input
         type="text"
         [(ngModel)]="orderIdSearch"
-        placeholder="Order ID">
+        placeholder="Search order or invoice">
 
     </div>
 
-
-    <!-- CREATED DATE -->
     <div class="filter-field">
 
       <label>
@@ -51,8 +57,6 @@
 
     </div>
 
-
-    <!-- DELIVERED DATE -->
     <div class="filter-field">
 
       <label>
@@ -65,23 +69,25 @@
 
     </div>
 
-
-    <!-- STATUS -->
     <div class="filter-field">
 
       <label>
         Invoice Status
       </label>
 
-      <select [(ngModel)]="invoiceStatus">
+      <select
+        [(ngModel)]="invoiceStatus">
 
         @for (
           status of statuses;
-          track status
+          track status.value
         ) {
 
-          <option [value]="status">
-            {{ status }}
+          <option
+            [value]="status.value">
+
+            {{ status.label }}
+
           </option>
 
         }
@@ -90,23 +96,25 @@
 
     </div>
 
-
-    <!-- SORT -->
     <div class="filter-field">
 
       <label>
         Sort By
       </label>
 
-      <select [(ngModel)]="sortBy">
+      <select
+        [(ngModel)]="sortBy">
 
         @for (
           option of sortOptions;
           track option
         ) {
 
-          <option [value]="option">
+          <option
+            [value]="option">
+
             {{ option }}
+
           </option>
 
         }
@@ -117,19 +125,17 @@
 
   </section>
 
-
-  <!-- BUTTONS -->
   <section class="invoice-actions">
 
     <button
       type="button"
       class="load-button"
+      [disabled]="loading"
       (click)="loadInvoices()">
 
       Load Invoices
 
     </button>
-
 
     <button
       type="button"
@@ -142,327 +148,1264 @@
 
   </section>
 
+  @if (errorMessage) {
 
-  <!-- TABLE -->
-  <section class="invoice-table-wrapper">
+    <div class="bill-error">
 
-    <table class="invoice-table">
+      <span>
+        {{ errorMessage }}
+      </span>
 
-      <thead>
+      <button
+        type="button"
+        (click)="errorMessage = ''">
 
-        <tr>
+        ×
 
-          <th>#</th>
+      </button>
 
-          <th>
-            Actions
-          </th>
+    </div>
 
-          <th>
-            Status
-          </th>
+  }
 
-          <th>
-            Invoice No.
-          </th>
+  @if (loading) {
 
-          <th>
-            Order No.
-          </th>
+    <div class="bill-loading">
 
-          <th>
-            Paid Amt
-          </th>
+      Loading invoices...
 
-          <th>
-            Due Amt
-          </th>
+    </div>
 
-          <th>
-            Total
-          </th>
+  }
 
-          <th>
-            Tax
-          </th>
+  @if (!loading) {
 
-          <th>
-            Taxable Amt
-          </th>
+    <section class="invoice-table-wrapper">
 
-          <th>
-            Express Amt
-          </th>
+      <table class="invoice-table">
 
-          <th>
-            Discount Amt
-          </th>
-
-          <th>
-            Gross Total
-          </th>
-
-          <th>
-            Created At
-          </th>
-
-          <th>
-            Deleted At
-          </th>
-
-          <th>
-            Paid At
-          </th>
-
-          <th>
-            Delivered At
-          </th>
-
-          <th>
-            Store
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody>
-
-        <!-- TOTAL ROW -->
-        <tr class="summary-row">
-
-          <td></td>
-
-          <td></td>
-
-          <td></td>
-
-          <td></td>
-
-          <td>
-            Total
-          </td>
-
-          <td>
-            {{ totalPaid }}
-          </td>
-
-          <td>
-            {{ totalDue }}
-          </td>
-
-          <td>
-            {{ totalAmount }}
-          </td>
-
-          <td>
-            {{ totalTax }}
-          </td>
-
-          <td>
-            {{ totalTaxable }}
-          </td>
-
-          <td>
-            {{ totalExpress }}
-          </td>
-
-          <td>
-            {{ totalDiscount }}
-          </td>
-
-          <td>
-            {{ grossTotal }}
-          </td>
-
-          <td></td>
-
-          <td></td>
-
-          <td></td>
-
-          <td></td>
-
-          <td></td>
-
-        </tr>
-
-
-        @for (
-          invoice of filteredInvoices;
-          track invoice.id;
-          let index = $index
-        ) {
+        <thead>
 
           <tr>
 
-            <td>
-              {{ index + 1 }}
-            </td>
+            <th>#</th>
 
+            <th>
+              Actions
+            </th>
 
-            <!-- ACTIONS -->
-            <td>
+            <th>
+              Status
+            </th>
 
-              <div class="row-actions">
+            <th>
+              Invoice No.
+            </th>
 
-                <button
-                  type="button"
-                  class="receipt-button"
-                  (click)="receipt(invoice)">
+            <th>
+              Order No.
+            </th>
 
-                  Receipt
+            <th>
+              Paid Amt
+            </th>
 
-                </button>
+            <th>
+              Due Amt
+            </th>
 
+            <th>
+              Total
+            </th>
 
-                @if (
-                  invoice.status !== 'Deleted' &&
-                  invoice.dueAmount > 0
-                ) {
+            <th>
+              Tax
+            </th>
 
-                  <button
-                    type="button"
-                    class="settle-button"
-                    (click)="settle(invoice)">
+            <th>
+              Taxable Amt
+            </th>
 
-                    Settle
+            <th>
+              Express Amt
+            </th>
 
-                  </button>
+            <th>
+              Discount Amt
+            </th>
 
-                }
+            <th>
+              Gross Total
+            </th>
 
-              </div>
+            <th>
+              Created At
+            </th>
 
-            </td>
+            <th>
+              Paid At
+            </th>
 
+            <th>
+              Delivered At
+            </th>
 
-            <!-- STATUS -->
-            <td>
-
-              <span
-                class="invoice-status"
-                [class.status-draft]="
-                  invoice.status === 'Draft'
-                "
-                [class.status-paid]="
-                  invoice.status === 'Paid'
-                "
-                [class.status-partial]="
-                  invoice.status === 'Partially Paid'
-                "
-                [class.status-deleted]="
-                  invoice.status === 'Deleted'
-                ">
-
-                {{ invoice.status }}
-
-              </span>
-
-            </td>
-
-
-            <td>
-
-              <strong class="invoice-number">
-                {{ invoice.invoiceNumber }}
-              </strong>
-
-            </td>
-
-
-            <td>
-
-              <strong class="order-number">
-                {{ invoice.orderNumber }}
-              </strong>
-
-            </td>
-
-
-            <td>
-              {{ invoice.paidAmount }}
-            </td>
-
-            <td>
-              {{ invoice.dueAmount }}
-            </td>
-
-            <td>
-              {{ invoice.total }}
-            </td>
-
-            <td>
-              {{ invoice.tax }}
-            </td>
-
-            <td>
-              {{ invoice.taxableAmount }}
-            </td>
-
-            <td>
-              {{ invoice.expressAmount }}
-            </td>
-
-            <td>
-              {{ invoice.discountAmount }}
-            </td>
-
-            <td>
-
-              <strong>
-                {{ invoice.grossTotal }}
-              </strong>
-
-            </td>
-
-
-            <td>
-              {{ invoice.createdAt }}
-            </td>
-
-            <td>
-              {{ invoice.deletedAt }}
-            </td>
-
-            <td>
-              {{ invoice.paidAt }}
-            </td>
-
-            <td>
-              {{ invoice.deliveredAt }}
-            </td>
-
-            <td>
-              {{ invoice.store }}
-            </td>
+            <th>
+              Order Status
+            </th>
 
           </tr>
 
-        }
+        </thead>
 
-      </tbody>
+        <tbody>
 
-    </table>
+          <tr class="summary-row">
 
+            <td></td>
 
-    @if (filteredInvoices.length === 0) {
+            <td></td>
 
-      <div class="empty-invoices">
+            <td></td>
 
-        <h3>
-          No invoices found
-        </h3>
+            <td></td>
 
-        <p>
-          Try changing the invoice filters.
-        </p>
+            <td>
+              <strong>
+                Total
+              </strong>
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalPaid) }}
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalDue) }}
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalAmount) }}
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalTax) }}
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalTaxable) }}
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalExpress) }}
+            </td>
+
+            <td>
+              ₹{{ formatAmount(totalDiscount) }}
+            </td>
+
+            <td>
+              <strong>
+                ₹{{ formatAmount(grossTotal) }}
+              </strong>
+            </td>
+
+            <td></td>
+
+            <td></td>
+
+            <td></td>
+
+            <td></td>
+
+          </tr>
+
+          @for (
+            invoice of filteredInvoices;
+            track invoice.orderId;
+            let index = $index
+          ) {
+
+            <tr>
+
+              <td>
+                {{ index + 1 }}
+              </td>
+
+              <td>
+
+                <div class="row-actions">
+
+                  <button
+                    type="button"
+                    class="receipt-button"
+                    (click)="receipt(invoice)">
+
+                    Receipt
+
+                  </button>
+
+                  @if (
+                    invoice.status !== 'CANCELLED' &&
+                    invoice.dueAmount > 0
+                  ) {
+
+                    <button
+                      type="button"
+                      class="settle-button"
+                      (click)="settle(invoice)">
+
+                      Settle
+
+                    </button>
+
+                  }
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <span
+                  class="invoice-status"
+
+                  [class.status-draft]="
+                    invoice.status === 'DRAFT'
+                  "
+
+                  [class.status-paid]="
+                    invoice.status === 'PAID'
+                  "
+
+                  [class.status-partial]="
+                    invoice.status === 'PARTIALLY_PAID'
+                  "
+
+                  [class.status-cancelled]="
+                    invoice.status === 'CANCELLED'
+                  ">
+
+                  {{
+                    getStatusLabel(
+                      invoice.status
+                    )
+                  }}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                <strong class="invoice-number">
+
+                  {{ invoice.invoiceNumber }}
+
+                </strong>
+
+              </td>
+
+              <td>
+
+                <strong class="order-number">
+
+                  {{ invoice.orderNumber }}
+
+                </strong>
+
+              </td>
+
+              <td>
+
+                <span class="paid-value">
+
+                  ₹{{ formatAmount(
+                    invoice.paidAmount
+                  ) }}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                <span
+                  [class.due-value]="
+                    invoice.dueAmount > 0
+                  "
+
+                  [class.no-due-value]="
+                    invoice.dueAmount === 0
+                  ">
+
+                  ₹{{ formatAmount(
+                    invoice.dueAmount
+                  ) }}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                ₹{{ formatAmount(
+                  invoice.total
+                ) }}
+
+              </td>
+
+              <td>
+
+                ₹{{ formatAmount(
+                  invoice.tax
+                ) }}
+
+              </td>
+
+              <td>
+
+                ₹{{ formatAmount(
+                  invoice.taxableAmount
+                ) }}
+
+              </td>
+
+              <td>
+
+                ₹{{ formatAmount(
+                  invoice.expressAmount
+                ) }}
+
+              </td>
+
+              <td>
+
+                ₹{{ formatAmount(
+                  invoice.discountAmount
+                ) }}
+
+              </td>
+
+              <td>
+
+                <strong>
+
+                  ₹{{ formatAmount(
+                    invoice.grossTotal
+                  ) }}
+
+                </strong>
+
+              </td>
+
+              <td>
+
+                {{
+                  invoice.createdAt
+                    | date:
+                      'dd-MM-yyyy hh:mm a'
+                }}
+
+              </td>
+
+              <td>
+
+                @if (invoice.paidAt) {
+
+                  {{
+                    invoice.paidAt
+                      | date:
+                        'dd-MM-yyyy hh:mm a'
+                  }}
+
+                } @else {
+
+                  -
+
+                }
+
+              </td>
+
+              <td>
+
+                @if (invoice.deliveredAt) {
+
+                  {{
+                    invoice.deliveredAt
+                      | date:
+                        'dd-MM-yyyy hh:mm a'
+                  }}
+
+                } @else {
+
+                  -
+
+                }
+
+              </td>
+
+              <td>
+
+                <span class="order-status">
+
+                  {{
+                    formatOrderStatus(
+                      invoice.orderStatus
+                    )
+                  }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+      @if (
+        filteredInvoices.length === 0
+      ) {
+
+        <div class="empty-invoices">
+
+          <h3>
+            No invoices found
+          </h3>
+
+          <p>
+            Try changing the invoice filters.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+</div>
+
+@if (receiptOpen) {
+
+  <div
+    class="receipt-overlay"
+    (click)="closeReceipt()">
+
+    <div
+      class="receipt-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="receipt-modal-header no-print">
+
+        <div>
+
+          <h2>
+            Receipt
+          </h2>
+
+          @if (selectedInvoice) {
+
+            <p>
+              {{ selectedInvoice.invoiceNumber }}
+            </p>
+
+          }
+
+        </div>
+
+        <button
+          type="button"
+          class="receipt-close-button"
+          (click)="closeReceipt()">
+
+          ×
+
+        </button>
 
       </div>
 
-    }
+      @if (receiptLoading) {
 
-  </section>
+        <div class="receipt-loading">
 
-</div>
+          Loading receipt...
+
+        </div>
+
+      }
+
+      @if (
+        !receiptLoading &&
+        receiptError
+      ) {
+
+        <div class="receipt-error">
+
+          {{ receiptError }}
+
+        </div>
+
+      }
+
+      @if (
+        !receiptLoading &&
+        !receiptError &&
+        selectedInvoice &&
+        receiptOrder
+      ) {
+
+        <div
+          class="receipt-print-area"
+          id="receipt-print-area">
+
+          <div class="print-store-header">
+
+            <h1>
+              Laundry POS
+            </h1>
+
+            <p>
+              Laundry & Dry Cleaning
+            </p>
+
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-info-grid">
+
+            <div>
+
+              <span>
+                Invoice No.
+              </span>
+
+              <strong>
+                {{ selectedInvoice.invoiceNumber }}
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>
+                Order No.
+              </span>
+
+              <strong>
+                {{ selectedInvoice.orderNumber }}
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>
+                Invoice Date
+              </span>
+
+              <strong>
+
+                {{
+                  selectedInvoice.createdAt
+                    | date:
+                      'dd-MM-yyyy'
+                }}
+
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>
+                Status
+              </span>
+
+              <strong>
+
+                {{
+                  getStatusLabel(
+                    selectedInvoice.status
+                  )
+                }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-section">
+
+            <h3>
+              Customer
+            </h3>
+
+            <div class="receipt-customer-row">
+
+              <span>
+                Name
+              </span>
+
+              <strong>
+                {{ receiptOrder.customer.name }}
+              </strong>
+
+            </div>
+
+            <div class="receipt-customer-row">
+
+              <span>
+                Mobile
+              </span>
+
+              <strong>
+                {{ receiptOrder.customer.phone }}
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-section">
+
+            <h3>
+              Items
+            </h3>
+
+            <table class="receipt-items-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Item
+                  </th>
+
+                  <th>
+                    Qty
+                  </th>
+
+                  <th>
+                    Rate
+                  </th>
+
+                  <th>
+                    Amount
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                @for (
+                  item of receiptOrder.items;
+                  track item.id
+                ) {
+
+                  <tr>
+
+                    <td>
+
+                      <strong>
+                        {{ item.productName }}
+                      </strong>
+
+                      <small>
+
+                        {{ item.typeName }}
+
+                        @if (item.serviceName) {
+
+                          • {{ item.serviceName }}
+
+                        }
+
+                      </small>
+
+                    </td>
+
+                    <td>
+
+                      {{
+                        getReceiptQuantity(
+                          item.quantity
+                        )
+                      }}
+
+                      {{
+                        getReceiptUnitLabel(
+                          item.unit
+                        )
+                      }}
+
+                    </td>
+
+                    <td>
+
+                      ₹{{ formatAmount(
+                        item.unitPrice
+                      ) }}
+
+                    </td>
+
+                    <td>
+
+                      ₹{{ formatAmount(
+                        item.lineTotal
+                      ) }}
+
+                    </td>
+
+                  </tr>
+
+                }
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-totals">
+
+            <div class="receipt-total-row">
+
+              <span>
+                Subtotal
+              </span>
+
+              <strong>
+
+                ₹{{ formatAmount(
+                  receiptOrder.subtotal
+                ) }}
+
+              </strong>
+
+            </div>
+
+            @if (
+              receiptOrder.discountAmount > 0
+            ) {
+
+              <div class="receipt-total-row">
+
+                <span>
+                  Discount
+                </span>
+
+                <strong class="receipt-discount">
+
+                  - ₹{{ formatAmount(
+                    receiptOrder.discountAmount
+                  ) }}
+
+                </strong>
+
+              </div>
+
+            }
+
+            @if (
+              receiptOrder.couponCode
+            ) {
+
+              <div class="receipt-total-row">
+
+                <span>
+                  Coupon
+                </span>
+
+                <strong>
+                  {{ receiptOrder.couponCode }}
+                </strong>
+
+              </div>
+
+            }
+
+            @if (
+              receiptOrder.expressChargeAmount > 0
+            ) {
+
+              <div class="receipt-total-row">
+
+                <span>
+
+                  Express Charge
+
+                  @if (
+                    receiptOrder.expressChargePercentage
+                  ) {
+
+                    ({{
+                      receiptOrder.expressChargePercentage
+                    }}%)
+
+                  }
+
+                </span>
+
+                <strong>
+
+                  ₹{{ formatAmount(
+                    receiptOrder.expressChargeAmount
+                  ) }}
+
+                </strong>
+
+              </div>
+
+            }
+
+            <div class="receipt-total-row receipt-grand-total">
+
+              <span>
+                Total
+              </span>
+
+              <strong>
+
+                ₹{{ formatAmount(
+                  receiptOrder.totalAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+            <div class="receipt-total-row">
+
+              <span>
+                Paid
+              </span>
+
+              <strong class="receipt-paid">
+
+                ₹{{ formatAmount(
+                  selectedInvoice.paidAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+            <div class="receipt-total-row">
+
+              <span>
+                Balance
+              </span>
+
+              <strong
+                [class.receipt-balance-due]="
+                  selectedInvoice.dueAmount > 0
+                ">
+
+                ₹{{ formatAmount(
+                  selectedInvoice.dueAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-section receipt-delivery">
+
+            <div class="receipt-customer-row">
+
+              <span>
+                Pickup
+              </span>
+
+              <strong>
+
+                {{
+                  receiptOrder.pickupDate
+                    | date:'dd-MM-yyyy'
+                }}
+
+                @if (receiptOrder.pickupTime) {
+
+                  {{ receiptOrder.pickupTime }}
+
+                }
+
+              </strong>
+
+            </div>
+
+            <div class="receipt-customer-row">
+
+              <span>
+                Delivery
+              </span>
+
+              <strong>
+
+                {{
+                  receiptOrder.deliveryDate
+                    | date:'dd-MM-yyyy'
+                }}
+
+                @if (receiptOrder.deliveryTime) {
+
+                  {{ receiptOrder.deliveryTime }}
+
+                }
+
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-footer">
+
+            <strong>
+              Thank You!
+            </strong>
+
+            <p>
+              We appreciate your business.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="receipt-modal-footer no-print">
+
+          <button
+            type="button"
+            class="receipt-cancel-button"
+            (click)="closeReceipt()">
+
+            Close
+
+          </button>
+
+          <button
+            type="button"
+            class="receipt-print-button"
+            (click)="printReceipt()">
+
+            Print Receipt
+
+          </button>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+}
+
+@if (settlementOpen) {
+
+  <div
+    class="payment-overlay"
+    (click)="closeSettlement()">
+
+    <div
+      class="payment-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="payment-modal-header">
+
+        <div>
+
+          <h2>
+            Add Payment
+          </h2>
+
+          @if (settlementInvoice) {
+
+            <p>
+              {{ settlementInvoice.orderNumber }}
+            </p>
+
+          }
+
+        </div>
+
+        <button
+          type="button"
+          class="payment-close-button"
+          [disabled]="paymentSubmitting"
+          (click)="closeSettlement()">
+
+          ×
+
+        </button>
+
+      </div>
+
+      @if (settlementLoading) {
+
+        <div class="payment-loading">
+
+          Loading settlement...
+
+        </div>
+
+      } @else {
+
+        @if (paymentError) {
+
+          <div class="payment-error">
+
+            {{ paymentError }}
+
+          </div>
+
+        }
+
+        @if (settlementInvoice) {
+
+          <div class="payment-modal-body">
+
+            <div class="payment-customer-grid">
+
+              <div class="payment-info-card">
+
+                <span>
+                  Customer
+                </span>
+
+                <strong>
+                  {{
+                    settlementOrder?.customerName
+                    || receiptOrder?.customer?.name
+                    || '-'
+                  }}
+                </strong>
+
+              </div>
+
+              <div class="payment-info-card">
+
+                <span>
+                  Mobile
+                </span>
+
+                <strong>
+                  {{
+                    settlementOrder?.mobile
+                    || receiptOrder?.customer?.phone
+                    || '-'
+                  }}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="payment-summary-grid">
+
+              <div class="payment-summary-card">
+
+                <span>
+                  Total Amount
+                </span>
+
+                <strong>
+                  ₹{{ formatAmount(settlementTotalAmount) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-summary-card">
+
+                <span>
+                  Already Paid
+                </span>
+
+                <strong>
+                  ₹{{ formatAmount(settlementPaidAmount) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-summary-card">
+
+                <span>
+                  Balance
+                </span>
+
+                <strong class="payment-balance">
+                  ₹{{ formatAmount(settlementBalanceAmount) }}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="payment-field-header">
+
+              <label>
+                Payment Amount
+              </label>
+
+              <button
+                type="button"
+                class="pay-full-button"
+                (click)="payFullBalance()">
+
+                Pay Full Balance
+
+              </button>
+
+            </div>
+
+            <div class="payment-amount-input">
+
+              <span>
+                ₹
+              </span>
+
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                [(ngModel)]="paymentAmount">
+
+            </div>
+
+            <div class="remaining-box">
+
+              <span>
+                Remaining after payment
+              </span>
+
+              <strong>
+                ₹{{ formatAmount(remainingAfterPayment) }}
+              </strong>
+
+            </div>
+
+            <div class="payment-method-section">
+
+              <label>
+                Payment Method
+              </label>
+
+              <div class="payment-method-grid">
+
+                <button
+                  type="button"
+                  [class.active]="paymentMethod === 'CASH'"
+                  (click)="selectPaymentMethod('CASH')">
+
+                  Cash
+
+                </button>
+
+                <button
+                  type="button"
+                  [class.active]="paymentMethod === 'UPI'"
+                  (click)="selectPaymentMethod('UPI')">
+
+                  UPI
+
+                </button>
+
+                <button
+                  type="button"
+                  [class.active]="paymentMethod === 'CARD'"
+                  (click)="selectPaymentMethod('CARD')">
+
+                  Card
+
+                </button>
+
+                <button
+                  type="button"
+                  [class.active]="paymentMethod === 'OTHER'"
+                  (click)="selectPaymentMethod('OTHER')">
+
+                  Other
+
+                </button>
+
+              </div>
+
+            </div>
+
+            <div class="reference-field">
+
+              <label>
+                Reference Number
+              </label>
+
+              <input
+                type="text"
+                [(ngModel)]="referenceNumber"
+                placeholder="Optional reference / transaction ID">
+
+            </div>
+
+          </div>
+
+          <div class="payment-modal-footer">
+
+            <button
+              type="button"
+              class="payment-cancel-button"
+              [disabled]="paymentSubmitting"
+              (click)="closeSettlement()">
+
+              Cancel
+
+            </button>
+
+            <button
+              type="button"
+              class="payment-submit-button"
+              [disabled]="paymentSubmitting || paymentAmount <= 0"
+              (click)="addPayment()">
+
+              @if (paymentSubmitting) {
+                Adding...
+              } @else {
+                Add Payment
+              }
+
+            </button>
+
+          </div>
+
+        }
+
+      }
+
+    </div>
+
+  </div>
+
+}
