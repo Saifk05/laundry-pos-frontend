@@ -13,8 +13,8 @@
   padding: 24px;
   box-sizing: border-box;
 
-  background: #f7f9fa;
-  color: #1f2937;
+  background: var(--app-background-soft);
+  color: var(--app-text-primary);
 }
 
 
@@ -33,7 +33,7 @@
 
 .page-header h1 {
   margin: 0;
-  color: #111827;
+  color: var(--app-text-primary);
 
   font-size: 28px;
   font-weight: 800;
@@ -42,7 +42,7 @@
 .page-header p {
   margin: 5px 0 0;
 
-  color: #6b7280;
+  color: var(--app-text-secondary);
 
   font-size: 13px;
 }
@@ -52,11 +52,11 @@
 
   padding: 0 16px;
 
-  border: 1px solid #13b5d1;
+  border: 1px solid var(--app-primary);
   border-radius: 8px;
 
-  background: #13b5d1;
-  color: #ffffff;
+  background: var(--app-primary);
+  color: var(--app-surface);
 
   font-size: 12px;
   font-weight: 700;
@@ -65,8 +65,8 @@
 }
 
 .refresh-button:hover:not(:disabled) {
-  background: #089bb8;
-  border-color: #089bb8;
+  background: var(--app-primary-dark);
+  border-color: var(--app-primary-dark);
 }
 
 .refresh-button:disabled {
@@ -101,7 +101,7 @@
 }
 
 .filter-field label {
-  color: #475467;
+  color: var(--app-text-secondary);
 
   font-size: 11px;
   font-weight: 700;
@@ -115,11 +115,11 @@
   padding: 0 11px;
   box-sizing: border-box;
 
-  border: 1px solid #d9e1e6;
+  border: 1px solid var(--app-border);
   border-radius: 8px;
 
-  background: #ffffff;
-  color: #111827;
+  background: var(--app-surface);
+  color: var(--app-text-primary);
 
   font-family: inherit;
   font-size: 12px;
@@ -129,10 +129,10 @@
 
 .filter-field input:focus,
 .filter-field select:focus {
-  border-color: #13b5d1;
+  border-color: var(--app-primary);
 
   box-shadow:
-    0 0 0 3px rgba(19, 181, 209, 0.08);
+    0 0 0 3px rgba(22, 163, 74, 0.10);
 }
 
 
@@ -163,15 +163,15 @@
 }
 
 .load-button {
-  border: 1px solid #13b5d1;
+  border: 1px solid var(--app-primary);
 
-  background: #13b5d1;
-  color: #ffffff;
+  background: var(--app-primary);
+  color: var(--app-surface);
 }
 
 .load-button:hover:not(:disabled) {
-  background: #089bb8;
-  border-color: #089bb8;
+  background: var(--app-primary-dark);
+  border-color: var(--app-primary-dark);
 }
 
 .load-button:disabled {
@@ -180,17 +180,17 @@
 }
 
 .clear-button {
-  border: 1px solid #d9e1e6;
+  border: 1px solid var(--app-border);
 
-  background: #ffffff;
-  color: #475467;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
 }
 
 .clear-button:hover {
-  border-color: #13b5d1;
+  border-color: var(--app-primary);
 
-  color: #089bb8;
-  background: #f5fcfd;
+  color: var(--app-primary-dark);
+  background: var(--app-primary-light);
 }
 
 
@@ -211,7 +211,7 @@
   border-radius: 8px;
 
   background: #fff5f5;
-  color: #b42318;
+  color: var(--app-danger);
 
   font-size: 12px;
   font-weight: 600;
@@ -221,7 +221,7 @@
   border: 0;
 
   background: transparent;
-  color: #b42318;
+  color: var(--app-danger);
 
   font-size: 18px;
 
@@ -240,12 +240,12 @@
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #dfe6ea;
+  border: 1px solid var(--app-border);
   border-radius: 10px;
 
-  background: #ffffff;
+  background: var(--app-surface);
 
-  color: #667085;
+  color: var(--app-text-secondary);
 
   font-size: 12px;
   font-weight: 600;
@@ -264,10 +264,10 @@
 
   overflow-x: auto;
 
-  border: 1px solid #dce3e8;
+  border: 1px solid var(--app-border);
   border-radius: 10px;
 
-  background: #ffffff;
+  background: var(--app-surface);
 
   scrollbar-width: none;
 }
@@ -287,7 +287,7 @@
 .invoice-table td {
   padding: 11px 12px;
 
-  border-bottom: 1px solid #e8edf0;
+  border-bottom: 1px solid var(--app-border);
 
   text-align: left;
   vertical-align: middle;
@@ -296,9 +296,9 @@
 }
 
 .invoice-table th {
-  background: #f5f7f9;
+  background: var(--app-surface-soft);
 
-  color: #566273;
+  color: var(--app-text-secondary);
 
   font-size: 10px;
   font-weight: 800;
@@ -307,13 +307,13 @@
 }
 
 .invoice-table td {
-  color: #344054;
+  color: var(--app-text-primary);
 
   font-size: 11px;
 }
 
 .invoice-table tbody tr:hover td {
-  background: #fbfdfe;
+  background: var(--app-background-soft);
 }
 
 .invoice-table tbody tr:last-child td {
@@ -326,16 +326,16 @@
 ========================================= */
 
 .summary-row td {
-  background: #eef7f9;
+  background: var(--app-primary-light);
 
-  color: #101828;
+  color: var(--app-text-primary);
 
   font-size: 11px;
   font-weight: 700;
 }
 
 .summary-row:hover td {
-  background: #eef7f9 !important;
+  background: var(--app-primary-light) !important;
 }
 
 
@@ -364,29 +364,29 @@
 }
 
 .receipt-button {
-  border: 1px solid #d9e1e6;
+  border: 1px solid var(--app-border);
 
-  background: #ffffff;
-  color: #475467;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
 }
 
 .receipt-button:hover {
-  border-color: #13b5d1;
+  border-color: var(--app-primary);
 
-  color: #089bb8;
-  background: #f5fcfd;
+  color: var(--app-primary-dark);
+  background: var(--app-primary-light);
 }
 
 .settle-button {
-  border: 1px solid #2ca56c;
+  border: 1px solid var(--app-primary);
 
-  background: #2ca56c;
-  color: #ffffff;
+  background: var(--app-primary);
+  color: var(--app-surface);
 }
 
 .settle-button:hover {
-  border-color: #208955;
-  background: #208955;
+  border-color: var(--app-primary-dark);
+  background: var(--app-primary-dark);
 }
 
 
@@ -411,48 +411,48 @@
 }
 
 .status-draft {
-  background: #f2f4f7;
-  color: #475467;
+  background: var(--app-surface-soft);
+  color: var(--app-text-secondary);
 }
 
 .status-paid {
-  background: #dcf6e8;
-  color: #198754;
+  background: var(--app-primary-light);
+  color: var(--app-success);
 }
 
 .status-partial {
-  background: #fff4cc;
-  color: #b77900;
+  background: var(--app-secondary-light);
+  color: var(--app-warning);
 }
 
 .status-cancelled {
   background: #fde2e2;
-  color: #c73434;
+  color: var(--app-danger);
 }
 
 .order-status {
-  background: #eaf7fa;
-  color: #078da8;
+  background: var(--app-primary-light);
+  color: var(--app-primary-dark);
 }
 
 .invoice-number,
 .order-number {
-  color: #078da8;
+  color: var(--app-primary-dark);
   font-weight: 800;
 }
 
 .paid-value {
-  color: #198754;
+  color: var(--app-success);
   font-weight: 700;
 }
 
 .due-value {
-  color: #c98200;
+  color: var(--app-warning);
   font-weight: 700;
 }
 
 .no-due-value {
-  color: #198754;
+  color: var(--app-success);
   font-weight: 700;
 }
 
@@ -477,7 +477,7 @@
 .empty-invoices h3 {
   margin: 0 0 6px;
 
-  color: #344054;
+  color: var(--app-text-primary);
 
   font-size: 15px;
   font-weight: 700;
@@ -486,7 +486,7 @@
 .empty-invoices p {
   margin: 0;
 
-  color: #98a2b3;
+  color: var(--app-text-muted);
 
   font-size: 12px;
 }
@@ -539,7 +539,7 @@
 
   border-radius: 12px;
 
-  background: #ffffff !important;
+  background: var(--app-surface) !important;
 
   box-shadow:
     0 25px 80px rgba(0, 0, 0, 0.35);
@@ -564,13 +564,13 @@
 
   gap: 12px;
 
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .receipt-modal-header h2 {
   margin: 0;
 
-  color: #111827;
+  color: var(--app-text-primary);
 
   font-size: 18px;
   font-weight: 800;
@@ -579,7 +579,7 @@
 .receipt-modal-header p {
   margin: 3px 0 0;
 
-  color: #667085;
+  color: var(--app-text-secondary);
 
   font-size: 11px;
 }
@@ -592,11 +592,11 @@
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #dfe4e8;
+  border: 1px solid var(--app-border);
   border-radius: 50%;
 
-  background: #ffffff;
-  color: #475467;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
 
   font-size: 20px;
 
@@ -620,11 +620,11 @@
 }
 
 .receipt-loading {
-  color: #667085;
+  color: var(--app-text-secondary);
 }
 
 .receipt-error {
-  color: #b42318;
+  color: var(--app-danger);
 }
 
 
@@ -642,7 +642,7 @@
   padding: 28px 30px;
   box-sizing: border-box;
 
-  background: #ffffff;
+  background: var(--app-surface);
 
   color: #111111;
 
@@ -854,15 +854,15 @@
 }
 
 .receipt-discount {
-  color: #b42318;
+  color: var(--app-danger);
 }
 
 .receipt-paid {
-  color: #198754;
+  color: var(--app-success);
 }
 
 .receipt-balance-due {
-  color: #c98200;
+  color: var(--app-warning);
 }
 
 
@@ -907,7 +907,7 @@
 
   gap: 8px;
 
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--app-border);
 }
 
 .receipt-cancel-button,
@@ -925,22 +925,22 @@
 }
 
 .receipt-cancel-button {
-  border: 1px solid #d9e1e6;
+  border: 1px solid var(--app-border);
 
-  background: #ffffff;
-  color: #475467;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
 }
 
 .receipt-print-button {
-  border: 1px solid #13b5d1;
+  border: 1px solid var(--app-primary);
 
-  background: #13b5d1;
-  color: #ffffff;
+  background: var(--app-primary);
+  color: var(--app-surface);
 }
 
 .receipt-print-button:hover {
-  background: #089bb8;
-  border-color: #089bb8;
+  background: var(--app-primary-dark);
+  border-color: var(--app-primary-dark);
 }
 
 
@@ -1126,7 +1126,7 @@
 
   border-radius: 18px !important;
 
-  background: #ffffff !important;
+  background: var(--app-surface) !important;
 
   box-shadow:
     0 30px 80px rgba(15, 23, 42, 0.35) !important;
@@ -1139,9 +1139,9 @@
   align-items: flex-start !important;
   justify-content: space-between !important;
 
-  border-bottom: 1px solid #e5e7eb !important;
+  border-bottom: 1px solid var(--app-border) !important;
 
-  background: #ffffff !important;
+  background: var(--app-surface) !important;
 }
 
 .payment-modal-header h2 {
@@ -1150,13 +1150,13 @@
   font-size: 26px !important;
   font-weight: 800 !important;
 
-  color: #111827 !important;
+  color: var(--app-text-primary) !important;
 }
 
 .payment-modal-header p {
   margin: 6px 0 0 !important;
 
-  color: #667085 !important;
+  color: var(--app-text-secondary) !important;
 
   font-size: 13px !important;
   font-weight: 700 !important;
@@ -1170,11 +1170,11 @@
   align-items: center !important;
   justify-content: center !important;
 
-  border: 1px solid #d8e0e6 !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 50% !important;
 
-  background: #ffffff !important;
-  color: #475467 !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text-secondary) !important;
 
   font-size: 24px !important;
 
@@ -1186,7 +1186,7 @@
 
   overflow-y: auto !important;
 
-  background: #ffffff !important;
+  background: var(--app-surface) !important;
 }
 
 .payment-customer-grid {
@@ -1211,20 +1211,20 @@
   border: 1px solid #dfe6eb !important;
   border-radius: 12px !important;
 
-  background: #f8fafb !important;
+  background: var(--app-surface-soft) !important;
 }
 
 .payment-info-card span {
   margin-bottom: 5px !important;
 
-  color: #7a8493 !important;
+  color: var(--app-text-muted) !important;
 
   font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 .payment-info-card strong {
-  color: #172033 !important;
+  color: var(--app-text-primary) !important;
 
   font-size: 16px !important;
   font-weight: 800 !important;
@@ -1253,11 +1253,11 @@
   border: 1px solid #dfe6eb !important;
   border-radius: 12px !important;
 
-  background: #f8fafb !important;
+  background: var(--app-surface-soft) !important;
 }
 
 .payment-summary-card span {
-  color: #7a8493 !important;
+  color: var(--app-text-muted) !important;
 
   font-size: 12px !important;
   font-weight: 600 !important;
@@ -1266,14 +1266,14 @@
 .payment-summary-card strong {
   margin-top: 7px !important;
 
-  color: #172033 !important;
+  color: var(--app-text-primary) !important;
 
   font-size: 18px !important;
   font-weight: 800 !important;
 }
 
 .payment-balance {
-  color: #db8600 !important;
+  color: var(--app-warning) !important;
 }
 
 .payment-field-header {
@@ -1287,7 +1287,7 @@
 .payment-field-header label,
 .payment-method-section label,
 .reference-field label {
-  color: #344054 !important;
+  color: var(--app-text-primary) !important;
 
   font-size: 13px !important;
   font-weight: 800 !important;
@@ -1297,7 +1297,7 @@
   border: 0 !important;
 
   background: transparent !important;
-  color: #0097b2 !important;
+  color: var(--app-primary) !important;
 
   font-size: 12px !important;
   font-weight: 800 !important;
@@ -1313,16 +1313,16 @@
   display: flex !important;
   align-items: center !important;
 
-  border: 1px solid #d9e1e6 !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 12px !important;
 
-  background: #ffffff !important;
+  background: var(--app-surface) !important;
 }
 
 .payment-amount-input span {
   padding-left: 18px !important;
 
-  color: #475467 !important;
+  color: var(--app-text-secondary) !important;
 
   font-size: 18px !important;
   font-weight: 800 !important;
@@ -1339,7 +1339,7 @@
   outline: 0 !important;
 
   background: transparent !important;
-  color: #172033 !important;
+  color: var(--app-text-primary) !important;
 
   font-size: 17px !important;
   font-weight: 700 !important;
@@ -1356,20 +1356,20 @@
   align-items: center !important;
   justify-content: space-between !important;
 
-  border: 1px solid #e1e7eb !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 12px !important;
 
-  background: #f8fafb !important;
+  background: var(--app-surface-soft) !important;
 }
 
 .remaining-box span {
-  color: #667085 !important;
+  color: var(--app-text-secondary) !important;
 
   font-size: 13px !important;
 }
 
 .remaining-box strong {
-  color: #172033 !important;
+  color: var(--app-text-primary) !important;
 
   font-size: 18px !important;
   font-weight: 800 !important;
@@ -1393,11 +1393,11 @@
 .payment-method-grid button {
   height: 50px !important;
 
-  border: 1px solid #d5dee5 !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 11px !important;
 
-  background: #ffffff !important;
-  color: #475467 !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text-secondary) !important;
 
   font-size: 13px !important;
   font-weight: 800 !important;
@@ -1406,10 +1406,10 @@
 }
 
 .payment-method-grid button.active {
-  border-color: #13b5d1 !important;
+  border-color: var(--app-primary) !important;
 
-  background: #13b5d1 !important;
-  color: #ffffff !important;
+  background: var(--app-primary) !important;
+  color: var(--app-surface) !important;
 }
 
 .reference-field {
@@ -1426,13 +1426,13 @@
   padding: 0 16px !important;
   box-sizing: border-box !important;
 
-  border: 1px solid #d9e1e6 !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 12px !important;
 
   outline: none !important;
 
-  background: #ffffff !important;
-  color: #172033 !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text-primary) !important;
 
   font-size: 14px !important;
 }
@@ -1446,9 +1446,9 @@
 
   gap: 12px !important;
 
-  border-top: 1px solid #e5e7eb !important;
+  border-top: 1px solid var(--app-border) !important;
 
-  background: #ffffff !important;
+  background: var(--app-surface) !important;
 }
 
 .payment-cancel-button,
@@ -1467,17 +1467,17 @@
 }
 
 .payment-cancel-button {
-  border: 1px solid #d5dee5 !important;
+  border: 1px solid var(--app-border) !important;
 
-  background: #ffffff !important;
-  color: #475467 !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text-secondary) !important;
 }
 
 .payment-submit-button {
-  border: 1px solid #13b5d1 !important;
+  border: 1px solid var(--app-primary) !important;
 
-  background: #13b5d1 !important;
-  color: #ffffff !important;
+  background: var(--app-primary) !important;
+  color: var(--app-surface) !important;
 }
 
 .payment-error {
@@ -1489,7 +1489,7 @@
   border-radius: 10px !important;
 
   background: #fff5f5 !important;
-  color: #b42318 !important;
+  color: var(--app-danger) !important;
 }
 
 .payment-loading {
