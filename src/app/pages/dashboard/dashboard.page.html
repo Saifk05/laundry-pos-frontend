@@ -1,10 +1,6 @@
 <div class="dashboard-page">
 
-  <!-- =========================================
-       HEADER
-  ========================================== -->
-
-  <div class="dashboard-header">
+  <div class="dashboard-toolbar">
 
     <button
       type="button"
@@ -18,10 +14,6 @@
 
   </div>
 
-
-  <!-- =========================================
-       ERROR
-  ========================================== -->
 
   @if (errorMessage) {
 
@@ -44,10 +36,6 @@
   }
 
 
-  <!-- =========================================
-       LOADING
-  ========================================== -->
-
   @if (loading) {
 
     <div class="dashboard-loading">
@@ -58,10 +46,6 @@
 
   }
 
-
-  <!-- =========================================
-       EMPTY
-  ========================================== -->
 
   @if (
     !loading &&
@@ -83,189 +67,122 @@
   }
 
 
-  <!-- =========================================
-       DASHBOARD BOARD
-  ========================================== -->
-
   @if (
     !loading &&
     deliveryDays.length > 0
   ) {
 
-    <div class="dashboard-board-wrapper">
+    <div class="delivery-matrix-wrapper">
 
       <div
-        class="dashboard-board"
+        class="delivery-matrix"
         [style.--date-count]="deliveryDays.length">
 
 
-        <!-- =====================================
-             LABEL COLUMN
-        ====================================== -->
-
-        <div class="dashboard-label-column">
+        <div class="matrix-label-column">
 
 
-          <div class="delivery-date-label">
+          <div class="matrix-delivery-label">
 
             Delivery Date
 
           </div>
 
 
-          <div class="summary-label total-label">
+          <div class="matrix-total-label">
+
+            Total
 
             <span>
-              Total
+              [{{ totalOrders }}]
             </span>
-
-            <small>
-              Orders / Pieces
-            </small>
 
           </div>
 
 
-          <div class="summary-label processing-label">
+          <div class="matrix-processing-label">
+
+            Processing
 
             <span>
-              Processing
+              [{{ processingOrders }}]
             </span>
-
-            <small>
-              Orders / Pieces
-            </small>
 
           </div>
 
 
-          <div class="summary-label ready-label">
+          <div class="matrix-ready-label">
+
+            Ready
 
             <span>
-              Ready
+              [{{ readyOrders }}]
             </span>
-
-            <small>
-              Orders / Pieces
-            </small>
 
           </div>
 
 
-          <div class="orders-label">
+          <div class="matrix-order-label">
 
-            Orders
+            <span class="ready-check">
+              ✓
+            </span>
 
           </div>
 
         </div>
 
 
-        <!-- =====================================
-             DELIVERY DATE COLUMNS
-        ====================================== -->
-
         @for (
           day of deliveryDays;
           track day.deliveryDate
         ) {
 
-          <div class="delivery-column">
+          <div class="matrix-date-column">
 
 
-            <!-- DATE -->
+            <div class="matrix-date-header">
 
-            <div class="delivery-date-header">
-
-              <strong>
-                {{ day.dayLabel }}
-              </strong>
-
-              <span>
-                {{ day.deliveryDate | date:'dd MMM yyyy' }}
-              </span>
+              {{ day.dayLabel }}
 
             </div>
 
 
-            <!-- TOTAL -->
+            <div class="matrix-total-cell">
 
-            <div class="summary-cell total-cell">
-
-              <div class="summary-number">
-
-                {{ day.totalOrders }}
-
-              </div>
-
-              <div class="summary-pieces">
-
-                {{ formatPieces(day.totalPieces) }} pc
-
-              </div>
+              {{ day.totalOrders }}
+              -
+              {{ formatPieces(day.totalPieces) }} pc
 
             </div>
 
 
-            <!-- PROCESSING -->
+            <div class="matrix-processing-cell">
 
-            <div class="summary-cell processing-cell">
-
-              <div class="summary-number">
-
-                {{ day.processingOrders }}
-
-              </div>
-
-              <div class="summary-pieces">
-
-                {{
-                  formatPieces(
-                    day.processingPieces
-                  )
-                }} pc
-
-              </div>
+              {{ day.processingOrders }}
+              -
+              {{ formatPieces(day.processingPieces) }} pc
 
             </div>
 
 
-            <!-- READY -->
+            <div class="matrix-ready-cell">
 
-            <div class="summary-cell ready-cell">
-
-              <div class="summary-number">
-
-                {{ day.readyOrders }}
-
-              </div>
-
-              <div class="summary-pieces">
-
-                {{
-                  formatPieces(
-                    day.readyPieces
-                  )
-                }} pc
-
-              </div>
+              {{ day.readyOrders }}
+              -
+              {{ formatPieces(day.readyPieces) }} pc
 
             </div>
 
 
-            <!-- =================================
-                 ORDERS
-            ================================== -->
+            <div class="matrix-orders">
 
-            <div class="orders-list">
 
               @if (
                 day.orders.length === 0
               ) {
 
-                <div class="no-orders">
-
-                  No orders
+                <div class="matrix-empty-row">
 
                 </div>
 
@@ -280,140 +197,116 @@
 
                 <button
                   type="button"
-                  class="order-card"
+                  class="matrix-order-row"
 
-                  [class.ready-order]="
-                    isReadyOrder(order)
+                  [class.processing-row]="
+                    isProcessingOrder(order)
                   "
 
-                  [class.processing-order]="
-                    isProcessingOrder(order)
+                  [class.ready-row]="
+                    isReadyOrder(order)
                   "
 
                   (click)="openCallPopup(order)">
 
 
-                  <!-- TOP -->
+                  <span class="matrix-order-index">
 
-                  <div class="order-card-top">
+                    {{ index + 1 }}.
 
-                    <span class="order-sequence">
+                  </span>
 
-                      {{ index + 1 }}.
+
+                  <span class="matrix-order-number">
+
+                    {{ order.orderNumber }}
+
+                  </span>
+
+
+                  <span class="matrix-divider">
+
+                    -
+
+                  </span>
+
+
+                  <span class="matrix-pieces">
+
+                    {{ formatPieces(order.totalPieces) }} pc
+
+                  </span>
+
+
+                  <span class="matrix-divider">
+
+                    -
+
+                  </span>
+
+
+                  <span class="matrix-amount">
+
+                    ₹{{ formatAmount(order.totalAmount) }}
+
+                  </span>
+
+
+                  <span class="matrix-divider">
+
+                    -
+
+                  </span>
+
+
+                  <span class="matrix-time">
+
+                    {{
+                      order.deliveryTime ||
+                      '-'
+                    }}
+
+                  </span>
+
+
+                  <span class="matrix-phone-icon">
+
+                    ☎
+
+                  </span>
+
+
+                  <span class="matrix-customer">
+
+                    {{ order.customerName }}
+
+                  </span>
+
+
+                  @if (
+                    isReadyOrder(order)
+                  ) {
+
+                    <span class="matrix-ready-icon">
+
+                      ✓
 
                     </span>
 
-
-                    <strong class="order-number">
-
-                      {{ order.orderNumber }}
-
-                    </strong>
+                  }
 
 
-                    <span
-                      class="order-status"
+                  @if (
+                    !isReadyOrder(order)
+                  ) {
 
-                      [class.status-processing]="
-                        isProcessingOrder(order)
-                      "
+                    <span class="matrix-piece-box">
 
-                      [class.status-ready]="
-                        isReadyOrder(order)
-                      ">
-
-                      {{ getStatusLabel(order) }}
+                      {{ formatPieces(order.totalPieces) }}
 
                     </span>
 
-                  </div>
-
-
-                  <!-- META -->
-
-                  <div class="order-meta">
-
-                    <span>
-
-                      {{
-                        formatPieces(
-                          order.totalPieces
-                        )
-                      }} pc
-
-                    </span>
-
-
-                    <span class="meta-dot">
-                      •
-                    </span>
-
-
-                    <span>
-
-                      ₹{{ formatAmount(
-                        order.totalAmount
-                      ) }}
-
-                    </span>
-
-                  </div>
-
-
-                  <!-- DELIVERY TIME -->
-
-                  <div class="order-time">
-
-                    <span class="time-icon">
-                      ◷
-                    </span>
-
-                    <span>
-
-                      {{
-                        order.deliveryTime ||
-                        'No delivery time'
-                      }}
-
-                    </span>
-
-                  </div>
-
-
-                  <!-- CUSTOMER -->
-
-                  <div class="order-customer">
-
-                    <div class="customer-avatar">
-
-                      {{
-                        order.customerName
-                          ? order.customerName
-                              .charAt(0)
-                              .toUpperCase()
-                          : '?'
-                      }}
-
-                    </div>
-
-
-                    <div class="customer-info">
-
-                      <strong>
-
-                        {{ order.customerName }}
-
-                      </strong>
-
-                      <span>
-
-                        {{ order.mobile }}
-
-                      </span>
-
-                    </div>
-
-                  </div>
+                  }
 
                 </button>
 
@@ -431,10 +324,6 @@
 
   }
 
-
-  <!-- =========================================
-       CALL POPUP
-  ========================================== -->
 
   @if (selectedOrder) {
 
@@ -506,6 +395,7 @@
 
           <div class="call-order-details">
 
+
             <div>
 
               <span>
@@ -533,9 +423,11 @@
 
               <strong>
 
-                ₹{{ formatAmount(
-                  selectedOrder.totalAmount
-                ) }}
+                ₹{{
+                  formatAmount(
+                    selectedOrder.totalAmount
+                  )
+                }}
 
               </strong>
 
@@ -558,6 +450,7 @@
               </strong>
 
             </div>
+
 
           </div>
 

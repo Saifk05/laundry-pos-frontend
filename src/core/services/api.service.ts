@@ -516,4 +516,38 @@ getBills():
       `${this.baseUrl}/bills`
     );
   }
+
+
+//   getBills():
+//   Observable<BillListResponse> {
+
+//   return this.http.get<BillListResponse>(
+//     `${this.baseUrl}/bills`
+//   );
+// }
+
+downloadBillReceipt(
+  orderId: string
+): Observable<Blob> {
+
+  return this.http.get(
+    `${this.baseUrl}/bills/${orderId}/receipt`,
+    {
+      responseType: 'blob'
+    }
+  );
+}
+
+sendBillReceiptToWhatsApp(
+  orderId: string
+): Observable<string> {
+
+  return this.http.post(
+    `${this.baseUrl}/bills/${orderId}/whatsapp`,
+    {},
+    {
+      responseType: 'text'
+    }
+  );
+}
 }

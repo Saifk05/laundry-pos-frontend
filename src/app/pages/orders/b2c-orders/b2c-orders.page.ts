@@ -19,50 +19,30 @@ import {
   RescheduleOrderRequest
 } from '../../../../core/models/b2c-order.model';
 
+import {
+  PaymentMethod,
+  PaymentRequest,
+  SettlementOrder
+} from '../../../../core/models/settlement.model';
 
 interface B2cOrderView {
-
   id: string;
-
   orderNumber: string;
-
   status: B2COrderStatus;
-
   customerName: string;
-
   mobile: string;
-
-  address: string;
-
   storageLabel: string;
-
   pickupDate: string;
-
   pickupSlot: string;
-
-  pickupRiderName: string;
-
-  pickupRiderMobile: string;
-
   deliveryDate: string;
-
   deliverySlot: string;
-
-  pieces: number;
-
   amount: number;
-
   homeDelivery: boolean;
-
   settled: boolean;
-
   createdAt: string;
-
   updatedAt: string;
-
   moreOpen?: boolean;
 }
-
 
 @Component({
   selector: 'app-b2c-orders',
@@ -100,18 +80,56 @@ export class B2cOrdersPage
   orders:
     B2cOrderView[] = [];
 
+  paymentModalOpen = false;
+
+  selectedPaymentOrder:
+    SettlementOrder | null =
+      null;
+
+  paymentAmount:
+    number | null =
+      null;
+
+  selectedPaymentMethod:
+    PaymentMethod =
+      'CASH';
+
+  paymentReference = '';
+
+  paymentError = '';
+
+  paymentMethods:
+    {
+      label: string;
+      value: PaymentMethod;
+    }[] = [
+      {
+        label: 'Cash',
+        value: 'CASH'
+      },
+      {
+        label: 'UPI',
+        value: 'UPI'
+      },
+      {
+        label: 'Card',
+        value: 'CARD'
+      },
+      {
+        label: 'Other',
+        value: 'OTHER'
+      }
+    ];
 
   constructor(
     private readonly apiService:
       ApiService
   ) {}
 
-
   ngOnInit(): void {
 
     this.loadOrders();
   }
-
 
   loadOrders(): void {
 
@@ -143,7 +161,8 @@ export class B2cOrdersPage
                   )
               );
 
-          this.loading = false;
+          this.loading =
+            false;
         },
 
         error: (
@@ -161,12 +180,12 @@ export class B2cOrdersPage
             error?.error?.error ||
             'Unable to load orders';
 
-          this.loading = false;
+          this.loading =
+            false;
         }
 
       });
   }
-
 
   private toViewOrder(
     order:
@@ -190,36 +209,30 @@ export class B2cOrdersPage
       mobile:
         order.mobile,
 
-      address:
-        '-',
-
       storageLabel:
-        order.storageLabel ?? '-',
+        order.storageLabel ??
+        '-',
 
       pickupDate:
-        order.pickupDate ?? '-',
-
-      pickupSlot:
-        order.pickupTime ?? '-',
-
-      pickupRiderName:
+        order.pickupDate ??
         '-',
 
-      pickupRiderMobile:
+      pickupSlot:
+        order.pickupTime ??
         '-',
 
       deliveryDate:
-        order.deliveryDate ?? '-',
+        order.deliveryDate ??
+        '-',
 
       deliverySlot:
-        order.deliveryTime ?? '-',
-
-      pieces:
-        0,
+        order.deliveryTime ??
+        '-',
 
       amount:
         Number(
-          order.totalAmount ?? 0
+          order.totalAmount ??
+          0
         ),
 
       homeDelivery:
@@ -239,56 +252,56 @@ export class B2cOrdersPage
     };
   }
 
-
   get filteredOrders():
     B2cOrderView[] {
 
-    return this.orders.filter(
-      (
-        order:
-          B2cOrderView
-      ) => {
+    return this.orders
+      .filter(
+        (
+          order:
+            B2cOrderView
+        ) => {
 
-        const matchesStatus =
-          this.selectedStatus ===
-            'All' ||
-          this.getStatusLabel(
-            order.status
-          ) ===
-            this.selectedStatus;
+          const matchesStatus =
+            this.selectedStatus ===
+              'All' ||
+            this.getStatusLabel(
+              order.status
+            ) ===
+              this.selectedStatus;
 
-        const orderSearch =
-          this.orderNumberSearch
-            .trim()
-            .toLowerCase();
+          const orderSearch =
+            this.orderNumberSearch
+              .trim()
+              .toLowerCase();
 
-        const mobileSearch =
-          this.mobileSearch
-            .trim();
+          const mobileSearch =
+            this.mobileSearch
+              .trim();
 
-        const matchesOrderNumber =
-          !orderSearch ||
-          order.orderNumber
-            .toLowerCase()
-            .includes(
-              orderSearch
-            );
+          const matchesOrderNumber =
+            !orderSearch ||
+            order.orderNumber
+              .toLowerCase()
+              .includes(
+                orderSearch
+              );
 
-        const matchesMobile =
-          !mobileSearch ||
-          order.mobile.includes(
-            mobileSearch
+          const matchesMobile =
+            !mobileSearch ||
+            order.mobile
+              .includes(
+                mobileSearch
+              );
+
+          return (
+            matchesStatus &&
+            matchesOrderNumber &&
+            matchesMobile
           );
-
-        return (
-          matchesStatus &&
-          matchesOrderNumber &&
-          matchesMobile
-        );
-      }
-    );
+        }
+      );
   }
-
 
   selectStatus(
     status:
@@ -303,14 +316,12 @@ export class B2cOrdersPage
     this.loadOrders();
   }
 
-
   searchOrders(): void {
 
     this.closeAllMoreMenus();
 
     this.loadOrders();
   }
-
 
   clearFilters(): void {
 
@@ -328,7 +339,6 @@ export class B2cOrdersPage
     this.loadOrders();
   }
 
-
   private getSearchValue():
     string {
 
@@ -336,7 +346,9 @@ export class B2cOrdersPage
       this.orderNumberSearch
         .trim();
 
-    if (orderNumber) {
+    if (
+      orderNumber
+    ) {
 
       return orderNumber;
     }
@@ -345,74 +357,73 @@ export class B2cOrdersPage
       .trim();
   }
 
+  private getBackendStatus():
+    B2COrderStatus | null {
 
-private getBackendStatus():
-  B2COrderStatus | null {
+    switch (
+      this.selectedStatus
+    ) {
 
-  switch (
-    this.selectedStatus
-  ) {
+      case 'New Order':
 
-    case 'New Order':
+        return 'NEW_ORDER';
 
-      return 'NEW_ORDER';
+      case 'Processing At Store':
 
-    case 'Processing At Store':
+        return 'PROCESSING_AT_STORE';
 
-      return 'PROCESSING_AT_STORE';
+      case 'Ready Order':
 
-    case 'Ready Order':
+        return 'READY_ORDER';
 
-      return 'READY_ORDER';
+      case 'Delivered':
 
-    case 'Delivered':
+        return 'DELIVERED';
 
-      return 'DELIVERED';
+      case 'Cancelled':
 
-    case 'Cancelled':
+        return 'CANCELLED';
 
-      return 'CANCELLED';
+      default:
 
-    default:
-
-      return null;
+        return null;
+    }
   }
-}
 
-getStatusLabel(
-  status:
-    B2COrderStatus
-): string {
+  getStatusLabel(
+    status:
+      B2COrderStatus
+  ): string {
 
-  switch (
-    status
-  ) {
+    switch (
+      status
+    ) {
 
-    case 'NEW_ORDER':
+      case 'NEW_ORDER':
 
-      return 'New Order';
+        return 'New Order';
 
-    case 'PROCESSING_AT_STORE':
+      case 'PROCESSING_AT_STORE':
 
-      return 'Processing At Store';
+        return 'Processing At Store';
 
-    case 'READY_ORDER':
+      case 'READY_ORDER':
 
-      return 'Ready Order';
+        return 'Ready Order';
 
-    case 'DELIVERED':
+      case 'DELIVERED':
 
-      return 'Delivered';
+        return 'Delivered';
 
-    case 'CANCELLED':
+      case 'CANCELLED':
 
-      return 'Cancelled';
+        return 'Cancelled';
 
-    default:
+      default:
 
-      return status;
+        return status;
+    }
   }
-}
 
   toggleMore(
     order:
@@ -429,33 +440,32 @@ getStatusLabel(
       !currentState;
   }
 
-
   private closeAllMoreMenus():
     void {
 
-    this.orders.forEach(
-      (
-        order:
-          B2cOrderView
-      ) => {
+    this.orders
+      .forEach(
+        (
+          order:
+            B2cOrderView
+        ) => {
 
-        order.moreOpen =
-          false;
-      }
-    );
+          order.moreOpen =
+            false;
+        }
+      );
   }
-
 
   processAtStore(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage =
-      '';
+    this.errorMessage = '';
 
-    this.actionLoading =
-      true;
+    this.actionLoading = true;
+
+    this.closeAllMoreMenus();
 
     this.apiService
       .updateB2COrderStatus(
@@ -473,8 +483,7 @@ getStatusLabel(
             response
           );
 
-          this.actionLoading =
-            false;
+          this.actionLoading = false;
         },
 
         error: (
@@ -491,17 +500,14 @@ getStatusLabel(
       });
   }
 
-
   markReady(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage =
-      '';
+    this.errorMessage = '';
 
-    this.actionLoading =
-      true;
+    this.actionLoading = true;
 
     this.closeAllMoreMenus();
 
@@ -520,8 +526,7 @@ getStatusLabel(
             response
           );
 
-          this.actionLoading =
-            false;
+          this.actionLoading = false;
         },
 
         error: (
@@ -538,17 +543,14 @@ getStatusLabel(
       });
   }
 
-
   markDelivered(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage =
-      '';
+    this.errorMessage = '';
 
-    this.actionLoading =
-      true;
+    this.actionLoading = true;
 
     this.closeAllMoreMenus();
 
@@ -567,8 +569,7 @@ getStatusLabel(
             response
           );
 
-          this.actionLoading =
-            false;
+          this.actionLoading = false;
         },
 
         error: (
@@ -585,17 +586,14 @@ getStatusLabel(
       });
   }
 
-
   cancelOrder(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage =
-      '';
+    this.errorMessage = '';
 
-    this.actionLoading =
-      true;
+    this.actionLoading = true;
 
     this.closeAllMoreMenus();
 
@@ -614,8 +612,7 @@ getStatusLabel(
             response
           );
 
-          this.actionLoading =
-            false;
+          this.actionLoading = false;
         },
 
         error: (
@@ -632,37 +629,80 @@ getStatusLabel(
       });
   }
 
-
   settleOrder(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage =
-      '';
-
-    this.actionLoading =
-      true;
-
     this.closeAllMoreMenus();
 
+    this.errorMessage = '';
+
+    this.paymentError = '';
+
+    if (
+      order.status ===
+        'CANCELLED'
+    ) {
+
+      this.errorMessage =
+        'Payment cannot be added to cancelled order';
+
+      return;
+    }
+
+    if (
+      order.settled
+    ) {
+
+      return;
+    }
+
+    this.actionLoading = true;
+
     this.apiService
-      .settleB2COrder(
+      .getSettlementById(
         order.id
       )
       .subscribe({
 
         next: (
           response:
-            B2COrder
+            SettlementOrder
         ) => {
 
-          this.updateLocalOrder(
-            response
-          );
+          this.actionLoading = false;
 
-          this.actionLoading =
-            false;
+          if (
+            response.paymentStatus ===
+              'SETTLED'
+          ) {
+
+            order.settled =
+              true;
+
+            return;
+          }
+
+          this.selectedPaymentOrder =
+            response;
+
+          this.paymentAmount =
+            Number(
+              response.balanceAmount
+            );
+
+          this.selectedPaymentMethod =
+            'CASH';
+
+          this.paymentReference =
+            '';
+
+          this.paymentError =
+            '';
+
+          this.paymentModalOpen =
+            true;
         },
 
         error: (
@@ -672,13 +712,220 @@ getStatusLabel(
 
           this.handleActionError(
             error,
-            'Unable to settle order'
+            'Unable to load payment details'
           );
         }
 
       });
   }
 
+  closePaymentModal(): void {
+
+    if (
+      this.actionLoading
+    ) {
+
+      return;
+    }
+
+    this.paymentModalOpen =
+      false;
+
+    this.selectedPaymentOrder =
+      null;
+
+    this.paymentAmount =
+      null;
+
+    this.selectedPaymentMethod =
+      'CASH';
+
+    this.paymentReference =
+      '';
+
+    this.paymentError =
+      '';
+  }
+
+  setFullBalance(): void {
+
+    if (
+      !this.selectedPaymentOrder
+    ) {
+
+      return;
+    }
+
+    this.paymentAmount =
+      Number(
+        this.selectedPaymentOrder
+          .balanceAmount
+      );
+  }
+
+  get remainingAfterPayment():
+    number {
+
+    if (
+      !this.selectedPaymentOrder
+    ) {
+
+      return 0;
+    }
+
+    const balance =
+      Number(
+        this.selectedPaymentOrder
+          .balanceAmount ??
+        0
+      );
+
+    const amount =
+      Number(
+        this.paymentAmount ??
+        0
+      );
+
+    return Math.max(
+      balance - amount,
+      0
+    );
+  }
+
+  addPayment(): void {
+
+    if (
+      !this.selectedPaymentOrder
+    ) {
+
+      return;
+    }
+
+    this.paymentError = '';
+
+    const amount =
+      Number(
+        this.paymentAmount
+      );
+
+    const balance =
+      Number(
+        this.selectedPaymentOrder
+          .balanceAmount
+      );
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      this.paymentError =
+        'Enter a valid payment amount';
+
+      return;
+    }
+
+    if (
+      amount >
+      balance
+    ) {
+
+      this.paymentError =
+        'Payment amount cannot be greater than balance amount';
+
+      return;
+    }
+
+    const request:
+      PaymentRequest = {
+
+      amount:
+        amount,
+
+      paymentMethod:
+        this.selectedPaymentMethod,
+
+      referenceNumber:
+        this.paymentReference
+          .trim()
+          ? this.paymentReference
+              .trim()
+          : null
+    };
+
+    const orderId =
+      this.selectedPaymentOrder.id;
+
+    this.actionLoading =
+      true;
+
+    this.apiService
+      .addSettlementPayment(
+        orderId,
+        request
+      )
+      .subscribe({
+
+        next: (
+          response:
+            SettlementOrder
+        ) => {
+
+          this.actionLoading =
+            false;
+
+          this.orders =
+            this.orders.map(
+              (
+                order:
+                  B2cOrderView
+              ) => {
+
+                if (
+                  order.id !==
+                    response.id
+                ) {
+
+                  return order;
+                }
+
+                return {
+                  ...order,
+
+                  settled:
+                    response.paymentStatus ===
+                      'SETTLED',
+
+                  moreOpen:
+                    false
+                };
+              }
+            );
+
+          this.closePaymentModal();
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Add payment error',
+            error
+          );
+
+          this.paymentError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to add payment';
+
+          this.actionLoading =
+            false;
+        }
+
+      });
+  }
 
   reschedule(
     order:
@@ -688,12 +935,14 @@ getStatusLabel(
     this.closeAllMoreMenus();
 
     const currentDate =
-      order.deliveryDate === '-'
+      order.deliveryDate ===
+        '-'
         ? ''
         : order.deliveryDate;
 
     const currentTime =
-      order.deliverySlot === '-'
+      order.deliverySlot ===
+        '-'
         ? ''
         : order.deliverySlot;
 
@@ -773,7 +1022,6 @@ getStatusLabel(
       });
   }
 
-
   updateStorageLabel(
     order:
       B2cOrderView
@@ -782,7 +1030,8 @@ getStatusLabel(
     this.closeAllMoreMenus();
 
     const currentValue =
-      order.storageLabel === '-'
+      order.storageLabel ===
+        '-'
         ? ''
         : order.storageLabel;
 
@@ -840,6 +1089,25 @@ getStatusLabel(
       });
   }
 
+  tagOrder(
+    order:
+      B2cOrderView
+  ): void {
+
+    this.updateStorageLabel(
+      order
+    );
+  }
+
+  retagOrder(
+    order:
+      B2cOrderView
+  ): void {
+
+    this.updateStorageLabel(
+      order
+    );
+  }
 
   callCustomer(
     order:
@@ -857,11 +1125,12 @@ getStatusLabel(
       `tel:${order.mobile}`;
   }
 
-
   viewOrder(
     order:
       B2cOrderView
   ): void {
+
+    this.closeAllMoreMenus();
 
     this.errorMessage =
       '';
@@ -897,6 +1166,52 @@ getStatusLabel(
       });
   }
 
+  sendReceiptWhatsApp(
+    order:
+      B2cOrderView
+  ): void {
+
+    this.closeAllMoreMenus();
+
+    this.errorMessage =
+      '';
+
+    this.actionLoading =
+      true;
+
+    this.apiService
+      .sendBillReceiptToWhatsApp(
+        order.id
+      )
+      .subscribe({
+
+        next: (
+          response:
+            string
+        ) => {
+
+          console.log(
+            'WhatsApp receipt sent',
+            response
+          );
+
+          this.actionLoading =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          this.handleActionError(
+            error,
+            'Unable to send receipt on WhatsApp'
+          );
+        }
+
+      });
+  }
 
   billReceipt(
     order:
@@ -904,6 +1219,9 @@ getStatusLabel(
   ): void {
 
     this.closeAllMoreMenus();
+
+    this.errorMessage =
+      '';
 
     this.apiService
       .getB2COrderById(
@@ -935,6 +1253,18 @@ getStatusLabel(
       });
   }
 
+  formatAmount(
+    amount:
+      number
+  ): string {
+
+    return Number(
+      amount ??
+      0
+    ).toFixed(
+      2
+    );
+  }
 
   private printReceipt(
     order:
@@ -1098,7 +1428,7 @@ getStatusLabel(
             <div class="center">
 
               <div class="shop-name">
-                Laundry POS
+                Venkateshwara Fabric Works
               </div>
 
               <div>
@@ -1111,6 +1441,7 @@ getStatusLabel(
 
             <div class="row">
               <span>Order</span>
+
               <strong>
                 ${order.orderNumber}
               </strong>
@@ -1118,6 +1449,7 @@ getStatusLabel(
 
             <div class="row">
               <span>Customer</span>
+
               <strong>
                 ${order.customer.name}
               </strong>
@@ -1125,6 +1457,7 @@ getStatusLabel(
 
             <div class="row">
               <span>Mobile</span>
+
               <strong>
                 ${order.customer.phone}
               </strong>
@@ -1155,6 +1488,7 @@ getStatusLabel(
 
             <div class="row">
               <span>Subtotal</span>
+
               <strong>
                 ₹${Number(
                   order.subtotal
@@ -1164,6 +1498,7 @@ getStatusLabel(
 
             <div class="row">
               <span>Discount</span>
+
               <strong>
                 -₹${Number(
                   order.discountAmount
@@ -1173,6 +1508,7 @@ getStatusLabel(
 
             <div class="row">
               <span>Express</span>
+
               <strong>
                 ₹${Number(
                   order.expressChargeAmount
@@ -1182,6 +1518,7 @@ getStatusLabel(
 
             <div class="row grand-total">
               <span>Total</span>
+
               <strong>
                 ₹${Number(
                   order.totalAmount
@@ -1205,83 +1542,82 @@ getStatusLabel(
     printWindow.document.close();
   }
 
-
   private updateLocalOrder(
     response:
       B2COrder
   ): void {
 
     this.orders =
-      this.orders.map(
-        (
-          order:
-            B2cOrderView
-        ) => {
+      this.orders
+        .map(
+          (
+            order:
+              B2cOrderView
+          ) => {
 
-          if (
-            order.id !==
-            response.id
-          ) {
+            if (
+              order.id !==
+              response.id
+            ) {
 
-            return order;
+              return order;
+            }
+
+            return {
+              ...order,
+
+              orderNumber:
+                response.orderNumber,
+
+              customerName:
+                response.customerName,
+
+              mobile:
+                response.mobile,
+
+              amount:
+                Number(
+                  response.totalAmount
+                ),
+
+              pickupDate:
+                response.pickupDate ??
+                '-',
+
+              pickupSlot:
+                response.pickupTime ??
+                '-',
+
+              deliveryDate:
+                response.deliveryDate ??
+                '-',
+
+              deliverySlot:
+                response.deliveryTime ??
+                '-',
+
+              storageLabel:
+                response.storageLabel ??
+                '-',
+
+              homeDelivery:
+                response.homeDelivery,
+
+              settled:
+                response.settled,
+
+              status:
+                response.status,
+
+              updatedAt:
+                response.updatedAt,
+
+              moreOpen:
+                false
+            };
           }
-
-          return {
-            ...order,
-
-            orderNumber:
-              response.orderNumber,
-
-            customerName:
-              response.customerName,
-
-            mobile:
-              response.mobile,
-
-            amount:
-              Number(
-                response.totalAmount
-              ),
-
-            pickupDate:
-              response.pickupDate ??
-              '-',
-
-            pickupSlot:
-              response.pickupTime ??
-              '-',
-
-            deliveryDate:
-              response.deliveryDate ??
-              '-',
-
-            deliverySlot:
-              response.deliveryTime ??
-              '-',
-
-            storageLabel:
-              response.storageLabel ??
-              '-',
-
-            homeDelivery:
-              response.homeDelivery,
-
-            settled:
-              response.settled,
-
-            status:
-              response.status,
-
-            updatedAt:
-              response.updatedAt,
-
-            moreOpen:
-              false
-          };
-        }
-      );
+        );
   }
-
 
   private handleActionError(
     error:
@@ -1303,102 +1639,4 @@ getStatusLabel(
       error?.error?.error ||
       fallbackMessage;
   }
-
-
-  assignRider(
-    order:
-      B2cOrderView
-  ): void {
-
-    console.log(
-      'Assign rider',
-      order.orderNumber
-    );
-  }
-
-
-  tagOrder(
-    order:
-      B2cOrderView
-  ): void {
-
-    this.updateStorageLabel(
-      order
-    );
-  }
-
-
-  processAtVendor(
-    order:
-      B2cOrderView
-  ): void {
-
-    console.log(
-      'Process at vendor',
-      order.orderNumber
-    );
-  }
-
-
-  retagOrder(
-    order:
-      B2cOrderView
-  ): void {
-
-    this.updateStorageLabel(
-      order
-    );
-  }
-
-
-  showPaymentQr(
-    order:
-      B2cOrderView
-  ): void {
-
-    console.log(
-      'Payment QR',
-      order.orderNumber
-    );
-  }
-
-
-  changeReadyStatus(
-    order:
-      B2cOrderView
-  ): void {
-
-    this.markReady(
-      order
-    );
-  }
-
-
-  // pickupSlips(
-  //   order:
-  //     B2cOrderView
-  // ): void {
-
-  //   console.log(
-  //     'Pickup slips',
-  //     order.orderNumber
-  //   );
-
-  //   this.closeAllMoreMenus();
-  // }
-
-
-  // smsPaymentLink(
-  //   order:
-  //     B2cOrderView
-  // ): void {
-
-  //   console.log(
-  //     'SMS payment link',
-  //     order.orderNumber
-  //   );
-
-  //   this.closeAllMoreMenus();
-  // }
-
 }

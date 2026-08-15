@@ -1,15 +1,9 @@
 <div class="b2c-page">
 
   <div class="page-header">
-
-    <div>
-
+    <div class="page-heading">
       <h1>B2C Orders</h1>
-
-      <p>
-        Manage processing, delivery and customer orders
-      </p>
-
+      <p>Manage processing, delivery and customer orders</p>
     </div>
 
     <button
@@ -17,62 +11,40 @@
       class="refresh-button"
       [disabled]="loading"
       (click)="loadOrders()">
-
       {{ loading ? 'Loading...' : 'Refresh' }}
-
     </button>
-
   </div>
 
-
   <section class="status-section">
-
     <div class="status-tabs">
 
-      @for (
-        status of statuses;
-        track status
-      ) {
-
+      @for (status of statuses; track status) {
         <button
           type="button"
           class="status-tab"
           [class.active]="selectedStatus === status"
           (click)="selectStatus(status)">
-
           {{ status }}
-
         </button>
-
       }
 
     </div>
-
   </section>
-
 
   <section class="filter-section">
 
     <div class="filter-field">
-
-      <label>
-        Order No.
-      </label>
+      <label>Order No.</label>
 
       <input
         type="text"
         [(ngModel)]="orderNumberSearch"
         placeholder="LAUNDRY-0001"
         (keyup.enter)="searchOrders()">
-
     </div>
 
-
     <div class="filter-field">
-
-      <label>
-        Mobile
-      </label>
+      <label>Mobile</label>
 
       <input
         type="text"
@@ -80,131 +52,67 @@
         placeholder="Search mobile number"
         maxlength="10"
         (keyup.enter)="searchOrders()">
-
     </div>
-
 
     <button
       type="button"
       class="search-button"
       (click)="searchOrders()">
-
       Search
-
     </button>
-
 
     <button
       type="button"
       class="clear-button"
       (click)="clearFilters()">
-
       Clear
-
     </button>
 
   </section>
 
-
   @if (errorMessage) {
-
     <div class="error-message">
-
       {{ errorMessage }}
-
     </div>
-
   }
 
-
   <div class="result-info">
-
     <span>
       {{ filteredOrders.length }} orders found
     </span>
 
     @if (loading) {
-
       <span class="loading-text">
         Loading orders...
       </span>
-
     }
-
   </div>
-
 
   <section class="orders-table-wrapper">
 
     <table class="orders-table">
 
       <thead>
-
         <tr>
-
-          <th class="actions-column">
-            Actions
-          </th>
-
-          <th>
-            Order No.
-          </th>
-
-          <th>
-            Order Status
-          </th>
-
-          <th>
-            Customer Name
-          </th>
-
-          <th>
-            Mobile
-          </th>
-
-          <th>
-            Storage Label
-          </th>
-
-          <th>
-            Pickup Date
-          </th>
-
-          <th>
-            Pickup Time
-          </th>
-
-          <th>
-            Delivery Date
-          </th>
-
-          <th>
-            Delivery Timeslot
-          </th>
-
-          <th>
-            Home Delivery
-          </th>
-
-          <th>
-            Payment
-          </th>
-
-          <th>
-            Amount
-          </th>
-
+          <th class="actions-column">Actions</th>
+          <th>Order No.</th>
+          <th>Order Status</th>
+          <th>Customer Name</th>
+          <th>Mobile</th>
+          <th>Storage Label</th>
+          <th>Pickup Date</th>
+          <th>Pickup Time</th>
+          <th>Delivery Date</th>
+          <th>Delivery Timeslot</th>
+          <th>Home Delivery</th>
+          <th>Payment</th>
+          <th>Amount</th>
         </tr>
-
       </thead>
-
 
       <tbody>
 
-        @for (
-          order of filteredOrders;
-          track order.id
-        ) {
+        @for (order of filteredOrders; track order.id) {
 
           <tr>
 
@@ -212,167 +120,123 @@
 
               <div class="actions-list">
 
-
-                @if (
-                  order.status ===
-                  'NEW_ORDER'
-                ) {
+                @if (order.status === 'NEW_ORDER') {
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="processAtStore(order)">
-
                     Process At Store
-
                   </button>
-
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     (click)="callCustomer(order)">
-
                     ☎ Call
-
                   </button>
-
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="tagOrder(order)">
-
-                    🏷 Storage Label
-
+                    ▣ Storage Label
                   </button>
 
                 }
 
-
-                @if (
-                  order.status ===
-                  'PROCESSING_AT_STORE'
-                ) {
+                @if (order.status === 'PROCESSING_AT_STORE') {
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="markReady(order)">
-
                     Mark Ready
-
                   </button>
-
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     (click)="callCustomer(order)">
-
                     ☎ Call
-
                   </button>
-
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="tagOrder(order)">
-
-                    🏷 Storage Label
-
+                    ▣ Storage Label
                   </button>
 
                 }
 
-
-                @if (
-                  order.status ===
-                  'READY_ORDER'
-                ) {
+                @if (order.status === 'READY_ORDER') {
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="markDelivered(order)">
-
                     Mark Delivered
-
                   </button>
-
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     (click)="callCustomer(order)">
-
                     ☎ Call
-
                   </button>
-
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="retagOrder(order)">
-
-                    🏷 Storage Label
-
+                    ▣ Storage Label
                   </button>
 
                 }
 
-
-                @if (
-                  order.status ===
-                  'DELIVERED'
-                ) {
+                @if (order.status === 'DELIVERED') {
 
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     (click)="viewOrder(order)">
-
                     View
-
                   </button>
 
-
                   <button
                     type="button"
-                    class="action-button"
+                    class="action-button primary-action"
                     (click)="billReceipt(order)">
-
                     Bill Receipt
-
                   </button>
-
-                }
-
-
-                @if (
-                  order.status ===
-                  'CANCELLED'
-                ) {
 
                   <button
                     type="button"
-                    class="action-button"
-                    (click)="viewOrder(order)">
-
-                    View
-
+                    class="action-button whatsapp-action"
+                    [disabled]="actionLoading"
+                    (click)="sendReceiptWhatsApp(order)">
+                    WhatsApp Receipt
                   </button>
 
                 }
 
+                @if (order.status === 'CANCELLED') {
+
+                  <button
+                    type="button"
+                    class="action-button primary-action"
+                    (click)="viewOrder(order)">
+                    View
+                  </button>
+
+                }
 
                 <div class="more-wrapper">
 
@@ -380,16 +244,12 @@
                     type="button"
                     class="more-button"
                     (click)="toggleMore(order)">
-
                     ⋮ More
-
                   </button>
-
 
                   @if (order.moreOpen) {
 
                     <div class="more-menu">
-
 
                       @if (
                         order.status !== 'DELIVERED' &&
@@ -399,37 +259,37 @@
                         <button
                           type="button"
                           (click)="reschedule(order)">
-
                           ↻ Reschedule
-
                         </button>
 
                       }
-
 
                       <button
                         type="button"
                         (click)="billReceipt(order)">
-
                         ▣ Bill Receipt
-
                       </button>
 
-
-                      @if (
-                        order.status !== 'CANCELLED'
-                      ) {
+                      @if (order.status === 'DELIVERED') {
 
                         <button
                           type="button"
-                          (click)="updateStorageLabel(order)">
-
-                          🏷 Storage Label
-
+                          [disabled]="actionLoading"
+                          (click)="sendReceiptWhatsApp(order)">
+                          WhatsApp Receipt
                         </button>
 
                       }
 
+                      @if (order.status !== 'CANCELLED') {
+
+                        <button
+                          type="button"
+                          (click)="updateStorageLabel(order)">
+                          ▣ Storage Label
+                        </button>
+
+                      }
 
                       @if (
                         !order.settled &&
@@ -440,13 +300,10 @@
                           type="button"
                           [disabled]="actionLoading"
                           (click)="settleOrder(order)">
-
                           Settle Order
-
                         </button>
 
                       }
-
 
                       @if (
                         order.status !== 'DELIVERED' &&
@@ -458,20 +315,16 @@
                           class="danger-action"
                           [disabled]="actionLoading"
                           (click)="cancelOrder(order)">
-
                           Cancel Order
-
                         </button>
 
                       }
 
-
                       <button
                         type="button"
+                        class="view-order-action"
                         (click)="viewOrder(order)">
-
                         View Order
-
                       </button>
 
                     </div>
@@ -484,45 +337,21 @@
 
             </td>
 
-
             <td>
-
               <strong class="order-number">
                 {{ order.orderNumber }}
               </strong>
-
             </td>
-
 
             <td>
 
               <span
                 class="status-badge"
-
-                [class.status-new]="
-                  order.status ===
-                  'NEW_ORDER'
-                "
-
-                [class.status-processing]="
-                  order.status ===
-                  'PROCESSING_AT_STORE'
-                "
-
-                [class.status-ready]="
-                  order.status ===
-                  'READY_ORDER'
-                "
-
-                [class.status-delivered]="
-                  order.status ===
-                  'DELIVERED'
-                "
-
-                [class.status-cancelled]="
-                  order.status ===
-                  'CANCELLED'
-                ">
+                [class.status-new]="order.status === 'NEW_ORDER'"
+                [class.status-processing]="order.status === 'PROCESSING_AT_STORE'"
+                [class.status-ready]="order.status === 'READY_ORDER'"
+                [class.status-delivered]="order.status === 'DELIVERED'"
+                [class.status-cancelled]="order.status === 'CANCELLED'">
 
                 {{ getStatusLabel(order.status) }}
 
@@ -530,15 +359,11 @@
 
             </td>
 
-
             <td>
-
-              <strong>
+              <strong class="customer-name">
                 {{ order.customerName }}
               </strong>
-
             </td>
-
 
             <td>
 
@@ -546,13 +371,10 @@
                 type="button"
                 class="mobile-link"
                 (click)="callCustomer(order)">
-
                 {{ order.mobile }}
-
               </button>
 
             </td>
-
 
             <td>
 
@@ -571,35 +393,28 @@
                   type="button"
                   class="add-storage-button"
                   (click)="updateStorageLabel(order)">
-
                   + Add Label
-
                 </button>
 
               }
 
             </td>
 
-
             <td>
               {{ order.pickupDate }}
             </td>
-
 
             <td>
               {{ order.pickupSlot }}
             </td>
 
-
             <td>
               {{ order.deliveryDate }}
             </td>
 
-
             <td>
               {{ order.deliverySlot }}
             </td>
-
 
             <td>
 
@@ -619,7 +434,6 @@
 
             </td>
 
-
             <td>
 
               @if (order.settled) {
@@ -638,13 +452,10 @@
 
             </td>
 
-
             <td>
-
               <strong class="amount">
                 ₹{{ order.amount }}
               </strong>
-
             </td>
 
           </tr>
@@ -655,26 +466,17 @@
 
     </table>
 
-
     @if (
       !loading &&
       filteredOrders.length === 0
     ) {
 
       <div class="empty-orders">
-
-        <h3>
-          No orders found
-        </h3>
-
-        <p>
-          Try changing the status or search filters.
-        </p>
-
+        <h3>No orders found</h3>
+        <p>Try changing the status or search filters.</p>
       </div>
 
     }
-
 
     @if (
       loading &&
@@ -682,15 +484,8 @@
     ) {
 
       <div class="empty-orders">
-
-        <h3>
-          Loading orders...
-        </h3>
-
-        <p>
-          Please wait.
-        </p>
-
+        <h3>Loading orders...</h3>
+        <p>Please wait.</p>
       </div>
 
     }
@@ -698,3 +493,241 @@
   </section>
 
 </div>
+
+@if (
+  paymentModalOpen &&
+  selectedPaymentOrder
+) {
+
+  <div
+    class="modal-overlay"
+    (click)="closePaymentModal()">
+
+    <div
+      class="payment-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            Add Payment
+          </h2>
+
+          <p>
+            {{ selectedPaymentOrder.orderNumber }}
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          [disabled]="actionLoading"
+          (click)="closePaymentModal()">
+          ×
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div class="payment-order-info">
+
+          <div>
+            <span>Customer</span>
+
+            <strong>
+              {{ selectedPaymentOrder.customerName }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Mobile</span>
+
+            <strong>
+              {{ selectedPaymentOrder.mobile }}
+            </strong>
+          </div>
+
+        </div>
+
+        <div class="payment-summary">
+
+          <div>
+            <span>
+              Total Amount
+            </span>
+
+            <strong>
+              ₹{{ formatAmount(
+                selectedPaymentOrder.totalAmount
+              ) }}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Already Paid
+            </span>
+
+            <strong>
+              ₹{{ formatAmount(
+                selectedPaymentOrder.paidAmount
+              ) }}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Balance
+            </span>
+
+            <strong class="balance-value">
+              ₹{{ formatAmount(
+                selectedPaymentOrder.balanceAmount
+              ) }}
+            </strong>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+
+          <div class="form-label-row">
+
+            <label>
+              Payment Amount
+            </label>
+
+            <button
+              type="button"
+              class="full-balance-button"
+              (click)="setFullBalance()">
+              Pay Full Balance
+            </button>
+
+          </div>
+
+          <div class="amount-input">
+
+            <span>
+              ₹
+            </span>
+
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              [max]="selectedPaymentOrder.balanceAmount"
+              [(ngModel)]="paymentAmount"
+              placeholder="Enter amount">
+
+          </div>
+
+        </div>
+
+        <div class="remaining-box">
+
+          <span>
+            Remaining after payment
+          </span>
+
+          <strong>
+            ₹{{ formatAmount(
+              remainingAfterPayment
+            ) }}
+          </strong>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Payment Method
+          </label>
+
+          <div class="payment-methods">
+
+            @for (
+              method of paymentMethods;
+              track method.value
+            ) {
+
+              <button
+                type="button"
+                class="payment-method-button"
+                [class.selected]="
+                  selectedPaymentMethod ===
+                    method.value
+                "
+                (click)="
+                  selectedPaymentMethod =
+                    method.value
+                ">
+
+                {{ method.label }}
+
+              </button>
+
+            }
+
+          </div>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Reference Number
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="paymentReference"
+            placeholder="Optional reference / transaction ID">
+
+        </div>
+
+        @if (paymentError) {
+
+          <div class="payment-error">
+            {{ paymentError }}
+          </div>
+
+        }
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="cancel-button"
+          [disabled]="actionLoading"
+          (click)="closePaymentModal()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="confirm-button"
+          [disabled]="actionLoading"
+          (click)="addPayment()">
+
+          @if (actionLoading) {
+            Processing...
+          } @else {
+            Add Payment
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

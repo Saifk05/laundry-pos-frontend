@@ -8,72 +8,53 @@
   width: 100%;
   min-height: 100%;
 
-  padding: 20px;
+  padding: 14px 18px 24px;
 
-  background: #f5f7f9;
-  color: #1f2937;
+  background: #ffffff;
+  color: #111111;
+
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 
 /* =========================================
-   HEADER
+   TOOLBAR
 ========================================= */
 
-.dashboard-header {
-  margin-bottom: 18px;
+.dashboard-toolbar {
+  margin-bottom: 10px;
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.dashboard-header h1 {
-  margin: 0;
-
-  font-size: 28px;
-  font-weight: 800;
-
-  color: #111827;
-
-  letter-spacing: -0.03em;
-}
-
-.dashboard-header p {
-  margin: 5px 0 0;
-
-  color: #6b7280;
-
-  font-size: 13px;
 }
 
 .refresh-button {
-  height: 40px;
+  height: 36px;
 
-  padding: 0 16px;
+  padding: 0 14px;
 
-  border: 1px solid #d9e1e6;
-  border-radius: 9px;
+  border: 1px solid #d5dce0;
+  border-radius: 4px;
 
   background: #ffffff;
-  color: #089bb8;
+  color: #078da8;
+
+  font-family: inherit;
 
   font-size: 12px;
   font-weight: 700;
 
   cursor: pointer;
-
-  transition: 0.2s ease;
 }
 
-.refresh-button:hover {
-  border-color: #13b5d1;
+.refresh-button:hover:not(:disabled) {
+  border-color: #078da8;
 
-  background: #f2fbfd;
+  background: #f6fcfd;
 }
 
 .refresh-button:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
@@ -83,19 +64,18 @@
 ========================================= */
 
 .dashboard-error {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 
-  padding: 11px 14px;
+  padding: 9px 12px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  border: 1px solid #efb4b4;
-  border-radius: 9px;
+  border: 1px solid #efaaaa;
 
   background: #fff4f4;
-  color: #d33c3c;
+  color: #bf3030;
 
   font-size: 12px;
   font-weight: 600;
@@ -105,7 +85,7 @@
   border: 0;
 
   background: transparent;
-  color: #d33c3c;
+  color: #bf3030;
 
   font-size: 18px;
 
@@ -119,171 +99,215 @@
 
 .dashboard-loading,
 .dashboard-empty {
-  min-height: 300px;
+  min-height: 240px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #e1e7eb;
-  border-radius: 14px;
+  border: 1px solid #bfc4c7;
 
   background: #ffffff;
 
-  color: #6b7280;
+  color: #555555;
+
+  font-size: 12px;
 }
 
 .dashboard-empty h3 {
   margin: 0;
 
-  color: #111827;
+  color: #111111;
 
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .dashboard-empty p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
 
-  font-size: 12px;
+  color: #777777;
+
+  font-size: 11px;
 }
 
 
 /* =========================================
-   BOARD WRAPPER
+   MATRIX WRAPPER
 ========================================= */
 
-.dashboard-board-wrapper {
+.delivery-matrix-wrapper {
   width: 100%;
 
   overflow-x: auto;
+  overflow-y: visible;
 
-  scrollbar-width: none;
-
-  border: 1px solid #dce3e7;
-  border-radius: 14px;
+  border-top: 1px solid #707070;
+  border-left: 1px solid #707070;
 
   background: #ffffff;
+
+  scrollbar-width: none;
 }
 
-.dashboard-board-wrapper::-webkit-scrollbar {
+.delivery-matrix-wrapper::-webkit-scrollbar {
   display: none;
 }
 
 
 /* =========================================
-   BOARD
+   MATRIX
 ========================================= */
 
-.dashboard-board {
+.delivery-matrix {
+  width: 100%;
   min-width: max-content;
 
   display: grid;
 
   grid-template-columns:
-    160px
+    170px
     repeat(
       var(--date-count),
-      minmax(240px, 1fr)
+      minmax(420px, 1fr)
     );
+
+  align-items: start;
 }
 
 
 /* =========================================
-   LABEL COLUMN
+   LEFT COLUMN
 ========================================= */
 
-.dashboard-label-column {
+.matrix-label-column {
   position: sticky;
+
   left: 0;
 
   z-index: 20;
 
-  border-right: 1px solid #d8e0e5;
-
   background: #ffffff;
-}
 
-.delivery-date-label,
-.summary-label,
-.orders-label {
-  padding: 0 14px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  border-bottom: 1px solid #dfe6ea;
-}
-
-.delivery-date-label {
-  height: 58px;
-
-  background: #1aa7c7;
-  color: #ffffff;
-
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.summary-label {
-  height: 66px;
-
-  color: #ffffff;
-}
-
-.summary-label span {
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.summary-label small {
-  margin-top: 3px;
-
-  font-size: 9px;
-  font-weight: 500;
-
-  opacity: 0.85;
-}
-
-.total-label {
-  background: #5f5bc4;
-}
-
-.processing-label {
-  background: #2e3438;
-}
-
-.ready-label {
-  background: #2ea96f;
-}
-
-.orders-label {
-  min-height: 46px;
-
-  background: #f4f6f8;
-  color: #4b5563;
-
-  font-size: 11px;
-  font-weight: 800;
+  border-right: 1px solid #707070;
 }
 
 
 /* =========================================
-   DELIVERY COLUMN
+   HEADER LABEL
 ========================================= */
 
-.delivery-column {
-  min-width: 240px;
+.matrix-delivery-label {
+  height: 44px;
 
-  border-right: 1px solid #dfe6ea;
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-right: 1px solid #707070;
+  border-bottom: 1px solid #707070;
+
+  background: #0505f4;
+  color: #ffffff;
+
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   SUMMARY LABELS
+========================================= */
+
+.matrix-total-label,
+.matrix-processing-label,
+.matrix-ready-label {
+  height: 44px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  border-right: 1px solid #707070;
+  border-bottom: 1px solid #707070;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.matrix-total-label {
+  background: #8d078e;
+}
+
+.matrix-processing-label {
+  background: #000000;
+}
+
+.matrix-ready-label {
+  background: #078b08;
+}
+
+.matrix-total-label span,
+.matrix-processing-label span,
+.matrix-ready-label span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+/* =========================================
+   ORDER LABEL CELL
+========================================= */
+
+.matrix-order-label {
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding-left: 8px;
+
+  border-right: 1px solid #707070;
+  border-bottom: 1px solid #707070;
 
   background: #ffffff;
 }
 
-.delivery-column:last-child {
-  border-right: none;
+.ready-check {
+  color: #30b9a6;
+
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   DATE COLUMN
+========================================= */
+
+.matrix-date-column {
+  min-width: 420px;
+
+  border-right: 1px solid #707070;
+
+  background: #ffffff;
 }
 
 
@@ -291,35 +315,34 @@
    DATE HEADER
 ========================================= */
 
-.delivery-date-header {
-  height: 58px;
+.matrix-date-header {
+  height: 44px;
 
-  padding: 0 12px;
+  padding: 0 14px;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  border-bottom: 1px solid #dfe6ea;
+  border-bottom: 1px solid #707070;
 
-  background: #1aa7c7;
+  background: #0505f4;
   color: #ffffff;
 
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 700;
+
   text-align: center;
+
+  white-space: nowrap;
 }
 
-.delivery-date-header strong {
-  font-size: 13px;
-  font-weight: 800;
-}
 
-.delivery-date-header span {
-  margin-top: 2px;
+/* first delivery date highlighted red like reference */
 
-  font-size: 9px;
-
-  opacity: 0.9;
+.matrix-date-column:first-of-type .matrix-date-header {
+  background: #f20b0b;
 }
 
 
@@ -327,244 +350,211 @@
    SUMMARY CELLS
 ========================================= */
 
-.summary-cell {
-  height: 66px;
+.matrix-total-cell,
+.matrix-processing-cell,
+.matrix-ready-cell {
+  height: 44px;
 
-  padding: 0 14px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  border-bottom: 1px solid #dfe6ea;
-
-  color: #ffffff;
-}
-
-.summary-number {
-  font-size: 24px;
-  font-weight: 800;
-
-  line-height: 1;
-}
-
-.summary-pieces {
-  min-width: 66px;
-
-  padding: 6px 9px;
-
-  border-radius: 7px;
-
-  background: rgba(255, 255, 255, 0.16);
-
-  text-align: center;
-
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.total-cell {
-  background: #6b66cf;
-}
-
-.processing-cell {
-  background: #343a3f;
-}
-
-.ready-cell {
-  background: #34ad74;
-}
-
-
-/* =========================================
-   ORDERS LIST
-========================================= */
-
-.orders-list {
-  min-height: 380px;
-
-  padding: 10px;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 8px;
-
-  background: #f9fafb;
-}
-
-.no-orders {
-  min-height: 120px;
+  padding: 0 12px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #9ca3af;
+  border-bottom: 1px solid #707070;
 
-  font-size: 11px;
+  color: #ffffff;
+
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.matrix-total-cell {
+  background: #8d078e;
+}
+
+.matrix-processing-cell {
+  background: #000000;
+}
+
+.matrix-ready-cell {
+  background: #078b08;
 }
 
 
 /* =========================================
-   ORDER CARD
+   ORDER AREA
 ========================================= */
 
-.order-card {
-  width: 100%;
-
-  padding: 10px;
-
-  display: block;
-
-  border: 1px solid #dfe5e9;
-  border-radius: 9px;
+.matrix-orders {
+  min-height: 540px;
 
   background: #ffffff;
-  color: #111827;
+}
+
+
+/* =========================================
+   ORDER ROW
+========================================= */
+
+.matrix-order-row {
+  width: 100%;
+  height: 45px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  border: 0;
+  border-bottom: 1px solid #707070;
+
+  background: #ffffff;
+  color: #111111;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 500;
 
   text-align: left;
 
   cursor: pointer;
 
-  box-shadow:
-    0 2px 5px rgba(15, 23, 42, 0.04);
-
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.order-card:hover {
-  transform: translateY(-1px);
-
-  border-color: #13b5d1;
-
-  box-shadow:
-    0 5px 12px rgba(15, 23, 42, 0.08);
-}
-
-.order-card.processing-order {
-  border-left: 4px solid #343a3f;
-}
-
-.order-card.ready-order {
-  border-left: 4px solid #2ea96f;
-
-  background: #f3fbf7;
-}
-
-
-/* =========================================
-   ORDER CARD TOP
-========================================= */
-
-.order-card-top {
-  display: flex;
-  align-items: center;
-
-  gap: 6px;
-}
-
-.order-sequence {
-  flex-shrink: 0;
-
-  color: #6b7280;
-
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.order-number {
-  flex: 1;
-
-  color: #0b90ad;
-
-  font-size: 11px;
-  font-weight: 800;
+  white-space: nowrap;
 
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.order-status {
-  min-height: 21px;
-
-  padding: 0 7px;
-
-  display: inline-flex;
-  align-items: center;
-
-  border-radius: 999px;
-
-  background: #eceff1;
-  color: #5d6670;
-
-  font-size: 8px;
-  font-weight: 800;
-
-  white-space: nowrap;
-}
-
-.order-status.status-processing {
-  background: #eceeef;
-  color: #343a3f;
-}
-
-.order-status.status-ready {
-  background: #daf5e7;
-  color: #198458;
+.matrix-order-row:hover {
+  filter: brightness(0.98);
 }
 
 
 /* =========================================
-   ORDER META
+   PROCESSING ROW
 ========================================= */
 
-.order-meta {
-  margin-top: 8px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 6px;
-
-  color: #4b5563;
-
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.meta-dot {
-  color: #c3c9cf;
+.matrix-order-row.processing-row {
+  background: #ffffff;
 }
 
 
 /* =========================================
-   DELIVERY TIME
+   READY ROW
 ========================================= */
 
-.order-time {
-  margin-top: 7px;
-
-  display: flex;
-  align-items: flex-start;
-
-  gap: 5px;
-
-  color: #6b7280;
-
-  font-size: 9px;
-  font-weight: 600;
-
-  line-height: 1.4;
+.matrix-order-row.ready-row {
+  background: #a6ff2f;
 }
 
-.time-icon {
+
+/* =========================================
+   ORDER INDEX
+========================================= */
+
+.matrix-order-index {
+  width: 30px;
+
   flex-shrink: 0;
 
-  color: #0b9ab8;
+  text-align: right;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   ORDER NUMBER
+========================================= */
+
+.matrix-order-number {
+  flex-shrink: 0;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   DIVIDERS
+========================================= */
+
+.matrix-divider {
+  flex-shrink: 0;
+
+  color: #111111;
+
+  font-size: 15px;
+}
+
+
+/* =========================================
+   PIECES
+========================================= */
+
+.matrix-pieces {
+  flex-shrink: 0;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   AMOUNT
+========================================= */
+
+.matrix-amount {
+  flex-shrink: 0;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   TIME
+========================================= */
+
+.matrix-time {
+  flex-shrink: 0;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   PHONE
+========================================= */
+
+.matrix-phone-icon {
+  margin-left: 5px;
+
+  flex-shrink: 0;
+
+  color: #000000;
+
+  font-size: 18px;
+  line-height: 1;
 }
 
 
@@ -572,22 +562,54 @@
    CUSTOMER
 ========================================= */
 
-.order-customer {
-  margin-top: 9px;
+.matrix-customer {
+  min-width: 0;
 
-  padding-top: 8px;
+  flex: 1;
 
-  display: flex;
-  align-items: center;
+  overflow: hidden;
 
-  gap: 8px;
+  color: #111111;
 
-  border-top: 1px solid #edf0f2;
+  font-size: 16px;
+  font-weight: 500;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  text-transform: uppercase;
 }
 
-.customer-avatar {
-  width: 28px;
-  height: 28px;
+
+/* =========================================
+   READY ICON
+========================================= */
+
+.matrix-ready-icon {
+  min-width: 42px;
+
+  margin-left: auto;
+
+  flex-shrink: 0;
+
+  color: #31b7a7;
+
+  font-size: 27px;
+  line-height: 1;
+
+  text-align: center;
+}
+
+
+/* =========================================
+   PIECE BOX
+========================================= */
+
+.matrix-piece-box {
+  width: 64px;
+  height: 36px;
+
+  margin-left: auto;
 
   flex-shrink: 0;
 
@@ -595,39 +617,46 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
+  border-radius: 3px;
 
-  background: #e1f7fb;
-  color: #078ea9;
+  background: #ffffff;
+  color: #333333;
 
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.customer-info {
-  min-width: 0;
 
-  display: flex;
-  flex-direction: column;
+/* =========================================
+   EMPTY ROWS
+========================================= */
+
+.matrix-empty-row {
+  height: 45px;
+
+  border-bottom: 1px solid #707070;
+
+  background: #ffffff;
 }
 
-.customer-info strong {
-  color: #24292f;
 
-  font-size: 10px;
-  font-weight: 800;
+/* simulate empty spreadsheet area */
 
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.matrix-orders::after {
+  content: '';
 
-.customer-info span {
-  margin-top: 2px;
+  display: block;
 
-  color: #8b949e;
+  min-height: 360px;
 
-  font-size: 8px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0,
+      #ffffff 44px,
+      #707070 44px,
+      #707070 45px
+    );
 }
 
 
@@ -640,7 +669,7 @@
 
   inset: 0;
 
-  z-index: 2000;
+  z-index: 9999;
 
   padding: 20px;
 
@@ -648,10 +677,7 @@
   align-items: center;
   justify-content: center;
 
-  background:
-    rgba(17, 24, 39, 0.42);
-
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.48);
 }
 
 
@@ -663,13 +689,13 @@
   width: 100%;
   max-width: 430px;
 
-  border: 1px solid #dce3e7;
-  border-radius: 15px;
-
   background: #ffffff;
 
+  border: 1px solid #d1d5d8;
+  border-radius: 8px;
+
   box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.2);
+    0 20px 50px rgba(0, 0, 0, 0.25);
 
   overflow: hidden;
 }
@@ -680,58 +706,49 @@
 ========================================= */
 
 .call-popup-header {
-  padding: 17px 18px;
+  padding: 15px 17px;
 
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
-  gap: 12px;
-
-  border-bottom: 1px solid #e6ebee;
+  border-bottom: 1px solid #e0e3e5;
 }
 
 .call-popup-header h2 {
   margin: 0;
 
-  color: #111827;
+  color: #111111;
 
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .call-popup-header p {
   margin: 4px 0 0;
 
-  color: #6b7280;
+  color: #777777;
 
   font-size: 11px;
-  font-weight: 600;
 }
 
 .popup-close {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #dae1e5;
+  border: 1px solid #d4dade;
   border-radius: 50%;
 
   background: #ffffff;
-  color: #4b5563;
+  color: #444444;
 
   font-size: 20px;
 
   cursor: pointer;
-}
-
-.popup-close:hover {
-  border-color: #13b5d1;
-
-  background: #f2fbfd;
 }
 
 
@@ -740,14 +757,14 @@
 ========================================= */
 
 .call-popup-body {
-  padding: 22px;
+  padding: 20px;
 
   text-align: center;
 }
 
 .call-customer-avatar {
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
 
   margin: 0 auto 10px;
 
@@ -757,32 +774,33 @@
 
   border-radius: 50%;
 
-  background: #dff7fb;
-  color: #078da8;
+  background: var(--app-primary-light);
+  color: var(--app-primary-dark);
 
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .call-popup-body h3 {
   margin: 0;
 
-  color: #111827;
+  color: #111111;
 
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .call-mobile {
-  margin: 4px 0 18px;
+  margin: 5px 0 16px;
 
-  color: #6b7280;
+  color: #777777;
 
   font-size: 12px;
 }
 
 .call-order-details {
   display: grid;
+
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
 
@@ -797,23 +815,23 @@
 
   gap: 4px;
 
-  border: 1px solid #e0e6ea;
-  border-radius: 9px;
+  border: 1px solid var(--app-border);
+  border-radius: 5px;
 
-  background: #f8fafb;
+  background: var(--app-background-soft);
 }
 
 .call-order-details span {
-  color: #7a838c;
+  color: var(--app-text-muted);
 
   font-size: 9px;
 }
 
 .call-order-details strong {
-  color: #1f2937;
+  color: var(--app-text-primary);
 
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 
@@ -822,24 +840,26 @@
 ========================================= */
 
 .call-popup-footer {
-  padding: 13px 18px;
+  padding: 12px 17px;
 
   display: flex;
   align-items: center;
   justify-content: flex-end;
 
-  gap: 9px;
+  gap: 8px;
 
-  border-top: 1px solid #e6ebee;
+  border-top: 1px solid #e0e3e5;
 }
 
 .cancel-call-button,
 .call-now-button {
-  height: 38px;
+  height: 36px;
 
-  padding: 0 15px;
+  padding: 0 14px;
 
-  border-radius: 8px;
+  border-radius: 5px;
+
+  font-family: inherit;
 
   font-size: 11px;
   font-weight: 700;
@@ -848,69 +868,167 @@
 }
 
 .cancel-call-button {
-  border: 1px solid #d8e0e5;
+  border: 1px solid var(--app-border);
 
   background: #ffffff;
-  color: #4b5563;
-}
-
-.cancel-call-button:hover {
-  border-color: #13b5d1;
-
-  background: #f4fcfd;
+  color: var(--app-text-secondary);
 }
 
 .call-now-button {
-  border: 1px solid #13b5d1;
+  border: 1px solid var(--app-primary);
 
-  background: #13b5d1;
+  background: var(--app-primary);
   color: #ffffff;
 }
 
 .call-now-button:hover {
-  border-color: #089bb8;
-
-  background: #089bb8;
+  background: var(--app-primary-dark);
 }
 
 
 /* =========================================
-   RESPONSIVE
+   LAPTOP
+========================================= */
+
+@media (max-width: 1200px) {
+
+  .delivery-matrix {
+    grid-template-columns:
+      155px
+      repeat(
+        var(--date-count),
+        minmax(390px, 1fr)
+      );
+  }
+
+  .matrix-date-column {
+    min-width: 390px;
+  }
+
+  .matrix-order-row {
+    font-size: 14px;
+  }
+
+  .matrix-order-number,
+  .matrix-pieces,
+  .matrix-amount,
+  .matrix-time,
+  .matrix-customer {
+    font-size: 14px;
+  }
+
+}
+
+
+/* =========================================
+   TABLET
 ========================================= */
 
 @media (max-width: 900px) {
 
   .dashboard-page {
-    padding: 14px;
+    padding: 10px;
   }
 
-  .dashboard-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .refresh-button {
-    width: 100%;
-  }
-
-  .dashboard-board {
+  .delivery-matrix {
     grid-template-columns:
       145px
       repeat(
         var(--date-count),
-        minmax(220px, 1fr)
+        minmax(360px, 1fr)
       );
   }
+
+  .matrix-date-column {
+    min-width: 360px;
+  }
+
+  .matrix-delivery-label,
+  .matrix-total-label,
+  .matrix-processing-label,
+  .matrix-ready-label {
+    font-size: 13px;
+  }
+
+  .matrix-total-cell,
+  .matrix-processing-cell,
+  .matrix-ready-cell,
+  .matrix-date-header {
+    font-size: 14px;
+  }
+
 }
+
+
+/* =========================================
+   MOBILE
+========================================= */
 
 @media (max-width: 600px) {
 
   .dashboard-page {
-    padding: 10px;
+    padding: 8px;
   }
 
-  .dashboard-header h1 {
-    font-size: 23px;
+  .delivery-matrix {
+    grid-template-columns:
+      125px
+      repeat(
+        var(--date-count),
+        minmax(330px, 1fr)
+      );
+  }
+
+  .matrix-date-column {
+    min-width: 330px;
+  }
+
+  .matrix-delivery-label,
+  .matrix-total-label,
+  .matrix-processing-label,
+  .matrix-ready-label {
+    padding: 0 7px;
+
+    font-size: 11px;
+  }
+
+  .matrix-date-header,
+  .matrix-total-cell,
+  .matrix-processing-cell,
+  .matrix-ready-cell {
+    font-size: 12px;
+  }
+
+  .matrix-order-row {
+    height: 42px;
+
+    padding: 0 7px;
+
+    gap: 4px;
+  }
+
+  .matrix-order-index,
+  .matrix-order-number,
+  .matrix-pieces,
+  .matrix-amount,
+  .matrix-time,
+  .matrix-customer {
+    font-size: 12px;
+  }
+
+  .matrix-phone-icon {
+    font-size: 14px;
+  }
+
+  .matrix-piece-box {
+    width: 45px;
+    height: 30px;
+
+    font-size: 11px;
+  }
+
+  .call-overlay {
+    padding: 10px;
   }
 
   .call-order-details {
@@ -925,4 +1043,130 @@
   .call-now-button {
     width: 100%;
   }
+
+}
+
+.delivery-matrix {
+  width: 100%;
+  min-width: max-content;
+
+  display: grid;
+
+  grid-template-columns:
+    125px
+    repeat(
+      var(--date-count),
+      minmax(360px, 1fr)
+    );
+
+  align-items: stretch;
+}
+
+.matrix-label-column {
+  position: sticky;
+  left: 0;
+
+  z-index: 20;
+
+  min-height: 100%;
+
+  border-right: 1px solid #858585;
+
+  background: #ffffff;
+
+  overflow: hidden;
+}
+
+.matrix-label-column::after {
+  content: '';
+
+  display: block;
+
+  width: 100%;
+  min-height: 500px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0,
+      #ffffff 39px,
+      #858585 39px,
+      #858585 40px
+    );
+}
+
+.matrix-order-label {
+  height: 40px;
+
+  padding-left: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  border-right: 0;
+  border-bottom: 1px solid #858585;
+
+  background: #ffffff;
+}
+
+.matrix-orders {
+  min-height: 500px;
+
+  background: #ffffff;
+}
+
+.matrix-order-row {
+  width: 100%;
+  height: 40px;
+
+  padding: 0 7px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+
+  border: 0;
+  border-bottom: 1px solid #858585;
+
+  background: #ffffff;
+  color: #111111;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.matrix-empty-row {
+  height: 40px;
+
+  border-bottom: 1px solid #858585;
+
+  background: #ffffff;
+}
+
+.matrix-orders::after {
+  content: '';
+
+  display: block;
+
+  min-height: 500px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0,
+      #ffffff 39px,
+      #858585 39px,
+      #858585 40px
+    );
 }
