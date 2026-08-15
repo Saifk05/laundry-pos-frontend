@@ -1,50 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
-
 :root {
+  --app-primary: #16a34a;
+  --app-primary-dark: #15803d;
+  --app-primary-light: #dcfce7;
 
-  /* Brand */
-  --app-primary: #12b7d6;
-  --app-primary-dark: #12b7d6;
-  --app-primary-light: #d8f5fb;
+  --app-secondary: #22c55e;
+  --app-secondary-dark: #16a34a;
+  --app-secondary-light: #f0fdf4;
 
-  --app-secondary: #ffd43b;
-  --app-secondary-dark: #e4b800;
-  --app-secondary-light: #fff5bf;
-
-  /* Backgrounds */
   --app-background: #ffffff;
-  --app-background-soft: #f8fbfc;
-  --app-background-blue: #cff5fb;
-  --app-background-yellow: #fff0ae;
-  --app-background-dark: #171b1d;
+  --app-background-soft: #f7faf8;
+  --app-background-blue: #ecfdf3;
+  --app-background-yellow: #f0fdf4;
+  --app-background-dark: #111815;
 
-  /* Surfaces */
   --app-surface: #ffffff;
-  --app-surface-soft: #f7f9fa;
-  --app-surface-dark: #202527;
+  --app-surface-soft: #f8faf9;
+  --app-surface-dark: #1b2420;
 
-  /* Text */
-  --app-text-primary: #111516;
-  --app-text-secondary: #626b6e;
-  --app-text-muted: #8b9497;
+  --app-text-primary: #111814;
+  --app-text-secondary: #5f6c64;
+  --app-text-muted: #8a9690;
   --app-text-light: #ffffff;
 
-  /* Borders */
-  --app-border: #e6ebed;
-  --app-border-dark: #303638;
+  --app-border: #e3e9e5;
+  --app-border-dark: #2c3731;
 
-  /* Status */
-  --app-success: #22a06b;
-  --app-warning: #e5a000;
-  --app-danger: #d64545;
+  --app-success: #16a34a;
+  --app-warning: #d99a00;
+  --app-danger: #dc4545;
   --app-info: #168aad;
 
-  /* Fonts */
   --app-font-body: 'Inter', sans-serif;
   --app-font-heading: 'Manrope', sans-serif;
 
-  /* Font Sizes */
   --app-font-size-xs: 12px;
   --app-font-size-sm: 14px;
   --app-font-size-md: 16px;
@@ -54,14 +44,12 @@
   --app-font-size-3xl: 48px;
   --app-font-size-4xl: 64px;
 
-  /* Radius */
   --app-radius-sm: 8px;
   --app-radius-md: 12px;
   --app-radius-lg: 18px;
   --app-radius-xl: 26px;
   --app-radius-round: 999px;
 
-  /* Spacing */
   --app-space-xs: 4px;
   --app-space-sm: 8px;
   --app-space-md: 16px;
@@ -71,38 +59,28 @@
   --app-space-3xl: 72px;
   --app-space-4xl: 100px;
 
-  /* Shadows */
   --app-shadow-sm:
-    0 2px 10px rgba(0, 0, 0, 0.05);
+    0 2px 10px rgba(17, 24, 20, 0.05);
 
   --app-shadow-md:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 10px 30px rgba(17, 24, 20, 0.08);
 
   --app-shadow-lg:
-    0 20px 60px rgba(0, 0, 0, 0.12);
+    0 20px 60px rgba(17, 24, 20, 0.12);
 
-  /* Layout */
   --app-container-width: 1280px;
   --app-page-padding: 48px;
 
-  /* Transition */
   --app-transition: 0.25s ease;
 }
-
-
-/* =========================================
-   BASE
-========================================= */
 
 * {
   box-sizing: border-box;
 }
 
-
 html {
   scroll-behavior: smooth;
 }
-
 
 html,
 body,
@@ -112,28 +90,20 @@ ion-app {
   height: 100%;
 }
 
-
 html,
 body {
   margin: 0;
   padding: 0;
 
   background: var(--app-background);
-
   color: var(--app-text-primary);
 
   font-family: var(--app-font-body);
 }
 
-
 body {
   min-height: 100vh;
 }
-
-
-/* =========================================
-   TYPOGRAPHY
-========================================= */
 
 h1,
 h2,
@@ -145,7 +115,6 @@ h6 {
   font-weight: 700;
 }
 
-
 button,
 input,
 textarea,
@@ -153,21 +122,17 @@ select {
   font-family: var(--app-font-body);
 }
 
-
-/* =========================================
-   IONIC
-========================================= */
-
 ion-content {
   --background: var(--app-background);
 
   font-family: var(--app-font-body);
 }
 
-
 ion-button {
   --background: var(--app-primary);
   --background-hover: var(--app-primary-dark);
+  --background-activated: var(--app-primary-dark);
+  --background-focused: var(--app-primary-dark);
 
   --color: var(--app-text-light);
 
@@ -176,20 +141,13 @@ ion-button {
   --box-shadow: none;
 
   font-family: var(--app-font-body);
-
   font-weight: 600;
 
   text-transform: none;
 }
 
-
-/* =========================================
-   COMMON CONTAINER
-========================================= */
-
 .app-container {
   width: 100%;
-
   max-width: var(--app-container-width);
 
   margin: 0 auto;
@@ -198,15 +156,9 @@ ion-button {
   padding-right: var(--app-page-padding);
 }
 
-
-/* =========================================
-   COMMON SECTION HEADING
-========================================= */
-
 .section-heading {
   text-align: center;
 }
-
 
 .section-heading h2 {
   margin: 0;
@@ -221,7 +173,6 @@ ion-button {
   letter-spacing: -0.03em;
 }
 
-
 .section-heading p {
   margin: 8px 0 0;
 
@@ -230,16 +181,10 @@ ion-button {
   font-size: var(--app-font-size-sm);
 }
 
-
-/* =========================================
-   HIDE SCROLLBAR
-========================================= */
-
 ion-content::part(scroll) {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-
 
 ion-content::part(scroll)::-webkit-scrollbar {
   display: none;
@@ -248,34 +193,22 @@ ion-content::part(scroll)::-webkit-scrollbar {
   height: 0;
 }
 
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
 @media (max-width: 992px) {
-
   :root {
     --app-page-padding: 28px;
   }
-
 }
 
-
 @media (max-width: 768px) {
-
   :root {
     --app-page-padding: 20px;
 
     --app-font-size-3xl: 40px;
     --app-font-size-4xl: 48px;
   }
-
 }
 
-
 @media (max-width: 480px) {
-
   :root {
     --app-page-padding: 16px;
 
@@ -283,5 +216,4 @@ ion-content::part(scroll)::-webkit-scrollbar {
     --app-font-size-3xl: 34px;
     --app-font-size-4xl: 40px;
   }
-
 }
