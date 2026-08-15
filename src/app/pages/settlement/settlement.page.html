@@ -1,0 +1,1241 @@
+<div class="settlement-page">
+
+  <!-- =====================================
+       PAGE HEADER
+  ====================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Settlement
+      </h1>
+
+      <p>
+        Manage order payments and outstanding balances
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="loadSettlements()">
+
+      ↻ Refresh
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================
+       SUMMARY CARDS
+  ====================================== -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        ₹
+      </div>
+
+      <div>
+
+        <span>
+          Total Order Value
+        </span>
+
+        <strong>
+          ₹{{ formatAmount(totalOrderAmount) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        ✓
+      </div>
+
+      <div>
+
+        <span>
+          Total Collected
+        </span>
+
+        <strong>
+          ₹{{ formatAmount(totalCollected) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        ₹
+      </div>
+
+      <div>
+
+        <span>
+          Pending Amount
+        </span>
+
+        <strong>
+          ₹{{ formatAmount(totalPending) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        #
+      </div>
+
+      <div>
+
+        <span>
+          Pending Orders
+        </span>
+
+        <strong>
+          {{ pendingOrdersCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================
+       STATUS SUMMARY
+  ====================================== -->
+
+  <div class="status-summary">
+
+    <div class="status-summary-item">
+
+      <span>
+        Pending
+      </span>
+
+      <strong>
+        {{ pendingOrdersCount }}
+      </strong>
+
+    </div>
+
+
+    <div class="status-summary-item">
+
+      <span>
+        Partially Paid
+      </span>
+
+      <strong>
+        {{ partialOrdersCount }}
+      </strong>
+
+    </div>
+
+
+    <div class="status-summary-item">
+
+      <span>
+        Settled
+      </span>
+
+      <strong>
+        {{ settledOrdersCount }}
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================
+       FILTERS
+  ====================================== -->
+
+  <div class="filter-card">
+
+    <div class="filter-group">
+
+      <label>
+        Order Number
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="orderNumberSearch"
+        placeholder="Search order number">
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label>
+        Mobile Number
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="mobileSearch"
+        placeholder="Search mobile number">
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label>
+        Payment Status
+      </label>
+
+      <select
+        [(ngModel)]="selectedPaymentStatus">
+
+        @for (
+          status of paymentStatuses;
+          track status.value
+        ) {
+
+          <option
+            [value]="status.value">
+
+            {{ status.label }}
+
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+
+    <div class="filter-actions">
+
+      <button
+        type="button"
+        class="clear-button"
+        (click)="clearFilters()">
+
+        Clear
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================
+       ERROR
+  ====================================== -->
+
+  @if (errorMessage) {
+
+    <div class="error-message">
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+      <button
+        type="button"
+        (click)="errorMessage = ''">
+
+        ×
+
+      </button>
+
+    </div>
+
+  }
+
+
+  <!-- =====================================
+       TABLE SECTION
+  ====================================== -->
+
+  <div class="settlement-section">
+
+    <div class="section-header">
+
+      <div>
+
+        <h2>
+          Order Settlements
+        </h2>
+
+        <p>
+          {{ filteredOrders.length }} orders found
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================
+         LOADING
+    ====================================== -->
+
+    @if (loading) {
+
+      <div class="table-state">
+
+        Loading settlements...
+
+      </div>
+
+    }
+
+
+    <!-- =====================================
+         EMPTY
+    ====================================== -->
+
+    @if (
+      !loading &&
+      filteredOrders.length === 0
+    ) {
+
+      <div class="table-state">
+
+        No settlement orders found.
+
+      </div>
+
+    }
+
+
+    <!-- =====================================
+         TABLE
+    ====================================== -->
+
+    @if (
+      !loading &&
+      filteredOrders.length > 0
+    ) {
+
+      <div class="table-wrapper">
+
+        <table class="settlement-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Actions
+              </th>
+
+              <th>
+                Order No.
+              </th>
+
+              <th>
+                Customer
+              </th>
+
+              <th>
+                Mobile
+              </th>
+
+              <th>
+                Order Status
+              </th>
+
+              <th>
+                Total
+              </th>
+
+              <th>
+                Paid
+              </th>
+
+              <th>
+                Balance
+              </th>
+
+              <th>
+                Payment Status
+              </th>
+
+              <th>
+                Created
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @for (
+              order of filteredOrders;
+              track order.id
+            ) {
+
+              <tr>
+
+
+                <!-- ACTIONS -->
+
+                <td>
+
+                  <div class="table-actions">
+
+
+                    @if (
+                      order.paymentStatus !== 'SETTLED' &&
+                      order.orderStatus !== 'CANCELLED'
+                    ) {
+
+                      <button
+                        type="button"
+                        class="primary-action"
+                        (click)="openPaymentModal(order)">
+
+                        + Payment
+
+                      </button>
+
+                    }
+
+
+                    <button
+                      type="button"
+                      class="secondary-action"
+                      (click)="openPaymentHistory(order)">
+
+                      History
+
+                    </button>
+
+                  </div>
+
+                </td>
+
+
+                <!-- ORDER NUMBER -->
+
+                <td>
+
+                  <strong class="order-number">
+
+                    {{ order.orderNumber }}
+
+                  </strong>
+
+                </td>
+
+
+                <!-- CUSTOMER -->
+
+                <td>
+
+                  <strong>
+
+                    {{ order.customerName }}
+
+                  </strong>
+
+                </td>
+
+
+                <!-- MOBILE -->
+
+                <td>
+
+                  <button
+                    type="button"
+                    class="mobile-link"
+                    (click)="callCustomer(order)">
+
+                    {{ order.mobile }}
+
+                  </button>
+
+                </td>
+
+
+                <!-- ORDER STATUS -->
+
+                <td>
+
+                  <span
+                    class="order-status"
+                    [class.new-order]="
+                      order.orderStatus === 'NEW_ORDER'
+                    "
+                    [class.processing]="
+                      order.orderStatus === 'PROCESSING_AT_STORE'
+                    "
+                    [class.ready]="
+                      order.orderStatus === 'READY_ORDER'
+                    "
+                    [class.delivered]="
+                      order.orderStatus === 'DELIVERED'
+                    "
+                    [class.cancelled]="
+                      order.orderStatus === 'CANCELLED'
+                    ">
+
+                    {{
+                      getOrderStatusLabel(
+                        order.orderStatus
+                      )
+                    }}
+
+                  </span>
+
+                </td>
+
+
+                <!-- TOTAL -->
+
+                <td>
+
+                  <strong>
+
+                    ₹{{ formatAmount(
+                      order.totalAmount
+                    ) }}
+
+                  </strong>
+
+                </td>
+
+
+                <!-- PAID -->
+
+                <td>
+
+                  <span class="paid-amount">
+
+                    ₹{{ formatAmount(
+                      order.paidAmount
+                    ) }}
+
+                  </span>
+
+                </td>
+
+
+                <!-- BALANCE -->
+
+                <td>
+
+                  <strong
+                    [class.balance-pending]="
+                      order.balanceAmount > 0
+                    "
+                    [class.balance-clear]="
+                      order.balanceAmount === 0
+                    ">
+
+                    ₹{{ formatAmount(
+                      order.balanceAmount
+                    ) }}
+
+                  </strong>
+
+                </td>
+
+
+                <!-- PAYMENT STATUS -->
+
+                <td>
+
+                  <span
+                    class="payment-status"
+                    [class.pending]="
+                      order.paymentStatus === 'PENDING'
+                    "
+                    [class.partial]="
+                      order.paymentStatus === 'PARTIALLY_PAID'
+                    "
+                    [class.settled]="
+                      order.paymentStatus === 'SETTLED'
+                    ">
+
+                    {{
+                      getPaymentStatusLabel(
+                        order.paymentStatus
+                      )
+                    }}
+
+                  </span>
+
+                </td>
+
+
+                <!-- CREATED -->
+
+                <td>
+
+                  <span class="created-date">
+
+                    {{
+                      order.createdAt
+                        | date:
+                          'dd-MM-yyyy hh:mm a'
+                    }}
+
+                  </span>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>
+
+
+<!-- =====================================
+     ADD PAYMENT MODAL
+====================================== -->
+
+@if (
+  paymentModalOpen &&
+  selectedOrder
+) {
+
+  <div
+    class="modal-overlay"
+    (click)="closePaymentModal()">
+
+    <div
+      class="payment-modal"
+      (click)="$event.stopPropagation()">
+
+
+      <!-- HEADER -->
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            Add Payment
+          </h2>
+
+          <p>
+            {{ selectedOrder.orderNumber }}
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="modal-close"
+          [disabled]="actionLoading"
+          (click)="closePaymentModal()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <!-- BODY -->
+
+      <div class="modal-body">
+
+
+        <!-- ORDER INFO -->
+
+        <div class="payment-order-info">
+
+          <div>
+
+            <span>
+              Customer
+            </span>
+
+            <strong>
+              {{ selectedOrder.customerName }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Mobile
+            </span>
+
+            <strong>
+              {{ selectedOrder.mobile }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- AMOUNT SUMMARY -->
+
+        <div class="payment-summary">
+
+          <div>
+
+            <span>
+              Total Amount
+            </span>
+
+            <strong>
+
+              ₹{{ formatAmount(
+                selectedOrder.totalAmount
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Already Paid
+            </span>
+
+            <strong>
+
+              ₹{{ formatAmount(
+                selectedOrder.paidAmount
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Balance
+            </span>
+
+            <strong class="balance-value">
+
+              ₹{{ formatAmount(
+                selectedOrder.balanceAmount
+              ) }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- PAYMENT AMOUNT -->
+
+        <div class="form-group">
+
+          <div class="form-label-row">
+
+            <label>
+              Payment Amount
+            </label>
+
+            <button
+              type="button"
+              class="full-balance-button"
+              (click)="setFullBalance()">
+
+              Pay Full Balance
+
+            </button>
+
+          </div>
+
+
+          <div class="amount-input">
+
+            <span>
+              ₹
+            </span>
+
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              [max]="selectedOrder.balanceAmount"
+              [(ngModel)]="paymentAmount"
+              placeholder="Enter amount">
+
+          </div>
+
+        </div>
+
+
+        <!-- REMAINING -->
+
+        <div class="remaining-box">
+
+          <span>
+            Remaining after payment
+          </span>
+
+          <strong>
+            ₹{{ formatAmount(
+              remainingAfterPayment
+            ) }}
+          </strong>
+
+        </div>
+
+
+        <!-- PAYMENT METHOD -->
+
+        <div class="form-group">
+
+          <label>
+            Payment Method
+          </label>
+
+          <div class="payment-methods">
+
+            @for (
+              method of paymentMethods;
+              track method.value
+            ) {
+
+              <button
+                type="button"
+                class="payment-method-button"
+                [class.selected]="
+                  selectedPaymentMethod ===
+                    method.value
+                "
+                (click)="
+                  selectedPaymentMethod =
+                    method.value
+                ">
+
+                {{ method.label }}
+
+              </button>
+
+            }
+
+          </div>
+
+        </div>
+
+
+        <!-- REFERENCE -->
+
+        <div class="form-group">
+
+          <label>
+            Reference Number
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="paymentReference"
+            placeholder="Optional reference / transaction ID">
+
+        </div>
+
+
+        <!-- PAYMENT ERROR -->
+
+        @if (paymentError) {
+
+          <div class="payment-error">
+
+            {{ paymentError }}
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="cancel-button"
+          [disabled]="actionLoading"
+          (click)="closePaymentModal()">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          type="button"
+          class="confirm-button"
+          [disabled]="actionLoading"
+          (click)="addPayment()">
+
+          @if (actionLoading) {
+
+            Processing...
+
+          } @else {
+
+            Add Payment
+
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- =====================================
+     PAYMENT HISTORY MODAL
+====================================== -->
+
+@if (
+  historyModalOpen &&
+  historyOrder
+) {
+
+  <div
+    class="modal-overlay"
+    (click)="closePaymentHistory()">
+
+    <div
+      class="history-modal"
+      (click)="$event.stopPropagation()">
+
+
+      <!-- HEADER -->
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            Payment History
+          </h2>
+
+          <p>
+            {{ historyOrder.orderNumber }}
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closePaymentHistory()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <!-- BODY -->
+
+      <div class="modal-body">
+
+
+        <!-- SUMMARY -->
+
+        <div class="history-summary">
+
+          <div>
+
+            <span>
+              Total
+            </span>
+
+            <strong>
+
+              ₹{{ formatAmount(
+                historyOrder.totalAmount
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Paid
+            </span>
+
+            <strong>
+
+              ₹{{ formatAmount(
+                historyOrder.paidAmount
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Balance
+            </span>
+
+            <strong>
+
+              ₹{{ formatAmount(
+                historyOrder.balanceAmount
+              ) }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        @if (historyLoading) {
+
+          <div class="empty-history">
+
+            Loading payment history...
+
+          </div>
+
+        }
+
+
+        <!-- HISTORY -->
+
+        @if (
+          !historyLoading &&
+          paymentHistory
+        ) {
+
+
+          <!-- HISTORY TOTALS -->
+
+          <div class="history-payment-summary">
+
+            <div>
+
+              <span>
+                Total Amount
+              </span>
+
+              <strong>
+
+                ₹{{ formatAmount(
+                  paymentHistory.totalAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+
+            <div>
+
+              <span>
+                Total Paid
+              </span>
+
+              <strong>
+
+                ₹{{ formatAmount(
+                  paymentHistory.paidAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+
+            <div>
+
+              <span>
+                Balance
+              </span>
+
+              <strong>
+
+                ₹{{ formatAmount(
+                  paymentHistory.balanceAmount
+                ) }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- NO PAYMENTS -->
+
+          @if (
+            paymentHistory.payments.length === 0
+          ) {
+
+            <div class="empty-history">
+
+              No payments have been made yet.
+
+            </div>
+
+          }
+
+
+          <!-- PAYMENT LIST -->
+
+          @if (
+            paymentHistory.payments.length > 0
+          ) {
+
+            <div class="payment-history-list">
+
+              @for (
+                payment of paymentHistory.payments;
+                track payment.id
+              ) {
+
+                <div class="payment-history-item">
+
+
+                  <div class="payment-history-main">
+
+                    <strong>
+
+                      ₹{{ formatAmount(
+                        payment.amount
+                      ) }}
+
+                    </strong>
+
+
+                    <span class="method-badge">
+
+                      {{
+                        getPaymentMethodLabel(
+                          payment.paymentMethod
+                        )
+                      }}
+
+                    </span>
+
+                  </div>
+
+
+                  <div class="payment-history-meta">
+
+                    <span>
+
+                      {{
+                        payment.paidAt
+                          | date:
+                            'dd-MM-yyyy hh:mm a'
+                      }}
+
+                    </span>
+
+
+                    @if (
+                      payment.referenceNumber
+                    ) {
+
+                      <span>
+
+                        Ref:
+                        {{ payment.referenceNumber }}
+
+                      </span>
+
+                    }
+
+                  </div>
+
+                </div>
+
+              }
+
+            </div>
+
+          }
+
+        }
+
+      </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="confirm-button"
+          (click)="closePaymentHistory()">
+
+          Close
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

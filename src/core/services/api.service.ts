@@ -11,6 +11,14 @@ import {
   OrderResponse
 } from '../models/walk-in.model';
 
+
+import {
+  SettlementOrder,
+  PaymentHistoryResponse,
+  PaymentRequest
+} from '../models/settlement.model';
+
+
 import {
   Coupon,
   CouponListResponse,
@@ -423,4 +431,47 @@ export class ApiService {
     );
   }
 
+    /* =========================================
+     SETTLEMENT
+  ========================================= */
+
+  getSettlements():
+    Observable<SettlementOrder[]> {
+
+    return this.http.get<SettlementOrder[]>(
+      `${this.baseUrl}/settlements`
+    );
+  }
+
+
+  getSettlementById(
+    orderId: string
+  ): Observable<SettlementOrder> {
+
+    return this.http.get<SettlementOrder>(
+      `${this.baseUrl}/settlements/${orderId}`
+    );
+  }
+
+
+  addSettlementPayment(
+    orderId: string,
+    request: PaymentRequest
+  ): Observable<SettlementOrder> {
+
+    return this.http.post<SettlementOrder>(
+      `${this.baseUrl}/settlements/${orderId}/payments`,
+      request
+    );
+  }
+
+
+  getSettlementPaymentHistory(
+    orderId: string
+  ): Observable<PaymentHistoryResponse> {
+
+    return this.http.get<PaymentHistoryResponse>(
+      `${this.baseUrl}/settlements/${orderId}/payments`
+    );
+  }
 }

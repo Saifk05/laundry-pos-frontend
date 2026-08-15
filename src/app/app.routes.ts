@@ -43,6 +43,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'settlement',
+        loadComponent: () =>
+          import('./pages/settlement/settlement.page')
+            .then((m) => m.SettlementPage),
+      },
+
+      {
         path: 'b2c-orders',
         loadComponent: () =>
           import('./pages/orders/b2c-orders/b2c-orders.page')
@@ -83,11 +90,12 @@ export const routes: Routes = [
           import('./pages/inventory/extra-charges/extra-charges.page')
             .then((m) => m.ExtraChargesPage),
       },
+
       {
-      path: 'inventory/add-product',
-        loadComponent: () => 
+        path: 'inventory/add-product',
+        loadComponent: () =>
           import('./pages/inventory/add-product/add-product.page')
-            .then( m => m.AddProductPage)
+            .then((m) => m.AddProductPage),
       },
     ],
   },
