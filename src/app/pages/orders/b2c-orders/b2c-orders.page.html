@@ -237,16 +237,6 @@
                   <button
                     type="button"
                     class="action-button primary-action"
-                    [disabled]="actionLoading"
-                    (click)="tagOrder(order)">
-
-                    ▣ Storage Label
-
-                  </button>
-
-                  <button
-                    type="button"
-                    class="action-button primary-action"
                     (click)="retagOrder(order)">
 
                     ↻ Re-Tag
@@ -276,16 +266,6 @@
                     (click)="callCustomer(order)">
 
                     ☎ Call
-
-                  </button>
-
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    [disabled]="actionLoading"
-                    (click)="tagOrder(order)">
-
-                    ▣ Storage Label
 
                   </button>
 
@@ -428,20 +408,6 @@
 
                       }
 
-                      @if (
-                        order.status !== 'DELIVERED' &&
-                        order.status !== 'CANCELLED'
-                      ) {
-
-                        <button
-                          type="button"
-                          (click)="updateStorageLabel(order)">
-
-                          ▣ Storage Label
-
-                        </button>
-
-                      }
 
                       @if (
                         order.status === 'TAGGED' ||
@@ -525,7 +491,7 @@
                     class="express-delivery-icon"
                     title="Express Delivery">
 
-                    🚗💨
+                    ⚡
 
                   </span>
 
@@ -572,16 +538,27 @@
 
             </td>
 
-            <td>
+            <td class="storage-label-cell">
 
               @if (
                 order.storageLabel &&
                 order.storageLabel !== '-'
               ) {
 
-                <span class="storage-label">
+                <button
+                  type="button"
+                  class="storage-label editable-storage-label"
+                  [disabled]="actionLoading"
+                  (click)="updateStorageLabel(order)"
+                  title="Edit storage label">
+
                   {{ order.storageLabel }}
-                </span>
+
+                  <span class="storage-edit-icon">
+                    ✎
+                  </span>
+
+                </button>
 
               } @else {
 
@@ -593,6 +570,7 @@
                   <button
                     type="button"
                     class="add-storage-button"
+                    [disabled]="actionLoading"
                     (click)="updateStorageLabel(order)">
 
                     + Add Label
@@ -1070,7 +1048,11 @@
             [(ngModel)]="readyStorageLabel"
             placeholder="Enter storage label"
             [disabled]="actionLoading"
-            (keyup.enter)="confirmMarkReady()">
+            (keyup.enter)="
+              storageModalMode === 'EDIT'
+                ? saveStorageLabel()
+                : confirmMarkReady()
+            ">
 
         </div>
 
@@ -1103,15 +1085,27 @@
             actionLoading ||
             !readyStorageLabel.trim()
           "
-          (click)="confirmMarkReady()">
+          (click)="
+            storageModalMode === 'EDIT'
+              ? saveStorageLabel()
+              : confirmMarkReady()
+          ">
 
           @if (actionLoading) {
 
-            Processing...
+            Saving...
 
           } @else {
 
-            Mark Ready
+            @if (storageModalMode === 'EDIT') {
+
+              Save Label
+
+            } @else {
+
+              Mark Ready
+
+            }
 
           }
 

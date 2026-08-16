@@ -12,6 +12,10 @@ import {
 } from '../models/walk-in.model';
 
 import {
+  SalesReportResponse
+} from '../models/sales-report.model';
+
+import {
   BusinessSettings,
   BusinessSettingsRequest
 } from '../models/business-settings.model';
@@ -588,4 +592,21 @@ retagB2COrder(
       request
     );
   }
+
+
+  getSalesReport(
+  startDate: string,
+  endDate: string
+): Observable<SalesReportResponse> {
+
+  return this.http.get<SalesReportResponse>(
+    `${this.baseUrl}/reports/sales`,
+    {
+      params: {
+        startDate,
+        endDate
+      }
+    }
+  );
+}
 }

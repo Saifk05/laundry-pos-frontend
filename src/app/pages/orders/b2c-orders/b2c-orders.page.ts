@@ -135,6 +135,10 @@ export class B2cOrdersPage
 
   readyStorageError = '';
 
+  storageModalMode:
+    'MARK_READY' | 'EDIT' =
+      'MARK_READY';
+
 
   constructor(
     private readonly apiService:
@@ -530,6 +534,9 @@ searchOrders(): void {
 
     this.readyStorageError = '';
 
+    this.storageModalMode =
+      'MARK_READY';
+
     this.selectedReadyOrder =
       order;
 
@@ -565,6 +572,9 @@ searchOrders(): void {
 
     this.readyStorageError =
       '';
+
+    this.storageModalMode =
+      'MARK_READY';
   }
 
 
@@ -1175,36 +1185,69 @@ searchOrders(): void {
 
     this.closeAllMoreMenus();
 
-    const currentValue =
-      order.storageLabel ===
-        '-'
-        ? ''
-        : order.storageLabel;
+    this.errorMessage =
+      '';
 
-    const storageLabel =
-      window.prompt(
-        'Storage label',
-        currentValue
-      );
+    this.readyStorageError =
+      '';
+
+    this.storageModalMode =
+      'EDIT';
+
+    this.selectedReadyOrder =
+      order;
+
+    this.readyStorageLabel =
+      order.storageLabel &&
+      order.storageLabel !== '-'
+        ? order.storageLabel
+        : '';
+
+    this.readyStorageModalOpen =
+      true;
+  }
+
+
+  saveStorageLabel():
+    void {
 
     if (
-      !storageLabel ||
-      !storageLabel.trim()
+      !this.selectedReadyOrder
     ) {
 
       return;
     }
 
-    this.actionLoading =
-      true;
+    const storageLabel =
+      this.readyStorageLabel
+        .trim();
+
+    if (
+      !storageLabel
+    ) {
+
+      this.readyStorageError =
+        'Storage label is required';
+
+      return;
+    }
+
+    this.readyStorageError =
+      '';
 
     this.errorMessage =
       '';
 
+    this.actionLoading =
+      true;
+
+    const orderId =
+      this.selectedReadyOrder.id;
+
     this.apiService
       .updateB2CStorageLabel(
-        order.id,
-        storageLabel.trim()
+        orderId,
+        storageLabel
       )
       .subscribe({
 
@@ -1219,6 +1262,21 @@ searchOrders(): void {
 
           this.actionLoading =
             false;
+
+          this.readyStorageModalOpen =
+            false;
+
+          this.selectedReadyOrder =
+            null;
+
+          this.readyStorageLabel =
+            '';
+
+          this.readyStorageError =
+            '';
+
+          this.storageModalMode =
+            'MARK_READY';
         },
 
         error: (
@@ -1226,14 +1284,18 @@ searchOrders(): void {
             any
         ) => {
 
-          this.handleActionError(
-            error,
-            'Unable to update storage label'
-          );
+          this.actionLoading =
+            false;
+
+          this.readyStorageError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to update storage label';
         }
 
       });
   }
+
 
   tagOrder(
     order:
