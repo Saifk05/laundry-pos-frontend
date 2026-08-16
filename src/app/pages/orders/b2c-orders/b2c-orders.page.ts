@@ -77,6 +77,7 @@ export class B2cOrdersPage
     'Tagged',
     'Processing At Store',
     'Ready Order',
+    'Delivered',
     'Cancelled'
   ];
 
@@ -133,7 +134,6 @@ export class B2cOrdersPage
   ) {}
 
   ngOnInit(): void {
-
     this.loadOrders();
   }
 
@@ -261,52 +261,51 @@ export class B2cOrdersPage
   get filteredOrders():
     B2cOrderView[] {
 
-    return this.orders
-      .filter(
-        (
-          order:
-            B2cOrderView
-        ) => {
+    return this.orders.filter(
+      (
+        order:
+          B2cOrderView
+      ) => {
 
-          const matchesStatus =
-            this.selectedStatus ===
-              'All' ||
-            this.getStatusLabel(
-              order.status
-            ) ===
-              this.selectedStatus;
+        const matchesStatus =
+          this.selectedStatus ===
+            'All' ||
+          this.getStatusLabel(
+            order.status
+          ) ===
+            this.selectedStatus;
 
-          const orderSearch =
-            this.orderNumberSearch
-              .trim()
-              .toLowerCase();
+        const orderSearch =
+          this.orderNumberSearch
+            .trim()
+            .toLowerCase();
 
-          const mobileSearch =
-            this.mobileSearch
-              .trim();
+        const mobileSearch =
+          this.mobileSearch
+            .trim();
 
-          const matchesOrderNumber =
-            !orderSearch ||
-            order.orderNumber
-              .toLowerCase()
-              .includes(
-                orderSearch
-              );
+        const matchesOrderNumber =
+          !orderSearch ||
+          order.orderNumber
+            .toLowerCase()
+            .includes(
+              orderSearch
+            );
 
-          const matchesMobile =
-            !mobileSearch ||
-            order.mobile
-              .includes(
-                mobileSearch
-              );
+        const matchesMobile =
+          !mobileSearch ||
+          order.mobile
+            .includes(
+              mobileSearch
+            );
 
-          return (
-            matchesStatus &&
-            matchesOrderNumber &&
-            matchesMobile
-          );
-        }
-      );
+        return (
+          matchesStatus &&
+          matchesOrderNumber &&
+          matchesMobile
+        );
+      }
+    );
   }
 
   selectStatus(
@@ -381,6 +380,10 @@ export class B2cOrdersPage
       case 'Ready Order':
 
         return 'READY_ORDER';
+
+      case 'Delivered':
+
+        return 'DELIVERED';
 
       case 'Cancelled':
 
@@ -485,7 +488,8 @@ export class B2cOrdersPage
             response
           );
 
-          this.actionLoading = false;
+          this.actionLoading =
+            false;
         },
 
         error: (
@@ -528,7 +532,8 @@ export class B2cOrdersPage
             response
           );
 
-          this.actionLoading = false;
+          this.actionLoading =
+            false;
         },
 
         error: (
@@ -567,12 +572,9 @@ export class B2cOrdersPage
             B2COrder
         ) => {
 
-          this.orders =
-            this.orders.filter(
-              existingOrder =>
-                existingOrder.id !==
-                response.id
-            );
+          this.updateLocalOrder(
+            response
+          );
 
           this.actionLoading =
             false;
@@ -618,7 +620,8 @@ export class B2cOrdersPage
             response
           );
 
-          this.actionLoading = false;
+          this.actionLoading =
+            false;
         },
 
         error: (
@@ -664,7 +667,8 @@ export class B2cOrdersPage
       return;
     }
 
-    this.actionLoading = true;
+    this.actionLoading =
+      true;
 
     this.apiService
       .getSettlementById(
@@ -677,7 +681,8 @@ export class B2cOrdersPage
             SettlementOrder
         ) => {
 
-          this.actionLoading = false;
+          this.actionLoading =
+            false;
 
           if (
             response.paymentStatus ===
@@ -1117,7 +1122,8 @@ export class B2cOrdersPage
       {
         queryParams: {
           mode: 'retag',
-          orderId: order.id
+          orderId:
+            order.id
         }
       }
     );
@@ -1557,90 +1563,79 @@ export class B2cOrdersPage
   }
 
   private updateLocalOrder(
-    response: B2COrder
+    response:
+      B2COrder
   ): void {
 
-    if (
-      response.status === 'DELIVERED'
-    ) {
-
-      this.orders = this.orders.filter(
-          order =>  order.id !== response.id
-        );
-
-      return;
-    }
-
     this.orders =
-      this.orders
-        .map(
-          (
-            order:
-              B2cOrderView
-          ) => {
+      this.orders.map(
+        (
+          order:
+            B2cOrderView
+        ) => {
 
-            if (
-              order.id !==
-                response.id
-            ) {
+          if (
+            order.id !==
+              response.id
+          ) {
 
-              return order;
-            }
-
-            return {
-              ...order,
-
-              orderNumber:
-                response.orderNumber,
-
-              customerName:
-                response.customerName,
-
-              mobile:
-                response.mobile,
-
-              amount:
-                Number(
-                  response.totalAmount
-                ),
-
-              pickupDate:
-                response.pickupDate ??
-                '-',
-
-              pickupSlot:
-                response.pickupTime ??
-                '-',
-
-              deliveryDate:
-                response.deliveryDate ??
-                '-',
-
-              deliverySlot:
-                response.deliveryTime ??
-                '-',
-
-              storageLabel:
-                response.storageLabel ??
-                '-',
-
-              homeDelivery:
-                response.homeDelivery,
-
-              settled:
-                response.settled,
-
-              status:
-                response.status,
-
-              updatedAt:
-                response.updatedAt,
-
-              moreOpen:
-                false
-            };
+            return order;
           }
-        );
+
+          return {
+            ...order,
+
+            orderNumber:
+              response.orderNumber,
+
+            customerName:
+              response.customerName,
+
+            mobile:
+              response.mobile,
+
+            amount:
+              Number(
+                response.totalAmount
+              ),
+
+            pickupDate:
+              response.pickupDate ??
+              '-',
+
+            pickupSlot:
+              response.pickupTime ??
+              '-',
+
+            deliveryDate:
+              response.deliveryDate ??
+              '-',
+
+            deliverySlot:
+              response.deliveryTime ??
+              '-',
+
+            storageLabel:
+              response.storageLabel ??
+              '-',
+
+            homeDelivery:
+              response.homeDelivery,
+
+            settled:
+              response.settled,
+
+            status:
+              response.status,
+
+            updatedAt:
+              response.updatedAt,
+
+            moreOpen:
+              false
+          };
+        }
+      );
   }
 
   private handleActionError(

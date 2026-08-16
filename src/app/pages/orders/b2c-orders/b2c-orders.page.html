@@ -1,6 +1,7 @@
 <div class="b2c-page">
 
   <div class="page-header">
+
     <div class="page-heading">
       <h1>B2C Orders</h1>
       <p>Manage processing, delivery and customer orders</p>
@@ -13,38 +14,52 @@
       (click)="loadOrders()">
       {{ loading ? 'Loading...' : 'Refresh' }}
     </button>
+
   </div>
 
   <section class="status-section">
+
     <div class="status-tabs">
 
       @for (status of statuses; track status) {
+
         <button
           type="button"
           class="status-tab"
           [class.active]="selectedStatus === status"
           (click)="selectStatus(status)">
+
           {{ status }}
+
         </button>
+
       }
 
     </div>
+
   </section>
 
   <section class="filter-section">
 
     <div class="filter-field">
-      <label>Order No.</label>
+
+      <label>
+        Order No.
+      </label>
 
       <input
         type="text"
         [(ngModel)]="orderNumberSearch"
         placeholder="LAUNDRY-0001"
         (keyup.enter)="searchOrders()">
+
     </div>
 
     <div class="filter-field">
-      <label>Mobile</label>
+
+      <label>
+        Mobile
+      </label>
 
       <input
         type="text"
@@ -52,40 +67,51 @@
         placeholder="Search mobile number"
         maxlength="10"
         (keyup.enter)="searchOrders()">
+
     </div>
 
     <button
       type="button"
       class="search-button"
       (click)="searchOrders()">
+
       Search
+
     </button>
 
     <button
       type="button"
       class="clear-button"
       (click)="clearFilters()">
+
       Clear
+
     </button>
 
   </section>
 
   @if (errorMessage) {
+
     <div class="error-message">
       {{ errorMessage }}
     </div>
+
   }
 
   <div class="result-info">
+
     <span>
       {{ filteredOrders.length }} orders found
     </span>
 
     @if (loading) {
+
       <span class="loading-text">
         Loading orders...
       </span>
+
     }
+
   </div>
 
   <section class="orders-table-wrapper">
@@ -93,6 +119,7 @@
     <table class="orders-table">
 
       <thead>
+
         <tr>
           <th class="actions-column">Actions</th>
           <th>Order No.</th>
@@ -108,6 +135,7 @@
           <th>Payment</th>
           <th>Amount</th>
         </tr>
+
       </thead>
 
       <tbody>
@@ -127,14 +155,18 @@
                     class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="processAtStore(order)">
+
                     Process At Store
+
                   </button>
 
                   <button
                     type="button"
                     class="action-button primary-action"
                     (click)="callCustomer(order)">
+
                     ☎ Call
+
                   </button>
 
                   <button
@@ -142,33 +174,44 @@
                     class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="tagOrder(order)">
+
                     ▣ Storage Label
+
                   </button>
 
                   <button
                     type="button"
                     class="action-button primary-action"
                     (click)="retagOrder(order)">
-                    ↻ RE-TAG
+
+                    ↻ Re-Tag
+
                   </button>
 
                 }
 
-                @if (order.status === 'PROCESSING_AT_STORE') {
+                @if (
+                  order.status ===
+                    'PROCESSING_AT_STORE'
+                ) {
 
                   <button
                     type="button"
                     class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="markReady(order)">
+
                     Mark Ready
+
                   </button>
 
                   <button
                     type="button"
                     class="action-button primary-action"
                     (click)="callCustomer(order)">
+
                     ☎ Call
+
                   </button>
 
                   <button
@@ -176,14 +219,18 @@
                     class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="tagOrder(order)">
+
                     ▣ Storage Label
+
                   </button>
 
                   <button
                     type="button"
                     class="action-button primary-action"
                     (click)="retagOrder(order)">
-                    ↻ RE-TAG
+
+                    ↻ Re-Tag
+
                   </button>
 
                 }
@@ -195,25 +242,62 @@
                     class="action-button primary-action"
                     [disabled]="actionLoading"
                     (click)="markDelivered(order)">
+
                     Mark Delivered
+
                   </button>
 
                   <button
                     type="button"
                     class="action-button primary-action"
                     (click)="callCustomer(order)">
+
                     ☎ Call
+
                   </button>
 
                   <button
                     type="button"
                     class="action-button primary-action"
-                    [disabled]="actionLoading"
                     (click)="retagOrder(order)">
-                    ↻ RE-TAG
+
+                    ↻ Re-Tag
+
                   </button>
 
                 }
+
+                
+
+                  <button
+                    type="button"
+                    class="action-button primary-action"
+                    (click)="viewOrder(order)">
+
+                    View
+
+                  </button>
+                  @if (order.status === 'DELIVERED') {
+                  <button
+                    type="button"
+                    class="action-button primary-action"
+                    (click)="billReceipt(order)">
+
+                    Bill Receipt
+
+                  </button>
+                }
+                  <button
+                    type="button"
+                    class="action-button whatsapp-action"
+                    [disabled]="actionLoading"
+                    (click)="sendReceiptWhatsApp(order)">
+
+                    WhatsApp Receipt
+
+                  </button>
+
+                
 
                 @if (order.status === 'CANCELLED') {
 
@@ -221,7 +305,9 @@
                     type="button"
                     class="action-button primary-action"
                     (click)="viewOrder(order)">
+
                     View
+
                   </button>
 
                 }
@@ -232,7 +318,9 @@
                     type="button"
                     class="more-button"
                     (click)="toggleMore(order)">
+
                     ⋮ More
+
                   </button>
 
                   @if (order.moreOpen) {
@@ -240,13 +328,16 @@
                     <div class="more-menu">
 
                       @if (
+                        order.status !== 'DELIVERED' &&
                         order.status !== 'CANCELLED'
                       ) {
 
                         <button
                           type="button"
                           (click)="reschedule(order)">
+
                           ↻ Reschedule
+
                         </button>
 
                       }
@@ -254,15 +345,35 @@
                       <button
                         type="button"
                         (click)="billReceipt(order)">
+
                         ▣ Bill Receipt
+
                       </button>
 
-                      @if (order.status !== 'CANCELLED') {
+                      @if (order.status === 'DELIVERED') {
+
+                        <button
+                          type="button"
+                          [disabled]="actionLoading"
+                          (click)="sendReceiptWhatsApp(order)">
+
+                          WhatsApp Receipt
+
+                        </button>
+
+                      }
+
+                      @if (
+                        order.status !== 'DELIVERED' &&
+                        order.status !== 'CANCELLED'
+                      ) {
 
                         <button
                           type="button"
                           (click)="updateStorageLabel(order)">
+
                           ▣ Storage Label
+
                         </button>
 
                       }
@@ -276,7 +387,9 @@
                         <button
                           type="button"
                           (click)="retagOrder(order)">
-                          ↻ RE-TAG
+
+                          ↻ Re-Tag
+
                         </button>
 
                       }
@@ -290,12 +403,15 @@
                           type="button"
                           [disabled]="actionLoading"
                           (click)="settleOrder(order)">
+
                           Settle Order
+
                         </button>
 
                       }
 
                       @if (
+                        order.status !== 'DELIVERED' &&
                         order.status !== 'CANCELLED'
                       ) {
 
@@ -304,7 +420,9 @@
                           class="danger-action"
                           [disabled]="actionLoading"
                           (click)="cancelOrder(order)">
+
                           Cancel Order
+
                         </button>
 
                       }
@@ -313,7 +431,9 @@
                         type="button"
                         class="view-order-action"
                         (click)="viewOrder(order)">
+
                         View Order
+
                       </button>
 
                     </div>
@@ -327,9 +447,11 @@
             </td>
 
             <td>
+
               <strong class="order-number">
                 {{ order.orderNumber }}
               </strong>
+
             </td>
 
             <td>
@@ -339,6 +461,7 @@
                 [class.status-new]="order.status === 'TAGGED'"
                 [class.status-processing]="order.status === 'PROCESSING_AT_STORE'"
                 [class.status-ready]="order.status === 'READY_ORDER'"
+                [class.status-delivered]="order.status === 'DELIVERED'"
                 [class.status-cancelled]="order.status === 'CANCELLED'">
 
                 {{ getStatusLabel(order.status) }}
@@ -348,9 +471,11 @@
             </td>
 
             <td>
+
               <strong class="customer-name">
                 {{ order.customerName }}
               </strong>
+
             </td>
 
             <td>
@@ -359,7 +484,9 @@
                 type="button"
                 class="mobile-link"
                 (click)="callCustomer(order)">
+
                 {{ order.mobile }}
+
               </button>
 
             </td>
@@ -377,12 +504,27 @@
 
               } @else {
 
-                <button
-                  type="button"
-                  class="add-storage-button"
-                  (click)="updateStorageLabel(order)">
-                  + Add Label
-                </button>
+                @if (
+                  order.status !== 'DELIVERED' &&
+                  order.status !== 'CANCELLED'
+                ) {
+
+                  <button
+                    type="button"
+                    class="add-storage-button"
+                    (click)="updateStorageLabel(order)">
+
+                    + Add Label
+
+                  </button>
+
+                } @else {
+
+                  <span>
+                    -
+                  </span>
+
+                }
 
               }
 
@@ -441,9 +583,11 @@
             </td>
 
             <td>
+
               <strong class="amount">
-                ₹{{ order.amount }}
+                ₹{{ formatAmount(order.amount) }}
               </strong>
+
             </td>
 
           </tr>
@@ -460,8 +604,15 @@
     ) {
 
       <div class="empty-orders">
-        <h3>No orders found</h3>
-        <p>Try changing the status or search filters.</p>
+
+        <h3>
+          No orders found
+        </h3>
+
+        <p>
+          Try changing the status or search filters.
+        </p>
+
       </div>
 
     }
@@ -472,8 +623,15 @@
     ) {
 
       <div class="empty-orders">
-        <h3>Loading orders...</h3>
-        <p>Please wait.</p>
+
+        <h3>
+          Loading orders...
+        </h3>
+
+        <p>
+          Please wait.
+        </p>
+
       </div>
 
     }
@@ -481,6 +639,7 @@
   </section>
 
 </div>
+
 
 @if (
   paymentModalOpen &&
@@ -514,7 +673,9 @@
           class="modal-close"
           [disabled]="actionLoading"
           (click)="closePaymentModal()">
+
           ×
+
         </button>
 
       </div>
@@ -524,19 +685,27 @@
         <div class="payment-order-info">
 
           <div>
-            <span>Customer</span>
+
+            <span>
+              Customer
+            </span>
 
             <strong>
               {{ selectedPaymentOrder.customerName }}
             </strong>
+
           </div>
 
           <div>
-            <span>Mobile</span>
+
+            <span>
+              Mobile
+            </span>
 
             <strong>
               {{ selectedPaymentOrder.mobile }}
             </strong>
+
           </div>
 
         </div>
@@ -544,6 +713,7 @@
         <div class="payment-summary">
 
           <div>
+
             <span>
               Total Amount
             </span>
@@ -553,9 +723,11 @@
                 selectedPaymentOrder.totalAmount
               ) }}
             </strong>
+
           </div>
 
           <div>
+
             <span>
               Already Paid
             </span>
@@ -565,18 +737,23 @@
                 selectedPaymentOrder.paidAmount
               ) }}
             </strong>
+
           </div>
 
           <div>
+
             <span>
               Balance
             </span>
 
             <strong class="balance-value">
+
               ₹{{ formatAmount(
                 selectedPaymentOrder.balanceAmount
               ) }}
+
             </strong>
+
           </div>
 
         </div>
@@ -593,7 +770,9 @@
               type="button"
               class="full-balance-button"
               (click)="setFullBalance()">
+
               Pay Full Balance
+
             </button>
 
           </div>
@@ -623,9 +802,11 @@
           </span>
 
           <strong>
+
             ₹{{ formatAmount(
               remainingAfterPayment
             ) }}
+
           </strong>
 
         </div>
@@ -648,11 +829,11 @@
                 class="payment-method-button"
                 [class.selected]="
                   selectedPaymentMethod ===
-                    method.value
+                  method.value
                 "
                 (click)="
                   selectedPaymentMethod =
-                    method.value
+                  method.value
                 ">
 
                 {{ method.label }}
@@ -681,7 +862,9 @@
         @if (paymentError) {
 
           <div class="payment-error">
+
             {{ paymentError }}
+
           </div>
 
         }
@@ -695,7 +878,9 @@
           class="cancel-button"
           [disabled]="actionLoading"
           (click)="closePaymentModal()">
+
           Cancel
+
         </button>
 
         <button
@@ -705,9 +890,13 @@
           (click)="addPayment()">
 
           @if (actionLoading) {
+
             Processing...
+
           } @else {
+
             Add Payment
+
           }
 
         </button>
