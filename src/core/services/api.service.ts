@@ -11,6 +11,12 @@ import {
   OrderResponse
 } from '../models/walk-in.model';
 
+
+import {
+  BulkProductResponse
+} from '../models/bulk-product.model';
+
+
 import {
   SalesReportResponse
 } from '../models/sales-report.model';
@@ -607,6 +613,24 @@ retagB2COrder(
         endDate
       }
     }
+  );
+}
+
+bulkUploadProductsPdf(
+  file: File
+): Observable<BulkProductResponse> {
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    'file',
+    file
+  );
+
+  return this.http.post<BulkProductResponse>(
+    `${this.baseUrl}/products/bulk/pdf`,
+    formData
   );
 }
 }

@@ -14,15 +14,29 @@
 
     </div>
 
-    <button
-      type="button"
-      class="primary-button"
-      [disabled]="loading"
-      (click)="addProduct()">
+    <div class="header-actions">
 
-      + Add Product
+      <button
+        type="button"
+        class="bulk-button"
+        [disabled]="loading || bulkLoading"
+        (click)="openBulkUpload()">
 
-    </button>
+        Bulk Upload
+
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        [disabled]="loading || bulkLoading"
+        (click)="addProduct()">
+
+        + Add Product
+
+      </button>
+
+    </div>
 
   </div>
 
@@ -821,6 +835,187 @@
                     ? 'Update Product'
                     : 'Save Product'
                 }}
+
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  @if (showBulkUpload) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeBulkUpload()">
+
+      <div
+        class="product-modal bulk-upload-modal"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+              Bulk Upload Products
+            </h2>
+
+            <p>
+              Upload your laundry price list PDF to create or update products automatically
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close"
+            [disabled]="bulkLoading"
+            (click)="closeBulkUpload()">
+
+            ×
+
+          </button>
+
+        </div>
+
+        <div class="product-form">
+
+          <div class="bulk-info-note">
+
+            <strong>
+              Upload Price List PDF
+            </strong>
+
+            <p>
+              The PDF will be read automatically and products, types, services and prices will be imported.
+            </p>
+
+          </div>
+
+          <div class="pdf-upload-section">
+
+            <input
+              #bulkPdfInput
+              type="file"
+              accept=".pdf,application/pdf"
+              class="pdf-file-input"
+              [disabled]="bulkLoading"
+              (change)="onBulkFileSelected($event)">
+
+            <button
+              type="button"
+              class="pdf-drop-zone"
+              [disabled]="bulkLoading"
+              (click)="bulkPdfInput.click()">
+
+              <span class="pdf-upload-icon">
+                📄
+              </span>
+
+              <strong>
+                Choose PDF File
+              </strong>
+
+              <span>
+                Select your laundry price list PDF
+              </span>
+
+              <small>
+                PDF only · Maximum 10 MB
+              </small>
+
+            </button>
+
+          </div>
+
+          @if (selectedBulkFile) {
+
+            <div class="selected-pdf-file">
+
+              <div class="selected-pdf-icon">
+                📄
+              </div>
+
+              <div class="selected-pdf-details">
+
+                <strong>
+                  {{ selectedBulkFile.name }}
+                </strong>
+
+                <span>
+                  {{ (selectedBulkFile.size / 1024 / 1024) | number:'1.2-2' }} MB
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="remove-pdf-button"
+                [disabled]="bulkLoading"
+                (click)="removeBulkFile()">
+
+                ×
+
+              </button>
+
+            </div>
+
+          }
+
+          @if (bulkErrorMessage) {
+
+            <div class="error-text">
+              {{ bulkErrorMessage }}
+            </div>
+
+          }
+
+          @if (bulkSuccessMessage) {
+
+            <div class="bulk-success-text">
+              {{ bulkSuccessMessage }}
+            </div>
+
+          }
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              [disabled]="bulkLoading"
+              (click)="closeBulkUpload()">
+
+              Cancel
+
+            </button>
+
+            <button
+              type="button"
+              class="save-button"
+              [disabled]="
+                bulkLoading ||
+                !selectedBulkFile
+              "
+              (click)="submitBulkUpload()">
+
+              @if (bulkLoading) {
+
+                Uploading...
+
+              } @else {
+
+                Upload Products
 
               }
 

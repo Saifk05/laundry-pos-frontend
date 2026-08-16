@@ -3,10 +3,17 @@ import {
   OnInit
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  CommonModule
+} from '@angular/common';
 
-import { ApiService } from '../../../../../src/core/services/api.service';
+import {
+  FormsModule
+} from '@angular/forms';
+
+import {
+  ApiService
+} from '../../../../core/services/api.service';
 
 import {
   PricingUnit,
@@ -15,6 +22,10 @@ import {
   ProductRequest,
   ProductTypeRequest
 } from '../../../../core/models/product.model';
+
+import {
+  BulkProductResponse
+} from '../../../../core/models/bulk-product.model';
 
 
 interface ProductServiceForm {
@@ -47,62 +58,96 @@ interface ProductFormData {
     FormsModule
   ]
 })
-export class ServicesPage implements OnInit {
+export class ServicesPage
+  implements OnInit {
 
   search = '';
 
   selectedUnit:
-    'ALL' | PricingUnit = 'ALL';
+    'ALL' | PricingUnit =
+      'ALL';
 
   loading = false;
 
+  bulkLoading = false;
+
   showProductForm = false;
 
-  editingProductId: string | null = null;
+  showBulkUpload = false;
+
+  editingProductId:
+    string | null =
+      null;
 
   errorMessage = '';
 
   successMessage = '';
 
-  products: Product[] = [];
+  bulkErrorMessage = '';
+
+  bulkSuccessMessage = '';
+
+  selectedBulkFile: File | null = null;
+
+  products:
+    Product[] =
+      [];
+
+  expandedProducts =
+    new Set<string>();
 
 
-  readonly productIcons: string[] = [
-    '👕',
-    '👖',
-    '👗',
-    '🥻',
-    '🧥',
-    '🧦',
-    '🧺',
-    '🛏️',
-    '👟',
-    '🧣',
-    '👚',
-    '🩳'
-  ];
+  readonly productIcons:
+    string[] = [
+      '👕',
+      '👖',
+      '👗',
+      '🥻',
+      '🧥',
+      '🧦',
+      '🧺',
+      '🛏️',
+      '👟',
+      '🧣',
+      '👚',
+      '🩳'
+    ];
 
 
-  productForm: ProductFormData = {
-    name: '',
-    icon: '',
-    unit: 'PC',
-    types: [
-      {
-        name: '',
-        services: [
-          {
-            name: '',
-            price: null
-          }
-        ]
-      }
-    ]
-  };
+  productForm:
+    ProductFormData = {
+
+      name:
+        '',
+
+      icon:
+        '',
+
+      unit:
+        'PC',
+
+      types: [
+        {
+          name:
+            '',
+
+          services: [
+            {
+              name:
+                '',
+
+              price:
+                null
+            }
+          ]
+        }
+      ]
+    };
 
 
   constructor(
-    private readonly apiService: ApiService
+    private readonly apiService:
+      ApiService
   ) {}
 
 
@@ -112,31 +157,34 @@ export class ServicesPage implements OnInit {
   }
 
 
-  /* =========================================
-     LOAD PRODUCTS
-  ========================================= */
-
   loadProducts(): void {
 
-    this.loading = true;
+    this.loading =
+      true;
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
     this.apiService
       .getProducts()
       .subscribe({
 
         next: (
-          response: ProductListResponse
+          response:
+            ProductListResponse
         ) => {
 
           this.products =
             response.products ?? [];
 
-          this.loading = false;
+          this.loading =
+            false;
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            any
+        ) => {
 
           console.error(
             'Failed to load products:',
@@ -145,55 +193,58 @@ export class ServicesPage implements OnInit {
 
           this.errorMessage =
             error?.error?.message ||
+            error?.error?.error ||
             'Failed to load products';
 
-          this.loading = false;
+          this.loading =
+            false;
         }
 
       });
   }
 
 
-  /* =========================================
-     FILTER PRODUCTS
-  ========================================= */
-
-  get filteredProducts(): Product[] {
+  get filteredProducts():
+    Product[] {
 
     const searchValue =
       this.search
         .trim()
         .toLowerCase();
 
-    return this.products.filter(
-      (product: Product) => {
+    return this.products
+      .filter(
+        (
+          product:
+            Product
+        ) => {
 
-        const matchesSearch =
-          !searchValue ||
-          product.name
-            .toLowerCase()
-            .includes(searchValue);
+          const matchesSearch =
+            !searchValue ||
+            product.name
+              .toLowerCase()
+              .includes(
+                searchValue
+              );
 
-        const matchesUnit =
-          this.selectedUnit === 'ALL' ||
-          product.unit ===
-            this.selectedUnit;
+          const matchesUnit =
+            this.selectedUnit ===
+              'ALL' ||
+            product.unit ===
+              this.selectedUnit;
 
-        return (
-          matchesSearch &&
-          matchesUnit
-        );
-      }
-    );
+          return (
+            matchesSearch &&
+            matchesUnit
+          );
+        }
+      );
   }
 
 
-  /* =========================================
-     UNIT FILTER
-  ========================================= */
-
   selectUnit(
-    unit: 'ALL' | PricingUnit
+    unit:
+      'ALL' | PricingUnit
   ): void {
 
     this.selectedUnit =
@@ -201,53 +252,37 @@ export class ServicesPage implements OnInit {
   }
 
 
-  /* =========================================
-     ADD PRODUCT
-  ========================================= */
-
   addProduct(): void {
 
-    this.editingProductId = null;
+    this.editingProductId =
+      null;
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.successMessage = '';
+    this.successMessage =
+      '';
 
-    this.productForm = {
-      name: '',
-      icon: '',
-      unit: 'PC',
-      types: [
-        {
-          name: '',
-          services: [
-            {
-              name: '',
-              price: null
-            }
-          ]
-        }
-      ]
-    };
+    this.resetProductForm();
 
-    this.showProductForm = true;
+    this.showProductForm =
+      true;
   }
 
 
-  /* =========================================
-     EDIT PRODUCT
-  ========================================= */
-
   editProduct(
-    product: Product
+    product:
+      Product
   ): void {
 
     this.editingProductId =
       product.id;
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.successMessage = '';
+    this.successMessage =
+      '';
 
     this.productForm = {
 
@@ -276,27 +311,31 @@ export class ServicesPage implements OnInit {
 
                   price:
                     service.price
-
                 })
               )
-
           })
         )
-
     };
 
 
     if (
-      this.productForm.types.length === 0
+      this.productForm
+        .types
+        .length === 0
     ) {
 
       this.productForm.types = [
         {
-          name: '',
+          name:
+            '',
+
           services: [
             {
-              name: '',
-              price: null
+              name:
+                '',
+
+              price:
+                null
             }
           ]
         }
@@ -304,12 +343,14 @@ export class ServicesPage implements OnInit {
     }
 
 
-    this.showProductForm = true;
+    this.showProductForm =
+      true;
   }
 
 
   selectProductIcon(
-    icon: string
+    icon:
+      string
   ): void {
 
     this.productForm.icon =
@@ -317,86 +358,103 @@ export class ServicesPage implements OnInit {
   }
 
 
-  /* =========================================
-     ADD PRODUCT TYPE
-  ========================================= */
-
   addType(): void {
 
-    this.productForm.types.push({
-      name: '',
-      services: [
-        {
-          name: '',
-          price: null
-        }
-      ]
-    });
-  }
+    this.productForm
+      .types
+      .push({
 
+        name:
+          '',
 
-  /* =========================================
-     REMOVE PRODUCT TYPE
-  ========================================= */
-
-  removeType(
-    typeIndex: number
-  ): void {
-
-    this.productForm.types.splice(
-      typeIndex,
-      1
-    );
-
-
-    if (
-      this.productForm.types.length === 0
-    ) {
-
-      this.productForm.types.push({
-        name: '',
         services: [
           {
-            name: '',
-            price: null
+            name:
+              '',
+
+            price:
+              null
           }
         ]
       });
+  }
+
+
+  removeType(
+    typeIndex:
+      number
+  ): void {
+
+    this.productForm
+      .types
+      .splice(
+        typeIndex,
+        1
+      );
+
+
+    if (
+      this.productForm
+        .types
+        .length === 0
+    ) {
+
+      this.productForm
+        .types
+        .push({
+
+          name:
+            '',
+
+          services: [
+            {
+              name:
+                '',
+
+              price:
+                null
+            }
+          ]
+        });
     }
   }
 
 
-  /* =========================================
-     ADD SERVICE TO TYPE
-  ========================================= */
-
   addServiceRow(
-    typeIndex: number
+    typeIndex:
+      number
   ): void {
 
     this.productForm
-      .types[typeIndex]
+      .types[
+        typeIndex
+      ]
       .services
       .push({
-        name: '',
-        price: null
+
+        name:
+          '',
+
+        price:
+          null
       });
   }
 
 
-  /* =========================================
-     REMOVE SERVICE FROM TYPE
-  ========================================= */
-
   removeServiceRow(
-    typeIndex: number,
-    serviceIndex: number
+    typeIndex:
+      number,
+    serviceIndex:
+      number
   ): void {
 
     const services =
       this.productForm
-        .types[typeIndex]
+        .types[
+          typeIndex
+        ]
         .services;
+
 
     services.splice(
       serviceIndex,
@@ -409,172 +467,53 @@ export class ServicesPage implements OnInit {
     ) {
 
       services.push({
-        name: '',
-        price: null
+
+        name:
+          '',
+
+        price:
+          null
       });
     }
   }
 
-
-  /* =========================================
-     CLOSE POPUP
-  ========================================= */
 
   closeProductForm(): void {
 
-    this.showProductForm = false;
+    this.showProductForm =
+      false;
 
-    this.editingProductId = null;
+    this.editingProductId =
+      null;
 
-    this.productForm = {
-      name: '',
-      icon: '',
-      unit: 'PC',
-      types: [
-        {
-          name: '',
-          services: [
-            {
-              name: '',
-              price: null
-            }
-          ]
-        }
-      ]
-    };
+    this.resetProductForm();
   }
 
 
-  /* =========================================
-     SAVE PRODUCT
-  ========================================= */
-
   saveProduct(): void {
 
-    const productName =
-      this.productForm
-        .name
-        .trim();
+    const request =
+      this.buildProductRequest();
 
 
-    if (!productName) {
-
-      this.errorMessage =
-        'Product name is required';
+    if (
+      !request
+    ) {
 
       return;
     }
 
 
-    const validTypes:
-      ProductTypeRequest[] = [];
+    this.errorMessage =
+      '';
 
-
-    for (
-      const type of
-      this.productForm.types
-    ) {
-
-      const typeName =
-        type.name.trim();
-
-
-      if (!typeName) {
-
-        this.errorMessage =
-          'Product type name is required';
-
-        return;
-      }
-
-
-      const validServices =
-        type.services
-          .filter(
-            service =>
-              service.name.trim() &&
-              service.price !== null &&
-              Number(service.price) >= 0
-          );
-
-
-      if (
-        validServices.length === 0
-      ) {
-
-        this.errorMessage =
-          `At least one service is required for ${typeName}`;
-
-        return;
-      }
-
-
-      validTypes.push({
-
-        name:
-          typeName,
-
-        services:
-          validServices.map(
-            service => ({
-
-              name:
-                service.name
-                  .trim(),
-
-              price:
-                Number(
-                  service.price
-                )
-
-            })
-          )
-
-      });
-    }
+    this.successMessage =
+      '';
 
 
     if (
-      validTypes.length === 0
-    ) {
-
-      this.errorMessage =
-        'At least one product type is required';
-
-      return;
-    }
-
-
-    const request:
-      ProductRequest = {
-
-      name:
-        productName,
-
-      icon:
-        this.productForm.icon.trim()
-          ? this.productForm.icon.trim()
-          : null,
-
-      unit:
-        this.productForm.unit,
-
-      active:
-        true,
-
-      types:
-        validTypes
-
-    };
-
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
-
-    if (
-      this.editingProductId !== null
+      this.editingProductId !==
+      null
     ) {
 
       this.updateProduct(
@@ -592,23 +531,158 @@ export class ServicesPage implements OnInit {
   }
 
 
-  /* =========================================
-     CREATE PRODUCT
-  ========================================= */
+  private buildProductRequest():
+    ProductRequest | null {
+
+    const productName =
+      this.productForm
+        .name
+        .trim();
+
+
+    if (
+      !productName
+    ) {
+
+      this.errorMessage =
+        'Product name is required';
+
+      return null;
+    }
+
+
+    const validTypes:
+      ProductTypeRequest[] =
+      [];
+
+
+    for (
+      const type of
+      this.productForm.types
+    ) {
+
+      const typeName =
+        type.name
+          .trim();
+
+
+      if (
+        !typeName
+      ) {
+
+        this.errorMessage =
+          'Product type name is required';
+
+        return null;
+      }
+
+
+      const validServices =
+        type.services
+          .filter(
+            service =>
+              service.name
+                .trim() &&
+              service.price !==
+                null &&
+              Number(
+                service.price
+              ) >= 0
+          );
+
+
+      if (
+        validServices.length ===
+        0
+      ) {
+
+        this.errorMessage =
+          `At least one service is required for ${typeName}`;
+
+        return null;
+      }
+
+
+      validTypes.push({
+
+        name:
+          typeName,
+
+        services:
+          validServices
+            .map(
+              service => ({
+
+                name:
+                  service.name
+                    .trim(),
+
+                price:
+                  Number(
+                    service.price
+                  )
+              })
+            )
+      });
+    }
+
+
+    if (
+      validTypes.length ===
+      0
+    ) {
+
+      this.errorMessage =
+        'At least one product type is required';
+
+      return null;
+    }
+
+
+    return {
+
+      name:
+        productName,
+
+      icon:
+        this.productForm
+          .icon
+          .trim()
+          ? this.productForm
+              .icon
+              .trim()
+          : null,
+
+      unit:
+        this.productForm.unit,
+
+      active:
+        true,
+
+      types:
+        validTypes
+    };
+  }
+
 
   private createProduct(
-    request: ProductRequest
+    request:
+      ProductRequest
   ): void {
 
-    this.loading = true;
+    this.loading =
+      true;
 
 
     this.apiService
-      .createProduct(request)
+      .createProduct(
+        request
+      )
       .subscribe({
 
         next: (
-          product: Product
+          product:
+            Product
         ) => {
 
           this.products = [
@@ -616,7 +690,8 @@ export class ServicesPage implements OnInit {
             ...this.products
           ];
 
-          this.loading = false;
+          this.loading =
+            false;
 
           this.successMessage =
             'Product created successfully';
@@ -624,7 +699,10 @@ export class ServicesPage implements OnInit {
           this.closeProductForm();
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            any
+        ) => {
 
           console.error(
             'Failed to create product:',
@@ -633,25 +711,26 @@ export class ServicesPage implements OnInit {
 
           this.errorMessage =
             error?.error?.message ||
+            error?.error?.error ||
             'Failed to create product';
 
-          this.loading = false;
+          this.loading =
+            false;
         }
 
       });
   }
 
 
-  /* =========================================
-     UPDATE PRODUCT
-  ========================================= */
-
   private updateProduct(
-    productId: string,
-    request: ProductRequest
+    productId:
+      string,
+    request:
+      ProductRequest
   ): void {
 
-    this.loading = true;
+    this.loading =
+      true;
 
 
     this.apiService
@@ -662,19 +741,22 @@ export class ServicesPage implements OnInit {
       .subscribe({
 
         next: (
-          updatedProduct: Product
+          updatedProduct:
+            Product
         ) => {
 
           this.products =
-            this.products.map(
-              product =>
-                product.id ===
-                updatedProduct.id
-                  ? updatedProduct
-                  : product
-            );
+            this.products
+              .map(
+                product =>
+                  product.id ===
+                  updatedProduct.id
+                    ? updatedProduct
+                    : product
+              );
 
-          this.loading = false;
+          this.loading =
+            false;
 
           this.successMessage =
             'Product updated successfully';
@@ -682,7 +764,10 @@ export class ServicesPage implements OnInit {
           this.closeProductForm();
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            any
+        ) => {
 
           console.error(
             'Failed to update product:',
@@ -691,26 +776,282 @@ export class ServicesPage implements OnInit {
 
           this.errorMessage =
             error?.error?.message ||
+            error?.error?.error ||
             'Failed to update product';
 
-          this.loading = false;
+          this.loading =
+            false;
         }
 
       });
   }
 
 
-  /* =========================================
-     DEACTIVATE PRODUCT
-  ========================================= */
+  openBulkUpload(): void {
 
-  deleteProduct(
-    product: Product
+    this.showBulkUpload =
+      true;
+
+    this.selectedBulkFile =
+      null;
+
+    this.bulkErrorMessage =
+      '';
+
+    this.bulkSuccessMessage =
+      '';
+  }
+
+
+  closeBulkUpload(): void {
+
+    if (
+      this.bulkLoading
+    ) {
+
+      return;
+    }
+
+    this.showBulkUpload =
+      false;
+
+    this.selectedBulkFile =
+      null;
+
+    this.bulkErrorMessage =
+      '';
+
+    this.bulkSuccessMessage =
+      '';
+  }
+
+
+  onBulkFileSelected(
+    event:
+      Event
   ): void {
 
-    this.errorMessage = '';
+    const input =
+      event.target as
+        HTMLInputElement;
 
-    this.successMessage = '';
+    const file =
+      input.files?.[0];
+
+    if (
+      !file
+    ) {
+
+      return;
+    }
+
+    this.bulkErrorMessage =
+      '';
+
+    this.bulkSuccessMessage =
+      '';
+
+    const isPdf =
+      file.type ===
+        'application/pdf' ||
+      file.name
+        .toLowerCase()
+        .endsWith(
+          '.pdf'
+        );
+
+    if (
+      !isPdf
+    ) {
+
+      this.selectedBulkFile =
+        null;
+
+      this.bulkErrorMessage =
+        'Please select a PDF file';
+
+      input.value =
+        '';
+
+      return;
+    }
+
+    const maxSize =
+      10 * 1024 * 1024;
+
+    if (
+      file.size >
+      maxSize
+    ) {
+
+      this.selectedBulkFile =
+        null;
+
+      this.bulkErrorMessage =
+        'PDF file size cannot exceed 10 MB';
+
+      input.value =
+        '';
+
+      return;
+    }
+
+    this.selectedBulkFile =
+      file;
+  }
+
+
+  removeBulkFile(): void {
+
+    if (
+      this.bulkLoading
+    ) {
+
+      return;
+    }
+
+    this.selectedBulkFile =
+      null;
+
+    this.bulkErrorMessage =
+      '';
+
+    this.bulkSuccessMessage =
+      '';
+  }
+
+
+submitBulkUpload(): void {
+
+  if (
+    !this.selectedBulkFile
+  ) {
+
+    this.bulkErrorMessage =
+      'Please select a PDF file';
+
+    return;
+  }
+
+  this.bulkLoading =
+    true;
+
+  this.bulkErrorMessage =
+    '';
+
+  this.bulkSuccessMessage =
+    '';
+
+  this.apiService
+    .bulkUploadProductsPdf(
+      this.selectedBulkFile
+    )
+    .subscribe({
+
+      next: (
+        response:
+          BulkProductResponse
+      ) => {
+
+        this.bulkLoading =
+          false;
+
+        this.bulkSuccessMessage =
+          `${response.totalProducts} products processed. ${response.createdProducts} created and ${response.updatedProducts} updated.`;
+
+        this.products =
+          this.mergeBulkProducts(
+            response.products
+          );
+
+        this.selectedBulkFile =
+          null;
+
+        setTimeout(
+          () => {
+
+            this.closeBulkUpload();
+
+          },
+          700
+        );
+      },
+
+      error: (
+        error:
+          any
+      ) => {
+
+        console.error(
+          'PDF bulk upload failed:',
+          error
+        );
+
+        this.bulkErrorMessage =
+          error?.error?.message ||
+          error?.error?.error ||
+          'PDF bulk upload failed';
+
+        this.bulkLoading =
+          false;
+      }
+
+    });
+}
+
+
+  private mergeBulkProducts(
+    uploadedProducts:
+      Product[]
+  ): Product[] {
+
+    const productMap =
+      new Map<
+        string,
+        Product
+      >();
+
+
+    for (
+      const product of
+      this.products
+    ) {
+
+      productMap.set(
+        product.id,
+        product
+      );
+    }
+
+
+    for (
+      const product of
+      uploadedProducts ?? []
+    ) {
+
+      productMap.set(
+        product.id,
+        product
+      );
+    }
+
+
+    return Array.from(
+      productMap.values()
+    );
+  }
+
+
+  deleteProduct(
+    product:
+      Product
+  ): void {
+
+    this.errorMessage =
+      '';
+
+    this.successMessage =
+      '';
 
 
     this.apiService
@@ -722,22 +1063,27 @@ export class ServicesPage implements OnInit {
         next: () => {
 
           this.products =
-            this.products.map(
-              item =>
-                item.id ===
-                product.id
-                  ? {
-                      ...item,
-                      active: false
-                    }
-                  : item
-            );
+            this.products
+              .map(
+                item =>
+                  item.id ===
+                  product.id
+                    ? {
+                        ...item,
+                        active:
+                          false
+                      }
+                    : item
+              );
 
           this.successMessage =
             'Product deactivated successfully';
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            any
+        ) => {
 
           console.error(
             'Failed to deactivate product:',
@@ -746,6 +1092,7 @@ export class ServicesPage implements OnInit {
 
           this.errorMessage =
             error?.error?.message ||
+            error?.error?.error ||
             'Failed to deactivate product';
         }
 
@@ -753,12 +1100,9 @@ export class ServicesPage implements OnInit {
   }
 
 
-  /* =========================================
-     MANAGE PRODUCT
-  ========================================= */
-
   manageServices(
-    product: Product
+    product:
+      Product
   ): void {
 
     this.editProduct(
@@ -767,26 +1111,21 @@ export class ServicesPage implements OnInit {
   }
 
 
-  /* =========================================
-     UNIT LABEL
-  ========================================= */
-
   getUnitLabel(
-    product: Product
+    product:
+      Product
   ): string {
 
-    return product.unit === 'KG'
+    return product.unit ===
+      'KG'
       ? 'Per KG'
       : 'Per Piece';
   }
 
 
-  /* =========================================
-     CHECK DEFAULT TYPE
-  ========================================= */
-
   isDefaultType(
-    typeName: string
+    typeName:
+      string
   ): boolean {
 
     return typeName
@@ -795,40 +1134,44 @@ export class ServicesPage implements OnInit {
       'default';
   }
 
-    expandedProducts =
-    new Set<string>();
-
 
   isProductExpanded(
-    productId: string
+    productId:
+      string
   ): boolean {
 
-    return this.expandedProducts.has(
-      productId
-    );
+    return this.expandedProducts
+      .has(
+        productId
+      );
   }
 
 
   toggleProductDetails(
-    productId: string
+    productId:
+      string
   ): void {
 
     if (
-      this.expandedProducts.has(
-        productId
-      )
+      this.expandedProducts
+        .has(
+          productId
+        )
     ) {
 
-      this.expandedProducts.delete(
-        productId
-      );
+      this.expandedProducts
+        .delete(
+          productId
+        );
 
     } else {
 
-      this.expandedProducts.add(
-        productId
-      );
+      this.expandedProducts
+        .add(
+          productId
+        );
     }
+
 
     this.expandedProducts =
       new Set(
@@ -836,13 +1179,46 @@ export class ServicesPage implements OnInit {
       );
   }
 
-  /* =========================================
-     REFRESH
-  ========================================= */
 
   refresh(): void {
 
     this.loadProducts();
+  }
+
+
+  private resetProductForm():
+    void {
+
+    this.productForm = {
+
+      name:
+        '',
+
+      icon:
+        '',
+
+      unit:
+        'PC',
+
+      types: [
+        {
+
+          name:
+            '',
+
+          services: [
+            {
+
+              name:
+                '',
+
+              price:
+                null
+            }
+          ]
+        }
+      ]
+    };
   }
 
 }
