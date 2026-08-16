@@ -12,6 +12,11 @@ import {
 } from '../models/walk-in.model';
 
 import {
+  BusinessSettings,
+  BusinessSettingsRequest
+} from '../models/business-settings.model';
+
+import {
   BillListResponse
 } from '../models/bill.model';
 
@@ -563,4 +568,24 @@ retagB2COrder(
     request
   );
 }
+
+ getBusinessSettings():
+    Observable<BusinessSettings> {
+
+    return this.http.get<BusinessSettings>(
+      `${this.baseUrl}/settings`
+    );
+  }
+
+
+  updateBusinessSettings(
+    request:
+      BusinessSettingsRequest
+  ): Observable<BusinessSettings> {
+
+    return this.http.put<BusinessSettings>(
+      `${this.baseUrl}/settings`,
+      request
+    );
+  }
 }

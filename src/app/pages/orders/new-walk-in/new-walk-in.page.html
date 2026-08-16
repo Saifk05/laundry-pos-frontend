@@ -313,44 +313,23 @@
 
           <div class="delivery-control">
 
-            <input
-              type="date"
-              [(ngModel)]="deliveryDate"
-              [min]="minimumDeliveryDate"
-              aria-label="Delivery Date">
-
-          </div>
-
-        </div>
-
-
-        <div class="delivery-option-row">
-
-          <div class="delivery-option-icon">
-            ◷
-          </div>
-
-          <div class="delivery-control">
-
             <select
-              [(ngModel)]="deliveryTime"
-              aria-label="Delivery Timeslot">
+              [(ngModel)]="deliveryDate"
+              aria-label="Delivery Date">
 
               <option
                 value=""
                 disabled>
-
-                Delivery Timeslot
-
+                Delivery Date
               </option>
 
               @for (
-                slot of deliveryTimeSlots;
-                track slot
+                date of deliveryDateOptions;
+                track date.value
               ) {
 
-                <option [value]="slot">
-                  {{ slot }}
+                <option [value]="date.value">
+                  {{ date.label }}
                 </option>
 
               }

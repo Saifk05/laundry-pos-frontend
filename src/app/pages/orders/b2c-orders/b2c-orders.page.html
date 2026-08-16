@@ -39,7 +39,7 @@
 
   </section>
 
-  <section class="filter-section">
+  <!-- <section class="filter-section">
 
     <div class="filter-field">
 
@@ -88,7 +88,72 @@
 
     </button>
 
-  </section>
+  </section> -->
+
+  <section class="filter-section">
+
+  <div class="filter-field">
+
+    <label>
+      Order No.
+    </label>
+
+    <input
+      type="text"
+      [(ngModel)]="orderNumberSearch"
+      placeholder="LAUNDRY-0001"
+      (keyup.enter)="searchOrders()">
+
+  </div>
+
+  <div class="filter-field">
+
+    <label>
+      Customer Name
+    </label>
+
+    <input
+      type="text"
+      [(ngModel)]="customerNameSearch"
+      placeholder="Search customer name"
+      (keyup.enter)="searchOrders()">
+
+  </div>
+
+  <div class="filter-field">
+
+    <label>
+      Mobile
+    </label>
+
+    <input
+      type="text"
+      [(ngModel)]="mobileSearch"
+      placeholder="Search mobile number"
+      maxlength="10"
+      (keyup.enter)="searchOrders()">
+
+  </div>
+
+  <button
+    type="button"
+    class="search-button"
+    (click)="searchOrders()">
+
+    Search
+
+  </button>
+
+  <button
+    type="button"
+    class="clear-button"
+    (click)="clearFilters()">
+
+    Clear
+
+  </button>
+
+</section>
 
   @if (errorMessage) {
 
@@ -896,6 +961,141 @@
           } @else {
 
             Add Payment
+
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+@if (
+  readyStorageModalOpen &&
+  selectedReadyOrder
+) {
+
+  <div
+    class="modal-overlay"
+    (click)="closeReadyStorageModal()">
+
+    <div
+      class="payment-modal storage-ready-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            Storage Label
+          </h2>
+
+          <p>
+            {{ selectedReadyOrder.orderNumber }}
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          [disabled]="actionLoading"
+          (click)="closeReadyStorageModal()">
+
+          ×
+
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div class="payment-order-info">
+
+          <div>
+
+            <span>
+              Customer
+            </span>
+
+            <strong>
+              {{ selectedReadyOrder.customerName }}
+            </strong>
+
+          </div>
+
+          <div>
+
+            <span>
+              Mobile
+            </span>
+
+            <strong>
+              {{ selectedReadyOrder.mobile }}
+            </strong>
+
+          </div>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Storage Label
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="readyStorageLabel"
+            placeholder="Enter storage label"
+            [disabled]="actionLoading"
+            (keyup.enter)="confirmMarkReady()">
+
+        </div>
+
+        @if (readyStorageError) {
+
+          <div class="payment-error">
+            {{ readyStorageError }}
+          </div>
+
+        }
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="cancel-button"
+          [disabled]="actionLoading"
+          (click)="closeReadyStorageModal()">
+
+          Cancel
+
+        </button>
+
+        <button
+          type="button"
+          class="confirm-button"
+          [disabled]="
+            actionLoading ||
+            !readyStorageLabel.trim()
+          "
+          (click)="confirmMarkReady()">
+
+          @if (actionLoading) {
+
+            Processing...
+
+          } @else {
+
+            Mark Ready
 
           }
 

@@ -1,23 +1,31 @@
 <div class="sidebar">
 
-  <!-- =========================================
-       PROFILE
-  ========================================== -->
-
   <div class="sidebar-profile">
 
     <div class="profile-avatar">
-      <ion-icon name="person"></ion-icon>
+
+      @if (settings.logoUrl) {
+
+        <img
+          [src]="settings.logoUrl"
+          alt="Business Logo">
+
+      } @else {
+
+        <ion-icon name="person"></ion-icon>
+
+      }
+
     </div>
 
     <div class="profile-info">
 
       <strong class="profile-name">
-        Admin
+        {{ settings.adminName || 'Admin' }}
       </strong>
 
       <span class="profile-code">
-        Laundry
+        {{ settings.adminSubtitle || 'Laundry' }}
       </span>
 
       <div class="profile-rating">
@@ -34,10 +42,6 @@
 
   </div>
 
-
-  <!-- =========================================
-       MENU
-  ========================================== -->
 
   <nav class="sidebar-menu">
 
@@ -109,7 +113,7 @@
 
     <!-- SETTLEMENT -->
 
-    <a
+    <!-- <a
       routerLink="/app/settlement"
       routerLinkActive="active"
       class="menu-item">
@@ -120,7 +124,7 @@
         Settlement
       </span>
 
-    </a>
+    </a> -->
 
 
     <!-- BILL -->

@@ -1,7 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
-import { SidebarComponent } from '../sidebar/sidebar.component';
+import {
+  RouterOutlet
+} from '@angular/router';
+
+import {
+  SidebarComponent
+} from '../sidebar/sidebar.component';
+
+import {
+  BusinessSettings
+} from '../../../core/models/business-settings.model';
+
+import {
+  BusinessSettingsService
+} from '../../../core/services/business-settings.service';
+
 
 @Component({
   selector: 'app-app-layout',
@@ -13,10 +30,53 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
     SidebarComponent
   ]
 })
-export class AppLayoutComponent implements OnInit {
+export class AppLayoutComponent
+  implements OnInit {
 
-  constructor() {}
+  settings:
+    BusinessSettings = {
+
+      id: 0,
+
+      businessName:
+        'Venkateshwara Fabric Works',
+
+      headerSubtitle:
+        'Operations',
+
+      adminName:
+        'Admin',
+
+      adminSubtitle:
+        'Laundry',
+
+      logoUrl:
+        null
+    };
+
+
+  constructor(
+    private readonly businessSettingsService:
+      BusinessSettingsService
+  ) {}
+
 
   ngOnInit(): void {
+
+    this.businessSettingsService
+      .settings$
+      .subscribe(
+        (
+          settings:
+            BusinessSettings | null
+        ) => {
+
+          if (settings) {
+
+            this.settings =
+              settings;
+          }
+        }
+      );
   }
 }

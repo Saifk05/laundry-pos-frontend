@@ -1,5 +1,11 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  Component
+} from '@angular/core';
+
+import {
+  Router
+} from '@angular/router';
+
 
 @Component({
   selector: 'app-inventory',
@@ -9,25 +15,41 @@ import { Router } from '@angular/router';
 })
 export class InventoryComponent {
 
+
   constructor(
-    private readonly router: Router
+    private readonly router:
+      Router
   ) {}
 
+
   openServices(): void {
+
     this.router.navigateByUrl(
       '/app/inventory/services'
     );
   }
 
+
   openCoupons(): void {
+
     this.router.navigateByUrl(
       '/app/inventory/coupons'
     );
   }
 
+
   openExtraCharges(): void {
+
     this.router.navigateByUrl(
       '/app/inventory/extra-charges'
+    );
+  }
+
+
+  openAdminPanel(): void {
+
+    this.router.navigateByUrl(
+      '/app/inventory/admin-panel'
     );
   }
 }

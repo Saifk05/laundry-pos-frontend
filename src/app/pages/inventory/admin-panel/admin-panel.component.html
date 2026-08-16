@@ -1,0 +1,178 @@
+<div class="admin-panel-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Admin Panel
+      </h1>
+
+      <p>
+        Manage business information and application branding
+      </p>
+
+    </div>
+
+  </div>
+
+
+  @if (loading) {
+
+    <div class="loading-state">
+      Loading settings...
+    </div>
+
+  } @else {
+
+    <div class="settings-card">
+
+      <div class="section-header">
+
+        <h2>
+          Business Settings
+        </h2>
+
+        <p>
+          These details will appear across the application.
+        </p>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label>
+            Business Name
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="businessName"
+            placeholder="Enter business name">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Header Subtitle
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="headerSubtitle"
+            placeholder="Operations">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Admin Name
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="adminName"
+            placeholder="Admin">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Admin Subtitle
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="adminSubtitle"
+            placeholder="Laundry">
+
+        </div>
+
+
+        <div class="form-group full-width">
+
+          <label>
+            Logo URL
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="logoUrl"
+            placeholder="https://example.com/logo.png">
+
+        </div>
+
+      </div>
+
+
+      @if (logoUrl.trim()) {
+
+        <div class="logo-preview">
+
+          <span>
+            Logo Preview
+          </span>
+
+          <div class="preview-box">
+
+            <img
+              [src]="logoUrl"
+              alt="Business Logo">
+
+          </div>
+
+        </div>
+
+      }
+
+
+      @if (errorMessage) {
+
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+
+      }
+
+
+      @if (successMessage) {
+
+        <div class="success-message">
+          {{ successMessage }}
+        </div>
+
+      }
+
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="save-button"
+          [disabled]="saving"
+          (click)="saveSettings()">
+
+          {{
+            saving
+              ? 'Saving...'
+              : 'Save Changes'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

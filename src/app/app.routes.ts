@@ -70,6 +70,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'inventory/admin-panel',
+        loadComponent: () =>
+          import('./pages/inventory/admin-panel/admin-panel.component')
+            .then((m) => m.AdminPanelComponent),
+      },
+
+      {
         path: 'inventory/services',
         loadComponent: () =>
           import('./pages/inventory/services/services.page')

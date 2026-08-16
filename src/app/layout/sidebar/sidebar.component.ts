@@ -1,13 +1,20 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
 import {
   RouterLink,
   RouterLinkActive
 } from '@angular/router';
 
-import { IonIcon } from '@ionic/angular/standalone';
+import {
+  IonIcon
+} from '@ionic/angular/standalone';
 
-import { addIcons } from 'ionicons';
+import {
+  addIcons
+} from 'ionicons';
 
 import {
   homeOutline,
@@ -20,8 +27,18 @@ import {
   checkmarkDoneOutline,
   receiptOutline,
   cardOutline,
-  cubeOutline
+  cubeOutline,
+  person
 } from 'ionicons/icons';
+
+import {
+  BusinessSettings
+} from '../../../core/models/business-settings.model';
+
+import {
+  BusinessSettingsService
+} from '../../../core/services/business-settings.service';
+
 
 @Component({
   selector: 'app-sidebar',
@@ -34,9 +51,35 @@ import {
     IonIcon
   ]
 })
-export class SidebarComponent {
+export class SidebarComponent
+  implements OnInit {
 
-  constructor() {
+  settings:
+    BusinessSettings = {
+
+      id: 0,
+
+      businessName:
+        '',
+
+      headerSubtitle:
+        '',
+
+      adminName:
+        'Admin',
+
+      adminSubtitle:
+        'Laundry',
+
+      logoUrl:
+        null
+    };
+
+
+  constructor(
+    private readonly businessSettingsService:
+      BusinessSettingsService
+  ) {
 
     addIcons({
       homeOutline,
@@ -49,7 +92,31 @@ export class SidebarComponent {
       checkmarkDoneOutline,
       receiptOutline,
       cardOutline,
-      cubeOutline
+      cubeOutline,
+      person
     });
+  }
+
+
+  ngOnInit(): void {
+
+    this.businessSettingsService
+      .settings$
+      .subscribe(
+        (
+          settings:
+            BusinessSettings | null
+        ) => {
+
+          if (settings) {
+
+            this.settings =
+              settings;
+          }
+        }
+      );
+
+    this.businessSettingsService
+      .loadSettings();
   }
 }

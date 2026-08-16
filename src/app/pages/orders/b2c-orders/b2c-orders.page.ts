@@ -1,11 +1,8 @@
 import {
-  Component,
-  OnInit
+  Component,OnInit 
 } from '@angular/core';
 
-import {
-  FormsModule
-} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import {
   Router
@@ -68,6 +65,8 @@ export class B2cOrdersPage
 
   selectedStatus = 'All';
 
+  customerNameSearch = '';
+
   orderNumberSearch = '';
 
   mobileSearch = '';
@@ -124,6 +123,17 @@ export class B2cOrdersPage
         value: 'OTHER'
       }
     ];
+
+  readyStorageModalOpen = false;
+
+  selectedReadyOrder:
+    B2cOrderView | null =
+      null;
+
+  readyStorageLabel = '';
+
+  readyStorageError = '';
+
 
   constructor(
     private readonly apiService:
@@ -258,55 +268,57 @@ export class B2cOrdersPage
     };
   }
 
-  get filteredOrders():
-    B2cOrderView[] {
+get filteredOrders(): B2cOrderView[] {
 
-    return this.orders.filter(
-      (
-        order:
-          B2cOrderView
-      ) => {
+  return this.orders.filter(
+    (order: B2cOrderView) => {
 
-        const matchesStatus =
-          this.selectedStatus ===
-            'All' ||
-          this.getStatusLabel(
-            order.status
-          ) ===
-            this.selectedStatus;
+      const matchesStatus =
+        this.selectedStatus === 'All' ||
+        this.getStatusLabel(order.status) ===
+          this.selectedStatus;
 
-        const orderSearch =
-          this.orderNumberSearch
-            .trim()
-            .toLowerCase();
+      const orderSearch =
+        this.orderNumberSearch
+          .trim()
+          .toLowerCase();
 
-        const mobileSearch =
-          this.mobileSearch
-            .trim();
+      const customerSearch =
+        this.customerNameSearch
+          .trim()
+          .toLowerCase();
 
-        const matchesOrderNumber =
-          !orderSearch ||
-          order.orderNumber
-            .toLowerCase()
-            .includes(
-              orderSearch
-            );
+      const mobileSearch =
+        this.mobileSearch
+          .trim();
 
-        const matchesMobile =
-          !mobileSearch ||
-          order.mobile
-            .includes(
-              mobileSearch
-            );
+      const matchesOrderNumber =
+        !orderSearch ||
+        order.orderNumber
+          .toLowerCase()
+          .includes(orderSearch);
 
-        return (
-          matchesStatus &&
-          matchesOrderNumber &&
-          matchesMobile
+      const matchesCustomerName =
+        !customerSearch ||
+        (order.customerName ?? '')
+          .toLowerCase()
+          .includes(customerSearch);
+
+      const matchesMobile =
+        !mobileSearch ||
+        order.mobile.includes(
+          mobileSearch
         );
-      }
-    );
-  }
+
+      return (
+        matchesStatus &&
+        matchesOrderNumber &&
+        matchesCustomerName &&
+        matchesMobile
+      );
+    }
+  );
+}
 
   selectStatus(
     status:
@@ -321,12 +333,18 @@ export class B2cOrdersPage
     this.loadOrders();
   }
 
-  searchOrders(): void {
+searchOrders(): void {
 
-    this.closeAllMoreMenus();
+  this.closeAllMoreMenus();
 
-    this.loadOrders();
+  if (
+    this.customerNameSearch.trim()
+  ) {
+    return;
   }
+
+  this.loadOrders();
+}
 
   clearFilters(): void {
 
@@ -338,6 +356,8 @@ export class B2cOrdersPage
 
     this.mobileSearch =
       '';
+    
+    this.customerNameSearch = '';  
 
     this.closeAllMoreMenus();
 
@@ -511,29 +531,148 @@ export class B2cOrdersPage
       B2cOrderView
   ): void {
 
-    this.errorMessage = '';
-
-    this.actionLoading = true;
-
     this.closeAllMoreMenus();
 
+    this.errorMessage = '';
+
+    this.readyStorageError = '';
+
+    this.selectedReadyOrder =
+      order;
+
+    this.readyStorageLabel =
+      order.storageLabel &&
+      order.storageLabel !== '-'
+        ? order.storageLabel
+        : '';
+
+    this.readyStorageModalOpen =
+      true;
+  }
+
+
+  closeReadyStorageModal():
+    void {
+
+    if (
+      this.actionLoading
+    ) {
+
+      return;
+    }
+
+    this.readyStorageModalOpen =
+      false;
+
+    this.selectedReadyOrder =
+      null;
+
+    this.readyStorageLabel =
+      '';
+
+    this.readyStorageError =
+      '';
+  }
+
+
+  confirmMarkReady():
+    void {
+
+    if (
+      !this.selectedReadyOrder
+    ) {
+
+      return;
+    }
+
+    const storageLabel =
+      this.readyStorageLabel
+        .trim();
+
+    if (
+      !storageLabel
+    ) {
+
+      this.readyStorageError =
+        'Storage label is required';
+
+      return;
+    }
+
+    this.readyStorageError =
+      '';
+
+    this.errorMessage =
+      '';
+
+    this.actionLoading =
+      true;
+
+    const orderId =
+      this.selectedReadyOrder.id;
+
     this.apiService
-      .markB2COrderReady(
-        order.id
+      .updateB2CStorageLabel(
+        orderId,
+        storageLabel
       )
       .subscribe({
 
         next: (
-          response:
+          storageResponse:
             B2COrder
         ) => {
 
           this.updateLocalOrder(
-            response
+            storageResponse
           );
 
-          this.actionLoading =
-            false;
+          this.apiService
+            .markB2COrderReady(
+              orderId
+            )
+            .subscribe({
+
+              next: (
+                readyResponse:
+                  B2COrder
+              ) => {
+
+                this.updateLocalOrder(
+                  readyResponse
+                );
+
+                this.actionLoading =
+                  false;
+
+                this.readyStorageModalOpen =
+                  false;
+
+                this.selectedReadyOrder =
+                  null;
+
+                this.readyStorageLabel =
+                  '';
+
+                this.readyStorageError =
+                  '';
+              },
+
+              error: (
+                error:
+                  any
+              ) => {
+
+                this.actionLoading =
+                  false;
+
+                this.readyStorageError =
+                  error?.error?.message ||
+                  error?.error?.error ||
+                  'Storage label saved, but unable to mark order ready';
+              }
+
+            });
         },
 
         error: (
@@ -541,10 +680,13 @@ export class B2cOrdersPage
             any
         ) => {
 
-          this.handleActionError(
-            error,
-            'Unable to mark order ready'
-          );
+          this.actionLoading =
+            false;
+
+          this.readyStorageError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to update storage label';
         }
 
       });
@@ -1619,11 +1761,9 @@ export class B2cOrdersPage
               response.storageLabel ??
               '-',
 
-            homeDelivery:
-              response.homeDelivery,
+            homeDelivery:response.homeDelivery,
 
-            settled:
-              response.settled,
+            settled:response.settled,
 
             status:
               response.status,
@@ -1638,20 +1778,11 @@ export class B2cOrdersPage
       );
   }
 
-  private handleActionError(
-    error:
-      any,
-    fallbackMessage:
-      string
-  ): void {
+  private handleActionError(error: any, fallbackMessage:string ): void {
 
-    console.error(
-      fallbackMessage,
-      error
-    );
+    console.error( fallbackMessage, error);
 
-    this.actionLoading =
-      false;
+    this.actionLoading = false;
 
     this.errorMessage =
       error?.error?.message ||
