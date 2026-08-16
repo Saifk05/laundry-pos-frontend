@@ -103,6 +103,12 @@ export const routes: Routes = [
           import('./pages/inventory/add-product/add-product.page')
             .then((m) => m.AddProductPage),
       },
+      {
+        path: 'sales-report',
+        loadComponent: () => 
+          import('./pages/sales-report/sales-report.page')
+            .then( m => m.SalesReportPage)
+      },
     ],
   },
 

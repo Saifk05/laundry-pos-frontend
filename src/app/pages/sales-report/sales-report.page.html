@@ -1,0 +1,1188 @@
+<div class="sales-report-page">
+
+  <div class="page-heading">
+
+    <div>
+
+      <h1>
+        Sales Report
+      </h1>
+
+      <p>
+        Monitor revenue, order performance, product sales and customer activity
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <section class="filter-bar">
+
+    <div class="date-range">
+
+      <div class="date-field">
+
+        <label>
+          From Date
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="startDate">
+
+      </div>
+
+
+      <span class="date-separator">
+        ~
+      </span>
+
+
+      <div class="date-field">
+
+        <label>
+          To Date
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="endDate">
+
+      </div>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+      <button
+        type="button"
+        (click)="setToday()">
+
+        Today
+
+      </button>
+
+
+      <button
+        type="button"
+        (click)="setYesterday()">
+
+        Yesterday
+
+      </button>
+
+
+      <button
+        type="button"
+        (click)="setThisWeek()">
+
+        This Week
+
+      </button>
+
+
+      <button
+        type="button"
+        (click)="setThisMonth()">
+
+        This Month
+
+      </button>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="refresh()">
+
+      @if (loading) {
+
+        Loading...
+
+      } @else {
+
+        ↻ Refresh
+
+      }
+
+    </button>
+
+  </section>
+
+
+  <section class="summary-grid">
+
+    <div class="summary-card highlight-card">
+
+      <div class="summary-label">
+        Net Sales
+      </div>
+
+      <strong>
+        ₹{{ formatAmount(summary.netSales) }}
+      </strong>
+
+      <span class="summary-meta">
+        Revenue after discounts and charges
+      </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Gross Sales
+      </div>
+
+      <strong>
+        ₹{{ formatAmount(summary.grossSales) }}
+      </strong>
+
+      <span class="summary-meta">
+        Before discounts
+      </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Total Orders
+      </div>
+
+      <strong>
+        {{ summary.totalOrders }}
+      </strong>
+
+      <span class="summary-meta">
+        {{ summary.completedOrders }} completed
+      </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Average Order Value
+      </div>
+
+      <strong>
+        ₹{{ formatAmount(summary.averageOrderValue) }}
+      </strong>
+
+      <span class="summary-meta">
+        Per order
+      </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Discounts
+      </div>
+
+      <strong>
+        ₹{{ formatAmount(
+          summary.discountAmount +
+          summary.couponDiscountAmount
+        ) }}
+      </strong>
+
+      <span class="summary-meta">
+        Manual + coupon discounts
+      </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Express Charges
+      </div>
+
+      <strong>
+        ₹{{ formatAmount(summary.expressAmount) }}
+      </strong>
+
+      <span class="summary-meta">
+        Additional express revenue
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <section class="secondary-summary-grid">
+
+    <div class="secondary-card">
+
+      <span>
+        Completed Orders
+      </span>
+
+      <strong>
+        {{ summary.completedOrders }}
+      </strong>
+
+    </div>
+
+
+    <div class="secondary-card danger-card">
+
+      <span>
+        Cancelled Orders
+      </span>
+
+      <strong>
+        {{ summary.cancelledOrders }}
+      </strong>
+
+    </div>
+
+
+    <div class="secondary-card">
+
+      <span>
+        Total Pieces
+      </span>
+
+      <strong>
+        {{ summary.totalPieces }} PC
+      </strong>
+
+    </div>
+
+
+    <div class="secondary-card">
+
+      <span>
+        Laundry Weight
+      </span>
+
+      <strong>
+        {{ summary.totalWeightKg }} KG
+      </strong>
+
+    </div>
+
+
+    <div class="secondary-card">
+
+      <span>
+        Express Orders
+      </span>
+
+      <strong>
+        {{ deliverySummary.expressOrders }}
+      </strong>
+
+    </div>
+
+
+    <div class="secondary-card">
+
+      <span>
+        Home Delivery
+      </span>
+
+      <strong>
+        {{ deliverySummary.homeDeliveryOrders }}
+      </strong>
+
+    </div>
+
+  </section>
+
+
+  <section class="report-section">
+
+    <div class="section-heading-row">
+
+      <div>
+
+        <h2>
+          Order Status Overview
+        </h2>
+
+        <p>
+          Current distribution of orders and sales value
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="status-summary-grid">
+
+      @for (
+        item of statusSummary;
+        track item.status
+      ) {
+
+        <button
+          type="button"
+          class="status-summary-card"
+          [class.selected]="selectedStatus === item.status"
+          (click)="selectStatus(item.status)">
+
+          <div class="status-card-top">
+
+            <span
+              class="status-dot"
+              [class.dot-tagged]="item.status === 'TAGGED'"
+              [class.dot-processing]="item.status === 'PROCESSING_AT_STORE'"
+              [class.dot-ready]="item.status === 'READY_ORDER'"
+              [class.dot-delivered]="item.status === 'DELIVERED'"
+              [class.dot-cancelled]="item.status === 'CANCELLED'">
+            </span>
+
+            <span>
+              {{ getStatusLabel(item.status) }}
+            </span>
+
+          </div>
+
+          <strong>
+            {{ item.count }}
+          </strong>
+
+          <small>
+            ₹{{ formatAmount(item.amount) }}
+          </small>
+
+        </button>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <section class="report-grid">
+
+    <div class="report-card">
+
+      <div class="report-card-header">
+
+        <div>
+
+          <h2>
+            Sales by Product
+          </h2>
+
+          <p>
+            Product contribution to total revenue
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="report-table">
+
+        <div class="report-table-header product-grid">
+
+          <span>
+            Product
+          </span>
+
+          <span>
+            Orders
+          </span>
+
+          <span>
+            Qty
+          </span>
+
+          <span>
+            Revenue
+          </span>
+
+          <span>
+            Share
+          </span>
+
+        </div>
+
+
+        @for (
+          product of productSales;
+          track product.productName
+        ) {
+
+          <div class="report-table-row product-grid">
+
+            <strong>
+              {{ product.productName }}
+            </strong>
+
+            <span>
+              {{ product.orders }}
+            </span>
+
+            <span>
+              {{ product.quantity }} {{ product.unit }}
+            </span>
+
+            <strong class="money-value">
+              ₹{{ formatAmount(product.revenue) }}
+            </strong>
+
+            <div class="share-cell">
+
+              <span>
+                {{ product.percentageOfSales }}%
+              </span>
+
+              <div class="share-track">
+
+                <div
+                  class="share-fill"
+                  [style.width.%]="product.percentageOfSales">
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="report-card">
+
+      <div class="report-card-header">
+
+        <div>
+
+          <h2>
+            Sales by Service
+          </h2>
+
+          <p>
+            Service-wise order and revenue performance
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="report-table">
+
+        <div class="report-table-header service-grid">
+
+          <span>
+            Service
+          </span>
+
+          <span>
+            Orders
+          </span>
+
+          <span>
+            Quantity
+          </span>
+
+          <span>
+            Revenue
+          </span>
+
+          <span>
+            Share
+          </span>
+
+        </div>
+
+
+        @for (
+          service of serviceSales;
+          track service.serviceName
+        ) {
+
+          <div class="report-table-row service-grid">
+
+            <strong>
+              {{ service.serviceName }}
+            </strong>
+
+            <span>
+              {{ service.orders }}
+            </span>
+
+            <span>
+              {{ service.quantity }}
+            </span>
+
+            <strong class="money-value">
+              ₹{{ formatAmount(service.revenue) }}
+            </strong>
+
+            <div class="share-cell">
+
+              <span>
+                {{ service.percentageOfSales }}%
+              </span>
+
+              <div class="share-track">
+
+                <div
+                  class="share-fill"
+                  [style.width.%]="service.percentageOfSales">
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="report-grid">
+
+    <div class="report-card">
+
+      <div class="report-card-header">
+
+        <div>
+
+          <h2>
+            Daily Sales Trend
+          </h2>
+
+          <p>
+            Revenue generated by day
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="daily-sales-list">
+
+        @for (
+          day of dailySales;
+          track day.date
+        ) {
+
+          <div class="daily-sales-row">
+
+            <div class="daily-date">
+
+              <strong>
+                {{ day.date | date:'dd MMM' }}
+              </strong>
+
+              <span>
+                {{ day.orders }} orders
+              </span>
+
+            </div>
+
+            <div class="daily-sales-values">
+
+              <div>
+
+                <span>
+                  Gross
+                </span>
+
+                <strong>
+                  ₹{{ formatAmount(day.grossSales) }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Discount
+                </span>
+
+                <strong>
+                  -₹{{ formatAmount(day.discountAmount) }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Express
+                </span>
+
+                <strong>
+                  +₹{{ formatAmount(day.expressAmount) }}
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Net
+                </span>
+
+                <strong class="money-value">
+                  ₹{{ formatAmount(day.netSales) }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="report-card">
+
+      <div class="report-card-header">
+
+        <div>
+
+          <h2>
+            Payment Mix
+          </h2>
+
+          <p>
+            Revenue distribution by payment method
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="payment-mix-list">
+
+        @for (
+          payment of paymentSummary;
+          track payment.method
+        ) {
+
+          <div class="payment-mix-row">
+
+            <div>
+
+              <strong>
+                {{ getPaymentMethodLabel(payment.method) }}
+              </strong>
+
+              <span>
+                {{ payment.count }} payments
+              </span>
+
+            </div>
+
+            <strong class="money-value">
+              ₹{{ formatAmount(payment.amount) }}
+            </strong>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <div class="delivery-breakdown">
+
+        <div class="delivery-breakdown-header">
+
+          <h3>
+            Delivery Breakdown
+          </h3>
+
+        </div>
+
+        <div class="delivery-breakdown-grid">
+
+          <div>
+
+            <span>
+              Normal
+            </span>
+
+            <strong>
+              {{ deliverySummary.normalOrders }}
+            </strong>
+
+          </div>
+
+          <div>
+
+            <span>
+              Express
+            </span>
+
+            <strong>
+              {{ deliverySummary.expressOrders }}
+            </strong>
+
+          </div>
+
+          <div>
+
+            <span>
+              Home Delivery
+            </span>
+
+            <strong>
+              {{ deliverySummary.homeDeliveryOrders }}
+            </strong>
+
+          </div>
+
+          <div>
+
+            <span>
+              Store Pickup
+            </span>
+
+            <strong>
+              {{ deliverySummary.storePickupOrders }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="report-card top-customers-card">
+
+    <div class="report-card-header">
+
+      <div>
+
+        <h2>
+          Top Customers
+        </h2>
+
+        <p>
+          Customers generating the highest sales
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="top-customers-list">
+
+      @for (
+        customer of topCustomers;
+        track customer.mobile;
+        let index = $index
+      ) {
+
+        <div class="top-customer-row">
+
+          <div class="customer-rank">
+            {{ index + 1 }}
+          </div>
+
+          <div class="customer-main">
+
+            <strong>
+              {{ customer.customerName }}
+            </strong>
+
+            <span>
+              {{ customer.mobile }}
+            </span>
+
+          </div>
+
+          <div class="customer-orders">
+
+            <span>
+              Orders
+            </span>
+
+            <strong>
+              {{ customer.orders }}
+            </strong>
+
+          </div>
+
+          <div class="customer-spent">
+
+            <span>
+              Total Spent
+            </span>
+
+            <strong>
+              ₹{{ formatAmount(customer.totalSpent) }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <section class="orders-section">
+
+    <div class="orders-section-header">
+
+      <div>
+
+        <h2>
+          Sales Orders
+        </h2>
+
+        <p>
+          Detailed order-level sales report
+        </p>
+
+      </div>
+
+
+      <div class="orders-tools">
+
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search order, customer or mobile">
+
+        <select
+          [(ngModel)]="selectedStatus">
+
+          <option value="ALL">
+            All Status
+          </option>
+
+          <option value="TAGGED">
+            Tagged
+          </option>
+
+          <option value="PROCESSING_AT_STORE">
+            Processing At Store
+          </option>
+
+          <option value="READY_ORDER">
+            Ready Order
+          </option>
+
+          <option value="DELIVERED">
+            Delivered
+          </option>
+
+          <option value="CANCELLED">
+            Cancelled
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="orders-result-info">
+
+      <span>
+        {{ filteredOrders.length }} orders
+      </span>
+
+      @if (selectedStatus !== 'ALL') {
+
+        <button
+          type="button"
+          (click)="selectStatus('ALL')">
+
+          Clear status filter
+
+        </button>
+
+      }
+
+    </div>
+
+
+    <div class="orders-table-wrapper">
+
+      <table class="orders-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Order No.
+            </th>
+
+            <th>
+              Customer
+            </th>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              Items
+            </th>
+
+            <th>
+              Subtotal
+            </th>
+
+            <th>
+              Discounts
+            </th>
+
+            <th>
+              Express
+            </th>
+
+            <th>
+              Total
+            </th>
+
+            <th>
+              Delivery
+            </th>
+
+            <th>
+              Payment
+            </th>
+
+            <th>
+              Status
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            order of filteredOrders;
+            track order.orderNumber
+          ) {
+
+            <tr>
+
+              <td>
+
+                <div class="order-number-cell">
+
+                  <strong class="order-number">
+                    {{ order.orderNumber }}
+                  </strong>
+
+                  @if (order.expressDelivery) {
+
+                    <span
+                      class="express-icon"
+                      title="Express Delivery">
+                      🚗💨
+                    </span>
+
+                  }
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <div class="customer-cell">
+
+                  <strong>
+                    {{ order.customerName }}
+                  </strong>
+
+                  <span>
+                    {{ order.mobile }}
+                  </span>
+
+                </div>
+
+              </td>
+
+              <td>
+                {{ order.date | date:'dd-MM-yyyy' }}
+              </td>
+
+              <td>
+                {{ order.itemCount }}
+              </td>
+
+              <td>
+                ₹{{ formatAmount(order.subtotal) }}
+              </td>
+
+              <td>
+                ₹{{ formatAmount(
+                  order.discountAmount +
+                  order.couponDiscountAmount
+                ) }}
+              </td>
+
+              <td>
+                ₹{{ formatAmount(order.expressAmount) }}
+              </td>
+
+              <td>
+
+                <strong class="money-value">
+                  ₹{{ formatAmount(order.totalAmount) }}
+                </strong>
+
+              </td>
+
+              <td>
+
+                @if (order.homeDelivery) {
+
+                  <span class="delivery-badge">
+                    Home
+                  </span>
+
+                } @else {
+
+                  <span class="pickup-badge">
+                    Store
+                  </span>
+
+                }
+
+              </td>
+
+              <td>
+
+                <div class="payment-cell">
+
+                  <strong>
+                    {{ getPaymentMethodLabel(
+                      order.paymentMethod
+                    ) }}
+                  </strong>
+
+                  <span
+                    [class.payment-paid]="
+                      order.paymentStatus === 'PAID'
+                    "
+                    [class.payment-partial]="
+                      order.paymentStatus === 'PARTIAL'
+                    "
+                    [class.payment-pending]="
+                      order.paymentStatus === 'PENDING'
+                    ">
+
+                    {{ getPaymentStatusLabel(
+                      order.paymentStatus
+                    ) }}
+
+                  </span>
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <span
+                  class="status-badge"
+                  [class.status-delivered]="
+                    order.status === 'DELIVERED'
+                  "
+                  [class.status-processing]="
+                    order.status === 'PROCESSING_AT_STORE'
+                  "
+                  [class.status-ready]="
+                    order.status === 'READY_ORDER'
+                  "
+                  [class.status-tagged]="
+                    order.status === 'TAGGED'
+                  "
+                  [class.status-cancelled]="
+                    order.status === 'CANCELLED'
+                  ">
+
+                  {{ getStatusLabel(order.status) }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+
+      @if (filteredOrders.length === 0) {
+
+        <div class="orders-empty">
+
+          <h3>
+            No sales orders found
+          </h3>
+
+          <p>
+            Try changing the status or search filter.
+          </p>
+
+        </div>
+
+      }
+
+    </div>
+
+  </section>
+
+</div>

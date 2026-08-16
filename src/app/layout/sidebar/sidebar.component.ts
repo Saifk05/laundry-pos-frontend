@@ -28,7 +28,8 @@ import {
   receiptOutline,
   cardOutline,
   cubeOutline,
-  person
+  person,
+  barChartOutline
 } from 'ionicons/icons';
 
 import {
@@ -93,6 +94,7 @@ export class SidebarComponent
       receiptOutline,
       cardOutline,
       cubeOutline,
+      barChartOutline,
       person
     });
   }
