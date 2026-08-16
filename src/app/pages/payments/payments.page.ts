@@ -12,6 +12,22 @@ import {
 } from '@angular/forms';
 
 import {
+  MatFormFieldModule
+} from '@angular/material/form-field';
+
+import {
+  MatInputModule
+} from '@angular/material/input';
+
+import {
+  MatDatepickerModule
+} from '@angular/material/datepicker';
+
+import {
+  MatNativeDateModule
+} from '@angular/material/core';
+
+import {
   ApiService
 } from '../../../core/services/api.service';
 
@@ -36,32 +52,35 @@ interface PaymentDayView
   styleUrls: ['./payments.page.scss'],
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ]
 })
 export class PaymentsPage
   implements OnInit {
 
-  /* =========================================
-     FILTERS
-  ========================================= */
+  startDate = '';
 
-  startDate =
-    '2026-08-01';
+  endDate = '';
 
-  endDate =
-    '2026-12-20';
+  rangeStart:
+    Date | null =
+      null;
 
+  rangeEnd:
+    Date | null =
+      null;
 
-  /* =========================================
-     STATE
-  ========================================= */
+  maxDate:
+    Date =
+      new Date();
 
-  loading =
-    false;
+  loading = false;
 
-  errorMessage =
-    '';
+  errorMessage = '';
 
   report:
     PaymentReportResponse | null =
@@ -78,19 +97,14 @@ export class PaymentsPage
   ) {}
 
 
-  /* =========================================
-     INIT
-  ========================================= */
-
   ngOnInit(): void {
 
-    this.loadPaymentReport();
+    this.maxDate =
+      this.getTodayDate();
+
+    this.setToday();
   }
 
-
-  /* =========================================
-     LOAD REPORT
-  ========================================= */
 
   loadPaymentReport(): void {
 
@@ -112,6 +126,24 @@ export class PaymentsPage
 
       this.errorMessage =
         'Start date cannot be after end date';
+
+      return;
+    }
+
+    const today =
+      this.formatLocalDate(
+        this.getTodayDate()
+      );
+
+    if (
+      this.startDate >
+      today ||
+      this.endDate >
+      today
+    ) {
+
+      this.errorMessage =
+        'Future dates cannot be selected';
 
       return;
     }
@@ -163,6 +195,12 @@ export class PaymentsPage
             error
           );
 
+          this.report =
+            null;
+
+          this.payments =
+            [];
+
           this.errorMessage =
             error?.error?.message ||
             error?.error?.error ||
@@ -176,9 +214,156 @@ export class PaymentsPage
   }
 
 
-  /* =========================================
-     TOTALS
-  ========================================= */
+  onDateRangeChange(): void {
+
+    if (
+      !this.rangeStart ||
+      !this.rangeEnd
+    ) {
+
+      return;
+    }
+
+    const today =
+      this.getTodayDate();
+
+    if (
+      this.rangeStart >
+      today ||
+      this.rangeEnd >
+      today
+    ) {
+
+      this.errorMessage =
+        'Future dates cannot be selected';
+
+      return;
+    }
+
+    if (
+      this.rangeStart >
+      this.rangeEnd
+    ) {
+
+      this.errorMessage =
+        'Start date cannot be after end date';
+
+      return;
+    }
+
+    this.startDate =
+      this.formatLocalDate(
+        this.rangeStart
+      );
+
+    this.endDate =
+      this.formatLocalDate(
+        this.rangeEnd
+      );
+
+    this.loadPaymentReport();
+  }
+
+
+  setToday(): void {
+
+    const today =
+      this.getTodayDate();
+
+    this.rangeStart =
+      new Date(
+        today
+      );
+
+    this.rangeEnd =
+      new Date(
+        today
+      );
+
+    this.startDate =
+      this.formatLocalDate(
+        today
+      );
+
+    this.endDate =
+      this.startDate;
+
+    this.loadPaymentReport();
+  }
+
+
+  setYesterday(): void {
+
+    const yesterday =
+      this.getTodayDate();
+
+    yesterday.setDate(
+      yesterday.getDate() - 1
+    );
+
+    this.rangeStart =
+      new Date(
+        yesterday
+      );
+
+    this.rangeEnd =
+      new Date(
+        yesterday
+      );
+
+    this.startDate =
+      this.formatLocalDate(
+        yesterday
+      );
+
+    this.endDate =
+      this.startDate;
+
+    this.loadPaymentReport();
+  }
+
+
+  private getTodayDate():
+    Date {
+
+    const now =
+      new Date();
+
+    return new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+  }
+
+
+  private formatLocalDate(
+    date:
+      Date
+  ): string {
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+    return `${year}-${month}-${day}`;
+  }
+
 
   get totalAmount():
     number {
@@ -230,10 +415,6 @@ export class PaymentsPage
   }
 
 
-  /* =========================================
-     ROW
-  ========================================= */
-
   toggleRow(
     payment:
       PaymentDayView
@@ -243,10 +424,6 @@ export class PaymentsPage
       !payment.expanded;
   }
 
-
-  /* =========================================
-     PAYMENT GROUP HELPERS
-  ========================================= */
 
   hasCashOrders(
     payment:
@@ -296,10 +473,6 @@ export class PaymentsPage
   }
 
 
-  /* =========================================
-     PAYMENT COUNT
-  ========================================= */
-
   getPaymentCount(
     payment:
       PaymentDayView
@@ -314,10 +487,6 @@ export class PaymentsPage
   }
 
 
-  /* =========================================
-     FORMAT MONEY
-  ========================================= */
-
   formatAmount(
     amount:
       number
@@ -331,10 +500,6 @@ export class PaymentsPage
   }
 
 
-  /* =========================================
-     ORDER DISPLAY
-  ========================================= */
-
   getOrderDisplay(
     order:
       PaymentReportOrder
@@ -343,10 +508,6 @@ export class PaymentsPage
     return order.orderNumber;
   }
 
-
-  /* =========================================
-     CALL CUSTOMER
-  ========================================= */
 
   callCustomer(
     order:
@@ -364,10 +525,6 @@ export class PaymentsPage
       `tel:${order.mobile}`;
   }
 
-
-  /* =========================================
-     REFRESH
-  ========================================= */
 
   refresh(): void {
 

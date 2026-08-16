@@ -39,6 +39,7 @@ interface B2cOrderView {
   deliverySlot: string;
   amount: number;
   homeDelivery: boolean;
+  expressDelivery: boolean;
   settled: boolean;
   createdAt: string;
   updatedAt: string;
@@ -251,20 +252,12 @@ export class B2cOrdersPage
           0
         ),
 
-      homeDelivery:
-        order.homeDelivery,
-
-      settled:
-        order.settled,
-
-      createdAt:
-        order.createdAt,
-
-      updatedAt:
-        order.updatedAt,
-
-      moreOpen:
-        false
+      homeDelivery:order.homeDelivery,
+      expressDelivery: order.expressDelivery,  
+      settled:order.settled,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      moreOpen:false
     };
   }
 
@@ -1727,20 +1720,12 @@ searchOrders(): void {
           return {
             ...order,
 
-            orderNumber:
-              response.orderNumber,
-
-            customerName:
-              response.customerName,
-
-            mobile:
-              response.mobile,
-
-            amount:
-              Number(
+            orderNumber:response.orderNumber,
+            customerName: response.customerName,
+            mobile:response.mobile,
+            amount:Number(
                 response.totalAmount
               ),
-
             pickupDate:
               response.pickupDate ??
               '-',
@@ -1757,22 +1742,14 @@ searchOrders(): void {
               response.deliveryTime ??
               '-',
 
-            storageLabel:
-              response.storageLabel ??
+            storageLabel: response.storageLabel ??
               '-',
-
             homeDelivery:response.homeDelivery,
-
+            expressDelivery: response.expressDelivery,
             settled:response.settled,
-
-            status:
-              response.status,
-
-            updatedAt:
-              response.updatedAt,
-
-            moreOpen:
-              false
+            status: response.status,
+            updatedAt: response.updatedAt,
+            moreOpen:false
           };
         }
       );

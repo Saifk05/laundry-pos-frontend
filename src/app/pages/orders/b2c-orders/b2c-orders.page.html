@@ -513,9 +513,25 @@
 
             <td>
 
-              <strong class="order-number">
-                {{ order.orderNumber }}
-              </strong>
+              <div class="order-number-cell">
+
+                <strong class="order-number">
+                  {{ order.orderNumber }}
+                </strong>
+
+                @if (order.expressDelivery) {
+
+                  <span
+                    class="express-delivery-icon"
+                    title="Express Delivery">
+
+                    🚗💨
+
+                  </span>
+
+                }
+
+              </div>
 
             </td>
 

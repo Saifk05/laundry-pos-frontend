@@ -27,37 +27,67 @@
 
   <section class="filter-bar">
 
-    <div class="date-range">
+<div class="date-range">
 
-      <div class="date-field">
+  <mat-form-field
+    appearance="outline"
+    class="material-date-range">
 
-        <label>
-          From Date
-        </label>
+    <mat-label>
+      Select date range
+    </mat-label>
 
-        <input
-          type="date"
-          [(ngModel)]="startDate">
+    <mat-date-range-input
+      [rangePicker]="picker">
 
-      </div>
+      <input
+        matStartDate
+        [(ngModel)]="rangeStart"
+        placeholder="Start date">
+
+      <input
+        matEndDate
+        [(ngModel)]="rangeEnd"
+        placeholder="End date"
+        (dateChange)="onDateRangeChange()">
+
+    </mat-date-range-input>
+
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="picker">
+    </mat-datepicker-toggle>
+
+    <mat-date-range-picker
+      #picker>
+    </mat-date-range-picker>
+
+  </mat-form-field>
+
+</div>
 
 
-      <span class="date-separator">
-        ~
-      </span>
+    <div class="quick-date-actions">
 
+      <button
+        type="button"
+        class="quick-date-button"
+        [disabled]="loading"
+        (click)="setToday()">
 
-      <div class="date-field">
+        Today
 
-        <label>
-          To Date
-        </label>
+      </button>
 
-        <input
-          type="date"
-          [(ngModel)]="endDate">
+      <button
+        type="button"
+        class="quick-date-button"
+        [disabled]="loading"
+        (click)="setYesterday()">
 
-      </div>
+        Yesterday
+
+      </button>
 
     </div>
 

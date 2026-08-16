@@ -4,63 +4,49 @@
   min-height: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .payments-page {
   width: 100%;
   min-height: 100%;
-
   padding: 22px;
-
   background: var(--app-background-soft);
   color: var(--app-text-primary);
 }
 
-
-/* =========================================
-   PAGE HEADING
-========================================= */
-
 .page-heading {
-  margin-bottom: 18px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 18px;
 }
 
 .page-heading h1 {
   margin: 0;
-
+  color: var(--app-text-primary);
   font-size: 28px;
   font-weight: 800;
-
-  color: var(--app-text-primary);
-
   letter-spacing: -0.03em;
 }
 
 .page-heading p {
   margin: 5px 0 0;
-
   color: var(--app-text-secondary);
-
   font-size: 13px;
+  font-weight: 500;
 }
 
-
-/* =========================================
-   FILTER BAR
-========================================= */
-
 .filter-bar {
+  width: 100%;
+  min-height: 74px;
   margin-bottom: 18px;
-
-  padding: 14px 16px;
+  padding: 12px 14px;
 
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
 
   border: 1px solid var(--app-border);
   border-radius: 12px;
@@ -70,108 +56,206 @@
 
 .date-range {
   display: flex;
-  align-items: flex-end;
-
-  gap: 12px;
+  align-items: center;
+  min-width: 300px;
 }
 
-.date-field {
-  display: flex;
-  flex-direction: column;
-
-  gap: 6px;
+.material-date-range {
+  width: 310px;
+  margin: 0;
 }
 
-.date-field label {
+:host ::ng-deep .material-date-range .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+:host ::ng-deep .material-date-range .mat-mdc-text-field-wrapper {
+  height: 46px;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: var(--app-surface);
+}
+
+:host ::ng-deep .material-date-range .mat-mdc-form-field-flex {
+  height: 46px;
+  align-items: center;
+}
+
+:host ::ng-deep .material-date-range .mat-mdc-form-field-infix {
+  min-height: 46px;
+  padding-top: 11px;
+  padding-bottom: 7px;
+}
+
+:host ::ng-deep .material-date-range input {
+  color: var(--app-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+:host ::ng-deep .material-date-range input::placeholder {
+  color: var(--app-text-muted);
+  opacity: 1;
+}
+
+:host ::ng-deep .material-date-range .mat-mdc-floating-label {
   color: var(--app-text-secondary);
-
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.date-field input {
-  width: 170px;
-  height: 40px;
+:host
+  ::ng-deep
+  .material-date-range
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .material-date-range
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .material-date-range
+  .mdc-notched-outline__trailing {
+  border-color: var(--app-border) !important;
+}
 
-  padding: 0 10px;
+:host
+  ::ng-deep
+  .material-date-range:hover
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .material-date-range:hover
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .material-date-range:hover
+  .mdc-notched-outline__trailing {
+  border-color: #9bc4aa !important;
+}
 
-  border: 1px solid var(--app-border);
+:host
+  ::ng-deep
+  .material-date-range.mat-focused
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .material-date-range.mat-focused
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .material-date-range.mat-focused
+  .mdc-notched-outline__trailing {
+  border-color: var(--app-primary) !important;
+  border-width: 1.5px !important;
+}
+
+:host ::ng-deep .material-date-range .mat-datepicker-toggle {
+  color: var(--app-primary-dark);
+}
+
+:host ::ng-deep .material-date-range .mat-datepicker-toggle button {
+  width: 34px;
+  height: 34px;
+}
+
+.quick-date-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-date-button,
+.refresh-button {
+  height: 42px;
+  padding: 0 16px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   border-radius: 8px;
 
-  background: var(--app-surface-soft);
-  color: var(--app-text-primary);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
 
-  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
 
-  outline: none;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
-.date-field input:focus {
-  border-color: var(--app-primary);
+.quick-date-button {
+  min-width: 92px;
+
+  border: 1px solid var(--app-border);
 
   background: var(--app-surface);
-
-  box-shadow:
-    0 0 0 3px rgba(22, 163, 74, 0.10);
+  color: var(--app-text-secondary);
 }
 
-.date-separator {
-  padding-bottom: 9px;
+.quick-date-button:hover:not(:disabled) {
+  border-color: var(--app-primary);
+  background: var(--app-primary-light);
+  color: var(--app-primary-dark);
+  transform: translateY(-1px);
+}
 
-  color: var(--app-text-muted);
-
-  font-size: 14px;
-  font-weight: 700;
+.quick-date-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .refresh-button {
-  height: 40px;
-
-  padding: 0 16px;
+  min-width: 96px;
+  margin-left: auto;
 
   border: 1px solid var(--app-primary);
-  border-radius: 8px;
 
   background: var(--app-primary);
-  color: var(--app-surface);
-
-  font-size: 11px;
-  font-weight: 800;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
+  color: #ffffff;
 }
 
-.refresh-button:hover {
+.refresh-button:hover:not(:disabled) {
   border-color: var(--app-primary-dark);
-
   background: var(--app-primary-dark);
+
+  box-shadow:
+    0 4px 10px rgba(22, 163, 74, 0.14);
+
+  transform: translateY(-1px);
 }
 
+.refresh-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.quick-date-button:disabled,
 .refresh-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
 }
-
-
-/* =========================================
-   ERROR
-========================================= */
 
 .payment-error {
+  width: 100%;
   margin-bottom: 16px;
-
-  padding: 10px 13px;
+  padding: 11px 13px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 
-  border: 1px solid #efb4b4;
+  border: 1px solid #f3b4b4;
   border-radius: 9px;
 
-  background: #fff4f4;
+  background: #fff5f5;
   color: var(--app-danger);
 
   font-size: 11px;
@@ -179,39 +263,34 @@
 }
 
 .payment-error button {
+  padding: 0;
   border: 0;
 
   background: transparent;
-  color: var(--app-danger);
+  color: inherit;
 
   font-size: 18px;
 
   cursor: pointer;
 }
 
-
-/* =========================================
-   SUMMARY
-========================================= */
-
 .payment-summary {
+  width: 100%;
   margin-bottom: 18px;
 
   display: grid;
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
-
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
 .summary-item {
-  min-height: 86px;
-
-  padding: 14px;
+  min-height: 92px;
+  padding: 15px 16px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 12px;
 
   border: 1px solid var(--app-border);
   border-radius: 12px;
@@ -219,21 +298,34 @@
   background: var(--app-surface);
 
   box-shadow:
-    0 3px 10px rgba(15, 23, 42, 0.04);
+    0 3px 12px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.summary-item:hover {
+  border-color: #c8ded0;
+
+  box-shadow:
+    0 6px 18px rgba(15, 23, 42, 0.06);
+
+  transform: translateY(-1px);
 }
 
 .summary-item span {
   color: var(--app-text-secondary);
-
   font-size: 11px;
   font-weight: 600;
 }
 
 .summary-item strong {
   color: var(--app-text-primary);
-
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .upi-summary {
@@ -244,12 +336,8 @@
   border-left: 4px solid var(--app-success);
 }
 
-
-/* =========================================
-   LOADING
-========================================= */
-
 .payments-loading {
+  width: 100%;
   min-height: 220px;
 
   display: flex;
@@ -260,17 +348,11 @@
   border-radius: 12px;
 
   background: var(--app-surface);
-
   color: var(--app-text-secondary);
 
   font-size: 12px;
   font-weight: 600;
 }
-
-
-/* =========================================
-   TABLE
-========================================= */
 
 .payments-table {
   width: 100%;
@@ -280,21 +362,31 @@
 
   background: var(--app-surface);
 
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: none;
+}
+
+.payments-table::-webkit-scrollbar {
+  display: none;
 }
 
 .table-header,
 .payment-row {
+  width: 100%;
+  min-width: 950px;
+
   display: grid;
 
   grid-template-columns:
     42px
     150px
-    1fr
-    1fr
-    1fr
-    1fr
-    1fr
+    minmax(110px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
     90px;
 
   align-items: center;
@@ -317,16 +409,17 @@
   font-weight: 800;
 
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .payment-row {
-  min-height: 52px;
+  min-height: 54px;
 
   border-bottom: 1px solid var(--app-border);
 
   cursor: pointer;
 
-  transition: 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .payment-row:hover {
@@ -363,19 +456,19 @@
 }
 
 .total-value {
-  color: var(--app-text-primary);
-
+  color: var(--app-primary-dark);
   font-weight: 800;
 }
 
 .payment-count {
-  min-width: 32px;
+  width: fit-content;
+  min-width: 34px;
+
+  padding: 5px 9px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  padding: 5px 8px;
 
   border-radius: 999px;
 
@@ -386,17 +479,12 @@
   font-weight: 800;
 }
 
-
-/* =========================================
-   EXPANDED DETAILS
-========================================= */
-
 .payment-details {
+  width: 100%;
   padding: 14px;
 
   display: flex;
   flex-direction: column;
-
   gap: 12px;
 
   border-bottom: 1px solid var(--app-border);
@@ -404,51 +492,43 @@
   background: var(--app-surface-soft);
 }
 
-
-/* =========================================
-   PAYMENT METHOD SECTION
-========================================= */
-
 .payment-method-section {
+  width: 100%;
+
   border: 1px solid var(--app-border);
   border-radius: 10px;
 
   background: var(--app-surface);
 
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: none;
+}
+
+.payment-method-section::-webkit-scrollbar {
+  display: none;
 }
 
 .method-header {
+  min-width: 720px;
   min-height: 46px;
-
   padding: 10px 14px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 14px;
 
   border-bottom: 1px solid var(--app-border);
-}
 
-.method-header > div {
-  display: flex;
-  flex-direction: column;
-
-  gap: 3px;
+  background: var(--app-surface);
 }
 
 .method-header strong {
+  color: var(--app-text-primary);
   font-size: 12px;
   font-weight: 800;
-}
-
-.method-header span {
-  color: var(--app-text-secondary);
-
-  font-size: 9px;
-  font-weight: 600;
 }
 
 .cash-header {
@@ -460,59 +540,37 @@
 }
 
 .card-header {
-  border-left: 4px solid var(--app-primary);
+  border-left: 4px solid #4f7cac;
 }
 
 .other-header {
   border-left: 4px solid var(--app-text-muted);
 }
 
-
-/* =========================================
-   METHOD EMPTY
-========================================= */
-
-.method-empty {
-  min-height: 48px;
-
-  padding: 0 14px;
-
-  display: flex;
-  align-items: center;
-
-  color: var(--app-text-muted);
-
-  font-size: 10px;
-}
-
-
-/* =========================================
-   ORDER PAYMENT LIST
-========================================= */
-
 .order-payment-list {
   width: 100%;
+  min-width: 720px;
 }
 
 .order-payment-row {
-  min-height: 54px;
-
+  width: 100%;
+  min-height: 56px;
   padding: 0 14px;
 
   display: grid;
 
   grid-template-columns:
-    minmax(180px, 1.3fr)
-    150px
+    minmax(180px, 1.5fr)
     minmax(120px, 1fr)
-    180px
-    110px;
+    minmax(180px, 1fr)
+    minmax(100px, 0.7fr);
 
   align-items: center;
-
-  gap: 12px;
+  gap: 16px;
 
   border-bottom: 1px solid var(--app-border);
+
+  transition: background 0.15s ease;
 }
 
 .order-payment-row:last-child {
@@ -523,31 +581,26 @@
   background: var(--app-background-soft);
 }
 
-
-/* =========================================
-   ORDER PAYMENT MAIN
-========================================= */
-
 .order-payment-main {
   min-width: 0;
 
   display: flex;
   flex-direction: column;
-
   gap: 3px;
 }
 
 .order-number {
   color: var(--app-primary-dark);
-
   font-size: 11px;
   font-weight: 800;
 }
 
 .customer-name {
+  max-width: 220px;
+
   color: var(--app-text-secondary);
 
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
 
   overflow: hidden;
@@ -555,12 +608,12 @@
   white-space: nowrap;
 }
 
-
-/* =========================================
-   MOBILE
-========================================= */
+.order-payment-mobile {
+  min-width: 0;
+}
 
 .order-payment-mobile button {
+  max-width: 100%;
   padding: 0;
 
   border: 0;
@@ -568,6 +621,7 @@
   background: transparent;
   color: var(--app-primary-dark);
 
+  font-family: inherit;
   font-size: 10px;
   font-weight: 700;
 
@@ -578,36 +632,14 @@
   text-decoration: underline;
 }
 
-
-/* =========================================
-   REFERENCE
-========================================= */
-
-.order-payment-reference {
-  color: var(--app-text-secondary);
-
-  font-size: 9px;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
-/* =========================================
-   TIME
-========================================= */
-
 .order-payment-time {
   color: var(--app-text-secondary);
 
-  font-size: 9px;
+  font-size: 10px;
+  font-weight: 500;
+
+  white-space: nowrap;
 }
-
-
-/* =========================================
-   AMOUNT
-========================================= */
 
 .order-payment-amount {
   color: var(--app-text-primary);
@@ -616,15 +648,13 @@
   font-weight: 800;
 
   text-align: right;
+
+  white-space: nowrap;
 }
-
-
-/* =========================================
-   EMPTY STATE
-========================================= */
 
 .payments-empty {
   min-height: 220px;
+  padding: 24px;
 
   display: flex;
   flex-direction: column;
@@ -651,66 +681,44 @@
   font-size: 10px;
 }
 
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
 @media (max-width: 1200px) {
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+
+  .refresh-button {
+    margin-left: auto;
+  }
 
   .payment-summary {
     grid-template-columns:
       repeat(3, minmax(0, 1fr));
   }
-
-  .payments-table {
-    overflow-x: auto;
-
-    scrollbar-width: none;
-  }
-
-  .payments-table::-webkit-scrollbar {
-    display: none;
-  }
-
-  .table-header,
-  .payment-row {
-    min-width: 1050px;
-  }
-
-  .order-payment-row {
-    min-width: 900px;
-  }
 }
 
-@media (max-width: 800px) {
-
+@media (max-width: 900px) {
   .payments-page {
-    padding: 14px;
+    padding: 16px;
   }
 
   .filter-bar {
-    flex-direction: column;
     align-items: stretch;
   }
 
   .date-range {
     width: 100%;
-
-    align-items: stretch;
-    flex-direction: column;
   }
 
-  .date-field input {
+  .material-date-range {
     width: 100%;
   }
 
-  .date-separator {
-    display: none;
+  .quick-date-actions {
+    flex: 1;
   }
 
-  .refresh-button {
-    width: 100%;
+  .quick-date-button {
+    flex: 1;
   }
 
   .payment-summary {
@@ -719,13 +727,64 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 650px) {
+  .payments-page {
+    padding: 12px;
+  }
+
+  .page-heading {
+    margin-bottom: 14px;
+  }
+
+  .page-heading h1 {
+    font-size: 24px;
+  }
+
+  .page-heading p {
+    font-size: 11px;
+  }
+
+  .filter-bar {
+    padding: 12px;
+    flex-direction: column;
+  }
+
+  .date-range {
+    min-width: 0;
+  }
+
+  .quick-date-actions {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-date-button {
+    width: 100%;
+  }
+
+  .refresh-button {
+    width: 100%;
+    margin-left: 0;
+  }
 
   .payment-summary {
     grid-template-columns: 1fr;
   }
 
+  .summary-item {
+    min-height: 82px;
+  }
+}
+
+@media (max-width: 420px) {
+  .quick-date-actions {
+    grid-template-columns: 1fr;
+  }
+
   .page-heading h1 {
-    font-size: 23px;
+    font-size: 22px;
   }
 }

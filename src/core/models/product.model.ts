@@ -2,11 +2,13 @@ export type PricingUnit =
   | 'PC'
   | 'KG';
 
+
 export interface ProductService {
   id: string;
   name: string;
   price: number;
 }
+
 
 export interface ProductType {
   id: string;
@@ -14,30 +16,37 @@ export interface ProductType {
   services: ProductService[];
 }
 
+
 export interface Product {
   id: string;
   name: string;
+  icon: string | null;
   unit: PricingUnit;
   active: boolean;
   types: ProductType[];
 }
+
 
 export interface ProductServiceRequest {
   name: string;
   price: number;
 }
 
+
 export interface ProductTypeRequest {
   name: string;
   services: ProductServiceRequest[];
 }
 
+
 export interface ProductRequest {
   name: string;
+  icon: string | null;
   unit: PricingUnit;
   active: boolean;
   types: ProductTypeRequest[];
 }
+
 
 export interface ProductListResponse {
   message: string;

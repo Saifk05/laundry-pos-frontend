@@ -217,3 +217,91 @@ ion-content::part(scroll)::-webkit-scrollbar {
     --app-font-size-4xl: 40px;
   }
 }
+
+.cdk-overlay-container {
+  position: fixed !important;
+  z-index: 10000 !important;
+}
+
+.cdk-overlay-pane {
+  z-index: 10000 !important;
+}
+
+.mat-datepicker-content {
+  background: #ffffff !important;
+  border: 1px solid #e2e8e4 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+
+  box-shadow:
+    0 12px 32px rgba(15, 23, 42, 0.16) !important;
+}
+
+.mat-datepicker-content .mat-calendar {
+  width: 300px !important;
+  height: 354px !important;
+  background: #ffffff !important;
+}
+
+.mat-datepicker-content .mat-calendar-header {
+  padding: 8px 8px 0 !important;
+}
+
+.mat-datepicker-content .mat-calendar-controls {
+  margin: 5% calc(4.7142857143% - 16px) !important;
+}
+
+.mat-datepicker-content .mat-calendar-period-button {
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+.mat-datepicker-content .mat-calendar-previous-button,
+.mat-datepicker-content .mat-calendar-next-button {
+  color: #1f2937 !important;
+}
+
+.mat-datepicker-content .mat-calendar-arrow {
+  fill: #1f2937 !important;
+}
+
+.mat-datepicker-content .mat-calendar-table-header th {
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-cell-content {
+  color: #1f2937 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-selected {
+  background-color: #16a34a !important;
+  color: #ffffff !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-today:not(
+  .mat-calendar-body-selected
+) {
+  border-color: #16a34a !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-in-range::before {
+  background: #dcfce7 !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-range-start::before {
+  left: 50% !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-range-end::before {
+  right: 50% !important;
+}
+
+.mat-datepicker-content
+  .mat-calendar-body-cell:hover
+  .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+  background: #ecfdf5 !important;
+}

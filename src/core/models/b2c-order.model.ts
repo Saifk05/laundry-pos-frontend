@@ -5,6 +5,7 @@ export type B2COrderStatus =
   | 'DELIVERED'
   | 'CANCELLED';
 
+
 export interface B2COrder {
   id: string;
 
@@ -27,6 +28,8 @@ export interface B2COrder {
   storageLabel: string | null;
 
   homeDelivery: boolean;
+
+  expressDelivery: boolean;
 
   settled: boolean;
 
@@ -113,6 +116,8 @@ export interface B2COrderDetails {
 
   couponCode: string | null;
 
+  expressDelivery: boolean;
+
   expressChargePercentage: number | null;
 
   expressChargeAmount: number;
@@ -142,10 +147,12 @@ export interface B2COrderDetails {
   message: string;
 }
 
+
 export interface RetagOrderItemRequest {
   orderItemId: string;
   quantity: number;
 }
+
 
 export interface RetagOrderRequest {
   items: RetagOrderItemRequest[];

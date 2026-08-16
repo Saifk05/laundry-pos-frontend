@@ -1121,3 +1121,12 @@
     bottom: 0;
   }
 }
+
+.express-delivery-icon {
+  display: inline-block;
+
+  font-size: 16px;
+  line-height: 1;
+
+  transform: scaleX(-1);
+}

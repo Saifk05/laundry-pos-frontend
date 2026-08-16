@@ -107,11 +107,14 @@
 
                 <div class="product-icon">
 
-                  @if (product.unit === 'KG') {
-                    ⚖
-                  } @else {
-                    👕
-                  }
+                  {{
+                    product.icon ||
+                    (
+                      product.unit === 'KG'
+                        ? '🧺'
+                        : '👕'
+                    )
+                  }}
 
                 </div>
 
@@ -463,6 +466,56 @@
               type="text"
               [(ngModel)]="productForm.name"
               placeholder="Example: Shirt">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Product Icon
+            </label>
+
+            <div class="icon-picker">
+
+              @for (
+                icon of productIcons;
+                track icon
+              ) {
+
+                <button
+                  type="button"
+                  class="icon-option"
+                  [class.selected]="
+                    productForm.icon === icon
+                  "
+                  (click)="selectProductIcon(icon)">
+
+                  {{ icon }}
+
+                </button>
+
+              }
+
+            </div>
+
+            <div class="icon-custom-row">
+
+              <span class="icon-preview">
+                {{ productForm.icon || '👕' }}
+              </span>
+
+              <input
+                type="text"
+                [(ngModel)]="productForm.icon"
+                maxlength="10"
+                placeholder="Or paste an emoji">
+
+            </div>
+
+            <small class="helper-text">
+              Choose an icon or paste your own emoji.
+            </small>
 
           </div>
 

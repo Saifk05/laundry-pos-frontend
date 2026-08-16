@@ -31,6 +31,7 @@ interface ProductTypeForm {
 
 interface ProductFormData {
   name: string;
+  icon: string;
   unit: PricingUnit;
   types: ProductTypeForm[];
 }
@@ -66,8 +67,25 @@ export class ServicesPage implements OnInit {
   products: Product[] = [];
 
 
+  readonly productIcons: string[] = [
+    '👕',
+    '👖',
+    '👗',
+    '🥻',
+    '🧥',
+    '🧦',
+    '🧺',
+    '🛏️',
+    '👟',
+    '🧣',
+    '👚',
+    '🩳'
+  ];
+
+
   productForm: ProductFormData = {
     name: '',
+    icon: '',
     unit: 'PC',
     types: [
       {
@@ -197,6 +215,7 @@ export class ServicesPage implements OnInit {
 
     this.productForm = {
       name: '',
+      icon: '',
       unit: 'PC',
       types: [
         {
@@ -234,6 +253,9 @@ export class ServicesPage implements OnInit {
 
       name:
         product.name,
+
+      icon:
+        product.icon ?? '',
 
       unit:
         product.unit,
@@ -283,6 +305,15 @@ export class ServicesPage implements OnInit {
 
 
     this.showProductForm = true;
+  }
+
+
+  selectProductIcon(
+    icon: string
+  ): void {
+
+    this.productForm.icon =
+      icon;
   }
 
 
@@ -397,6 +428,7 @@ export class ServicesPage implements OnInit {
 
     this.productForm = {
       name: '',
+      icon: '',
       unit: 'PC',
       types: [
         {
@@ -518,6 +550,11 @@ export class ServicesPage implements OnInit {
 
       name:
         productName,
+
+      icon:
+        this.productForm.icon.trim()
+          ? this.productForm.icon.trim()
+          : null,
 
       unit:
         this.productForm.unit,
