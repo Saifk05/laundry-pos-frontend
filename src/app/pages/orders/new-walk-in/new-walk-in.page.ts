@@ -194,6 +194,9 @@ export class NewWalkInPage
 
   loadingRetagOrder = false;
 
+  businessName =
+    'Venkateshwara Fabric Works';
+
 
   constructor(
     private readonly apiService:
@@ -216,6 +219,39 @@ export class NewWalkInPage
     this.setDefaultDeliveryDate();
 
     this.loadWalkInSetup();
+
+    this.loadBusinessSettings();
+  }
+
+
+  loadBusinessSettings(): void {
+
+  this.apiService
+    .getBusinessSettings()
+    .subscribe({
+
+        next: (
+          response:
+            any
+        ) => {
+
+          this.businessName =
+            response?.businessName ||
+            'Venkateshwara Fabric Works';
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Settings load error',
+            error
+          );
+        }
+
+      });
   }
 
 
@@ -1887,8 +1923,7 @@ const request:
       false;
   }
 
-
-printReceipt(): void {
+  printReceipt(): void {
 
   if (!this.createdOrder) {
     return;
@@ -1896,6 +1931,40 @@ printReceipt(): void {
 
   const order =
     this.createdOrder;
+
+  const termsAndConditions =
+    localStorage.getItem(
+      'receiptTermsAndConditions'
+    ) ?? '';
+
+  const termsHtml =
+    termsAndConditions.trim()
+      ? `
+        <div class="divider"></div>
+
+        <div class="terms">
+
+          <div class="terms-title">
+            Terms & Conditions
+          </div>
+
+          <div class="terms-content">
+            ${termsAndConditions
+              .split('\n')
+              .filter(
+                line =>
+                  line.trim()
+              )
+              .map(
+                line =>
+                  `<div>${line}</div>`
+              )
+              .join('')}
+          </div>
+
+        </div>
+      `
+      : '';
 
   const itemsHtml =
     order.items
@@ -1927,12 +1996,12 @@ printReceipt(): void {
       )
       .join('');
 
-  const printWindow =
-    window.open(
-      '',
-      '_blank',
-      'width=420,height=700'
-    );
+const printWindow =
+  window.open(
+    '',
+    '_blank',
+    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+  );
 
   if (!printWindow) {
     return;
@@ -1941,10 +2010,15 @@ printReceipt(): void {
   printWindow.document.write(`
     <!DOCTYPE html>
     <html>
+
       <head>
-        <title>Receipt</title>
+
+        <title>
+          Receipt
+        </title>
 
         <style>
+
           * {
             box-sizing: border-box;
           }
@@ -2025,6 +2099,28 @@ printReceipt(): void {
             font-weight: 700;
           }
 
+          .terms {
+            margin-top: 6px;
+            font-size: 8px;
+            line-height: 1.4;
+          }
+
+          .terms-title {
+            margin-bottom: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+          }
+
+          .terms-content {
+            text-align: left;
+            color: #333;
+          }
+
+          .terms-content div {
+            margin-bottom: 2px;
+          }
+
           .footer {
             margin-top: 14px;
             text-align: center;
@@ -2032,6 +2128,7 @@ printReceipt(): void {
           }
 
           @media print {
+
             @page {
               size: 80mm auto;
               margin: 0;
@@ -2040,8 +2137,11 @@ printReceipt(): void {
             body {
               padding: 4mm;
             }
+
           }
+
         </style>
+
       </head>
 
       <body>
@@ -2051,7 +2151,7 @@ printReceipt(): void {
           <div class="center">
 
             <div class="shop-name">
-               Venkateshwara Fabric Works
+              ${this.businessName}
             </div>
 
             <div class="muted">
@@ -2063,31 +2163,51 @@ printReceipt(): void {
           <div class="divider"></div>
 
           <div class="info-row">
-            <span>Order</span>
+
+            <span>
+              Order
+            </span>
+
             <strong>
               #${order.orderNumber}
             </strong>
+
           </div>
 
           <div class="info-row">
-            <span>Customer</span>
+
+            <span>
+              Customer
+            </span>
+
             <strong>
               ${order.customer.name}
             </strong>
+
           </div>
 
           <div class="info-row">
-            <span>Mobile</span>
+
+            <span>
+              Mobile
+            </span>
+
             <strong>
               ${order.customer.phone}
             </strong>
+
           </div>
 
           <div class="info-row">
-            <span>Date</span>
+
+            <span>
+              Date
+            </span>
+
             <strong>
               ${new Date(order.createdAt).toLocaleString()}
             </strong>
+
           </div>
 
           <div class="divider"></div>
@@ -2095,18 +2215,27 @@ printReceipt(): void {
           <table>
 
             <thead>
+
               <tr>
-                <th>Item</th>
+
+                <th>
+                  Item
+                </th>
+
                 <th style="text-align:center;">
                   Qty
                 </th>
+
                 <th style="text-align:right;">
                   Rate
                 </th>
+
                 <th style="text-align:right;">
                   Total
                 </th>
+
               </tr>
+
             </thead>
 
             <tbody>
@@ -2118,32 +2247,54 @@ printReceipt(): void {
           <div class="divider"></div>
 
           <div class="total-row">
-            <span>Subtotal</span>
+
+            <span>
+              Subtotal
+            </span>
+
             <strong>
               ₹${Number(order.subtotal).toFixed(2)}
             </strong>
+
           </div>
 
           <div class="total-row">
-            <span>Discount</span>
+
+            <span>
+              Discount
+            </span>
+
             <strong>
               -₹${Number(order.discountAmount).toFixed(2)}
             </strong>
+
           </div>
 
           <div class="total-row">
-            <span>Express Charge</span>
+
+            <span>
+              Express Charge
+            </span>
+
             <strong>
               +₹${Number(order.expressChargeAmount).toFixed(2)}
             </strong>
+
           </div>
 
           <div class="total-row grand-total">
-            <span>Total</span>
+
+            <span>
+              Total
+            </span>
+
             <strong>
               ₹${Number(order.totalAmount).toFixed(2)}
             </strong>
+
           </div>
+
+          ${termsHtml}
 
           <div class="footer">
 
@@ -2159,12 +2310,15 @@ printReceipt(): void {
         </div>
 
         <script>
+
           window.onload = function () {
             window.print();
           };
+
         </script>
 
       </body>
+
     </html>
   `);
 
@@ -2180,9 +2334,6 @@ printTag(): void {
   const order =
     this.createdOrder;
 
-  const orderNumber =
-    order.orderNumber;
-
   const createdDate =
     new Date(
       order.createdAt
@@ -2192,36 +2343,61 @@ printTag(): void {
     createdDate.toLocaleDateString(
       'en-GB',
       {
-        weekday: 'short',
         day: '2-digit',
         month: 'short',
         year: 'numeric'
       }
     );
 
+  const totalPieces =
+    order.items
+      .filter(
+        item =>
+          item.unit === 'PC'
+      )
+      .reduce(
+        (
+          total,
+          item
+        ) =>
+          total +
+          Number(
+            item.quantity
+          ),
+        0
+      );
+
   let tagsHtml = '';
 
   for (
-    const item of order.items
+    const item
+    of order.items
   ) {
 
     const typeName =
       item.typeName &&
-      item.typeName.toLowerCase() !== 'default'
+      item.typeName
+        .toLowerCase() !== 'default'
         ? item.typeName
         : '';
 
     const productDisplay =
       typeName
-        ? `${item.productName} [${typeName}]`
+        ? `${item.productName} (${typeName})`
         : item.productName;
 
     const serviceCode =
       item.serviceName
         .split(' ')
+        .filter(
+          word =>
+            word.trim()
+        )
         .map(
           word =>
-            word.charAt(0).toUpperCase()
+            word
+              .charAt(0)
+              .toUpperCase()
         )
         .join('');
 
@@ -2248,38 +2424,32 @@ printTag(): void {
         tagsHtml += `
           <section class="tag">
 
-            <div class="store">
-              FAB-HUBLI-89510
+            <div class="business-name">
+              ${this.businessName}
             </div>
 
-            <div class="customer">
+            <div class="customer-name">
               ${order.customer.name}
             </div>
 
             <div class="order-number">
-              #${orderNumber}
+              #${order.orderNumber}
             </div>
 
-            <div class="date">
+            <div class="order-date">
               ${formattedDate}
             </div>
 
-            <div class="service-box">
+            <div class="service-code">
               ${serviceCode}
             </div>
 
-            <div class="divider"></div>
-
-            <div class="product">
+            <div class="product-name">
               ${productDisplay}
             </div>
 
-            <div class="service">
-              ${item.serviceName}
-            </div>
-
-            <div class="piece">
-              ${index} / ${quantity}
+            <div class="tag-number">
+              T${totalPieces}
             </div>
 
           </section>
@@ -2291,37 +2461,31 @@ printTag(): void {
       tagsHtml += `
         <section class="tag">
 
-          <div class="store">
-            FAB-HUBLI-89510
+          <div class="business-name">
+            ${this.businessName}
           </div>
 
-          <div class="customer">
+          <div class="customer-name">
             ${order.customer.name}
           </div>
 
           <div class="order-number">
-            #${orderNumber}
+            #${order.orderNumber}
           </div>
 
-          <div class="date">
+          <div class="order-date">
             ${formattedDate}
           </div>
 
-          <div class="service-box">
+          <div class="service-code">
             ${serviceCode}
           </div>
 
-          <div class="divider"></div>
-
-          <div class="product">
+          <div class="product-name">
             ${productDisplay}
           </div>
 
-          <div class="service">
-            ${item.serviceName}
-          </div>
-
-          <div class="piece">
+          <div class="tag-number">
             ${item.quantity} KG
           </div>
 
@@ -2334,7 +2498,7 @@ printTag(): void {
     window.open(
       '',
       '_blank',
-      'width=300,height=500'
+      `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
     );
 
   if (!printWindow) {
@@ -2412,26 +2576,28 @@ printTag(): void {
             page-break-after: auto;
           }
 
-          .store {
+          .business-name {
             width: 100%;
-
-            font-size: 9px;
-            font-weight: 700;
-
-            letter-spacing: 0.3px;
-
-            white-space: nowrap;
-          }
-
-          .customer {
-            width: 100%;
-
-            margin-top: 3mm;
 
             font-size: 10px;
+            line-height: 1.2;
+
             font-weight: 700;
 
-            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .customer-name {
+            width: 100%;
+
+            margin-top: 4mm;
+
+            font-size: 11px;
+            line-height: 1.2;
+
+            font-weight: 700;
 
             white-space: nowrap;
             overflow: hidden;
@@ -2439,26 +2605,27 @@ printTag(): void {
           }
 
           .order-number {
-            margin-top: 1.5mm;
+            margin-top: 2mm;
 
-            font-size: 18px;
+            font-size: 19px;
             line-height: 1;
 
+            font-weight: 800;
+          }
+
+          .order-date {
+            margin-top: 2mm;
+
+            font-size: 10px;
             font-weight: 700;
           }
 
-          .date {
-            margin-top: 2.5mm;
+          .service-code {
+            min-width: 12mm;
+            height: 12mm;
 
-            font-size: 9px;
-            line-height: 1.2;
-          }
-
-          .service-box {
-            width: 9mm;
-            height: 9mm;
-
-            margin-top: 2.5mm;
+            margin-top: 4mm;
+            padding: 1mm;
 
             display: flex;
             align-items: center;
@@ -2466,56 +2633,42 @@ printTag(): void {
 
             border: 1.5px solid #000000;
 
-            font-size: 8px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 800;
           }
 
-          .divider {
+          .product-name {
             width: 100%;
 
-            margin: 2.5mm 0;
+            margin-top: 5mm;
 
-            border-top:
-              1px dashed
-              #000000;
-          }
-
-          .product {
-            width: 100%;
-
-            font-size: 11px;
+            font-size: 12px;
             line-height: 1.2;
 
             font-weight: 700;
 
-            text-transform: uppercase;
-
-            overflow: hidden;
-            word-break: break-word;
-          }
-
-          .service {
-            width: 100%;
-
-            margin-top: 1.5mm;
-
-            font-size: 9px;
-            line-height: 1.2;
-
-            font-weight: 600;
-
-            text-transform: uppercase;
+            text-transform: capitalize;
 
             overflow: hidden;
           }
 
-          .piece {
-            margin-top: auto;
+          .tag-number {
+            margin-top: 4mm;
 
-            padding-top: 2mm;
+            font-size: 22px;
+            line-height: 1;
 
-            font-size: 10px;
-            font-weight: 700;
+            font-weight: 900;
+          }
+
+          .tag::after {
+            content: '';
+
+            width: 90%;
+
+            margin-top: 3mm;
+
+            border-bottom: 1px dashed #000000;
           }
 
           @media print {
@@ -2523,14 +2676,9 @@ printTag(): void {
             html,
             body {
               width: 50mm !important;
-              height: auto !important;
 
               margin: 0 !important;
               padding: 0 !important;
-            }
-
-            .tags {
-              width: 50mm !important;
             }
 
             .tag {
@@ -2584,6 +2732,7 @@ printTag(): void {
 
   printWindow.document.close();
 }
+
 
   startNewOrder():
     void {

@@ -52,4 +52,13 @@ export class InventoryComponent {
       '/app/inventory/admin-panel'
     );
   }
+
+
+  openTermsConditions(): void {
+
+    this.router.navigateByUrl(
+      '/app/inventory/terms-conditions'
+    );
+  }
+
 }

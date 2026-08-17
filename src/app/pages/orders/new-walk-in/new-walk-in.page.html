@@ -773,23 +773,9 @@
 
             <div class="product-actions">
 
-              <div class="product-icon">
-
-                @if (
-                  product.unit === 'KG'
-                ) {
-
-                  🧺
-
-                } @else {
-
-                  👕
-
-                }
-
-              </div>
-
-
+            <div class="product-icon">
+              {{ product.icon || (product.unit === 'KG' ? '🧺' : '👕') }}
+            </div>    
               <button
                 type="button"
                 class="add-product-button"

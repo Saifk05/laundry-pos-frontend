@@ -91,6 +91,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'inventory/terms-conditions',
+        loadComponent: () =>
+          import('./pages/inventory/terms-conditions/terms-conditions.component')
+            .then((m) => m.TermsConditionsComponent),
+      },
+
+      {
         path: 'inventory/extra-charges',
         loadComponent: () =>
           import('./pages/inventory/extra-charges/extra-charges.page')

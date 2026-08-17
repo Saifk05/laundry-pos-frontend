@@ -32,6 +32,7 @@ export interface WalkInProductType {
 export interface WalkInProduct {
   id: string;
   name: string;
+  icon: string | null;
   unit: PricingUnit;
   active: boolean;
   types: WalkInProductType[];

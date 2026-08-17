@@ -11,6 +11,10 @@ import {
   OrderResponse
 } from '../models/walk-in.model';
 
+import {
+  TermsConditionsRequest,
+  TermsConditionsResponse
+} from '../models/terms-conditions.model';
 
 import {
   BulkProductResponse
@@ -633,4 +637,25 @@ bulkUploadProductsPdf(
     formData
   );
 }
+
+getTermsConditions():
+  Observable<TermsConditionsResponse> {
+
+  return this.http.get<TermsConditionsResponse>(
+    `${this.baseUrl}/terms-conditions`
+  );
+}
+
+
+updateTermsConditions(
+  request: TermsConditionsRequest
+): Observable<TermsConditionsResponse> {
+
+  return this.http.put<TermsConditionsResponse>(
+    `${this.baseUrl}/terms-conditions`,
+    request
+  );
+}
+
+
 }
