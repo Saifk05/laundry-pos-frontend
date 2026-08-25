@@ -35,7 +35,8 @@ import {
 
 import {
   B2COrderDetails,
-  RetagOrderRequest
+  RetagOrderRequest,
+  RescheduleOrderRequest
 } from '../../../../core/models/b2c-order.model';
 
 
@@ -194,6 +195,11 @@ export class NewWalkInPage
 
   loadingRetagOrder = false;
 
+  isRescheduleMode = false;
+
+  rescheduleOrderId:
+    string | null = null;
+
   businessName =
     'Venkateshwara Fabric Works';
 
@@ -212,7 +218,7 @@ export class NewWalkInPage
 
   ngOnInit(): void {
 
-    this.initializeRetagMode();
+    this.initializeOrderMode();
 
     this.generateDeliveryDates();
 
@@ -287,6 +293,16 @@ export class NewWalkInPage
           ) {
 
             this.loadRetagOrder();
+
+            return;
+          }
+
+          if (
+            this.isRescheduleMode &&
+            this.rescheduleOrderId
+          ) {
+
+            this.loadRescheduleOrder();
           }
         },
 
@@ -307,7 +323,7 @@ export class NewWalkInPage
   }
 
 
-  private initializeRetagMode():
+  private initializeOrderMode():
     void {
 
     const mode =
@@ -324,8 +340,17 @@ export class NewWalkInPage
       mode === 'retag' &&
       !!orderId;
 
+    this.isRescheduleMode =
+      mode === 'reschedule' &&
+      !!orderId;
+
     this.retagOrderId =
       this.isRetagMode
+        ? orderId
+        : null;
+
+    this.rescheduleOrderId =
+      this.isRescheduleMode
         ? orderId
         : null;
   }
@@ -383,6 +408,67 @@ export class NewWalkInPage
             error?.error?.message ||
             error?.error?.error ||
             'Unable to load order for re-tag';
+        }
+
+      });
+  }
+
+
+  private loadRescheduleOrder():
+    void {
+
+    if (
+      !this.rescheduleOrderId
+    ) {
+
+      return;
+    }
+
+    this.loadingRetagOrder =
+      true;
+
+    this.errorMessage =
+      '';
+
+    this.apiService
+      .getB2COrderById(
+        this.rescheduleOrderId
+      )
+      .subscribe({
+
+        next: (
+          response:
+            B2COrderDetails
+        ) => {
+
+          this.populateRetagOrder(
+            response
+          );
+
+          this.customerMessage =
+            'Existing order loaded for reschedule';
+
+          this.loadingRetagOrder =
+            false;
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Load reschedule order error',
+            error
+          );
+
+          this.loadingRetagOrder =
+            false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to load order for reschedule';
         }
 
       });
@@ -1585,6 +1671,15 @@ private formatLocalDate(
       '';
 
     if (
+      this.isRescheduleMode
+    ) {
+
+      this.updateRescheduleOrder();
+
+      return;
+    }
+
+    if (
       this.isRetagMode
     ) {
 
@@ -1793,6 +1888,95 @@ const request:
             error?.error?.message ||
             error?.error?.error ||
             'Unable to create order';
+        }
+
+      });
+  }
+
+
+  private updateRescheduleOrder():
+    void {
+
+    if (
+      !this.rescheduleOrderId
+    ) {
+
+      this.errorMessage =
+        'Reschedule order id is missing';
+
+      return;
+    }
+
+    if (
+      !this.deliveryDate
+    ) {
+
+      this.errorMessage =
+        'Delivery date is required';
+
+      return;
+    }
+
+    if (
+      !this.deliveryTime
+    ) {
+
+      this.errorMessage =
+        'Delivery time is required';
+
+      return;
+    }
+
+    const request:
+      RescheduleOrderRequest = {
+
+      deliveryDate:
+        this.deliveryDate,
+
+      deliveryTime:
+        this.deliveryTime
+    };
+
+    this.creatingOrder =
+      true;
+
+    this.errorMessage =
+      '';
+
+    this.apiService
+      .rescheduleB2COrder(
+        this.rescheduleOrderId,
+        request
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.creatingOrder =
+            false;
+
+          this.router.navigate(
+            ['/app/b2c-orders']
+          );
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Reschedule order error',
+            error
+          );
+
+          this.creatingOrder =
+            false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Unable to reschedule order';
         }
 
       });
@@ -2738,7 +2922,8 @@ printTag(): void {
     void {
 
     if (
-      this.isRetagMode
+      this.isRetagMode ||
+      this.isRescheduleMode
     ) {
 
       this.router.navigate(

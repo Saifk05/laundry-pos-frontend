@@ -2,28 +2,48 @@
 
   <section class="order-panel">
 
-    @if (isRetagMode) {
+@if (isRetagMode || isRescheduleMode) {
 
-      <div class="retag-header">
+  <div class="retag-header">
 
-        <div>
-          <h2>Re-Tag Order</h2>
-          <p>
-            Update garment quantities for
-            <strong>{{ retagOrderNumber }}</strong>
-          </p>
-        </div>
+    <div>
 
-        <button
-          type="button"
-          class="retag-cancel-button"
-          (click)="cancelRetag()">
-          Back to Orders
-        </button>
+      <h2>
+        {{
+          isRescheduleMode
+            ? 'Reschedule Order'
+            : 'Re-Tag Order'
+        }}
+      </h2>
 
-      </div>
+      <p>
 
-    }
+        {{
+          isRescheduleMode
+            ? 'Update delivery date and timeslot for'
+            : 'Update garment quantities for'
+        }}
+
+        <strong>
+          {{ retagOrderNumber }}
+        </strong>
+
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="retag-cancel-button"
+      (click)="cancelRetag()">
+
+      Back to Orders
+
+    </button>
+
+  </div>
+
+}
 
     <div class="customer-section">
 
@@ -41,8 +61,8 @@
             maxlength="10"
             inputmode="numeric"
             placeholder="Mobile"
-            [readonly]="isRetagMode"
-            (blur)="!isRetagMode && checkCustomer()">
+            [readonly]="isRetagMode || isRescheduleMode"
+            (blur)="!isRetagMode && !isRescheduleMode && checkCustomer()">
 
         </div>
 
@@ -56,7 +76,7 @@
             type="text"
             [(ngModel)]="customerName"
             placeholder="Name"
-            [readonly]="customerExists || isRetagMode">
+            [readonly]="customerExists || isRetagMode || isRescheduleMode">
 
         </div>
 
@@ -122,7 +142,9 @@
 
                 <div class="compact-cart-left">
 
-                  <div class="compact-cart-actions">
+                  @if (!isRescheduleMode) {
+
+                    <div class="compact-cart-actions">
 
                     <button
                       type="button"
@@ -146,6 +168,7 @@
 
                   </div>
 
+                  }
 
                   <div class="compact-cart-info">
 
@@ -377,6 +400,8 @@
         </div>
 
 
+        @if (!isRescheduleMode) {
+
         <div class="delivery-option-row toggle-row">
 
           <div class="delivery-option-icon"></div>
@@ -476,8 +501,12 @@
 
         }
 
+        }
+
       </div>
 
+
+      @if (!isRescheduleMode) {
 
       <div class="coupon-area">
 
@@ -590,6 +619,8 @@
 
       </div>
 
+      }
+
 
       @if (errorMessage) {
 
@@ -600,7 +631,28 @@
       }
 
 
-      @if (isRetagMode) {
+      @if (isRescheduleMode) {
+
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            loadingRetagOrder ||
+            !deliveryDate ||
+            !deliveryTime
+          "
+          (click)="createOrder()">
+
+          {{
+            creatingOrder
+              ? 'Rescheduling...'
+              : 'Update Schedule'
+          }}
+
+        </button>
+
+      } @else if (isRetagMode) {
 
         <button
           type="button"
@@ -654,7 +706,7 @@
   </section>
 
 
-  @if (!isRetagMode) {
+  @if (!isRetagMode && !isRescheduleMode) {
 
   <section class="products-panel">
 
@@ -959,7 +1011,7 @@
 
             <button
               type="button"
-              [disabled]="isRetagMode"
+              [disabled]="isRetagMode || isRescheduleMode"
               (click)="increaseModalQuantity()">
 
               +
@@ -996,7 +1048,9 @@
           {{
             isRetagMode
               ? 'Update Quantity'
-              : 'Add Product'
+              : isRescheduleMode
+                ? 'Update'
+                : 'Add Product'
           }}
 
         </button>

@@ -20,11 +20,39 @@
 
       <div class="header-actions">
 
-        <button
-          type="button"
-          class="header-action">
-          +
-        </button>
+        <div class="zoom-controls">
+
+          <button
+            type="button"
+            class="header-action zoom-button"
+            title="Zoom Out"
+            [disabled]="zoomLevel <= minZoom"
+            (click)="zoomOut()">
+            −
+          </button>
+
+          <span class="zoom-value">
+            {{ zoomPercentage }}%
+          </span>
+
+          <button
+            type="button"
+            class="header-action zoom-button"
+            title="Zoom In"
+            [disabled]="zoomLevel >= maxZoom"
+            (click)="zoomIn()">
+            +
+          </button>
+
+          <button
+            type="button"
+            class="header-action zoom-reset"
+            title="Reset Zoom"
+            (click)="resetZoom()">
+            100%
+          </button>
+
+        </div>
 
         <button
           type="button"
@@ -42,8 +70,12 @@
 
     </header>
 
-    <main class="app-content">
+    <main
+      class="app-content"
+      [style.zoom]="zoomLevel">
+
       <router-outlet></router-outlet>
+
     </main>
 
   </div>

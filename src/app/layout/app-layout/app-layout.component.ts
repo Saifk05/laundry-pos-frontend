@@ -55,6 +55,15 @@ export class AppLayoutComponent
     };
 
 
+  zoomLevel = 1;
+
+  readonly minZoom = 0.7;
+
+  readonly maxZoom = 1.3;
+
+  readonly zoomStep = 0.1;
+
+
   constructor(
     private readonly businessSettingsService:
       BusinessSettingsService
@@ -62,6 +71,8 @@ export class AppLayoutComponent
 
 
   ngOnInit(): void {
+
+    this.loadZoom();
 
     this.businessSettingsService
       .settings$
@@ -71,7 +82,9 @@ export class AppLayoutComponent
             BusinessSettings | null
         ) => {
 
-          if (settings) {
+          if (
+            settings
+          ) {
 
             this.settings =
               settings;
@@ -79,4 +92,128 @@ export class AppLayoutComponent
         }
       );
   }
+
+
+  get zoomPercentage():
+    number {
+
+    return Math.round(
+      this.zoomLevel * 100
+    );
+  }
+
+
+  zoomIn():
+    void {
+
+    if (
+      this.zoomLevel >=
+      this.maxZoom
+    ) {
+
+      return;
+    }
+
+    this.zoomLevel =
+      Math.min(
+        this.maxZoom,
+        Number(
+          (
+            this.zoomLevel +
+            this.zoomStep
+          ).toFixed(1)
+        )
+      );
+
+    this.saveZoom();
+  }
+
+
+  zoomOut():
+    void {
+
+    if (
+      this.zoomLevel <=
+      this.minZoom
+    ) {
+
+      return;
+    }
+
+    this.zoomLevel =
+      Math.max(
+        this.minZoom,
+        Number(
+          (
+            this.zoomLevel -
+            this.zoomStep
+          ).toFixed(1)
+        )
+      );
+
+    this.saveZoom();
+  }
+
+
+  resetZoom():
+    void {
+
+    this.zoomLevel =
+      1;
+
+    this.saveZoom();
+  }
+
+
+  private saveZoom():
+    void {
+
+    localStorage.setItem(
+      'appZoomLevel',
+      String(
+        this.zoomLevel
+      )
+    );
+  }
+
+
+  private loadZoom():
+    void {
+
+    const savedZoom =
+      localStorage.getItem(
+        'appZoomLevel'
+      );
+
+    if (
+      !savedZoom
+    ) {
+
+      return;
+    }
+
+    const zoom =
+      Number(
+        savedZoom
+      );
+
+    if (
+      Number.isNaN(
+        zoom
+      )
+    ) {
+
+      return;
+    }
+
+    this.zoomLevel =
+      Math.min(
+        this.maxZoom,
+        Math.max(
+          this.minZoom,
+          zoom
+        )
+      );
+  }
+
 }

@@ -1090,92 +1090,16 @@ searchOrders(): void {
 
     this.closeAllMoreMenus();
 
-    const currentDate =
-      order.deliveryDate ===
-        '-'
-        ? ''
-        : order.deliveryDate;
-
-    const currentTime =
-      order.deliverySlot ===
-        '-'
-        ? ''
-        : order.deliverySlot;
-
-    const deliveryDate =
-      window.prompt(
-        'Delivery date (YYYY-MM-DD)',
-        currentDate
-      );
-
-    if (
-      !deliveryDate
-    ) {
-
-      return;
-    }
-
-    const deliveryTime =
-      window.prompt(
-        'Delivery time slot',
-        currentTime
-      );
-
-    if (
-      !deliveryTime
-    ) {
-
-      return;
-    }
-
-    const request:
-      RescheduleOrderRequest = {
-
-      deliveryDate:
-        deliveryDate.trim(),
-
-      deliveryTime:
-        deliveryTime.trim()
-    };
-
-    this.actionLoading =
-      true;
-
-    this.errorMessage =
-      '';
-
-    this.apiService
-      .rescheduleB2COrder(
-        order.id,
-        request
-      )
-      .subscribe({
-
-        next: (
-          response:
-            B2COrder
-        ) => {
-
-          this.updateLocalOrder(
-            response
-          );
-
-          this.actionLoading =
-            false;
-        },
-
-        error: (
-          error:
-            any
-        ) => {
-
-          this.handleActionError(
-            error,
-            'Unable to reschedule order'
-          );
+    this.router.navigate(
+      ['/app/new-walk-in'],
+      {
+        queryParams: {
+          mode: 'reschedule',
+          orderId:
+            order.id
         }
-
-      });
+      }
+    );
   }
 
   updateStorageLabel(
