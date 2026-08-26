@@ -97,21 +97,32 @@ export class ServicesPage
     new Set<string>();
 
 
-  readonly productIcons:
-    string[] = [
-      '👕',
-      '👖',
-      '👗',
-      '🥻',
-      '🧥',
-      '🧦',
-      '🧺',
-      '🛏️',
-      '👟',
-      '🧣',
-      '👚',
-      '🩳'
-    ];
+  readonly productIcons: string[] = [
+    '🧺',
+    '👔',
+    '👕',
+    '👖',
+    '🧥',
+    '🥻',
+    '🧶',
+    '🩳',
+    '👗',
+    '👚',
+    '🧣',
+    '👜',
+    '👟',
+    '🧤',
+    '☂️',
+    '🧢',
+    '🎒',
+    '🩴',
+    '🧦',
+    '🦺',
+    '🛏️',
+    '🪟',
+    '🧸',
+    '🧹'
+  ];
 
 
   productForm:

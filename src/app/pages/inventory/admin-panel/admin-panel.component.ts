@@ -35,6 +35,8 @@ export class AdminPanelComponent
 
   businessName = '';
 
+  whatsappDisplayName = '';
+
   headerSubtitle = '';
 
   adminName = '';
@@ -68,6 +70,9 @@ export class AdminPanelComponent
     this.errorMessage =
       '';
 
+    this.successMessage =
+      '';
+
     this.businessSettingsService
       .getSettings()
       .subscribe({
@@ -79,6 +84,9 @@ export class AdminPanelComponent
 
           this.businessName =
             response.businessName ?? '';
+
+          this.whatsappDisplayName =
+            response.whatsappDisplayName ?? '';
 
           this.headerSubtitle =
             response.headerSubtitle ?? '';
@@ -138,6 +146,16 @@ export class AdminPanelComponent
     }
 
     if (
+      !this.whatsappDisplayName.trim()
+    ) {
+
+      this.errorMessage =
+        'WhatsApp display name is required';
+
+      return;
+    }
+
+    if (
       !this.adminName.trim()
     ) {
 
@@ -152,6 +170,9 @@ export class AdminPanelComponent
 
       businessName:
         this.businessName.trim(),
+
+      whatsappDisplayName:
+        this.whatsappDisplayName.trim(),
 
       headerSubtitle:
         this.headerSubtitle.trim(),
@@ -183,16 +204,19 @@ export class AdminPanelComponent
         ) => {
 
           this.businessName =
-            response.businessName;
+            response.businessName ?? '';
+
+          this.whatsappDisplayName =
+            response.whatsappDisplayName ?? '';
 
           this.headerSubtitle =
-            response.headerSubtitle;
+            response.headerSubtitle ?? '';
 
           this.adminName =
-            response.adminName;
+            response.adminName ?? '';
 
           this.adminSubtitle =
-            response.adminSubtitle;
+            response.adminSubtitle ?? '';
 
           this.logoUrl =
             response.logoUrl ?? '';

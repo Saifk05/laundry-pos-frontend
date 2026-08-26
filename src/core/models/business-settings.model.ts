@@ -1,8 +1,11 @@
 export interface BusinessSettings {
+
   id: number;
 
   businessName: string;
 
+  whatsappDisplayName: string;
+
   headerSubtitle: string;
 
   adminName: string;
@@ -10,11 +13,14 @@ export interface BusinessSettings {
   adminSubtitle: string;
 
   logoUrl: string | null;
+
 }
 
-
 export interface BusinessSettingsRequest {
+
   businessName: string;
+
+  whatsappDisplayName: string;
 
   headerSubtitle: string;
 
@@ -23,4 +29,5 @@ export interface BusinessSettingsRequest {
   adminSubtitle: string;
 
   logoUrl: string | null;
+
 }

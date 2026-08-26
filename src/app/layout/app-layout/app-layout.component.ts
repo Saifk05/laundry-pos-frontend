@@ -41,6 +41,9 @@ export class AppLayoutComponent
       businessName:
         'Venkateshwara Fabric Works',
 
+      whatsappDisplayName:
+        'Fabric Luxury Shine',
+
       headerSubtitle:
         'Operations',
 

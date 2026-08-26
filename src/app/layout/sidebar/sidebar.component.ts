@@ -63,6 +63,9 @@ export class SidebarComponent
       businessName:
         '',
 
+      whatsappDisplayName:
+        '',
+
       headerSubtitle:
         '',
 
