@@ -421,41 +421,41 @@ export class BillPage
     );
   }
 
-  get totalTax():
-    number {
+  // get totalTax():
+  //   number {
 
-    return this.filteredInvoices.reduce(
-      (
-        total:
-          number,
-        invoice:
-          Bill
-      ) =>
-        total +
-        Number(
-          invoice.tax ?? 0
-        ),
-      0
-    );
-  }
+  //   return this.filteredInvoices.reduce(
+  //     (
+  //       total:
+  //         number,
+  //       invoice:
+  //         Bill
+  //     ) =>
+  //       total +
+  //       Number(
+  //         invoice.tax ?? 0
+  //       ),
+  //     0
+  //   );
+  // }
 
-  get totalTaxable():
-    number {
+  // get totalTaxable():
+  //   number {
 
-    return this.filteredInvoices.reduce(
-      (
-        total:
-          number,
-        invoice:
-          Bill
-      ) =>
-        total +
-        Number(
-          invoice.taxableAmount ?? 0
-        ),
-      0
-    );
-  }
+  //   return this.filteredInvoices.reduce(
+  //     (
+  //       total:
+  //         number,
+  //       invoice:
+  //         Bill
+  //     ) =>
+  //       total +
+  //       Number(
+  //         invoice.taxableAmount ?? 0
+  //       ),
+  //     0
+  //   );
+  // }
 
   get totalExpress():
     number {

@@ -217,16 +217,7 @@
             <th>
               Total
             </th>
-
-            <th>
-              Tax
-            </th>
-
-            <th>
-              Taxable Amt
-            </th>
-
-            <th>
+<th>
               Express Amt
             </th>
 
@@ -287,16 +278,7 @@
             <td>
               ₹{{ formatAmount(totalAmount) }}
             </td>
-
-            <td>
-              ₹{{ formatAmount(totalTax) }}
-            </td>
-
-            <td>
-              ₹{{ formatAmount(totalTaxable) }}
-            </td>
-
-            <td>
+<td>
               ₹{{ formatAmount(totalExpress) }}
             </td>
 
@@ -454,24 +436,7 @@
                 ) }}
 
               </td>
-
-              <td>
-
-                ₹{{ formatAmount(
-                  invoice.tax
-                ) }}
-
-              </td>
-
-              <td>
-
-                ₹{{ formatAmount(
-                  invoice.taxableAmount
-                ) }}
-
-              </td>
-
-              <td>
+<td>
 
                 ₹{{ formatAmount(
                   invoice.expressAmount
