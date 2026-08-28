@@ -269,11 +269,26 @@
 
   background: var(--app-surface);
 
-  scrollbar-width: none;
+  scrollbar-width: auto;
+  scrollbar-color: var(--app-text-muted) var(--app-background-soft);
 }
 
 .invoice-table-wrapper::-webkit-scrollbar {
-  display: none;
+  height: 10px;
+}
+
+.invoice-table-wrapper::-webkit-scrollbar-track {
+  background: var(--app-background-soft);
+  border-radius: 999px;
+}
+
+.invoice-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--app-text-muted);
+  border-radius: 999px;
+}
+
+.invoice-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--app-text-secondary);
 }
 
 .invoice-table {
@@ -1502,13 +1517,23 @@
 
 .payment-overlay,
 .payment-modal-body {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+  scrollbar-width: auto !important;
+  scrollbar-color: var(--app-text-muted) var(--app-background-soft) !important;
 }
 
 .payment-overlay::-webkit-scrollbar,
 .payment-modal-body::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.payment-overlay::-webkit-scrollbar-track,
+.payment-modal-body::-webkit-scrollbar-track {
+  background: var(--app-background-soft) !important;
+}
+
+.payment-overlay::-webkit-scrollbar-thumb,
+.payment-modal-body::-webkit-scrollbar-thumb {
+  background: var(--app-text-muted) !important;
+  border-radius: 999px !important;
 }

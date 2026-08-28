@@ -181,17 +181,17 @@ ion-button {
   font-size: var(--app-font-size-sm);
 }
 
-ion-content::part(scroll) {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
+// ion-content::part(scroll) {
+//   scrollbar-width: none;
+//   -ms-overflow-style: none;
+// }
 
-ion-content::part(scroll)::-webkit-scrollbar {
-  display: none;
+// ion-content::part(scroll)::-webkit-scrollbar {
+//   display: none;
 
-  width: 0;
-  height: 0;
-}
+//   width: 0;
+//   height: 0;
+// }
 
 @media (max-width: 992px) {
   :root {

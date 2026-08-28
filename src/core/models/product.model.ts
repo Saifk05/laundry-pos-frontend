@@ -4,51 +4,99 @@ export type PricingUnit =
 
 
 export interface ProductService {
+
   id: string;
+
   name: string;
+
   price: number;
+
 }
 
 
 export interface ProductType {
+
   id: string;
+
   name: string;
+
   services: ProductService[];
+
 }
 
 
 export interface Product {
+
   id: string;
+
   name: string;
+
   icon: string | null;
+
   unit: PricingUnit;
+
   active: boolean;
+
+  displayOrder: number;
+
   types: ProductType[];
+
 }
 
 
 export interface ProductServiceRequest {
+
   name: string;
+
   price: number;
+
 }
 
 
 export interface ProductTypeRequest {
+
   name: string;
+
   services: ProductServiceRequest[];
+
 }
 
 
 export interface ProductRequest {
+
   name: string;
+
   icon: string | null;
+
   unit: PricingUnit;
+
   active: boolean;
+
   types: ProductTypeRequest[];
+
+}
+
+
+export interface ProductOrderItem {
+
+  productId: string;
+
+  displayOrder: number;
+
+}
+
+
+export interface ProductReorderRequest {
+
+  products: ProductOrderItem[];
+
 }
 
 
 export interface ProductListResponse {
+
   message: string;
+
   products: Product[];
+
 }

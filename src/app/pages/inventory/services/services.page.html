@@ -16,25 +16,74 @@
 
     <div class="header-actions">
 
-      <button
-        type="button"
-        class="bulk-button"
-        [disabled]="loading || bulkLoading"
-        (click)="openBulkUpload()">
+      @if (!arrangeMode) {
 
-        Bulk Upload
+        <button
+          type="button"
+          class="arrange-button"
+          [disabled]="
+            loading ||
+            bulkLoading ||
+            arrangementSaving ||
+            products.length === 0
+          "
+          (click)="startArrange()">
 
-      </button>
+          Arrange Products
 
-      <button
-        type="button"
-        class="primary-button"
-        [disabled]="loading || bulkLoading"
-        (click)="addProduct()">
+        </button>
 
-        + Add Product
+        <button
+          type="button"
+          class="bulk-button"
+          [disabled]="loading || bulkLoading"
+          (click)="openBulkUpload()">
 
-      </button>
+          Bulk Upload
+
+        </button>
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="loading || bulkLoading"
+          (click)="addProduct()">
+
+          + Add Product
+
+        </button>
+
+      } @else {
+
+        <button
+          type="button"
+          class="cancel-arrange-button"
+          [disabled]="arrangementSaving"
+          (click)="cancelArrange()">
+
+          Cancel
+
+        </button>
+
+        <button
+          type="button"
+          class="save-arrange-button"
+          [disabled]="arrangementSaving"
+          (click)="saveArrangement()">
+
+          @if (arrangementSaving) {
+
+            Saving...
+
+          } @else {
+
+            Save Arrangement
+
+          }
+
+        </button>
+
+      }
 
     </div>
 
@@ -48,7 +97,12 @@
       <input
         type="text"
         [(ngModel)]="search"
-        placeholder="Search product">
+        [disabled]="arrangeMode"
+        [placeholder]="
+          arrangeMode
+            ? 'Search disabled while arranging'
+            : 'Search product'
+        ">
 
     </div>
 
@@ -59,6 +113,7 @@
         type="button"
         class="category-button"
         [class.active]="selectedUnit === 'ALL'"
+        [disabled]="arrangeMode"
         (click)="selectUnit('ALL')">
 
         All
@@ -70,6 +125,7 @@
         type="button"
         class="category-button"
         [class.active]="selectedUnit === 'PC'"
+        [disabled]="arrangeMode"
         (click)="selectUnit('PC')">
 
         Per Piece
@@ -81,6 +137,7 @@
         type="button"
         class="category-button"
         [class.active]="selectedUnit === 'KG'"
+        [disabled]="arrangeMode"
         (click)="selectUnit('KG')">
 
         Per KG
@@ -90,6 +147,49 @@
     </div>
 
   </section>
+
+
+  @if (arrangeMode) {
+
+    <div class="arrange-mode-banner">
+
+      <div class="arrange-mode-icon">
+        ↕
+      </div>
+
+      <div>
+
+        <strong>
+          Arrange Products
+        </strong>
+
+        <p>
+          Drag and drop the product cards into the order you want, then save the arrangement.
+        </p>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  @if (successMessage && !showProductForm) {
+
+    <div class="page-success-message">
+      {{ successMessage }}
+    </div>
+
+  }
+
+
+  @if (errorMessage && !showProductForm) {
+
+    <div class="page-error-message">
+      {{ errorMessage }}
+    </div>
+
+  }
 
 
   @if (loading && products.length === 0) {
@@ -106,14 +206,50 @@
 
     @if (filteredProducts.length > 0) {
 
-      <section class="product-grid">
+      <section
+        class="product-grid"
+        [class.arrange-mode]="arrangeMode">
 
         @for (
           product of filteredProducts;
-          track product.id
+          track product.id;
+          let productIndex = $index
         ) {
 
-          <article class="product-card">
+          <article
+            class="product-card"
+            [class.arrange-card]="arrangeMode"
+            [class.dragging]="
+              arrangeMode &&
+              draggedProductId === product.id
+            "
+            [attr.draggable]="
+              arrangeMode &&
+              !arrangementSaving
+                ? 'true'
+                : 'false'
+            "
+            (dragstart)="onProductDragStart($event, product)"
+            (dragover)="onProductDragOver($event)"
+            (drop)="onProductDrop($event, product)"
+            (dragend)="onProductDragEnd()">
+
+            @if (arrangeMode) {
+
+              <div class="arrange-card-header">
+
+                <div class="drag-handle">
+                  ☰
+                </div>
+
+                <span class="arrange-position">
+                  Position {{ productIndex + 1 }}
+                </span>
+
+              </div>
+
+            }
+
 
             <div class="product-card-header">
 
@@ -162,15 +298,19 @@
               </div>
 
 
-              <button
-                type="button"
-                class="edit-product-button"
-                [disabled]="loading"
-                (click)="editProduct(product)">
+              @if (!arrangeMode) {
 
-                Edit
+                <button
+                  type="button"
+                  class="edit-product-button"
+                  [disabled]="loading"
+                  (click)="editProduct(product)">
 
-              </button>
+                  Edit
+
+                </button>
+
+              }
 
             </div>
 
@@ -183,15 +323,19 @@
                   Types & Pricing
                 </h3>
 
-                <button
-                  type="button"
-                  class="text-button"
-                  [disabled]="loading"
-                  (click)="manageServices(product)">
+                @if (!arrangeMode) {
 
-                  Manage
+                  <button
+                    type="button"
+                    class="text-button"
+                    [disabled]="loading"
+                    (click)="manageServices(product)">
 
-                </button>
+                    Manage
+
+                  </button>
+
+                }
 
               </div>
 
@@ -328,7 +472,10 @@
                 </div>
 
 
-                @if (product.types.length > 1) {
+                @if (
+                  product.types.length > 1 &&
+                  !arrangeMode
+                ) {
 
                   <button
                     type="button"
@@ -389,6 +536,7 @@
           <button
             type="button"
             class="primary-button"
+            [disabled]="arrangeMode"
             (click)="addProduct()">
 
             + Add Product

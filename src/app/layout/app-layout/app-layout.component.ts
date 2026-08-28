@@ -219,4 +219,8 @@ export class AppLayoutComponent
       );
   }
 
+  reloadPage(): void {
+  window.location.reload();
+}
+
 }

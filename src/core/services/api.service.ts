@@ -64,7 +64,8 @@ import {
 import {
   Product,
   ProductListResponse,
-  ProductRequest
+  ProductRequest,
+  ProductReorderRequest
 } from '../models/product.model';
 
 import {
@@ -191,6 +192,16 @@ export class ApiService {
 
     return this.http.post<Product>(
       `${this.baseUrl}/products`,
+      request
+    );
+  }
+
+  reorderProducts(
+    request: ProductReorderRequest
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${this.baseUrl}/products/reorder`,
       request
     );
   }

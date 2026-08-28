@@ -20,6 +20,7 @@ import {
   Product,
   ProductListResponse,
   ProductRequest,
+  ProductReorderRequest,
   ProductTypeRequest
 } from '../../../../core/models/product.model';
 
@@ -95,6 +96,21 @@ export class ServicesPage
 
   expandedProducts =
     new Set<string>();
+
+
+  arrangeMode =
+    false;
+
+  arrangementSaving =
+    false;
+
+  draggedProductId:
+    string | null =
+      null;
+
+  arrangementSnapshot:
+    Product[] =
+      [];
 
 
   readonly productIcons: string[] = [
@@ -186,7 +202,16 @@ export class ServicesPage
         ) => {
 
           this.products =
-            response.products ?? [];
+            [
+              ...(response.products ?? [])
+            ].sort(
+              (
+                firstProduct,
+                secondProduct
+              ) =>
+                (firstProduct.displayOrder ?? 0) -
+                (secondProduct.displayOrder ?? 0)
+            );
 
           this.loading =
             false;
@@ -217,6 +242,13 @@ export class ServicesPage
 
   get filteredProducts():
     Product[] {
+
+    if (
+      this.arrangeMode
+    ) {
+
+      return this.products;
+    }
 
     const searchValue =
       this.search
@@ -258,12 +290,338 @@ export class ServicesPage
       'ALL' | PricingUnit
   ): void {
 
+    if (
+      this.arrangeMode
+    ) {
+
+      return;
+    }
+
     this.selectedUnit =
       unit;
   }
 
 
+  startArrange(): void {
+
+    if (
+      this.loading ||
+      this.bulkLoading ||
+      this.arrangementSaving ||
+      this.products.length === 0
+    ) {
+
+      return;
+    }
+
+    this.errorMessage =
+      '';
+
+    this.successMessage =
+      '';
+
+    this.search =
+      '';
+
+    this.selectedUnit =
+      'ALL';
+
+    this.arrangementSnapshot =
+      this.products.map(
+        product => ({
+          ...product
+        })
+      );
+
+    this.draggedProductId =
+      null;
+
+    this.arrangeMode =
+      true;
+  }
+
+
+  cancelArrange(): void {
+
+    if (
+      this.arrangementSaving
+    ) {
+
+      return;
+    }
+
+    this.products =
+      this.arrangementSnapshot.map(
+        product => ({
+          ...product
+        })
+      );
+
+    this.arrangementSnapshot =
+      [];
+
+    this.draggedProductId =
+      null;
+
+    this.arrangeMode =
+      false;
+
+    this.errorMessage =
+      '';
+  }
+
+
+  onProductDragStart(
+    event:
+      DragEvent,
+    product:
+      Product
+  ): void {
+
+    if (
+      !this.arrangeMode ||
+      this.arrangementSaving
+    ) {
+
+      event.preventDefault();
+
+      return;
+    }
+
+    this.draggedProductId =
+      product.id;
+
+    if (
+      event.dataTransfer
+    ) {
+
+      event.dataTransfer.effectAllowed =
+        'move';
+
+      event.dataTransfer.setData(
+        'text/plain',
+        product.id
+      );
+    }
+  }
+
+
+  onProductDragOver(
+    event:
+      DragEvent
+  ): void {
+
+    if (
+      !this.arrangeMode ||
+      this.arrangementSaving
+    ) {
+
+      return;
+    }
+
+    event.preventDefault();
+
+    if (
+      event.dataTransfer
+    ) {
+
+      event.dataTransfer.dropEffect =
+        'move';
+    }
+  }
+
+
+  onProductDrop(
+    event:
+      DragEvent,
+    targetProduct:
+      Product
+  ): void {
+
+    if (
+      !this.arrangeMode ||
+      this.arrangementSaving
+    ) {
+
+      return;
+    }
+
+    event.preventDefault();
+
+    const draggedId =
+      this.draggedProductId ||
+      event.dataTransfer
+        ?.getData(
+          'text/plain'
+        );
+
+    if (
+      !draggedId ||
+      draggedId === targetProduct.id
+    ) {
+
+      return;
+    }
+
+    const fromIndex =
+      this.products.findIndex(
+        product =>
+          product.id === draggedId
+      );
+
+    const toIndex =
+      this.products.findIndex(
+        product =>
+          product.id === targetProduct.id
+      );
+
+    if (
+      fromIndex < 0 ||
+      toIndex < 0
+    ) {
+
+      return;
+    }
+
+    const reorderedProducts =
+      [
+        ...this.products
+      ];
+
+    const [
+      movedProduct
+    ] =
+      reorderedProducts.splice(
+        fromIndex,
+        1
+      );
+
+    reorderedProducts.splice(
+      toIndex,
+      0,
+      movedProduct
+    );
+
+    this.products =
+      reorderedProducts;
+  }
+
+
+  onProductDragEnd(): void {
+
+    this.draggedProductId =
+      null;
+  }
+
+
+  saveArrangement(): void {
+
+    if (
+      !this.arrangeMode ||
+      this.arrangementSaving ||
+      this.products.length === 0
+    ) {
+
+      return;
+    }
+
+    const request:
+      ProductReorderRequest = {
+
+      products:
+        this.products.map(
+          (
+            product,
+            index
+          ) => ({
+
+            productId:
+              product.id,
+
+            displayOrder:
+              index + 1
+          })
+        )
+    };
+
+    this.arrangementSaving =
+      true;
+
+    this.errorMessage =
+      '';
+
+    this.successMessage =
+      '';
+
+    this.apiService
+      .reorderProducts(
+        request
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.products =
+            this.products.map(
+              (
+                product,
+                index
+              ) => ({
+
+                ...product,
+
+                displayOrder:
+                  index + 1
+              })
+            );
+
+          this.arrangementSnapshot =
+            [];
+
+          this.draggedProductId =
+            null;
+
+          this.arrangeMode =
+            false;
+
+          this.arrangementSaving =
+            false;
+
+          this.successMessage =
+            'Product arrangement saved successfully';
+        },
+
+        error: (
+          error:
+            any
+        ) => {
+
+          console.error(
+            'Failed to save product arrangement:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Failed to save product arrangement';
+
+          this.arrangementSaving =
+            false;
+        }
+
+      });
+  }
+
+
   addProduct(): void {
+
+    if (
+      this.arrangeMode
+    ) {
+
+      return;
+    }
 
     this.editingProductId =
       null;
@@ -285,6 +643,13 @@ export class ServicesPage
     product:
       Product
   ): void {
+
+    if (
+      this.arrangeMode
+    ) {
+
+      return;
+    }
 
     this.editingProductId =
       product.id;
@@ -696,10 +1061,18 @@ export class ServicesPage
             Product
         ) => {
 
-          this.products = [
-            product,
-            ...this.products
-          ];
+          this.products =
+            [
+              ...this.products,
+              product
+            ].sort(
+              (
+                firstProduct,
+                secondProduct
+              ) =>
+                (firstProduct.displayOrder ?? 0) -
+                (secondProduct.displayOrder ?? 0)
+            );
 
           this.loading =
             false;
@@ -799,6 +1172,13 @@ export class ServicesPage
 
 
   openBulkUpload(): void {
+
+    if (
+      this.arrangeMode
+    ) {
+
+      return;
+    }
 
     this.showBulkUpload =
       true;
@@ -1049,6 +1429,13 @@ submitBulkUpload(): void {
 
     return Array.from(
       productMap.values()
+    ).sort(
+      (
+        firstProduct,
+        secondProduct
+      ) =>
+        (firstProduct.displayOrder ?? 0) -
+        (secondProduct.displayOrder ?? 0)
     );
   }
 
@@ -1057,6 +1444,13 @@ submitBulkUpload(): void {
     product:
       Product
   ): void {
+
+    if (
+      this.arrangeMode
+    ) {
+
+      return;
+    }
 
     this.errorMessage =
       '';
@@ -1115,6 +1509,13 @@ submitBulkUpload(): void {
     product:
       Product
   ): void {
+
+    if (
+      this.arrangeMode
+    ) {
+
+      return;
+    }
 
     this.editProduct(
       product
@@ -1192,6 +1593,14 @@ submitBulkUpload(): void {
 
 
   refresh(): void {
+
+    if (
+      this.arrangeMode ||
+      this.arrangementSaving
+    ) {
+
+      return;
+    }
 
     this.loadProducts();
   }

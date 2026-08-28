@@ -365,11 +365,26 @@
   overflow-x: auto;
   overflow-y: hidden;
 
-  scrollbar-width: none;
+  scrollbar-width: auto;
+  scrollbar-color: var(--app-text-muted) var(--app-background-soft);
 }
 
 .payments-table::-webkit-scrollbar {
-  display: none;
+  height: 10px;
+}
+
+.payments-table::-webkit-scrollbar-track {
+  background: var(--app-background-soft);
+  border-radius: 999px;
+}
+
+.payments-table::-webkit-scrollbar-thumb {
+  background: var(--app-text-muted);
+  border-radius: 999px;
+}
+
+.payments-table::-webkit-scrollbar-thumb:hover {
+  background: var(--app-text-secondary);
 }
 
 .table-header,
@@ -503,11 +518,26 @@
   overflow-x: auto;
   overflow-y: hidden;
 
-  scrollbar-width: none;
+  scrollbar-width: auto;
+  scrollbar-color: var(--app-text-muted) var(--app-background-soft);
 }
 
 .payment-method-section::-webkit-scrollbar {
-  display: none;
+  height: 10px;
+}
+
+.payment-method-section::-webkit-scrollbar-track {
+  background: var(--app-background-soft);
+  border-radius: 999px;
+}
+
+.payment-method-section::-webkit-scrollbar-thumb {
+  background: var(--app-text-muted);
+  border-radius: 999px;
+}
+
+.payment-method-section::-webkit-scrollbar-thumb:hover {
+  background: var(--app-text-secondary);
 }
 
 .method-header {
