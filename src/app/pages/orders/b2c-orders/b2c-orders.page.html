@@ -39,7 +39,7 @@
 
   </section>
 
-  <!-- <section class="filter-section">
+  <section class="filter-section">
 
     <div class="filter-field">
 
@@ -51,6 +51,20 @@
         type="text"
         [(ngModel)]="orderNumberSearch"
         placeholder="LAUNDRY-0001"
+        (keyup.enter)="searchOrders()">
+
+    </div>
+
+    <div class="filter-field">
+
+      <label>
+        Customer Name
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="customerNameSearch"
+        placeholder="Search customer name"
         (keyup.enter)="searchOrders()">
 
     </div>
@@ -88,72 +102,7 @@
 
     </button>
 
-  </section> -->
-
-  <section class="filter-section">
-
-  <div class="filter-field">
-
-    <label>
-      Order No.
-    </label>
-
-    <input
-      type="text"
-      [(ngModel)]="orderNumberSearch"
-      placeholder="LAUNDRY-0001"
-      (keyup.enter)="searchOrders()">
-
-  </div>
-
-  <div class="filter-field">
-
-    <label>
-      Customer Name
-    </label>
-
-    <input
-      type="text"
-      [(ngModel)]="customerNameSearch"
-      placeholder="Search customer name"
-      (keyup.enter)="searchOrders()">
-
-  </div>
-
-  <div class="filter-field">
-
-    <label>
-      Mobile
-    </label>
-
-    <input
-      type="text"
-      [(ngModel)]="mobileSearch"
-      placeholder="Search mobile number"
-      maxlength="10"
-      (keyup.enter)="searchOrders()">
-
-  </div>
-
-  <button
-    type="button"
-    class="search-button"
-    (click)="searchOrders()">
-
-    Search
-
-  </button>
-
-  <button
-    type="button"
-    class="clear-button"
-    (click)="clearFilters()">
-
-    Clear
-
-  </button>
-
-</section>
+  </section>
 
   @if (errorMessage) {
 
@@ -312,17 +261,17 @@
 
                 }
 
-                
+                <button
+                  type="button"
+                  class="action-button primary-action"
+                  (click)="viewOrder(order)">
 
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="viewOrder(order)">
+                  View
 
-                    View
+                </button>
 
-                  </button>
-                  @if (order.status === 'DELIVERED') {
+                @if (order.status === 'DELIVERED') {
+
                   <button
                     type="button"
                     class="action-button primary-action"
@@ -331,18 +280,8 @@
                     Bill Receipt
 
                   </button>
+
                 }
-                  <button
-                    type="button"
-                    class="action-button whatsapp-action"
-                    [disabled]="actionLoading"
-                    (click)="sendReceiptWhatsApp(order)">
-
-                    WhatsApp Receipt
-
-                  </button>
-
-                
 
                 @if (order.status === 'CANCELLED') {
 
@@ -394,20 +333,6 @@
                         ▣ Bill Receipt
 
                       </button>
-
-                      @if (order.status === 'DELIVERED') {
-
-                        <button
-                          type="button"
-                          [disabled]="actionLoading"
-                          (click)="sendReceiptWhatsApp(order)">
-
-                          WhatsApp Receipt
-
-                        </button>
-
-                      }
-
 
                       @if (
                         order.status === 'TAGGED' ||

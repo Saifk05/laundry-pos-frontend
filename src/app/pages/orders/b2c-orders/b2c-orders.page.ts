@@ -1,8 +1,11 @@
 import {
-  Component,OnInit 
+  Component,
+  OnInit
 } from '@angular/core';
 
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule
+} from '@angular/forms';
 
 import {
   Router
@@ -26,25 +29,44 @@ import {
   SettlementOrder
 } from '../../../../core/models/settlement.model';
 
+
 interface B2cOrderView {
+
   id: string;
+
   orderNumber: string;
+
   status: B2COrderStatus;
+
   customerName: string;
+
   mobile: string;
+
   storageLabel: string;
+
   pickupDate: string;
+
   pickupSlot: string;
+
   deliveryDate: string;
+
   deliverySlot: string;
+
   amount: number;
+
   homeDelivery: boolean;
+
   expressDelivery: boolean;
+
   settled: boolean;
+
   createdAt: string;
+
   updatedAt: string;
+
   moreOpen?: boolean;
 }
+
 
 @Component({
   selector: 'app-b2c-orders',
@@ -148,15 +170,20 @@ export class B2cOrdersPage
       Router
   ) {}
 
+
   ngOnInit(): void {
+
     this.loadOrders();
   }
 
+
   loadOrders(): void {
 
-    this.loading = true;
+    this.loading =
+      true;
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
     this.apiService
       .getB2COrders(
@@ -208,6 +235,7 @@ export class B2cOrdersPage
       });
   }
 
+
   private toViewOrder(
     order:
       B2COrder
@@ -256,66 +284,94 @@ export class B2cOrdersPage
           0
         ),
 
-      homeDelivery:order.homeDelivery,
-      expressDelivery: order.expressDelivery,  
-      settled:order.settled,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-      moreOpen:false
+      homeDelivery:
+        order.homeDelivery,
+
+      expressDelivery:
+        order.expressDelivery,
+
+      settled:
+        order.settled,
+
+      createdAt:
+        order.createdAt,
+
+      updatedAt:
+        order.updatedAt,
+
+      moreOpen:
+        false
     };
   }
 
-get filteredOrders(): B2cOrderView[] {
 
-  return this.orders.filter(
-    (order: B2cOrderView) => {
+  get filteredOrders():
+    B2cOrderView[] {
 
-      const matchesStatus =
-        this.selectedStatus === 'All' ||
-        this.getStatusLabel(order.status) ===
-          this.selectedStatus;
+    return this.orders.filter(
+      (
+        order:
+          B2cOrderView
+      ) => {
 
-      const orderSearch =
-        this.orderNumberSearch
-          .trim()
-          .toLowerCase();
+        const matchesStatus =
+          this.selectedStatus ===
+            'All' ||
+          this.getStatusLabel(
+            order.status
+          ) ===
+            this.selectedStatus;
 
-      const customerSearch =
-        this.customerNameSearch
-          .trim()
-          .toLowerCase();
+        const orderSearch =
+          this.orderNumberSearch
+            .trim()
+            .toLowerCase();
 
-      const mobileSearch =
-        this.mobileSearch
-          .trim();
+        const customerSearch =
+          this.customerNameSearch
+            .trim()
+            .toLowerCase();
 
-      const matchesOrderNumber =
-        !orderSearch ||
-        order.orderNumber
-          .toLowerCase()
-          .includes(orderSearch);
+        const mobileSearch =
+          this.mobileSearch
+            .trim();
 
-      const matchesCustomerName =
-        !customerSearch ||
-        (order.customerName ?? '')
-          .toLowerCase()
-          .includes(customerSearch);
+        const matchesOrderNumber =
+          !orderSearch ||
+          order.orderNumber
+            .toLowerCase()
+            .includes(
+              orderSearch
+            );
 
-      const matchesMobile =
-        !mobileSearch ||
-        order.mobile.includes(
-          mobileSearch
+        const matchesCustomerName =
+          !customerSearch ||
+          (
+            order.customerName ??
+            ''
+          )
+            .toLowerCase()
+            .includes(
+              customerSearch
+            );
+
+        const matchesMobile =
+          !mobileSearch ||
+          order.mobile
+            .includes(
+              mobileSearch
+            );
+
+        return (
+          matchesStatus &&
+          matchesOrderNumber &&
+          matchesCustomerName &&
+          matchesMobile
         );
+      }
+    );
+  }
 
-      return (
-        matchesStatus &&
-        matchesOrderNumber &&
-        matchesCustomerName &&
-        matchesMobile
-      );
-    }
-  );
-}
 
   selectStatus(
     status:
@@ -330,18 +386,22 @@ get filteredOrders(): B2cOrderView[] {
     this.loadOrders();
   }
 
-searchOrders(): void {
 
-  this.closeAllMoreMenus();
+  searchOrders(): void {
 
-  if (
-    this.customerNameSearch.trim()
-  ) {
-    return;
+    this.closeAllMoreMenus();
+
+    if (
+      this.customerNameSearch
+        .trim()
+    ) {
+
+      return;
+    }
+
+    this.loadOrders();
   }
 
-  this.loadOrders();
-}
 
   clearFilters(): void {
 
@@ -353,13 +413,15 @@ searchOrders(): void {
 
     this.mobileSearch =
       '';
-    
-    this.customerNameSearch = '';  
+
+    this.customerNameSearch =
+      '';
 
     this.closeAllMoreMenus();
 
     this.loadOrders();
   }
+
 
   private getSearchValue():
     string {
@@ -378,6 +440,7 @@ searchOrders(): void {
     return this.mobileSearch
       .trim();
   }
+
 
   private getBackendStatus():
     B2COrderStatus | null {
@@ -411,6 +474,7 @@ searchOrders(): void {
         return null;
     }
   }
+
 
   getStatusLabel(
     status:
@@ -447,6 +511,7 @@ searchOrders(): void {
     }
   }
 
+
   toggleMore(
     order:
       B2cOrderView
@@ -461,6 +526,7 @@ searchOrders(): void {
     order.moreOpen =
       !currentState;
   }
+
 
   private closeAllMoreMenus():
     void {
@@ -478,14 +544,17 @@ searchOrders(): void {
       );
   }
 
+
   processAtStore(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.actionLoading = true;
+    this.actionLoading =
+      true;
 
     this.closeAllMoreMenus();
 
@@ -523,6 +592,7 @@ searchOrders(): void {
       });
   }
 
+
   markReady(
     order:
       B2cOrderView
@@ -530,9 +600,11 @@ searchOrders(): void {
 
     this.closeAllMoreMenus();
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.readyStorageError = '';
+    this.readyStorageError =
+      '';
 
     this.storageModalMode =
       'MARK_READY';
@@ -695,14 +767,17 @@ searchOrders(): void {
       });
   }
 
+
   markDelivered(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.actionLoading = true;
+    this.actionLoading =
+      true;
 
     this.closeAllMoreMenus();
 
@@ -739,14 +814,17 @@ searchOrders(): void {
       });
   }
 
+
   cancelOrder(
     order:
       B2cOrderView
   ): void {
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.actionLoading = true;
+    this.actionLoading =
+      true;
 
     this.closeAllMoreMenus();
 
@@ -783,6 +861,7 @@ searchOrders(): void {
       });
   }
 
+
   settleOrder(
     order:
       B2cOrderView
@@ -790,9 +869,11 @@ searchOrders(): void {
 
     this.closeAllMoreMenus();
 
-    this.errorMessage = '';
+    this.errorMessage =
+      '';
 
-    this.paymentError = '';
+    this.paymentError =
+      '';
 
     if (
       order.status ===
@@ -875,7 +956,9 @@ searchOrders(): void {
       });
   }
 
-  closePaymentModal(): void {
+
+  closePaymentModal():
+    void {
 
     if (
       this.actionLoading
@@ -903,7 +986,9 @@ searchOrders(): void {
       '';
   }
 
-  setFullBalance(): void {
+
+  setFullBalance():
+    void {
 
     if (
       !this.selectedPaymentOrder
@@ -918,6 +1003,7 @@ searchOrders(): void {
           .balanceAmount
       );
   }
+
 
   get remainingAfterPayment():
     number {
@@ -943,12 +1029,15 @@ searchOrders(): void {
       );
 
     return Math.max(
-      balance - amount,
+      balance -
+      amount,
       0
     );
   }
 
-  addPayment(): void {
+
+  addPayment():
+    void {
 
     if (
       !this.selectedPaymentOrder
@@ -957,7 +1046,8 @@ searchOrders(): void {
       return;
     }
 
-    this.paymentError = '';
+    this.paymentError =
+      '';
 
     const amount =
       Number(
@@ -1083,6 +1173,7 @@ searchOrders(): void {
       });
   }
 
+
   reschedule(
     order:
       B2cOrderView
@@ -1091,16 +1182,21 @@ searchOrders(): void {
     this.closeAllMoreMenus();
 
     this.router.navigate(
-      ['/app/new-walk-in'],
+      [
+        '/app/new-walk-in'
+      ],
       {
         queryParams: {
-          mode: 'reschedule',
+          mode:
+            'reschedule',
+
           orderId:
             order.id
         }
       }
     );
   }
+
 
   updateStorageLabel(
     order:
@@ -1231,6 +1327,7 @@ searchOrders(): void {
     );
   }
 
+
   retagOrder(
     order:
       B2cOrderView
@@ -1239,16 +1336,21 @@ searchOrders(): void {
     this.closeAllMoreMenus();
 
     this.router.navigate(
-      ['/app/new-walk-in'],
+      [
+        '/app/new-walk-in'
+      ],
       {
         queryParams: {
-          mode: 'retag',
+          mode:
+            'retag',
+
           orderId:
             order.id
         }
       }
     );
   }
+
 
   callCustomer(
     order:
@@ -1265,6 +1367,7 @@ searchOrders(): void {
     window.location.href =
       `tel:${order.mobile}`;
   }
+
 
   viewOrder(
     order:
@@ -1307,52 +1410,6 @@ searchOrders(): void {
       });
   }
 
-  sendReceiptWhatsApp(
-    order:
-      B2cOrderView
-  ): void {
-
-    this.closeAllMoreMenus();
-
-    this.errorMessage =
-      '';
-
-    this.actionLoading =
-      true;
-
-    this.apiService
-      .sendBillReceiptToWhatsApp(
-        order.id
-      )
-      .subscribe({
-
-        next: (
-          response:
-            string
-        ) => {
-
-          console.log(
-            'WhatsApp receipt sent',
-            response
-          );
-
-          this.actionLoading =
-            false;
-        },
-
-        error: (
-          error:
-            any
-        ) => {
-
-          this.handleActionError(
-            error,
-            'Unable to send receipt on WhatsApp'
-          );
-        }
-
-      });
-  }
 
   billReceipt(
     order:
@@ -1394,6 +1451,7 @@ searchOrders(): void {
       });
   }
 
+
   formatAmount(
     amount:
       number
@@ -1406,6 +1464,7 @@ searchOrders(): void {
       2
     );
   }
+
 
   private printReceipt(
     order:
@@ -1683,6 +1742,7 @@ searchOrders(): void {
     printWindow.document.close();
   }
 
+
   private updateLocalOrder(
     response:
       B2COrder
@@ -1706,12 +1766,20 @@ searchOrders(): void {
           return {
             ...order,
 
-            orderNumber:response.orderNumber,
-            customerName: response.customerName,
-            mobile:response.mobile,
-            amount:Number(
+            orderNumber:
+              response.orderNumber,
+
+            customerName:
+              response.customerName,
+
+            mobile:
+              response.mobile,
+
+            amount:
+              Number(
                 response.totalAmount
               ),
+
             pickupDate:
               response.pickupDate ??
               '-',
@@ -1728,24 +1796,47 @@ searchOrders(): void {
               response.deliveryTime ??
               '-',
 
-            storageLabel: response.storageLabel ??
+            storageLabel:
+              response.storageLabel ??
               '-',
-            homeDelivery:response.homeDelivery,
-            expressDelivery: response.expressDelivery,
-            settled:response.settled,
-            status: response.status,
-            updatedAt: response.updatedAt,
-            moreOpen:false
+
+            homeDelivery:
+              response.homeDelivery,
+
+            expressDelivery:
+              response.expressDelivery,
+
+            settled:
+              response.settled,
+
+            status:
+              response.status,
+
+            updatedAt:
+              response.updatedAt,
+
+            moreOpen:
+              false
           };
         }
       );
   }
 
-  private handleActionError(error: any, fallbackMessage:string ): void {
 
-    console.error( fallbackMessage, error);
+  private handleActionError(
+    error:
+      any,
+    fallbackMessage:
+      string
+  ): void {
 
-    this.actionLoading = false;
+    console.error(
+      fallbackMessage,
+      error
+    );
+
+    this.actionLoading =
+      false;
 
     this.errorMessage =
       error?.error?.message ||
