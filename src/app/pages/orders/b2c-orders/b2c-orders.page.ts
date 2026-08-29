@@ -675,11 +675,11 @@ private printReceipt(order: B2COrderDetails): void {
     )
     .join('');
 
-const printWindow = window.open(
-  '',
-  '_blank',
-  `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
-);
+  const printWindow = window.open(
+    '',
+    '_blank',
+    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+  );
 
   if (!printWindow) {
     return;
@@ -811,17 +811,18 @@ const printWindow = window.open(
           <div class="row">
             <span>Created</span>
             <strong>
-              ${new Date(order.createdAt).toLocaleString('en-IN')}
+              ${new Date(order.createdAt).toLocaleDateString('en-GB')}
             </strong>
           </div>
 
           <div class="row">
             <span>Delivery</span>
             <strong>
-              ${order.deliveryDate
-                ? new Date(order.deliveryDate + 'T00:00:00').toLocaleDateString('en-IN')
-                : '-'}
-              ${order.deliveryTime ? `, ${order.deliveryTime}` : ''}
+              ${
+                order.deliveryDate
+                  ? new Date(order.deliveryDate + 'T00:00:00').toLocaleDateString('en-GB')
+                  : '-'
+              }
             </strong>
           </div>
 
@@ -889,7 +890,6 @@ const printWindow = window.open(
   printWindow.document.close();
   printWindow.focus();
 }
-
   private printQrTags(order: B2COrderDetails): void {
     const createdDate = new Date(order.createdAt);
     const formattedDate = createdDate.toLocaleDateString('en-GB', {

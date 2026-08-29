@@ -2014,320 +2014,338 @@ const printWindow =
     return;
   }
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
+printWindow.document.write(`
+  <!DOCTYPE html>
+  <html>
 
-      <head>
+    <head>
 
-        <title>
-          Receipt
-        </title>
+      <title>
+        Receipt
+      </title>
 
-        <style>
+      <style>
 
-          * {
-            box-sizing: border-box;
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          padding: 12px;
+          font-family: Arial, sans-serif;
+          color: #111;
+          background: #fff;
+        }
+
+        .receipt {
+          width: 80mm;
+          margin: 0 auto;
+          font-size: 12px;
+        }
+
+        .center {
+          text-align: center;
+        }
+
+        .shop-name {
+          font-size: 18px;
+          font-weight: 700;
+        }
+
+        .muted {
+          color: #555;
+          font-size: 11px;
+        }
+
+        .divider {
+          margin: 8px 0;
+          border-top: 1px dashed #000;
+        }
+
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          margin: 3px 0;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+
+        th,
+        td {
+          padding: 5px 2px;
+          vertical-align: top;
+          border-bottom: 1px dashed #bbb;
+        }
+
+        th {
+          text-align: left;
+          font-size: 11px;
+        }
+
+        td {
+          font-size: 11px;
+        }
+
+        .total-row {
+          display: flex;
+          justify-content: space-between;
+          margin: 4px 0;
+        }
+
+        .grand-total {
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px solid #000;
+          font-size: 15px;
+          font-weight: 700;
+        }
+
+        .terms {
+          margin-top: 6px;
+          font-size: 8px;
+          line-height: 1.4;
+        }
+
+        .terms-title {
+          margin-bottom: 4px;
+          font-size: 9px;
+          font-weight: 700;
+          text-align: left;
+        }
+
+        .terms-content {
+          text-align: left;
+          color: #333;
+        }
+
+        .terms-content div {
+          margin-bottom: 2px;
+        }
+
+        .footer {
+          margin-top: 14px;
+          text-align: center;
+          font-size: 11px;
+        }
+
+        @media print {
+
+          @page {
+            size: 80mm auto;
+            margin: 0;
           }
 
           body {
-            margin: 0;
-            padding: 12px;
-            font-family: Arial, sans-serif;
-            color: #111;
-            background: #fff;
+            padding: 4mm;
           }
 
-          .receipt {
-            width: 80mm;
-            margin: 0 auto;
-            font-size: 12px;
-          }
+        }
 
-          .center {
-            text-align: center;
-          }
+      </style>
 
-          .shop-name {
-            font-size: 18px;
-            font-weight: 700;
-          }
+    </head>
 
-          .muted {
-            color: #555;
-            font-size: 11px;
-          }
+    <body>
 
-          .divider {
-            margin: 8px 0;
-            border-top: 1px dashed #000;
-          }
+      <div class="receipt">
 
-          .info-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin: 3px 0;
-          }
+        <div class="center">
 
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-          }
-
-          th,
-          td {
-            padding: 5px 2px;
-            vertical-align: top;
-            border-bottom: 1px dashed #bbb;
-          }
-
-          th {
-            text-align: left;
-            font-size: 11px;
-          }
-
-          td {
-            font-size: 11px;
-          }
-
-          .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 4px 0;
-          }
-
-          .grand-total {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #000;
-            font-size: 15px;
-            font-weight: 700;
-          }
-
-          .terms {
-            margin-top: 6px;
-            font-size: 8px;
-            line-height: 1.4;
-          }
-
-          .terms-title {
-            margin-bottom: 4px;
-            font-size: 9px;
-            font-weight: 700;
-            text-align: left;
-          }
-
-          .terms-content {
-            text-align: left;
-            color: #333;
-          }
-
-          .terms-content div {
-            margin-bottom: 2px;
-          }
-
-          .footer {
-            margin-top: 14px;
-            text-align: center;
-            font-size: 11px;
-          }
-
-          @media print {
-
-            @page {
-              size: 80mm auto;
-              margin: 0;
-            }
-
-            body {
-              padding: 4mm;
-            }
-
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        <div class="receipt">
-
-          <div class="center">
-
-            <div class="shop-name">
-              ${this.businessName}
-            </div>
-
-            <div class="muted">
-              Laundry Service Receipt
-            </div>
-
+          <div class="shop-name">
+            ${this.businessName}
           </div>
 
-          <div class="divider"></div>
-
-          <div class="info-row">
-
-            <span>
-              Order
-            </span>
-
-            <strong>
-              #${order.orderNumber}
-            </strong>
-
-          </div>
-
-          <div class="info-row">
-
-            <span>
-              Customer
-            </span>
-
-            <strong>
-              ${order.customer.name}
-            </strong>
-
-          </div>
-
-          <div class="info-row">
-
-            <span>
-              Mobile
-            </span>
-
-            <strong>
-              ${order.customer.phone}
-            </strong>
-
-          </div>
-
-          <div class="info-row">
-
-            <span>
-              Date
-            </span>
-
-            <strong>
-              ${new Date(order.createdAt).toLocaleString()}
-            </strong>
-
-          </div>
-
-          <div class="divider"></div>
-
-          <table>
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Item
-                </th>
-
-                <th style="text-align:center;">
-                  Qty
-                </th>
-
-                <th style="text-align:right;">
-                  Rate
-                </th>
-
-                <th style="text-align:right;">
-                  Total
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-
-          </table>
-
-          <div class="divider"></div>
-
-          <div class="total-row">
-
-            <span>
-              Subtotal
-            </span>
-
-            <strong>
-              ₹${Number(order.subtotal).toFixed(2)}
-            </strong>
-
-          </div>
-
-          <div class="total-row">
-
-            <span>
-              Discount
-            </span>
-
-            <strong>
-              -₹${Number(order.discountAmount).toFixed(2)}
-            </strong>
-
-          </div>
-
-          <div class="total-row">
-
-            <span>
-              Express Charge
-            </span>
-
-            <strong>
-              +₹${Number(order.expressChargeAmount).toFixed(2)}
-            </strong>
-
-          </div>
-
-          <div class="total-row grand-total">
-
-            <span>
-              Total
-            </span>
-
-            <strong>
-              ₹${Number(order.totalAmount).toFixed(2)}
-            </strong>
-
-          </div>
-
-          ${termsHtml}
-
-          <div class="footer">
-
-            Thank you!
-
-            <br>
-
-            Please keep this receipt
-            until collection.
-
+          <div class="muted">
+            Laundry Service Receipt
           </div>
 
         </div>
 
-        <script>
+        <div class="divider"></div>
 
-          window.onload = function () {
-            window.print();
-          };
+        <div class="info-row">
 
-        </script>
+          <span>
+            Order
+          </span>
 
-      </body>
+          <strong>
+            #${order.orderNumber}
+          </strong>
 
-    </html>
-  `);
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Customer
+          </span>
+
+          <strong>
+            ${order.customer.name}
+          </strong>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Mobile
+          </span>
+
+          <strong>
+            ${order.customer.phone}
+          </strong>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Created
+          </span>
+
+          <strong>
+            ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+          </strong>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Delivery
+          </span>
+
+          <strong>
+            ${
+              order.deliveryDate
+                ? new Date(
+                    order.deliveryDate + 'T00:00:00'
+                  ).toLocaleDateString('en-GB')
+                : '-'
+            }
+          </strong>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Item
+              </th>
+
+              <th style="text-align:center;">
+                Qty
+              </th>
+
+              <th style="text-align:right;">
+                Rate
+              </th>
+
+              <th style="text-align:right;">
+                Total
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+
+        </table>
+
+        <div class="divider"></div>
+
+        <div class="total-row">
+
+          <span>
+            Subtotal
+          </span>
+
+          <strong>
+            ₹${Number(order.subtotal).toFixed(2)}
+          </strong>
+
+        </div>
+
+        <div class="total-row">
+
+          <span>
+            Discount
+          </span>
+
+          <strong>
+            -₹${Number(order.discountAmount).toFixed(2)}
+          </strong>
+
+        </div>
+
+        <div class="total-row">
+
+          <span>
+            Express Charge
+          </span>
+
+          <strong>
+            +₹${Number(order.expressChargeAmount).toFixed(2)}
+          </strong>
+
+        </div>
+
+        <div class="total-row grand-total">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+            ₹${Number(order.totalAmount).toFixed(2)}
+          </strong>
+
+        </div>
+
+        ${termsHtml}
+
+        <div class="footer">
+
+          Thank you!
+
+          <br>
+
+          Please keep this receipt
+          until collection.
+
+        </div>
+
+      </div>
+
+      <script>
+
+        window.onload = function () {
+          window.print();
+        };
+
+      </script>
+
+    </body>
+
+  </html>
+`);
 
   printWindow.document.close();
 }
