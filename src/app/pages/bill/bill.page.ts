@@ -261,14 +261,12 @@ export class BillPage
                 this.createdDate
               );
 
-          const matchesDeliveredDate =
+          const matchesDeliveryDate =
             !this.deliveredDate ||
 
             (
-              invoice.deliveredAt !==
-                null &&
-
-              invoice.deliveredAt
+              invoice.deliveryDate !== null &&
+              invoice.deliveryDate 
                 .startsWith(
                   this.deliveredDate
                 )
@@ -278,7 +276,7 @@ export class BillPage
             matchesOrder &&
             matchesStatus &&
             matchesCreatedDate &&
-            matchesDeliveredDate
+            matchesDeliveryDate
           );
         }
       );
@@ -313,24 +311,12 @@ export class BillPage
 
       result.sort(
         (
-          a:
-            Bill,
-          b:
-            Bill
-        ) =>
-          Number(
-            a.grossTotal
-          ) -
-          Number(
-            b.grossTotal
-          )
+          a: Bill,
+          b: Bill
+        ) => Number( a.grossTotal ) - Number( b.grossTotal )
       );
 
-    } else if (
-      this.sortBy ===
-        'Created Date Asc'
-    ) {
-
+    } else if ( this.sortBy === 'Created Date Asc') {
       result.sort(
         (
           a:
@@ -421,57 +407,13 @@ export class BillPage
     );
   }
 
-  // get totalTax():
-  //   number {
-
-  //   return this.filteredInvoices.reduce(
-  //     (
-  //       total:
-  //         number,
-  //       invoice:
-  //         Bill
-  //     ) =>
-  //       total +
-  //       Number(
-  //         invoice.tax ?? 0
-  //       ),
-  //     0
-  //   );
-  // }
-
-  // get totalTaxable():
-  //   number {
-
-  //   return this.filteredInvoices.reduce(
-  //     (
-  //       total:
-  //         number,
-  //       invoice:
-  //         Bill
-  //     ) =>
-  //       total +
-  //       Number(
-  //         invoice.taxableAmount ?? 0
-  //       ),
-  //     0
-  //   );
-  // }
 
   get totalExpress():
     number {
 
     return this.filteredInvoices.reduce(
-      (
-        total:
-          number,
-        invoice:
-          Bill
-      ) =>
-        total +
-        Number(
-          invoice.expressAmount ?? 0
-        ),
-      0
+      ( total: number, invoice:Bill ) =>
+        total + Number( invoice.expressAmount ?? 0 ), 0
     );
   }
 
@@ -480,10 +422,8 @@ export class BillPage
 
     return this.filteredInvoices.reduce(
       (
-        total:
-          number,
-        invoice:
-          Bill
+        total: number,
+        invoice: Bill
       ) =>
         total +
         Number(

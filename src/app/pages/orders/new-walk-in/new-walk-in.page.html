@@ -102,7 +102,6 @@
 
     </div>
 
-
     <div class="cart-section">
 
       @if (loadingRetagOrder) {
@@ -191,23 +190,21 @@
 
                     </div>
 
-
                     <div class="compact-cart-services">
-
-                      <span>
-                        Services:
-                      </span>
-
-                      <strong>
-                        {{ item.serviceNames.join(', ') }}
-                      </strong>
-
+                      <span>Services:</span>
+                      <strong>{{ item.serviceNames.join(', ') }}</strong>
                     </div>
+
+                    @if (item.unit === 'KG') {
+                      <div class="compact-cart-services">
+                        <span>Total Garments:</span>
+                        <strong>{{ item.garmentCount }}</strong>
+                      </div>
+                    }
 
                   </div>
 
                 </div>
-
 
                 <div class="compact-cart-total">
 
@@ -241,7 +238,6 @@
 
     </div>
 
-
     <div class="left-summary">
 
       <div class="summary-line">
@@ -256,7 +252,6 @@
 
       </div>
 
-
       <div class="summary-line">
 
         <span>
@@ -268,7 +263,6 @@
         </strong>
 
       </div>
-
 
       <div class="summary-line">
 
@@ -295,7 +289,6 @@
 
       </div>
 
-
       <div class="summary-line">
 
         <span>
@@ -307,7 +300,6 @@
         </strong>
 
       </div>
-
 
       <div class="summary-line total">
 
@@ -322,7 +314,6 @@
       </div>
 
     </div>
-
 
     <div class="bottom-options">
 
@@ -363,7 +354,6 @@
 
         </div>
 
-
         <div class="delivery-option-row">
 
           <div class="delivery-option-icon">
@@ -399,7 +389,6 @@
 
         </div>
 
-
         @if (!isRescheduleMode) {
 
         <div class="delivery-option-row toggle-row">
@@ -422,7 +411,6 @@
 
         </div>
 
-
         <div class="delivery-option-row express-row">
 
           <div class="delivery-option-icon"></div>
@@ -441,7 +429,6 @@
           <span class="toggle-label">
             Express Delivery
           </span>
-
 
           @if (expressDelivery) {
 
@@ -480,7 +467,6 @@
 
         </div>
 
-
         @if (
           expressDelivery &&
           expressPercentage > 0
@@ -504,7 +490,6 @@
         }
 
       </div>
-
 
       @if (!isRescheduleMode) {
 
@@ -539,7 +524,6 @@
           }
 
         </button>
-
 
         @if (couponDropdownOpen) {
 
@@ -603,7 +587,6 @@
 
         }
 
-
         @if (couponApplied) {
 
           <button
@@ -621,7 +604,6 @@
 
       }
 
-
       @if (errorMessage) {
 
         <div class="error-text">
@@ -629,7 +611,6 @@
         </div>
 
       }
-
 
       @if (isRescheduleMode) {
 
@@ -705,7 +686,6 @@
 
   </section>
 
-
   @if (!isRetagMode && !isRescheduleMode) {
 
   <section class="products-panel">
@@ -722,7 +702,6 @@
         placeholder="Search products">
 
     </div>
-
 
     <div class="product-list">
 
@@ -755,7 +734,6 @@
                 {{ product.name }}
               </h3>
 
-
               @if (product.types.length > 0) {
 
                 <div class="product-types">
@@ -780,7 +758,6 @@
                 </div>
 
               }
-
 
               @if (
                 product.types.length > 0 &&
@@ -822,12 +799,11 @@
 
             </div>
 
-
             <div class="product-actions">
 
             <div class="product-icon">
               {{ product.icon || (product.unit === 'KG' ? '🧺' : '👕') }}
-            </div>    
+            </div>
               <button
                 type="button"
                 class="add-product-button"
@@ -852,7 +828,6 @@
   }
 
 </div>
-
 
 @if (
   productModalOpen &&
@@ -883,7 +858,6 @@
         </h2>
 
       </div>
-
 
       <div class="product-modal-body">
 
@@ -931,7 +905,6 @@
 
         }
 
-
         <div class="modal-section">
 
           <label class="modal-label">
@@ -978,52 +951,53 @@
 
         </div>
 
-
-        <div
-          class="
-            modal-section
-            modal-quantity-section
-          ">
+        <div class="modal-section modal-quantity-section">
 
           <label class="modal-label">
-
             {{
               selectedProduct.unit === 'KG'
                 ? 'Quantity / Weight'
                 : 'Quantity'
             }}
-
           </label>
 
           <div class="modal-quantity">
-
-            <button
-              type="button"
-              (click)="decreaseModalQuantity()">
-
-              −
-
-            </button>
-
-            <strong>
-              {{ modalQuantity }}
-            </strong>
-
+            <button type="button" (click)="decreaseModalQuantity()">−</button>
+            <strong>{{ modalQuantity }}</strong>
             <button
               type="button"
               [disabled]="isRetagMode || isRescheduleMode"
               (click)="increaseModalQuantity()">
-
               +
-
             </button>
-
           </div>
 
         </div>
 
-      </div>
+        @if (selectedProduct.unit === 'KG') {
 
+          <div class="modal-section modal-quantity-section">
+
+            <label class="modal-label">
+              Total Garments
+            </label>
+
+            <div class="modal-quantity">
+              <button type="button" (click)="decreaseGarmentCount()">−</button>
+              <strong>{{ modalGarmentCount }}</strong>
+              <button
+                type="button"
+                [disabled]="isRetagMode || isRescheduleMode"
+                (click)="increaseGarmentCount()">
+                +
+              </button>
+            </div>
+
+          </div>
+
+        }
+
+      </div>
 
       <div class="product-modal-footer">
 
@@ -1063,7 +1037,6 @@
 
 }
 
-
 @if (orderCreated) {
 
   <div class="success-overlay">
@@ -1085,7 +1058,6 @@
         </span>
 
       </div>
-
 
       <div class="success-actions compact-success-actions">
 

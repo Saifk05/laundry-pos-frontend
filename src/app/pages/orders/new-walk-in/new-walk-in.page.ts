@@ -1,25 +1,8 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
-
-import {
-  CommonModule
-} from '@angular/common';
-
-import {
-  FormsModule
-} from '@angular/forms';
-
-import {
-  ActivatedRoute,
-  Router
-} from '@angular/router';
-
-import {
-  ApiService
-} from '../../../../core/services/api.service';
-
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ApiService } from '../../../../core/services/api.service';
 import {
   CustomerResponse,
   WalkInCoupon,
@@ -51,6 +34,7 @@ interface SelectedOrderItem {
   services: WalkInServicePrice[];
   unitPrice: number;
   quantity: number;
+  garmentCount: number;
   unit: PricingUnit;
   preferences: string[];
   comment: string;
@@ -70,47 +54,27 @@ interface SelectedOrderItem {
 })
 export class NewWalkInPage
   implements OnInit {
-
   loading = false;
-
   creatingOrder = false;
-
   customerName = '';
-
   customerPhone = '';
-
   customerId: string | null = null;
-
   customerExists = false;
-
   checkingCustomer = false;
-
   customerMessage = '';
-
   searchText = '';
-
   products: WalkInProduct[] = [];
-
   productModalOpen = false;
-
-  editingOrderItemId:
-    string | null = null;
-
-  selectedProduct:
-    WalkInProduct | null = null;
-
-  selectedProductType:
-    WalkInProductType | null = null;
-
-  selectedServiceIds:
-    string[] = [];
-
-  selectedPreferences:
-    string[] = [];
-
+  editingOrderItemId: string | null = null;
+  selectedProduct: WalkInProduct | null = null;
+  selectedProductType: WalkInProductType | null = null;
+  selectedServiceIds: string[] = [];
+  selectedPreferences: string[] = [];
   productComment = '';
 
   modalQuantity = 1;
+
+  modalGarmentCount = 1;
 
   availablePreferences:
     string[] = [
@@ -121,30 +85,19 @@ export class NewWalkInPage
       'Remove Stains'
     ];
 
-  orderItems:
-    SelectedOrderItem[] = [];
-
+  orderItems: SelectedOrderItem[] = [];
   deliveryDate = '';
-
   deliveryDateOptions: {
     value: string;
     label: string;
   }[] = [];
 
   deliveryTime = '';
-
   homeDelivery = false;
-
   expressDelivery = false;
-
-  selectedExpressChargeId:
-    string | null = null;
-
+  selectedExpressChargeId: string | null = null;
   expressPercentage = 0;
-
-  expressCharges:
-    WalkInExpressCharge[] = [];
-
+  expressCharges: WalkInExpressCharge[] = [];
   readonly deliveryTimeSlots:
     string[] = [
       '09:00 AM - 10:00 AM',
@@ -163,98 +116,49 @@ export class NewWalkInPage
 
   discountAmount = 0;
 
-  coupons:
-    WalkInCoupon[] = [];
-
+  coupons: WalkInCoupon[] = [];
   couponDropdownOpen = false;
-
   couponApplied = false;
-
-  selectedCouponId:
-    string | null = null;
-
+  selectedCouponId: string | null = null;
   couponCode = '';
-
   couponDiscount = 0;
-
   orderCreated = false;
-
   createdOrderNumber = '';
-
-  createdOrder:
-    OrderResponse | null = null;
-
+  createdOrder: OrderResponse | null = null;
   errorMessage = '';
-
   isRetagMode = false;
-
-  retagOrderId:
-    string | null = null;
-
+  retagOrderId: string | null = null;
   retagOrderNumber = '';
-
   loadingRetagOrder = false;
-
   isRescheduleMode = false;
-
-  rescheduleOrderId:
-    string | null = null;
-
-  businessName =
-    'Venkateshwara Fabric Works';
-
+  rescheduleOrderId: string | null = null;
+  businessName = 'Venkateshwara Fabric Works';
 
   constructor(
-    private readonly apiService:
-      ApiService,
-
-    private readonly route:
-      ActivatedRoute,
-
-    private readonly router:
-      Router
+    private readonly apiService: ApiService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
 
   ngOnInit(): void {
-
     this.initializeOrderMode();
-
     this.generateDeliveryDates();
-
     this.setDefaultDeliveryDate();
-
     this.loadWalkInSetup();
-
     this.loadBusinessSettings();
   }
 
 
   loadBusinessSettings(): void {
 
-  this.apiService
-    .getBusinessSettings()
+  this.apiService .getBusinessSettings()
     .subscribe({
-
-        next: (
-          response:
-            any
-        ) => {
-
-          this.businessName =
-            response?.businessName ||
+        next: ( response: any ) => {
+          this.businessName = response?.businessName ||
             'Venkateshwara Fabric Works';
         },
-
-        error: (
-          error:
-            any
-        ) => {
-
-          console.error(
-            'Settings load error',
-            error
-          );
+         error: (  error: any ) => {
         }
 
       });
@@ -271,51 +175,26 @@ export class NewWalkInPage
       .getWalkInSetup()
       .subscribe({
 
-        next: (
-          response:
-            WalkInSetupResponse
-        ) => {
+        next: ( response: WalkInSetupResponse ) => {
 
-          this.products =
-            response.products ?? [];
-
-          this.coupons =
-            response.coupons ?? [];
-
-          this.expressCharges =
-            response.expressCharges ?? [];
-
+          this.products = response.products ?? [];
+          this.coupons =  response.coupons ?? [];
+          this.expressCharges = response.expressCharges ?? [];
           this.loading = false;
 
-          if (
-            this.isRetagMode &&
-            this.retagOrderId
-          ) {
-
+          if ( this.isRetagMode && this.retagOrderId ) {
             this.loadRetagOrder();
-
             return;
           }
 
-          if (
-            this.isRescheduleMode &&
-            this.rescheduleOrderId
-          ) {
-
+          if ( this.isRescheduleMode && this.rescheduleOrderId ) {
             this.loadRescheduleOrder();
           }
         },
 
         error: (error: any) => {
 
-          console.error(
-            'Walk-in setup error',
-            error
-          );
-
-          this.errorMessage =
-            'Unable to load walk-in setup';
-
+          this.errorMessage = 'Unable to load walk-in setup';
           this.loading = false;
         }
 
@@ -326,31 +205,21 @@ export class NewWalkInPage
   private initializeOrderMode():
     void {
 
-    const mode =
-      this.route.snapshot
+    const mode = this.route.snapshot
         .queryParamMap
         .get('mode');
 
-    const orderId =
-      this.route.snapshot
+    const orderId = this.route.snapshot
         .queryParamMap
         .get('orderId');
 
-    this.isRetagMode =
-      mode === 'retag' &&
-      !!orderId;
-
-    this.isRescheduleMode =
-      mode === 'reschedule' &&
-      !!orderId;
-
-    this.retagOrderId =
-      this.isRetagMode
+    this.isRetagMode = mode === 'retag' && !!orderId;
+    this.isRescheduleMode = mode === 'reschedule' && !!orderId;
+    this.retagOrderId = this.isRetagMode
         ? orderId
         : null;
 
-    this.rescheduleOrderId =
-      this.isRescheduleMode
+    this.rescheduleOrderId = this.isRescheduleMode
         ? orderId
         : null;
   }
@@ -366,43 +235,20 @@ export class NewWalkInPage
       return;
     }
 
-    this.loadingRetagOrder =
-      true;
-
-    this.errorMessage =
-      '';
-
+    this.loadingRetagOrder = true;
+    this.errorMessage = '';
     this.apiService
       .getB2COrderById(
         this.retagOrderId
       )
       .subscribe({
-
-        next: (
-          response:
-            B2COrderDetails
-        ) => {
-
-          this.populateRetagOrder(
-            response
-          );
-
-          this.loadingRetagOrder =
-            false;
+        next: ( response: B2COrderDetails ) => {
+          this.populateRetagOrder( response );
+          this.loadingRetagOrder = false;
         },
 
-        error: (
-          error:
-            any
-        ) => {
-
-          console.error(
-            'Load re-tag order error',
-            error
-          );
-
-          this.loadingRetagOrder =
-            false;
+        error: ( error: any ) => {
+          this.loadingRetagOrder = false;
 
           this.errorMessage =
             error?.error?.message ||
@@ -456,11 +302,6 @@ export class NewWalkInPage
           error:
             any
         ) => {
-
-          console.error(
-            'Load reschedule order error',
-            error
-          );
 
           this.loadingRetagOrder =
             false;
@@ -589,6 +430,11 @@ export class NewWalkInPage
                 Number(
                   item.quantity
                 ),
+
+              garmentCount:
+                item.unit === 'PC'
+                  ? Number(item.quantity)
+                  : 1,
 
               unit:
                 item.unit,
@@ -772,11 +618,6 @@ export class NewWalkInPage
 
         error: (error: any) => {
 
-          console.error(
-            'Customer lookup error',
-            error
-          );
-
           this.checkingCustomer =
             false;
 
@@ -871,6 +712,9 @@ export class NewWalkInPage
     this.modalQuantity =
       1;
 
+    this.modalGarmentCount =
+      1;
+
     this.productModalOpen =
       true;
   }
@@ -900,6 +744,9 @@ export class NewWalkInPage
       '';
 
     this.modalQuantity =
+      1;
+
+    this.modalGarmentCount =
       1;
   }
 
@@ -1062,6 +909,25 @@ export class NewWalkInPage
   }
 
 
+  increaseGarmentCount():
+    void {
+
+    this.modalGarmentCount++;
+  }
+
+
+  decreaseGarmentCount():
+    void {
+
+    if (
+      this.modalGarmentCount > 1
+    ) {
+
+      this.modalGarmentCount--;
+    }
+  }
+
+
   addConfiguredProduct():
     void {
 
@@ -1171,6 +1037,11 @@ export class NewWalkInPage
 
       quantity:
         this.modalQuantity,
+
+      garmentCount:
+        this.selectedProduct.unit === 'KG'
+          ? this.modalGarmentCount
+          : this.modalQuantity,
 
       unit:
         this.selectedProduct.unit,
@@ -1683,17 +1554,6 @@ private formatLocalDate(
       this.isRetagMode
     ) {
 
-      console.log(
-        '[RETAG] createOrder triggered',
-        {
-          orderId:
-            this.retagOrderId,
-
-          items:
-            this.orderItems
-        }
-      );
-
       this.updateRetagOrder();
 
       return;
@@ -1790,19 +1650,13 @@ private formatLocalDate(
       ) {
 
         items.push({
-
-          productId:
-            item.productId,
-
-          typeId:
-            item.typeId,
-
-          serviceId:
-            service.id,
-
-          quantity:
-            item.quantity
-
+          productId: item.productId,
+          typeId: item.typeId,
+          serviceId: service.id,
+          quantity: item.quantity,
+          garmentCount: item.unit === 'KG'
+            ? item.garmentCount
+            : null
         });
       }
     }
@@ -1875,11 +1729,6 @@ const request:
           error:
             any
         ) => {
-
-          console.error(
-            'Create walk-in order error',
-            error
-          );
 
           this.creatingOrder =
             false;
@@ -1965,11 +1814,6 @@ const request:
             any
         ) => {
 
-          console.error(
-            'Reschedule order error',
-            error
-          );
-
           this.creatingOrder =
             false;
 
@@ -1986,20 +1830,12 @@ const request:
   private updateRetagOrder():
     void {
 
-    console.log(
-      '[RETAG] updateRetagOrder called'
-    );
-
     if (
       !this.retagOrderId
     ) {
 
       this.errorMessage =
         'Re-tag order id is missing';
-
-      console.error(
-        '[RETAG] Missing order id'
-      );
 
       return;
     }
@@ -2010,10 +1846,6 @@ const request:
 
       this.errorMessage =
         'At least one item must remain in the order';
-
-      console.error(
-        '[RETAG] No order items'
-      );
 
       return;
     }
@@ -2033,16 +1865,6 @@ const request:
         )
     };
 
-    console.log(
-      '[RETAG] Calling retagB2COrder',
-      {
-        orderId:
-          this.retagOrderId,
-
-        request
-      }
-    );
-
     this.creatingOrder =
       true;
 
@@ -2061,11 +1883,6 @@ const request:
             B2COrderDetails
         ) => {
 
-          console.log(
-            '[RETAG] API success',
-            response
-          );
-
           this.creatingOrder =
             false;
 
@@ -2082,11 +1899,6 @@ const request:
             any
         ) => {
 
-          console.error(
-            '[RETAG] API error',
-            error
-          );
-
           this.creatingOrder =
             false;
 
@@ -2100,11 +1912,8 @@ const request:
   }
 
 
-  closeOrderModal():
-    void {
-
-    this.orderCreated =
-      false;
+  closeOrderModal(): void {
+    this.startNewOrder();
   }
 
   printReceipt(): void {
@@ -2150,35 +1959,49 @@ const request:
       `
       : '';
 
-  const itemsHtml =
-    order.items
-      .map(
-        item => `
-          <tr>
-            <td>
-              ${item.productName}
-              ${item.typeName ? ` (${item.typeName})` : ''}
-              <br>
-              <small>
-                ${item.serviceName}
-              </small>
-            </td>
 
-            <td style="text-align:center;">
-              ${item.quantity}
-            </td>
+const itemsHtml =
+  order.items
+    .map(
+      item => `
+        <tr>
+          <td>
+            ${item.productName}
+            ${item.typeName ? ` (${item.typeName})` : ''}
 
-            <td style="text-align:right;">
-              ₹${Number(item.unitPrice).toFixed(2)}
-            </td>
+            <br>
 
-            <td style="text-align:right;">
-              ₹${Number(item.lineTotal).toFixed(2)}
-            </td>
-          </tr>
-        `
-      )
-      .join('');
+            <small>
+              ${item.serviceName}
+            </small>
+
+            ${
+              item.unit === 'KG' && item.garmentCount
+                ? `
+                  <br>
+                  <small>
+                    Garments: ${item.garmentCount}
+                  </small>
+                `
+                : ''
+            }
+          </td>
+
+          <td style="text-align:center;">
+            ${item.quantity}
+          </td>
+
+          <td style="text-align:right;">
+            ₹${Number(item.unitPrice).toFixed(2)}
+          </td>
+
+          <td style="text-align:right;">
+            ₹${Number(item.lineTotal).toFixed(2)}
+          </td>
+        </tr>
+      `
+    )
+    .join('');
 
 const printWindow =
   window.open(
@@ -2510,180 +2333,141 @@ const printWindow =
 }
 
 printTag(): void {
-
   if (!this.createdOrder) {
     return;
   }
 
-  const order =
-    this.createdOrder;
+  const order = this.createdOrder;
+  const createdDate = new Date(order.createdAt);
+  const formattedDate = createdDate.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
 
-  const createdDate =
-    new Date(
-      order.createdAt
+  const groupedItems = new Map<string, {
+    productName: string;
+    typeName: string;
+    unit: PricingUnit;
+    quantity: number;
+    garmentCount: number;
+    serviceNames: string[];
+  }>();
+
+  for (const item of order.items) {
+    const key = [
+      item.productName,
+      item.typeName ?? '',
+      item.unit,
+      Number(item.quantity)
+    ].join('|');
+
+    const sourceItem = this.orderItems.find(currentItem =>
+      currentItem.productName === item.productName &&
+      currentItem.typeName === item.typeName &&
+      currentItem.unit === item.unit &&
+      Number(currentItem.quantity) === Number(item.quantity)
     );
 
-  const formattedDate =
-    createdDate.toLocaleDateString(
-      'en-GB',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
+    const existingItem = groupedItems.get(key);
+
+    if (existingItem) {
+      if (!existingItem.serviceNames.includes(item.serviceName)) {
+        existingItem.serviceNames.push(item.serviceName);
       }
-    );
+      continue;
+    }
 
-  const totalPieces =
-    order.items
-      .filter(
-        item =>
-          item.unit === 'PC'
-      )
-      .reduce(
-        (
-          total,
-          item
-        ) =>
-          total +
-          Number(
-            item.quantity
-          ),
-        0
-      );
+    groupedItems.set(key, {
+      productName: item.productName,
+      typeName: item.typeName ?? '',
+      unit: item.unit,
+      quantity: Number(item.quantity),
+      garmentCount: item.unit === 'KG'
+        ? Math.max(1, Number(sourceItem?.garmentCount ?? 1))
+        : Math.max(1, Number(item.quantity)),
+      serviceNames: [item.serviceName]
+    });
+  }
+
+  const groupedOrderItems = Array.from(groupedItems.values());
+
+  const totalPieces = groupedOrderItems
+    .filter(item => item.unit === 'PC')
+    .reduce((total, item) => total + Number(item.quantity), 0);
 
   let tagsHtml = '';
 
-  for (
-    const item
-    of order.items
-  ) {
-
+  for (const item of groupedOrderItems) {
     const typeName =
-      item.typeName &&
-      item.typeName
-        .toLowerCase() !== 'default'
+      item.typeName && item.typeName.toLowerCase() !== 'default'
         ? item.typeName
         : '';
 
-    const productDisplay =
-      typeName
-        ? `${item.productName} (${typeName})`
-        : item.productName;
+    const productDisplay = typeName
+      ? `${item.productName} (${typeName})`
+      : item.productName;
 
-    const serviceCode =
-      item.serviceName
-        .split(' ')
-        .filter(
-          word =>
-            word.trim()
-        )
-        .map(
-          word =>
-            word
-              .charAt(0)
-              .toUpperCase()
-        )
-        .join('');
+    const getServiceCode = (serviceName: string): string => {
+      const normalized = serviceName.trim().toLowerCase();
 
-    if (
-      item.unit === 'PC'
-    ) {
+      const serviceCodeMap: Record<string, string> = {
+        'starching': 'ST',
+        'dry clean': 'DC',
+        'steam press': 'SP',
+        'wash & iron': 'WI',
+        'wash and iron': 'WI',
+        'wash & fold': 'WF',
+        'wash and fold': 'WF'
+      };
 
-      const quantity =
-        Math.max(
-          1,
-          Math.floor(
-            Number(
-              item.quantity
-            )
-          )
-        );
-
-      for (
-        let index = 1;
-        index <= quantity;
-        index++
-      ) {
-
-        tagsHtml += `
-          <section class="tag">
-
-            <div class="business-name">
-              ${this.businessName}
-            </div>
-
-            <div class="customer-name">
-              ${order.customer.name}
-            </div>
-
-            <div class="order-number">
-              #${order.orderNumber}
-            </div>
-
-            <div class="order-date">
-              ${formattedDate}
-            </div>
-
-            <div class="service-code">
-              ${serviceCode}
-            </div>
-
-            <div class="product-name">
-              ${productDisplay}
-            </div>
-
-            <div class="tag-number">
-              T${totalPieces}
-            </div>
-
-          </section>
-        `;
+      if (serviceCodeMap[normalized]) {
+        return serviceCodeMap[normalized];
       }
 
-    } else {
+      return serviceName
+        .split(' ')
+        .filter(word => word.trim())
+        .map(word => word.charAt(0).toUpperCase())
+        .join('');
+    };
 
+    const serviceCodes = item.serviceNames.map(serviceName =>
+      getServiceCode(serviceName)
+    );
+
+    const serviceCode = serviceCodes.join(
+      '<span class="service-divider">|</span>'
+    );
+
+    const tagCount = item.unit === 'KG'
+      ? item.garmentCount
+      : Math.max(1, Math.floor(Number(item.quantity)));
+
+    const tagNumber = item.unit === 'KG'
+      ? `T${item.garmentCount}`
+      : `T${totalPieces}`;
+
+    for (let index = 1; index <= tagCount; index++) {
       tagsHtml += `
         <section class="tag">
-
-          <div class="business-name">
-            ${this.businessName}
-          </div>
-
-          <div class="customer-name">
-            ${order.customer.name}
-          </div>
-
-          <div class="order-number">
-            #${order.orderNumber}
-          </div>
-
-          <div class="order-date">
-            ${formattedDate}
-          </div>
-
-          <div class="service-code">
-            ${serviceCode}
-          </div>
-
-          <div class="product-name">
-            ${productDisplay}
-          </div>
-
-          <div class="tag-number">
-            ${item.quantity} KG
-          </div>
-
+          <div class="business-name">${this.businessName}</div>
+          <div class="customer-name">${order.customer.name}</div>
+          <div class="order-number">#${order.orderNumber}</div>
+          <div class="order-date">${formattedDate}</div>
+          <div class="service-code">${serviceCode}</div>
+          <div class="product-name">${productDisplay}</div>
+          <div class="tag-number">${tagNumber}</div>
         </section>
       `;
     }
   }
 
-  const printWindow =
-    window.open(
-      '',
-      '_blank',
-      `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
-    );
+  const printWindow = window.open(
+    '',
+    '_blank',
+    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+  );
 
   if (!printWindow) {
     return;
@@ -2691,19 +2475,12 @@ printTag(): void {
 
   printWindow.document.write(`
     <!DOCTYPE html>
-
     <html>
-
       <head>
-
         <meta charset="UTF-8">
-
-        <title>
-          Laundry Tags
-        </title>
+        <title>Laundry Tags</title>
 
         <style>
-
           @page {
             size: 50mm 70mm;
             margin: 0;
@@ -2722,11 +2499,7 @@ printTag(): void {
           }
 
           body {
-            font-family:
-              Arial,
-              Helvetica,
-              sans-serif;
-
+            font-family: Arial, Helvetica, sans-serif;
             color: #000000;
           }
 
@@ -2739,18 +2512,13 @@ printTag(): void {
           .tag {
             width: 50mm;
             height: 70mm;
-
             margin: 0;
             padding: 4mm 3mm;
-
             display: flex;
             flex-direction: column;
             align-items: center;
-
             text-align: center;
-
             overflow: hidden;
-
             break-after: page;
             page-break-after: always;
           }
@@ -2762,12 +2530,9 @@ printTag(): void {
 
           .business-name {
             width: 100%;
-
             font-size: 10px;
             line-height: 1.2;
-
             font-weight: 700;
-
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -2775,14 +2540,10 @@ printTag(): void {
 
           .customer-name {
             width: 100%;
-
             margin-top: 4mm;
-
             font-size: 11px;
             line-height: 1.2;
-
             font-weight: 700;
-
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -2790,77 +2551,71 @@ printTag(): void {
 
           .order-number {
             margin-top: 2mm;
-
             font-size: 19px;
             line-height: 1;
-
             font-weight: 800;
           }
 
           .order-date {
             margin-top: 2mm;
-
             font-size: 10px;
             font-weight: 700;
           }
 
           .service-code {
-            min-width: 12mm;
-            height: 12mm;
-
+            min-width: 20mm;
+            min-height: 12mm;
             margin-top: 4mm;
-            padding: 1mm;
-
+            padding: 2mm;
             display: flex;
             align-items: center;
             justify-content: center;
-
             border: 1.5px solid #000000;
-
-            font-size: 16px;
+            font-size: 14px;
+            line-height: 1;
             font-weight: 800;
+            white-space: nowrap;
+          }
+
+          .service-divider {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2mm;
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 500;
+            transform: scaleY(1.35);
           }
 
           .product-name {
             width: 100%;
-
             margin-top: 5mm;
-
             font-size: 12px;
             line-height: 1.2;
-
             font-weight: 700;
-
             text-transform: capitalize;
-
             overflow: hidden;
           }
 
           .tag-number {
             margin-top: 4mm;
-
             font-size: 22px;
             line-height: 1;
-
             font-weight: 900;
           }
 
           .tag::after {
             content: '';
-
             width: 90%;
-
             margin-top: 3mm;
-
             border-bottom: 1px dashed #000000;
           }
 
           @media print {
-
             html,
             body {
               width: 50mm !important;
-
               margin: 0 !important;
               padding: 0 !important;
             }
@@ -2868,9 +2623,7 @@ printTag(): void {
             .tag {
               width: 50mm !important;
               height: 70mm !important;
-
               margin: 0 !important;
-
               break-after: page;
               page-break-after: always;
             }
@@ -2879,178 +2632,119 @@ printTag(): void {
               break-after: auto;
               page-break-after: auto;
             }
-
           }
-
         </style>
-
       </head>
 
       <body>
-
-        <div class="tags">
-
-          ${tagsHtml}
-
-        </div>
+        <div class="tags">${tagsHtml}</div>
 
         <script>
-
           window.onload = function () {
-
-            setTimeout(
-              function () {
-                window.print();
-              },
-              300
-            );
-
+            setTimeout(function () {
+              window.print();
+            }, 300);
           };
-
         </script>
-
       </body>
-
     </html>
   `);
 
   printWindow.document.close();
 }
 
+  startNewOrder(): void {
 
-  startNewOrder():
-    void {
-
-    if (
-      this.isRetagMode ||
-      this.isRescheduleMode
-    ) {
-
-      this.router.navigate(
-        ['/app/new-walk-in']
-      );
-
-      return;
-    }
-
-    this.orderCreated =
-      false;
-
-    this.createdOrderNumber =
-      '';
-
-    this.createdOrder =
-      null;
-
-    this.customerName =
-      '';
-
-    this.customerPhone =
-      '';
-
-    this.customerId =
-      null;
-
-    this.customerExists =
-      false;
-
-    this.customerMessage =
-      '';
-
-    this.orderItems =
-      [];
-
-    this.homeDelivery =
-      false;
-
-    this.expressDelivery =
-      false;
-
-    this.selectedExpressChargeId =
-      null;
-
-    this.expressPercentage =
-      0;
-
-    this.deliveryTime =
-      '';
-
-    this.discountAmount =
-      0;
-
-    this.errorMessage =
-      '';
-
-    this.removeCoupon();
-
-    this.setDefaultDeliveryDate();
-  }
-
-
-  private setDefaultDeliveryDate():
-    void {
-
-    const date =
-      new Date();
-
-    date.setDate(
-      date.getDate() + 2
+  if (
+    this.isRetagMode ||
+    this.isRescheduleMode
+  ) {
+    this.router.navigate(
+      ['/app/new-walk-in']
     );
 
-    this.deliveryDate =
-      this.formatLocalDate(
+    return;
+  }
+
+  this.orderCreated = false;
+
+  this.createdOrderNumber = '';
+  this.createdOrder = null;
+
+  this.customerName = '';
+  this.customerPhone = '';
+  this.customerId = null;
+  this.customerExists = false;
+  this.checkingCustomer = false;
+  this.customerMessage = '';
+
+  this.searchText = '';
+
+  this.orderItems = [];
+
+  this.productModalOpen = false;
+  this.editingOrderItemId = null;
+  this.selectedProduct = null;
+  this.selectedProductType = null;
+  this.selectedServiceIds = [];
+  this.selectedPreferences = [];
+  this.productComment = '';
+  this.modalQuantity = 1;
+  this.modalGarmentCount = 1;
+
+  this.homeDelivery = false;
+
+  this.expressDelivery = false;
+  this.selectedExpressChargeId = null;
+  this.expressPercentage = 0;
+
+  this.deliveryTime = '';
+
+  this.discountAmount = 0;
+
+  this.couponApplied = false;
+  this.selectedCouponId = null;
+  this.couponCode = '';
+  this.couponDiscount = 0;
+  this.couponDropdownOpen = false;
+
+  this.errorMessage = '';
+
+  this.generateDeliveryDates();
+  this.setDefaultDeliveryDate();
+}
+  private setDefaultDeliveryDate(): void {
+    const date = new Date();
+    date.setDate( date.getDate() + 2 );
+    this.deliveryDate = this.formatLocalDate(
         date
       );
   }
 
-  editOrderItem(
-    item:
-      SelectedOrderItem
-  ): void {
-
-    const product =
-      this.products.find(
+  editOrderItem( item: SelectedOrderItem ): void {
+    const product = this.products.find(
         (
-          currentProduct:
-            WalkInProduct
+          currentProduct: WalkInProduct
         ) =>
-          currentProduct.id ===
-          item.productId
+          currentProduct.id === item.productId
       );
 
-    if (
-      !product
-    ) {
-
+    if ( !product ) {
       return;
     }
 
-    const productType =
-      product.types.find(
-        (
-          type:
-            WalkInProductType
-        ) =>
-          type.id ===
-          item.typeId
+    const productType = product.types.find(
+        ( type: WalkInProductType ) =>
+          type.id === item.typeId
       );
 
-    if (
-      !productType
-    ) {
-
+    if ( !productType ) {
       return;
     }
 
-    this.editingOrderItemId =
-      item.id;
-
-    this.selectedProduct =
-      product;
-
-    this.selectedProductType =
-      productType;
-
+    this.editingOrderItemId = item.id;
+    this.selectedProduct = product;
+    this.selectedProductType = productType;
     this.selectedServiceIds = [
       ...item.serviceIds
     ];
@@ -3059,14 +2753,16 @@ printTag(): void {
       ...item.preferences
     ];
 
-    this.productComment =
-      item.comment;
+    this.productComment = item.comment;
 
-    this.modalQuantity =
-      item.quantity;
+    this.modalQuantity = item.quantity;
 
-    this.productModalOpen =
-      true;
+    this.modalGarmentCount =
+      item.unit === 'KG'
+        ? Math.max(1, Number(item.garmentCount ?? 1))
+        : Math.max(1, Number(item.quantity));
+
+    this.productModalOpen = true;
   }
 
 }

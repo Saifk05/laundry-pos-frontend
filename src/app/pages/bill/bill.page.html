@@ -60,7 +60,7 @@
     <div class="filter-field">
 
       <label>
-        Delivered Date
+        Delivery Date
       </label>
 
       <input
@@ -238,8 +238,12 @@
             </th>
 
             <th>
-              Delivered At
+              Delivery Date
             </th>
+
+            <!-- <th>
+              Delivered At
+            </th> -->
 
             <th>
               Order Status
@@ -291,6 +295,8 @@
                 ₹{{ formatAmount(grossTotal) }}
               </strong>
             </td>
+
+            <td></td>
 
             <td></td>
 
@@ -494,6 +500,24 @@
 
               <td>
 
+                @if (invoice.deliveryDate) {
+
+                  {{
+                    invoice.deliveryDate
+                      | date:
+                        'dd-MM-yyyy'
+                  }}
+
+                } @else {
+
+                  -
+
+                }
+
+              </td>
+
+              <!-- <td>
+
                 @if (invoice.deliveredAt) {
 
                   {{
@@ -508,7 +532,7 @@
 
                 }
 
-              </td>
+              </td> -->
 
               <td>
 
