@@ -714,6 +714,32 @@
             <div>
 
               <span>
+                Delivery Date
+              </span>
+
+              <strong>
+
+                @if (receiptOrder.deliveryDate) {
+
+                  {{
+                    receiptOrder.deliveryDate
+                      | date:
+                        'dd-MM-yyyy'
+                  }}
+
+                } @else {
+
+                  -
+
+                }
+
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>
                 Status
               </span>
 
@@ -841,6 +867,17 @@
                           item.unit
                         )
                       }}
+
+                      @if (
+                        item.unit === 'KG' &&
+                        item.garmentCount
+                      ) {
+
+                        <small>
+                          Garments: {{ item.garmentCount }}
+                        </small>
+
+                      }
 
                     </td>
 

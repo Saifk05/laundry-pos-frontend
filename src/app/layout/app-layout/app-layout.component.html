@@ -67,13 +67,15 @@
           (click)="reloadPage()">
           ↻
         </button>
+
       </div>
 
     </header>
 
     <main
       class="app-content"
-      [style.zoom]="zoomLevel">
+      [style.zoom]="zoomLevel"
+      [style.--app-zoom]="zoomLevel">
 
       <router-outlet></router-outlet>
 
