@@ -809,14 +809,14 @@ private printReceipt(order: B2COrderDetails): void {
           </div>
 
           <div class="row">
-            <span>Created</span>
+            <span>Created At </span>
             <strong>
               ${new Date(order.createdAt).toLocaleDateString('en-GB')}
             </strong>
           </div>
 
           <div class="row">
-            <span>Delivery</span>
+            <span>Delivered Date</span>
             <strong>
               ${
                 order.deliveryDate
@@ -890,127 +890,489 @@ private printReceipt(order: B2COrderDetails): void {
   printWindow.document.close();
   printWindow.focus();
 }
-  private printQrTags(order: B2COrderDetails): void {
-    const createdDate = new Date(order.createdAt);
-    const formattedDate = createdDate.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
 
-    const totalPieces = order.items
-      .filter(item => item.unit === 'PC')
-      .reduce((total, item) => total + Number(item.quantity), 0);
 
-    let tagsHtml = '';
+private printQrTags(
+  order: B2COrderDetails
+): void {
 
-    for (const item of order.items) {
-      const typeName =
-        item.typeName && item.typeName.toLowerCase() !== 'default'
-          ? item.typeName
-          : '';
+  const createdDate =
+    new Date(order.createdAt);
 
-      const productDisplay = typeName
+  const formattedDate =
+    createdDate.toLocaleDateString(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }
+    );
+
+  const groupedItems =
+    new Map<
+      string,
+      {
+        productName: string;
+        typeName: string;
+        unit: string;
+        quantity: number;
+        garmentCount: number;
+        serviceNames: string[];
+      }
+    >();
+
+  for (const item of order.items) {
+
+    const key = [
+      item.productName,
+      item.typeName ?? '',
+      item.unit,
+      Number(item.quantity)
+    ].join('|');
+
+    const existingItem =
+      groupedItems.get(key);
+
+    if (existingItem) {
+
+      if (
+        !existingItem.serviceNames
+          .includes(item.serviceName)
+      ) {
+
+        existingItem.serviceNames.push(
+          item.serviceName
+        );
+      }
+
+      continue;
+    }
+
+    groupedItems.set(
+      key,
+      {
+        productName:
+          item.productName,
+
+        typeName:
+          item.typeName ?? '',
+
+        unit:
+          item.unit,
+
+        quantity:
+          Number(item.quantity),
+
+        garmentCount:
+          item.unit === 'KG'
+            ? Math.max(
+                1,
+                Number(
+                  item.garmentCount ?? 1
+                )
+              )
+            : Math.max(
+                1,
+                Number(item.quantity)
+              ),
+
+        serviceNames: [
+          item.serviceName
+        ]
+      }
+    );
+  }
+
+  const groupedOrderItems =
+    Array.from(
+      groupedItems.values()
+    );
+
+  const totalItemCount =
+    groupedOrderItems.reduce(
+      (
+        total,
+        item
+      ) => {
+
+        if (
+          item.unit === 'KG'
+        ) {
+
+          return (
+            total +
+            Math.max(
+              1,
+              Number(
+                item.garmentCount ?? 1
+              )
+            )
+          );
+        }
+
+        return (
+          total +
+          Math.max(
+            1,
+            Math.floor(
+              Number(
+                item.quantity ?? 1
+              )
+            )
+          )
+        );
+      },
+      0
+    );
+
+  const getServiceCode = (
+    serviceName: string
+  ): string => {
+
+    const normalized =
+      serviceName
+        .trim()
+        .toLowerCase();
+
+    const serviceCodeMap:
+      Record<string, string> = {
+
+      'starching': 'ST',
+      'dry clean': 'DC',
+      'steam press': 'SP',
+      'wash & iron': 'WI',
+      'wash and iron': 'WI',
+      'wash & fold': 'WF',
+      'wash and fold': 'WF'
+    };
+
+    if (
+      serviceCodeMap[
+        normalized
+      ]
+    ) {
+
+      return serviceCodeMap[
+        normalized
+      ];
+    }
+
+    return serviceName
+      .split(' ')
+      .filter(
+        word =>
+          word.trim()
+      )
+      .map(
+        word =>
+          word
+            .charAt(0)
+            .toUpperCase()
+      )
+      .join('');
+  };
+
+  let tagsHtml = '';
+
+  for (
+    const item
+    of groupedOrderItems
+  ) {
+
+    const typeName =
+      item.typeName &&
+      item.typeName
+        .toLowerCase() !==
+        'default'
+        ? item.typeName
+        : '';
+
+    const productDisplay =
+      typeName
         ? `${item.productName} (${typeName})`
         : item.productName;
 
-      const serviceCode = item.serviceName
-        .split(' ')
-        .filter(word => word.trim())
-        .map(word => word.charAt(0).toUpperCase())
-        .join('');
-
-      if (item.unit === 'PC') {
-        const quantity = Math.max(1, Math.floor(Number(item.quantity)));
-
-        for (let index = 1; index <= quantity; index++) {
-          tagsHtml += `
-            <section class="tag">
-              <div class="business-name">${this.businessName}</div>
-              <div class="customer-name">${order.customer.name}</div>
-              <div class="order-number">#${order.orderNumber}</div>
-              <div class="order-date">${formattedDate}</div>
-              <div class="service-code">${serviceCode}</div>
-              <div class="product-name">${productDisplay}</div>
-              <div class="tag-number">T${totalPieces}</div>
-            </section>
-          `;
-        }
-      } else {
-        const garmentCount = Math.max(
-          1,
-          Number(item.garmentCount ?? 1)
+    const serviceCode =
+      item.serviceNames
+        .map(
+          serviceName =>
+            getServiceCode(
+              serviceName
+            )
+        )
+        .join(
+          '<span class="service-divider">|</span>'
         );
 
-        for (let index = 1; index <= garmentCount; index++) {
-          tagsHtml += `
-            <section class="tag">
-              <div class="business-name">${this.businessName}</div>
-              <div class="customer-name">${order.customer.name}</div>
-              <div class="order-number">#${order.orderNumber}</div>
-              <div class="order-date">${formattedDate}</div>
-              <div class="service-code">${serviceCode}</div>
-              <div class="product-name">${productDisplay}</div>
-              <div class="tag-number">T${garmentCount}</div>
-            </section>
-          `;
-        }
-      }
-    }
+    const tagCount =
+      item.unit === 'KG'
+        ? Math.max(
+            1,
+            Number(
+              item.garmentCount ?? 1
+            )
+          )
+        : Math.max(
+            1,
+            Math.floor(
+              Number(
+                item.quantity ?? 1
+              )
+            )
+          );
 
-    const printWindow = window.open(
+    for (
+      let index = 1;
+      index <= tagCount;
+      index++
+    ) {
+
+      tagsHtml += `
+        <section class="tag">
+
+          <div class="business-name">
+            ${this.businessName}
+          </div>
+
+          <div class="customer-name">
+            ${order.customer.name}
+          </div>
+
+          <div class="order-number">
+            #${order.orderNumber}
+          </div>
+
+          <div class="order-date">
+            ${formattedDate}
+          </div>
+
+          <div class="service-code">
+            ${serviceCode}
+          </div>
+
+          <div class="product-name">
+            ${productDisplay}
+          </div>
+
+          <div class="tag-number">
+            T${totalItemCount}
+          </div>
+
+        </section>
+      `;
+    }
+  }
+
+  const printWindow =
+    window.open(
       '',
       '_blank',
       `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
     );
 
-    if (!printWindow) {
-      return;
-    }
+  if (!printWindow) {
+    return;
+  }
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Re-print Tags</title>
-          <style>
-            @page {
-              size: 50mm 70mm;
-              margin: 0;
-            }
+  printWindow.document.write(`
+    <!DOCTYPE html>
 
-            * { box-sizing: border-box; }
+    <html>
+
+      <head>
+
+        <meta charset="UTF-8">
+
+        <title>
+          Re-print Tags
+        </title>
+
+        <style>
+
+          @page {
+            size: 50mm 70mm;
+            margin: 0;
+          }
+
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            width: 50mm;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+          }
+
+          body {
+            font-family:
+              Arial,
+              Helvetica,
+              sans-serif;
+
+            color: #000000;
+          }
+
+          .tags {
+            width: 50mm;
+            margin: 0;
+            padding: 0;
+          }
+
+          .tag {
+            width: 50mm;
+            height: 70mm;
+
+            margin: 0;
+            padding: 4mm 3mm;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            text-align: center;
+
+            overflow: hidden;
+
+            break-after: page;
+            page-break-after: always;
+          }
+
+          .tag:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+
+          .business-name {
+            width: 100%;
+
+            font-size: 10px;
+            line-height: 1.2;
+            font-weight: 700;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .customer-name {
+            width: 100%;
+            margin-top: 4mm;
+
+            font-size: 11px;
+            line-height: 1.2;
+            font-weight: 700;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .order-number {
+            margin-top: 2mm;
+
+            font-size: 19px;
+            line-height: 1;
+            font-weight: 800;
+          }
+
+          .order-date {
+            margin-top: 2mm;
+
+            font-size: 10px;
+            font-weight: 700;
+          }
+
+          .service-code {
+            min-width: 20mm;
+            min-height: 12mm;
+
+            margin-top: 4mm;
+            padding: 2mm;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border:
+              1.5px solid
+              #000000;
+
+            font-size: 14px;
+            line-height: 1;
+            font-weight: 800;
+
+            white-space: nowrap;
+          }
+
+          .service-divider {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 2mm;
+
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 500;
+
+            transform:
+              scaleY(1.35);
+          }
+
+          .product-name {
+            width: 100%;
+
+            margin-top: 5mm;
+
+            font-size: 12px;
+            line-height: 1.2;
+            font-weight: 700;
+
+            text-transform:
+              capitalize;
+
+            overflow: hidden;
+          }
+
+          .tag-number {
+            margin-top: 4mm;
+
+            font-size: 22px;
+            line-height: 1;
+            font-weight: 900;
+          }
+
+          .tag::after {
+            content: '';
+
+            width: 90%;
+
+            margin-top: 3mm;
+
+            border-bottom:
+              1px dashed
+              #000000;
+          }
+
+          @media print {
 
             html,
             body {
-              width: 50mm;
-              margin: 0;
-              padding: 0;
-              background: #ffffff;
-            }
-
-            body {
-              font-family: Arial, Helvetica, sans-serif;
-              color: #000000;
-            }
-
-            .tags {
-              width: 50mm;
-              margin: 0;
-              padding: 0;
+              width: 50mm !important;
+              margin: 0 !important;
+              padding: 0 !important;
             }
 
             .tag {
-              width: 50mm;
-              height: 70mm;
-              margin: 0;
-              padding: 4mm 3mm;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              text-align: center;
-              overflow: hidden;
+              width: 50mm !important;
+              height: 70mm !important;
+
+              margin: 0 !important;
+
               break-after: page;
               page-break-after: always;
             }
@@ -1019,119 +1381,44 @@ private printReceipt(order: B2COrderDetails): void {
               break-after: auto;
               page-break-after: auto;
             }
+          }
 
-            .business-name {
-              width: 100%;
-              font-size: 10px;
-              line-height: 1.2;
-              font-weight: 700;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
+        </style>
 
-            .customer-name {
-              width: 100%;
-              margin-top: 4mm;
-              font-size: 11px;
-              line-height: 1.2;
-              font-weight: 700;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
+      </head>
 
-            .order-number {
-              margin-top: 2mm;
-              font-size: 19px;
-              line-height: 1;
-              font-weight: 800;
-            }
+      <body>
 
-            .order-date {
-              margin-top: 2mm;
-              font-size: 10px;
-              font-weight: 700;
-            }
+        <div class="tags">
+          ${tagsHtml}
+        </div>
 
-            .service-code {
-              min-width: 12mm;
-              height: 12mm;
-              margin-top: 4mm;
-              padding: 1mm;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              border: 1.5px solid #000000;
-              font-size: 16px;
-              font-weight: 800;
-            }
+        <script>
 
-            .product-name {
-              width: 100%;
-              margin-top: 5mm;
-              font-size: 12px;
-              line-height: 1.2;
-              font-weight: 700;
-              text-transform: capitalize;
-              overflow: hidden;
-            }
+          window.onload =
+            function () {
 
-            .tag-number {
-              margin-top: 4mm;
-              font-size: 22px;
-              line-height: 1;
-              font-weight: 900;
-            }
+              setTimeout(
+                function () {
 
-            .tag::after {
-              content: '';
-              width: 90%;
-              margin-top: 3mm;
-              border-bottom: 1px dashed #000000;
-            }
+                  window.focus();
+                  window.print();
 
-            @media print {
-              html,
-              body {
-                width: 50mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-              }
-
-              .tag {
-                width: 50mm !important;
-                height: 70mm !important;
-                margin: 0 !important;
-                break-after: page;
-                page-break-after: always;
-              }
-
-              .tag:last-child {
-                break-after: auto;
-                page-break-after: auto;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="tags">${tagsHtml}</div>
-
-          <script>
-            window.onload = function () {
-              setTimeout(function () {
-                window.focus();
-                window.print();
-              }, 500);
+                },
+                500
+              );
             };
-          </script>
-        </body>
-      </html>
-    `);
 
-    printWindow.document.close();
-    printWindow.focus();
-  }
+        </script>
+
+      </body>
+
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+}
 
   private updateLocalOrder(response: B2COrder): void {
     this.orders = this.orders.map((order: B2cOrderView) => {

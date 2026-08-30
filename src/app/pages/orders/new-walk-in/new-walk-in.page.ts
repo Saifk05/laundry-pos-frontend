@@ -316,227 +316,317 @@ export class NewWalkInPage
   }
 
 
-  private populateRetagOrder(
-    order:
-      B2COrderDetails
-  ): void {
+private populateRetagOrder(
+  order: B2COrderDetails
+): void {
 
-    this.retagOrderNumber =
-      order.orderNumber;
+  this.retagOrderNumber =
+    order.orderNumber;
 
-    this.customerId =
-      order.customer.id;
+  this.customerId =
+    order.customer.id;
 
-    this.customerName =
-      order.customer.name;
+  this.customerName =
+    order.customer.name;
 
-    this.customerPhone =
-      order.customer.phone;
+  this.customerPhone =
+    order.customer.phone;
 
-    this.customerExists =
-      true;
+  this.customerExists =
+    true;
 
-    this.customerMessage =
-      'Existing order loaded for re-tag';
+  this.customerMessage =
+    this.isRescheduleMode
+      ? 'Existing order loaded for reschedule'
+      : 'Existing order loaded for re-tag';
 
-    this.deliveryDate =
-      order.deliveryDate ?? '';
+  this.deliveryDate =
+    order.deliveryDate ?? '';
 
-    this.deliveryTime =
-      order.deliveryTime ?? '';
+  this.deliveryTime =
+    order.deliveryTime ?? '';
 
-    this.homeDelivery =
-      order.homeDelivery;
+  this.homeDelivery =
+    order.homeDelivery;
 
-    this.orderItems =
-      (order.items ?? [])
-        .map(
-          item => {
+  const groupedItems =
+    new Map<string, SelectedOrderItem>();
 
-            const product =
-              this.products.find(
-                currentProduct =>
-                  currentProduct.id ===
-                    item.productId
-              );
+  for (const item of order.items ?? []) {
 
-            const productType =
-              product?.types.find(
-                currentType =>
-                  currentType.id ===
-                    item.typeId
-              );
-
-            const configuredService =
-              productType?.services.find(
-                service =>
-                  service.id ===
-                    item.serviceId
-              );
-
-            const service =
-              configuredService ??
-              ({
-                id:
-                  item.serviceId,
-
-                name:
-                  item.serviceName,
-
-                price:
-                  Number(
-                    item.unitPrice
-                  ),
-
-                active:
-                  true
-              } as WalkInServicePrice);
-
-            return {
-
-              id:
-                item.id,
-
-              productId:
-                item.productId,
-
-              productName:
-                item.productName,
-
-              typeId:
-                item.typeId,
-
-              typeName:
-                item.typeName,
-
-              serviceIds: [
-                item.serviceId
-              ],
-
-              serviceNames: [
-                item.serviceName
-              ],
-
-              services: [
-                service
-              ],
-
-              unitPrice:
-                Number(
-                  item.unitPrice
-                ),
-
-              quantity:
-                Number(
-                  item.quantity
-                ),
-
-              garmentCount:
-                item.unit === 'PC'
-                  ? Number(item.quantity)
-                  : 1,
-
-              unit:
-                item.unit,
-
-              preferences:
-                [],
-
-              comment:
-                '',
-
-              total:
-                Number(
-                  item.lineTotal
-                )
-
-            } as SelectedOrderItem;
-          }
-        );
-
-    this.discountAmount =
-      0;
-
-    this.couponApplied =
-      false;
-
-    this.selectedCouponId =
-      null;
-
-    this.couponCode =
-      '';
-
-    this.couponDiscount =
-      0;
-
-    if (
-      order.couponCode
-    ) {
-
-      const coupon =
-        this.coupons.find(
-          currentCoupon =>
-            currentCoupon.code ===
-              order.couponCode
-        );
-
-      this.couponApplied =
-        true;
-
-      this.selectedCouponId =
-        coupon?.id ?? null;
-
-      this.couponCode =
-        order.couponCode;
-
-      this.couponDiscount =
-        Number(
-          order.discountAmount ?? 0
-        );
-
-    } else {
-
-      this.discountAmount =
-        Number(
-          order.discountAmount ?? 0
-        );
-    }
-
-    const expressPercentage =
-      Number(
-        order.expressChargePercentage ??
-        0
+    const product =
+      this.products.find(
+        currentProduct =>
+          currentProduct.id ===
+          item.productId
       );
 
-    this.expressDelivery =
-      expressPercentage > 0;
+    const productType =
+      product?.types.find(
+        currentType =>
+          currentType.id ===
+          item.typeId
+      );
 
-    this.expressPercentage =
-      expressPercentage;
+    const configuredService =
+      productType?.services.find(
+        service =>
+          service.id ===
+          item.serviceId
+      );
 
-    if (
-      this.expressDelivery
-    ) {
+    const service =
+      configuredService ??
+      ({
+        id:
+          item.serviceId,
 
-      const expressCharge =
-        this.expressCharges.find(
-          charge =>
+        name:
+          item.serviceName,
+
+        price:
+          Number(
+            item.unitPrice
+          ),
+
+        active:
+          true
+      } as WalkInServicePrice);
+
+    const key = [
+      item.productId,
+      item.typeId,
+      item.unit,
+      Number(item.quantity)
+    ].join('|');
+
+    const existingItem =
+      groupedItems.get(key);
+
+    if (existingItem) {
+
+      if (
+        !existingItem.serviceIds
+          .includes(item.serviceId)
+      ) {
+        existingItem.serviceIds.push(
+          item.serviceId
+        );
+      }
+
+      if (
+        !existingItem.serviceNames
+          .includes(item.serviceName)
+      ) {
+        existingItem.serviceNames.push(
+          item.serviceName
+        );
+      }
+
+      if (
+        !existingItem.services.some(
+          currentService =>
+            currentService.id ===
+            service.id
+        )
+      ) {
+        existingItem.services.push(
+          service
+        );
+      }
+
+      existingItem.unitPrice =
+        existingItem.services.reduce(
+          (
+            total,
+            currentService
+          ) =>
+            total +
             Number(
-              charge.percentage
-            ) ===
-            expressPercentage
+              currentService.price
+            ),
+          0
         );
 
-      this.selectedExpressChargeId =
-        expressCharge?.id ?? null;
+      existingItem.total =
+        existingItem.unitPrice *
+        existingItem.quantity;
 
-    } else {
+      if (
+        item.unit === 'KG'
+      ) {
+        existingItem.garmentCount =
+          Math.max(
+            existingItem.garmentCount,
+            Number(
+              item.garmentCount ?? 1
+            )
+          );
+      }
 
-      this.selectedExpressChargeId =
-        null;
+      continue;
     }
+
+    const quantity =
+      Number(item.quantity);
+
+    const garmentCount =
+      item.unit === 'KG'
+        ? Math.max(
+            1,
+            Number(
+              item.garmentCount ?? 1
+            )
+          )
+        : Math.max(
+            1,
+            quantity
+          );
+
+    groupedItems.set(
+      key,
+      {
+        id:
+          item.id,
+
+        productId:
+          item.productId,
+
+        productName:
+          item.productName,
+
+        typeId:
+          item.typeId,
+
+        typeName:
+          item.typeName,
+
+        serviceIds: [
+          item.serviceId
+        ],
+
+        serviceNames: [
+          item.serviceName
+        ],
+
+        services: [
+          service
+        ],
+
+        unitPrice:
+          Number(
+            service.price
+          ),
+
+        quantity:
+          quantity,
+
+        garmentCount:
+          garmentCount,
+
+        unit:
+          item.unit,
+
+        preferences:
+          [],
+
+        comment:
+          '',
+
+        total:
+          Number(service.price) *
+          quantity
+      } as SelectedOrderItem
+    );
   }
 
+  this.orderItems =
+    Array.from(
+      groupedItems.values()
+    );
+
+  this.discountAmount =
+    0;
+
+  this.couponApplied =
+    false;
+
+  this.selectedCouponId =
+    null;
+
+  this.couponCode =
+    '';
+
+  this.couponDiscount =
+    0;
+
+  if (
+    order.couponCode
+  ) {
+
+    const coupon =
+      this.coupons.find(
+        currentCoupon =>
+          currentCoupon.code ===
+          order.couponCode
+      );
+
+    this.couponApplied =
+      true;
+
+    this.selectedCouponId =
+      coupon?.id ?? null;
+
+    this.couponCode =
+      order.couponCode;
+
+    this.couponDiscount =
+      Number(
+        order.discountAmount ?? 0
+      );
+
+  } else {
+
+    this.discountAmount =
+      Number(
+        order.discountAmount ?? 0
+      );
+  }
+
+  const expressPercentage =
+    Number(
+      order.expressChargePercentage ??
+      0
+    );
+
+  this.expressDelivery =
+    expressPercentage > 0;
+
+  this.expressPercentage =
+    expressPercentage;
+
+  if (
+    this.expressDelivery
+  ) {
+
+    const expressCharge =
+      this.expressCharges.find(
+        charge =>
+          Number(
+            charge.percentage
+          ) ===
+          expressPercentage
+      );
+
+    this.selectedExpressChargeId =
+      expressCharge?.id ?? null;
+
+  } else {
+
+    this.selectedExpressChargeId =
+      null;
+  }
+}
 
   cancelRetag():
     void {
@@ -2208,7 +2298,7 @@ printWindow.document.write(`
         <div class="info-row">
 
           <span>
-            Created
+            Created At
           </span>
 
           <strong>
@@ -2220,7 +2310,7 @@ printWindow.document.write(`
         <div class="info-row">
 
           <span>
-            Delivery
+            Delivered Date 
           </span>
 
           <strong>
@@ -2410,9 +2500,22 @@ printTag(): void {
 
   const groupedOrderItems = Array.from(groupedItems.values());
 
-  const totalPieces = groupedOrderItems
-    .filter(item => item.unit === 'PC')
-    .reduce((total, item) => total + Number(item.quantity), 0);
+  const totalItemCount = groupedOrderItems.reduce(
+    (total, item) => {
+      if (item.unit === 'KG') {
+        return total + Math.max(
+          1,
+          Number(item.garmentCount ?? 1)
+        );
+      }
+
+      return total + Math.max(
+        1,
+        Number(item.quantity ?? 1)
+      );
+    },
+    0
+  );
 
   let tagsHtml = '';
 
@@ -2462,9 +2565,7 @@ printTag(): void {
       ? item.garmentCount
       : Math.max(1, Math.floor(Number(item.quantity)));
 
-    const tagNumber = item.unit === 'KG'
-      ? `T${item.garmentCount}`
-      : `T${totalPieces}`;
+    const tagNumber = `T${totalItemCount}`;
 
     for (let index = 1; index <= tagCount; index++) {
       tagsHtml += `
