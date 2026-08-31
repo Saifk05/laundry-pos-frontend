@@ -2446,12 +2446,23 @@ printTag(): void {
   }
 
   const order = this.createdOrder;
-  const createdDate = new Date(order.createdAt);
-  const formattedDate = createdDate.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
+
+  const deliveryDate =
+    order.deliveryDate
+      ? new Date(order.deliveryDate + 'T00:00:00')
+      : null;
+
+  const formattedDate =
+    deliveryDate
+      ? deliveryDate.toLocaleDateString(
+          'en-GB',
+          {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }
+        )
+      : '-';
 
   const groupedItems = new Map<string, {
     productName: string;
@@ -2649,7 +2660,7 @@ printTag(): void {
 
           .business-name {
             width: 100%;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.2;
             font-weight: 700;
             white-space: nowrap;
@@ -2660,7 +2671,7 @@ printTag(): void {
           .customer-name {
             width: 100%;
             margin-top: 4mm;
-            font-size: 11px;
+            font-size: 13px;
             line-height: 1.2;
             font-weight: 700;
             white-space: nowrap;
@@ -2677,7 +2688,7 @@ printTag(): void {
 
           .order-date {
             margin-top: 2mm;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
           }
 
@@ -2710,7 +2721,7 @@ printTag(): void {
           .product-name {
             width: 100%;
             margin-top: 5mm;
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.2;
             font-weight: 700;
             text-transform: capitalize;
