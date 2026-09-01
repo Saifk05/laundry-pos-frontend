@@ -1056,55 +1056,25 @@
 
           <div class="receipt-divider"></div>
 
-          <div class="receipt-section receipt-delivery">
+          @if (receiptTermsAndConditions) {
 
-            <div class="receipt-customer-row">
+            <div class="receipt-divider"></div>
 
-              <span>
-                Pickup
-              </span>
+            <div class="receipt-section receipt-terms">
 
-              <strong>
+              <h3>
+                Terms & Conditions
+              </h3>
 
-                {{
-                  receiptOrder.pickupDate
-                    | date:'dd-MM-yyyy'
-                }}
-
-                @if (receiptOrder.pickupTime) {
-
-                  {{ receiptOrder.pickupTime }}
-
-                }
-
-              </strong>
+              <div
+                class="receipt-terms-text"
+                style="white-space: pre-line; line-height: 1.6; font-size: 12px; color: #444;">
+                {{ receiptTermsAndConditions }}
+              </div>
 
             </div>
 
-            <div class="receipt-customer-row">
-
-              <span>
-                Delivery
-              </span>
-
-              <strong>
-
-                {{
-                  receiptOrder.deliveryDate
-                    | date:'dd-MM-yyyy'
-                }}
-
-                @if (receiptOrder.deliveryTime) {
-
-                  {{ receiptOrder.deliveryTime }}
-
-                }
-
-              </strong>
-
-            </div>
-
-          </div>
+          }
 
           <div class="receipt-divider"></div>
 

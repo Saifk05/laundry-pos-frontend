@@ -640,6 +640,19 @@ export class B2cOrdersPage implements OnInit {
   }
 
 private printReceipt(order: B2COrderDetails): void {
+  const termsAndConditions =
+    localStorage.getItem(
+      'receiptTermsAndConditions'
+    ) ?? '';
+
+  const escapedTermsAndConditions =
+    termsAndConditions
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line)
+      .map(line => `<div class="term-line">${line}</div>`)
+      .join('');
+
   const itemsHtml = order.items
     .map(
       item => `
@@ -765,6 +778,25 @@ private printReceipt(order: B2COrderDetails): void {
             font-weight: 700;
           }
 
+          .terms-section {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed #000;
+          }
+
+          .terms-title {
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 700;
+          }
+
+          .term-line {
+            margin: 4px 0;
+            font-size: 9px;
+            line-height: 1.4;
+            text-align: left;
+          }
+
           @media print {
             @page {
               size: 80mm auto;
@@ -872,6 +904,20 @@ private printReceipt(order: B2COrderDetails): void {
               ₹${Number(order.totalAmount).toFixed(2)}
             </strong>
           </div>
+
+          ${
+            escapedTermsAndConditions
+              ? `
+                <div class="terms-section">
+                  <div class="terms-title">
+                    Terms & Conditions
+                  </div>
+
+                  ${escapedTermsAndConditions}
+                </div>
+              `
+              : ''
+          }
 
         </div>
 

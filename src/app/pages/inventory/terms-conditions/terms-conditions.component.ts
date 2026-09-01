@@ -87,6 +87,11 @@ export class TermsConditionsComponent
             response.termsText?.trim()
               ? response.termsText
               : this.defaultTerms;
+
+          localStorage.setItem(
+            'receiptTermsAndConditions',
+            this.termsAndConditions
+          );
         },
 
         error: (
@@ -103,6 +108,11 @@ export class TermsConditionsComponent
 
           this.termsAndConditions =
             this.defaultTerms;
+
+          localStorage.setItem(
+            'receiptTermsAndConditions',
+            this.termsAndConditions
+          );
 
           this.errorMessage =
             error?.error?.message ||
@@ -157,6 +167,11 @@ export class TermsConditionsComponent
 
           this.termsAndConditions =
             response.termsText;
+
+          localStorage.setItem(
+            'receiptTermsAndConditions',
+            response.termsText
+          );
 
           this.successMessage =
             response.message ||

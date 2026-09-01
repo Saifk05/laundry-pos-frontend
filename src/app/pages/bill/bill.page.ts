@@ -76,6 +76,9 @@ export class BillPage
     B2COrderDetails | null =
       null;
 
+  receiptTermsAndConditions =
+    '';
+
   settlementOpen =
     false;
 
@@ -163,6 +166,11 @@ export class BillPage
   }
 
   ngOnInit(): void {
+
+    this.receiptTermsAndConditions =
+      localStorage.getItem(
+        'receiptTermsAndConditions'
+      ) ?? '';
 
     this.loadInvoices();
   }
@@ -516,6 +524,11 @@ export class BillPage
     invoice:
       Bill
   ): void {
+
+    this.receiptTermsAndConditions =
+      localStorage.getItem(
+        'receiptTermsAndConditions'
+      ) ?? '';
 
     this.selectedInvoice =
       invoice;
