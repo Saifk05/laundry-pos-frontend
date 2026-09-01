@@ -535,11 +535,11 @@
               track coupon.id
             ) {
 
-              <button
-                type="button"
-                [disabled]="!coupon.active"
-                [class.disabled]="!coupon.active"
-                (click)="selectCoupon(coupon)">
+            <button
+              type="button"
+              [disabled]="!coupon.active"
+              [class.disabled]="!coupon.active"
+              (click)="selectCoupon(coupon)">
 
                 <div>
 

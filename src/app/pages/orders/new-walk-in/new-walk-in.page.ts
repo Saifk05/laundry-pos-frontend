@@ -2009,12 +2009,15 @@ const request:
       }
     }
 
-    const request:
-      RetagOrderRequest = {
+const request:
+  RetagOrderRequest = {
 
-      items:
-        items
-    };
+  items:
+    items,
+
+  couponId:
+    this.selectedCouponId
+};
 
     this.creatingOrder =
       true;

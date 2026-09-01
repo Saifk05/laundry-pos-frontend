@@ -1,13 +1,8 @@
 export type B2COrderStatus =
-
   | 'TAGGED'
-
   | 'PROCESSING_AT_STORE'
-
   | 'READY_ORDER'
-
   | 'DELIVERED'
-
   | 'CANCELLED';
 
 
@@ -87,9 +82,7 @@ export interface B2COrderCustomer {
 
 
 export type PricingUnit =
-
   | 'PC'
-
   | 'KG';
 
 
@@ -189,5 +182,7 @@ export interface RetagOrderItemRequest {
 export interface RetagOrderRequest {
 
   items: RetagOrderItemRequest[];
+
+  couponId: string | null;
 
 }

@@ -1462,3 +1462,68 @@ button {
   }
 }
 
+/* =========================================================
+   COUPON DROPDOWN - FINAL VISIBILITY OVERRIDE
+   Keep this block at the END of this file.
+   ========================================================= */
+
+.coupon-menu > button,
+.coupon-menu > button:hover,
+.coupon-menu > button:focus,
+.coupon-menu > button:active {
+  opacity: 1 !important;
+  background: #ffffff !important;
+  color: #1f2925 !important;
+  border: 1px solid #dce5e1 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.coupon-menu > button:hover:not(:disabled) {
+  background: #f1faf6 !important;
+  border-color: #8bd7c0 !important;
+}
+
+.coupon-menu > button > div > strong,
+.coupon-menu > button:hover > div > strong,
+.coupon-menu > button:focus > div > strong {
+  color: #17201d !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.coupon-menu > button > div > small,
+.coupon-menu > button:hover > div > small,
+.coupon-menu > button:focus > div > small {
+  color: #5f6965 !important;
+  opacity: 1 !important;
+}
+
+.coupon-menu > button > span,
+.coupon-menu > button:hover > span,
+.coupon-menu > button:focus > span {
+  color: #159b79 !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.coupon-menu > button.disabled,
+.coupon-menu > button:disabled {
+  opacity: 1 !important;
+  background: #f4f5f5 !important;
+  border-color: #e0e4e2 !important;
+  cursor: not-allowed !important;
+}
+
+.coupon-menu > button.disabled > div > strong,
+.coupon-menu > button:disabled > div > strong {
+  color: #7d8581 !important;
+}
+
+.coupon-menu > button.disabled > div > small,
+.coupon-menu > button:disabled > div > small,
+.coupon-menu > button.disabled > span,
+.coupon-menu > button:disabled > span {
+  color: #9aa19e !important;
+}
+
