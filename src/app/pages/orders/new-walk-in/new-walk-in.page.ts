@@ -980,24 +980,56 @@ private populateRetagOrder(
   }
 
 
-  increaseModalQuantity():
-    void {
+increaseModalQuantity(): void {
 
-    this.modalQuantity++;
+  if (
+    this.selectedProduct?.unit === 'KG'
+  ) {
+
+    this.modalQuantity =
+      Number(
+        (
+          Number(this.modalQuantity) +
+          0.1
+        ).toFixed(2)
+      );
+
+    return;
   }
 
+  this.modalQuantity++;
+}
 
-  decreaseModalQuantity():
-    void {
+
+decreaseModalQuantity(): void {
+
+  if (
+    this.selectedProduct?.unit === 'KG'
+  ) {
 
     if (
-      this.modalQuantity > 1
+      Number(this.modalQuantity) > 0.1
     ) {
 
-      this.modalQuantity--;
+      this.modalQuantity =
+        Number(
+          (
+            Number(this.modalQuantity) -
+            0.1
+          ).toFixed(2)
+        );
     }
+
+    return;
   }
 
+  if (
+    this.modalQuantity > 1
+  ) {
+
+    this.modalQuantity--;
+  }
+}
 
   increaseGarmentCount():
     void {
@@ -1940,19 +1972,48 @@ const request:
       return;
     }
 
+    const items:
+      RetagOrderRequest['items'] =
+      [];
+
+    for (
+      const item
+      of this.orderItems
+    ) {
+
+      for (
+        const service
+        of item.services
+      ) {
+
+        items.push({
+
+          productId:
+            item.productId,
+
+          typeId:
+            item.typeId,
+
+          serviceId:
+            service.id,
+
+          quantity:
+            item.quantity,
+
+          garmentCount:
+            item.unit === 'KG'
+              ? item.garmentCount
+              : null
+
+        });
+      }
+    }
+
     const request:
       RetagOrderRequest = {
 
       items:
-        this.orderItems.map(
-          item => ({
-            orderItemId:
-              item.id,
-
-            quantity:
-              item.quantity
-          })
-        )
+        items
     };
 
     this.creatingOrder =
@@ -2578,6 +2639,42 @@ printTag(): void {
 
     const tagNumber = `T${totalItemCount}`;
 
+    const isShoes =
+      item.productName
+        .trim()
+        .toLowerCase() === 'shoes';
+
+    if (isShoes) {
+
+      for (
+        let shoeIndex = 1;
+        shoeIndex <= tagCount;
+        shoeIndex++
+      ) {
+
+        for (
+          let pieceIndex = 1;
+          pieceIndex <= 2;
+          pieceIndex++
+        ) {
+
+          tagsHtml += `
+            <section class="tag">
+              <div class="business-name">${this.businessName}</div>
+              <div class="customer-name">${order.customer.name}</div>
+              <div class="order-number">#${order.orderNumber}</div>
+              <div class="order-date">${formattedDate}</div>
+              <div class="service-code">${serviceCode}</div>
+              <div class="product-name">${productDisplay}</div>
+              <div class="tag-number">${tagNumber}</div>
+            </section>
+          `;
+        }
+      }
+
+      continue;
+    }
+
     for (let index = 1; index <= tagCount; index++) {
       tagsHtml += `
         <section class="tag">
@@ -2603,52 +2700,160 @@ printTag(): void {
     return;
   }
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Laundry Tags</title>
+printWindow.document.write(`
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Laundry Tags</title>
 
-        <style>
-          @page {
-            size: 50mm 70mm;
-            margin: 0;
-          }
+      <style>
+        @page {
+          size: 50mm 70mm;
+          margin: 0;
+        }
 
-          * {
-            box-sizing: border-box;
-          }
+        * {
+          box-sizing: border-box;
+        }
 
+        html,
+        body {
+          width: 50mm;
+          margin: 0;
+          padding: 0;
+          background: #ffffff;
+        }
+
+        body {
+          font-family: Arial, Helvetica, sans-serif;
+          color: #000000;
+        }
+
+        .tags {
+          width: 50mm;
+          margin: 0;
+          padding: 0;
+        }
+
+        .tag {
+          width: 50mm;
+          height: 70mm;
+          margin: 0;
+          padding: 3mm 3mm;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          overflow: hidden;
+          break-after: page;
+          page-break-after: always;
+        }
+
+        .tag:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+
+        .business-name {
+          width: 100%;
+          font-size: 12px;
+          line-height: 1.15;
+          font-weight: 700;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .customer-name {
+          width: 100%;
+          margin-top: 3mm;
+          font-size: 13px;
+          line-height: 1.15;
+          font-weight: 700;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .order-number {
+          margin-top: 1.8mm;
+          font-size: 19px;
+          line-height: 1;
+          font-weight: 800;
+        }
+
+        .order-date {
+          margin-top: 1.8mm;
+          font-size: 12px;
+          line-height: 1.1;
+          font-weight: 700;
+        }
+
+        .service-code {
+          min-width: 20mm;
+          min-height: 11mm;
+          margin-top: 3.5mm;
+          padding: 1.5mm 2mm;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1.5px solid #000000;
+          font-size: 14px;
+          line-height: 1;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+
+        .service-divider {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 2mm;
+          font-size: 22px;
+          line-height: 1;
+          font-weight: 500;
+          transform: scaleY(1.25);
+        }
+
+        .product-name {
+          width: 100%;
+          margin-top: 4mm;
+          font-size: 14px;
+          line-height: 1.25;
+          font-weight: 700;
+          text-transform: capitalize;
+          overflow: visible;
+          white-space: normal;
+        }
+
+        .tag-number {
+          margin-top: 2.5mm;
+          font-size: 22px;
+          line-height: 1;
+          font-weight: 900;
+        }
+
+        .tag::after {
+          content: '';
+          width: 90%;
+          margin-top: 2.5mm;
+          border-bottom: 1px dashed #000000;
+        }
+
+        @media print {
           html,
           body {
-            width: 50mm;
-            margin: 0;
-            padding: 0;
-            background: #ffffff;
-          }
-
-          body {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #000000;
-          }
-
-          .tags {
-            width: 50mm;
-            margin: 0;
-            padding: 0;
+            width: 50mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
 
           .tag {
-            width: 50mm;
-            height: 70mm;
-            margin: 0;
-            padding: 4mm 3mm;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            overflow: hidden;
+            width: 50mm !important;
+            height: 70mm !important;
+            margin: 0 !important;
+            padding: 3mm 3mm !important;
             break-after: page;
             page-break-after: always;
           }
@@ -2657,128 +2862,25 @@ printTag(): void {
             break-after: auto;
             page-break-after: auto;
           }
+        }
+      </style>
+    </head>
 
-          .business-name {
-            width: 100%;
-            font-size: 12px;
-            line-height: 1.2;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
+    <body>
+      <div class="tags">
+        ${tagsHtml}
+      </div>
 
-          .customer-name {
-            width: 100%;
-            margin-top: 4mm;
-            font-size: 13px;
-            line-height: 1.2;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          .order-number {
-            margin-top: 2mm;
-            font-size: 19px;
-            line-height: 1;
-            font-weight: 800;
-          }
-
-          .order-date {
-            margin-top: 2mm;
-            font-size: 12px;
-            font-weight: 700;
-          }
-
-          .service-code {
-            min-width: 20mm;
-            min-height: 12mm;
-            margin-top: 4mm;
-            padding: 2mm;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1.5px solid #000000;
-            font-size: 14px;
-            line-height: 1;
-            font-weight: 800;
-            white-space: nowrap;
-          }
-
-          .service-divider {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 2mm;
-            font-size: 24px;
-            line-height: 1;
-            font-weight: 500;
-            transform: scaleY(1.35);
-          }
-
-          .product-name {
-            width: 100%;
-            margin-top: 5mm;
-            font-size: 14px;
-            line-height: 1.2;
-            font-weight: 700;
-            text-transform: capitalize;
-            overflow: hidden;
-          }
-
-          .tag-number {
-            margin-top: 4mm;
-            font-size: 22px;
-            line-height: 1;
-            font-weight: 900;
-          }
-
-          .tag::after {
-            content: '';
-            width: 90%;
-            margin-top: 3mm;
-            border-bottom: 1px dashed #000000;
-          }
-
-          @media print {
-            html,
-            body {
-              width: 50mm !important;
-              margin: 0 !important;
-              padding: 0 !important;
-            }
-
-            .tag {
-              width: 50mm !important;
-              height: 70mm !important;
-              margin: 0 !important;
-              break-after: page;
-              page-break-after: always;
-            }
-
-            .tag:last-child {
-              break-after: auto;
-              page-break-after: auto;
-            }
-          }
-        </style>
-      </head>
-
-      <body>
-        <div class="tags">${tagsHtml}</div>
-
-        <script>
-          window.onload = function () {
-            setTimeout(function () {
-              window.print();
-            }, 300);
-          };
-        </script>
-      </body>
-    </html>
-  `);
+      <script>
+        window.onload = function () {
+          setTimeout(function () {
+            window.print();
+          }, 300);
+        };
+      </script>
+    </body>
+  </html>
+`);
 
   printWindow.document.close();
 }

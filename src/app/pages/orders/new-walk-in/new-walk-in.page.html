@@ -213,7 +213,8 @@
                     ×
                     ₹{{ item.unitPrice }}
                     =
-                    ₹{{ item.total }}
+                    ₹{{ item.total | number:'1.2-2' }}
+
                   </strong>
 
                   <span>
@@ -247,7 +248,7 @@
         </span>
 
         <strong>
-          ₹{{ grossTotal }}
+          ₹{{ grossTotal | number:'1.2-2' }}
         </strong>
 
       </div>
@@ -259,7 +260,7 @@
         </span>
 
         <strong>
-          ₹{{ totalDiscount }}
+          ₹{{ totalDiscount | number:'1.2-2' }}
         </strong>
 
       </div>
@@ -308,7 +309,7 @@
         </span>
 
         <strong>
-          ₹{{ grandTotal }}
+          ₹{{ grandTotal | number:'1.2-2' }}
         </strong>
 
       </div>
@@ -686,7 +687,7 @@
 
   </section>
 
-  @if (!isRetagMode && !isRescheduleMode) {
+  @if (!isRescheduleMode) {
 
   <section class="products-panel">
 
@@ -962,14 +963,38 @@
           </label>
 
           <div class="modal-quantity">
-            <button type="button" (click)="decreaseModalQuantity()">−</button>
-            <strong>{{ modalQuantity }}</strong>
+
             <button
               type="button"
-              [disabled]="isRetagMode || isRescheduleMode"
+              (click)="decreaseModalQuantity()">
+              −
+            </button>
+
+            @if (selectedProduct.unit === 'KG') {
+
+              <input
+                type="number"
+                [(ngModel)]="modalQuantity"
+                min="0.1"
+                step="0.1"
+                inputmode="decimal"
+                class="weight-input">
+
+            } @else {
+
+              <strong>
+                {{ modalQuantity }}
+              </strong>
+
+            }
+
+            <button
+              type="button"
+              [disabled]="isRescheduleMode"
               (click)="increaseModalQuantity()">
               +
             </button>
+
           </div>
 
         </div>
@@ -987,7 +1012,7 @@
               <strong>{{ modalGarmentCount }}</strong>
               <button
                 type="button"
-                [disabled]="isRetagMode || isRescheduleMode"
+                [disabled]="isRescheduleMode"
                 (click)="increaseGarmentCount()">
                 +
               </button>
@@ -1020,11 +1045,9 @@
           (click)="addConfiguredProduct()">
 
           {{
-            isRetagMode
-              ? 'Update Quantity'
-              : isRescheduleMode
-                ? 'Update'
-                : 'Add Product'
+            editingOrderItemId
+              ? 'Update Product'
+              : 'Add Product'
           }}
 
         </button>

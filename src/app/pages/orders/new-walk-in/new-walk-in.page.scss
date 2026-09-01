@@ -258,6 +258,37 @@ button {
   font-size: 14px;
 }
 
+
+.weight-input {
+  width: 70px;
+  height: 38px;
+  padding: 0 6px;
+  border: none;
+  outline: none;
+  background: #ffffff;
+  color: #303538;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.weight-input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px #27bd96;
+}
+
+.weight-input::-webkit-inner-spin-button,
+.weight-input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.weight-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .cart-price {
   display: flex;
   flex-direction: column;

@@ -1126,6 +1126,69 @@ private printQrTags(
             )
           );
 
+    const isShoes =
+      item.productName
+        .trim()
+        .toLowerCase() ===
+      'shoes';
+
+    if (isShoes) {
+
+      for (
+        let shoeIndex = 1;
+        shoeIndex <= tagCount;
+        shoeIndex++
+      ) {
+
+        const sideLabels = [
+          'Left',
+          'Right'
+        ];
+
+        for (
+          const sideLabel
+          of sideLabels
+        ) {
+
+          tagsHtml += `
+            <section class="tag">
+
+              <div class="business-name">
+                ${this.businessName}
+              </div>
+
+              <div class="customer-name">
+                ${order.customer.name}
+              </div>
+
+              <div class="order-number">
+                #${order.orderNumber}
+              </div>
+
+              <div class="order-date">
+                ${formattedDate}
+              </div>
+
+              <div class="service-code">
+                ${serviceCode}
+              </div>
+
+              <div class="product-name">
+                ${productDisplay}
+              </div>
+
+              <div class="tag-number">
+                T${totalItemCount}
+              </div>
+
+            </section>
+          `;
+        }
+      }
+
+      continue;
+    }
+
     for (
       let index = 1;
       index <= tagCount;
@@ -1231,7 +1294,7 @@ private printQrTags(
             height: 70mm;
 
             margin: 0;
-            padding: 4mm 3mm;
+            padding: 3mm 3mm;
 
             display: flex;
             flex-direction: column;
@@ -1254,7 +1317,7 @@ private printQrTags(
             width: 100%;
 
             font-size: 12px;
-            line-height: 1.2;
+            line-height: 1.15;
             font-weight: 700;
 
             white-space: nowrap;
@@ -1264,10 +1327,10 @@ private printQrTags(
 
           .customer-name {
             width: 100%;
-            margin-top: 4mm;
+            margin-top: 3mm;
 
             font-size: 13px;
-            line-height: 1.2;
+            line-height: 1.15;
             font-weight: 700;
 
             white-space: nowrap;
@@ -1276,7 +1339,7 @@ private printQrTags(
           }
 
           .order-number {
-            margin-top: 2mm;
+            margin-top: 1.8mm;
 
             font-size: 19px;
             line-height: 1;
@@ -1284,18 +1347,19 @@ private printQrTags(
           }
 
           .order-date {
-            margin-top: 2mm;
+            margin-top: 1.8mm;
 
-            font-size: 19px;
+            font-size: 12px;
+            line-height: 1.1;
             font-weight: 700;
           }
 
           .service-code {
             min-width: 20mm;
-            min-height: 12mm;
+            min-height: 11mm;
 
-            margin-top: 4mm;
-            padding: 2mm;
+            margin-top: 3.5mm;
+            padding: 1.5mm 2mm;
 
             display: flex;
             align-items: center;
@@ -1319,31 +1383,49 @@ private printQrTags(
 
             margin: 0 2mm;
 
-            font-size: 24px;
+            font-size: 22px;
             line-height: 1;
             font-weight: 500;
 
             transform:
-              scaleY(1.35);
+              scaleY(1.25);
           }
 
           .product-name {
             width: 100%;
 
-            margin-top: 5mm;
+            margin-top: 4mm;
 
             font-size: 14px;
-            line-height: 1.2;
+            line-height: 1.25;
             font-weight: 700;
 
             text-transform:
               capitalize;
 
-            overflow: hidden;
+            overflow: visible;
+            white-space: normal;
+          }
+
+          .shoe-side-label {
+            margin-top: 2mm;
+            padding: 1mm 4mm;
+
+            border-radius: 10mm;
+
+            background: #000000;
+            color: #ffffff;
+
+            font-size: 10px;
+            line-height: 1.1;
+            font-weight: 800;
+
+            text-transform: uppercase;
+            white-space: nowrap;
           }
 
           .tag-number {
-            margin-top: 4mm;
+            margin-top: 2.5mm;
 
             font-size: 22px;
             line-height: 1;
@@ -1355,7 +1437,7 @@ private printQrTags(
 
             width: 90%;
 
-            margin-top: 3mm;
+            margin-top: 2.5mm;
 
             border-bottom:
               1px dashed
@@ -1376,6 +1458,7 @@ private printQrTags(
               height: 70mm !important;
 
               margin: 0 !important;
+              padding: 3mm 3mm !important;
 
               break-after: page;
               page-break-after: always;
@@ -1423,6 +1506,7 @@ private printQrTags(
   printWindow.document.close();
   printWindow.focus();
 }
+
 
   private updateLocalOrder(response: B2COrder): void {
     this.orders = this.orders.map((order: B2cOrderView) => {
