@@ -2009,59 +2009,32 @@ const request:
       }
     }
 
-const request:
-  RetagOrderRequest = {
-
-  items:
-    items,
-
-  couponId:
-    this.selectedCouponId
+const request: RetagOrderRequest = {
+  items: items,
+  couponId: this.selectedCouponId
 };
 
-    this.creatingOrder =
-      true;
-
-    this.errorMessage =
-      '';
-
-    this.apiService
-      .retagB2COrder(
+    this.creatingOrder = true;
+    this.errorMessage = '';
+    this.apiService.retagB2COrder(
         this.retagOrderId,
         request
       )
-      .subscribe({
-
-        next: (
-          response:
-            B2COrderDetails
-        ) => {
-
-          this.creatingOrder =
-            false;
-
-          this.createdOrderNumber =
-            response.orderNumber;
-
+      .subscribe({next: (  response: B2COrderDetails ) => {
+          this.creatingOrder = false;
+          this.createdOrderNumber = response.orderNumber;
           this.router.navigate(
             ['/app/b2c-orders']
           );
         },
 
-        error: (
-          error:
-            any
-        ) => {
-
-          this.creatingOrder =
-            false;
-
+        error: ( error: any ) => {
+          this.creatingOrder = false;
           this.errorMessage =
             error?.error?.message ||
             error?.error?.error ||
             'Unable to update re-tag order';
         }
-
       });
   }
 
@@ -2076,8 +2049,7 @@ const request:
     return;
   }
 
-  const order =
-    this.createdOrder;
+  const order = this.createdOrder;
 
   const termsAndConditions =
     localStorage.getItem(
@@ -2528,53 +2500,28 @@ printTag(): void {
         )
       : '-';
 
-  const groupedItems = new Map<string, {
-    productName: string;
-    typeName: string;
-    unit: PricingUnit;
-    quantity: number;
-    garmentCount: number;
-    serviceNames: string[];
-  }>();
+  //sdsd    
+const groupedOrderItems = this.orderItems.map(item => ({
+  productName: item.productName,
+  typeName: item.typeName ?? '',
+  unit: item.unit,
+  quantity: Number(item.quantity),
 
-  for (const item of order.items) {
-    const key = [
-      item.productName,
-      item.typeName ?? '',
-      item.unit,
-      Number(item.quantity)
-    ].join('|');
+  garmentCount:
+    item.unit === 'KG'
+      ? Math.max(
+          1,
+          Number(item.garmentCount ?? 1)
+        )
+      : Math.max(
+          1,
+          Number(item.quantity)
+        ),
 
-    const sourceItem = this.orderItems.find(currentItem =>
-      currentItem.productName === item.productName &&
-      currentItem.typeName === item.typeName &&
-      currentItem.unit === item.unit &&
-      Number(currentItem.quantity) === Number(item.quantity)
-    );
-
-    const existingItem = groupedItems.get(key);
-
-    if (existingItem) {
-      if (!existingItem.serviceNames.includes(item.serviceName)) {
-        existingItem.serviceNames.push(item.serviceName);
-      }
-      continue;
-    }
-
-    groupedItems.set(key, {
-      productName: item.productName,
-      typeName: item.typeName ?? '',
-      unit: item.unit,
-      quantity: Number(item.quantity),
-      garmentCount: item.unit === 'KG'
-        ? Math.max(1, Number(sourceItem?.garmentCount ?? 1))
-        : Math.max(1, Number(item.quantity)),
-      serviceNames: [item.serviceName]
-    });
-  }
-
-  const groupedOrderItems = Array.from(groupedItems.values());
-
+  serviceNames:
+    item.services.map(service => service.name)
+}));
+/////////////////////////////////////////////
   const totalItemCount = groupedOrderItems.reduce(
     (total, item) => {
       if (item.unit === 'KG') {
