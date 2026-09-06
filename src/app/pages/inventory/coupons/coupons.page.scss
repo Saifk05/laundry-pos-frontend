@@ -71,10 +71,10 @@ select {
 
   padding: 0 18px;
 
-  border: 1px solid #16b2cf;
+  border: 1px solid #16a34a;
   border-radius: 7px;
 
-  background: #18b5d2;
+  background: #16a34a;
   color: #ffffff;
 
   font-size: 13px;
@@ -83,7 +83,7 @@ select {
   cursor: pointer;
 
   box-shadow:
-    0 4px 12px rgba(24, 181, 210, 0.15);
+    0 4px 12px rgba(22, 163, 74, 0.14);
 
   transition:
     background 0.2s ease,
@@ -91,8 +91,8 @@ select {
 }
 
 .primary-button:hover {
-  background: #0faac7;
-  border-color: #0fa5c1;
+  background: #15803d;
+  border-color: #15803d;
 }
 
 
@@ -156,10 +156,10 @@ select {
 }
 
 .search-field input:focus {
-  border-color: #17b4d0;
+  border-color: #16a34a;
 
   box-shadow:
-    0 0 0 3px rgba(23, 180, 208, 0.08);
+    0 0 0 3px rgba(22, 163, 74, 0.08);
 }
 
 .search-icon {
@@ -219,12 +219,12 @@ select {
 }
 
 .status-button:hover {
-  color: #079db9;
+  color: #15803d;
 }
 
 .status-button.active {
   background: #ffffff;
-  color: #079db9;
+  color: #15803d;
 
   box-shadow:
     0 1px 4px rgba(0, 0, 0, 0.08);
@@ -312,8 +312,8 @@ select {
 
   border-radius: 9px;
 
-  background: #eafafd;
-  color: #0ba5c0;
+  background: #ecfdf3;
+  color: #16a34a;
 
   font-size: 18px;
   font-weight: 700;
@@ -394,10 +394,10 @@ select {
 }
 
 .edit-button:hover {
-  border-color: #17b4d0;
+  border-color: #16a34a;
 
-  background: #f0fbfd;
-  color: #079db9;
+  background: #f0fdf4;
+  color: #15803d;
 }
 
 
@@ -426,7 +426,7 @@ select {
 }
 
 .discount-value {
-  color: #0aa4bf;
+  color: #16a34a;
 
   font-size: 24px;
   line-height: 1.2;
@@ -512,7 +512,7 @@ select {
 }
 
 .toggle-switch.enabled {
-  background: #18b5d2;
+  background: #16a34a;
 }
 
 .toggle-knob {
@@ -573,8 +573,8 @@ select {
 
   border-radius: 50%;
 
-  background: #eafafd;
-  color: #0aa4bf;
+  background: #ecfdf3;
+  color: #16a34a;
 
   font-size: 20px;
   font-weight: 700;
@@ -777,10 +777,10 @@ select {
 
 .form-group > input:focus,
 .form-group select:focus {
-  border-color: #17b4d0;
+  border-color: #16a34a;
 
   box-shadow:
-    0 0 0 3px rgba(23, 180, 208, 0.08);
+    0 0 0 3px rgba(22, 163, 74, 0.08);
 }
 
 .form-group select {
@@ -812,10 +812,10 @@ select {
 }
 
 .amount-input:focus-within {
-  border-color: #17b4d0;
+  border-color: #16a34a;
 
   box-shadow:
-    0 0 0 3px rgba(23, 180, 208, 0.08);
+    0 0 0 3px rgba(22, 163, 74, 0.08);
 }
 
 .amount-input > span {
@@ -963,14 +963,14 @@ select {
 }
 
 .save-button {
-  border: 1px solid #16b2cf;
+  border: 1px solid #16a34a;
 
-  background: #18b5d2;
+  background: #16a34a;
   color: #ffffff;
 }
 
 .save-button:hover {
-  background: #0faac7;
+  background: #15803d;
 }
 
 

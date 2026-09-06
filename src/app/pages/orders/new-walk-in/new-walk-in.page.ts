@@ -1263,22 +1263,17 @@ decreaseModalQuantity(): void {
   }
 
 
-  get totalPieces():
-    number {
-
-    return this.orderItems
-      .reduce(
-        (
-          total:
-            number,
-          item:
-            SelectedOrderItem
-        ) =>
-          total +
-          item.quantity,
-        0
-      );
-  }
+get totalPieces(): number {
+  return this.orderItems.reduce(
+    (total, item) =>
+      total + (
+        item.unit === 'KG'
+          ? item.garmentCount
+          : item.quantity
+      ),
+    0
+  );
+}
 
 
   get grossTotal():
@@ -2521,26 +2516,21 @@ const groupedOrderItems = this.orderItems.map(item => ({
   serviceNames:
     item.services.map(service => service.name)
 }));
-/////////////////////////////////////////////
+
   const totalItemCount = groupedOrderItems.reduce(
     (total, item) => {
       if (item.unit === 'KG') {
-        return total + Math.max(
-          1,
-          Number(item.garmentCount ?? 1)
+        return total + Math.max( 1, Number(item.garmentCount ?? 1)
         );
       }
 
       return total + Math.max(
-        1,
-        Number(item.quantity ?? 1)
+        1,Number(item.quantity ?? 1)
       );
-    },
-    0
+    }, 0
   );
 
   let tagsHtml = '';
-
   for (const item of groupedOrderItems) {
     const typeName =
       item.typeName && item.typeName.toLowerCase() !== 'default'
@@ -2946,5 +2936,20 @@ printWindow.document.write(`
 
     this.productModalOpen = true;
   }
+
+  normalizeModalQuantity(): void {
+  const value = Number(this.modalQuantity);
+
+  if (this.selectedProduct?.unit === 'KG') {
+    this.modalQuantity = !value || value < 0.1 ? 0.1 : Number(value.toFixed(2));
+    return;
+  }
+
+  this.modalQuantity = !value || value < 1 ? 1 : Math.floor(value);
+}
+normalizeGarmentCount(): void {
+  const value = Number(this.modalGarmentCount);
+  this.modalGarmentCount = !value || value < 1 ? 1 : Math.floor(value);
+}
 
 }

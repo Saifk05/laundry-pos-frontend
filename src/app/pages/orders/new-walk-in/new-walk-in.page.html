@@ -970,23 +970,14 @@
               −
             </button>
 
-            @if (selectedProduct.unit === 'KG') {
-
-              <input
-                type="number"
-                [(ngModel)]="modalQuantity"
-                min="0.1"
-                step="0.1"
-                inputmode="decimal"
-                class="weight-input">
-
-            } @else {
-
-              <strong>
-                {{ modalQuantity }}
-              </strong>
-
-            }
+            <input
+              type="number"
+              [(ngModel)]="modalQuantity"
+              [min]="selectedProduct.unit === 'KG' ? 0.1 : 1"
+              [max]="selectedProduct.unit === 'KG' ? 100 : 999"
+              [step]="selectedProduct.unit === 'KG' ? 0.1 : 1"
+              class="quantity-input"
+              (blur)="normalizeModalQuantity()">
 
             <button
               type="button"
@@ -999,28 +990,42 @@
 
         </div>
 
-        @if (selectedProduct.unit === 'KG') {
+@if (selectedProduct.unit === 'KG') {
 
-          <div class="modal-section modal-quantity-section">
+  <div class="modal-section modal-quantity-section">
 
-            <label class="modal-label">
-              Total Garments
-            </label>
+    <label class="modal-label">
+      Total Garments
+    </label>
 
-            <div class="modal-quantity">
-              <button type="button" (click)="decreaseGarmentCount()">−</button>
-              <strong>{{ modalGarmentCount }}</strong>
-              <button
-                type="button"
-                [disabled]="isRescheduleMode"
-                (click)="increaseGarmentCount()">
-                +
-              </button>
-            </div>
+    <div class="modal-quantity">
 
-          </div>
+      <button
+        type="button"
+        (click)="decreaseGarmentCount()">
+        −
+      </button>
 
-        }
+      <input
+        type="number"
+        [(ngModel)]="modalGarmentCount"
+        min="1"
+        step="1"
+        inputmode="numeric"
+        class="quantity-input"
+        (blur)="normalizeGarmentCount()">
+
+      <button
+        type="button"
+        (click)="increaseGarmentCount()">
+        +
+      </button>
+
+    </div>
+
+  </div>
+
+}
 
       </div>
 

@@ -2,63 +2,70 @@
   display: block;
   width: 100%;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .b2c-page {
   width: 100%;
-  min-height: 100%;
-  padding: var(--app-space-lg);
+  height: 100%;
+  min-height: 0;
+  padding: 18px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--app-background);
   color: var(--app-text-primary);
+  box-sizing: border-box;
 }
 
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
 .page-header {
-  margin-bottom: var(--app-space-lg);
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--app-space-md);
+  gap: 16px;
 }
 
 .page-header h1 {
   margin: 0;
   font-family: var(--app-font-heading);
-  font-size: var(--app-font-size-xl);
+  font-size: 24px;
+  line-height: 1.15;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--app-text-primary);
 }
 
 .page-header p {
-  margin: var(--app-space-xs) 0 0;
+  margin: 5px 0 0;
   color: var(--app-text-secondary);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
 }
 
 .refresh-button {
-  min-width: 100px;
-  height: 40px;
+  min-width: 92px;
+  height: 38px;
   padding: 0 16px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-sm);
+  border-radius: 8px;
   background: var(--app-surface);
   color: var(--app-text-primary);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    border-color var(--app-transition),
-    color var(--app-transition),
-    background var(--app-transition),
-    transform var(--app-transition);
+  transition: 0.18s ease;
 }
 
 .refresh-button:hover:not(:disabled) {
   border-color: var(--app-primary);
   background: var(--app-background-soft);
   color: var(--app-primary-dark);
-  transform: translateY(-1px);
 }
 
 .refresh-button:disabled {
@@ -66,39 +73,38 @@
   cursor: not-allowed;
 }
 
+/* =========================================================
+   STATUS TABS
+   ========================================================= */
+
 .status-section {
-  margin-bottom: var(--app-space-md);
+  margin-bottom: 14px;
 }
 
 .status-tabs {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--app-space-sm);
+  gap: 8px;
 }
 
 .status-tab {
   min-height: 34px;
   padding: 0 14px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-round);
+  border-radius: 999px;
   background: var(--app-surface);
   color: var(--app-text-secondary);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background var(--app-transition),
-    color var(--app-transition),
-    border-color var(--app-transition),
-    transform var(--app-transition);
+  transition: 0.18s ease;
 }
 
 .status-tab:hover {
   border-color: var(--app-primary);
   color: var(--app-primary-dark);
-  transform: translateY(-1px);
 }
 
 .status-tab.active {
@@ -107,46 +113,49 @@
   color: var(--app-text-light);
 }
 
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
 .filter-section {
-  margin-bottom: var(--app-space-md);
-  padding: var(--app-space-md);
+  margin-bottom: 14px;
+  padding: 14px;
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: var(--app-space-md);
+  gap: 12px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-md);
+  border-radius: 10px;
   background: var(--app-surface);
 }
 
 .filter-field {
-  min-width: 220px;
+  width: 210px;
+  min-width: 180px;
   display: flex;
   flex-direction: column;
-  gap: var(--app-space-sm);
+  gap: 6px;
 }
 
 .filter-field label {
   color: var(--app-text-primary);
-  font-size: var(--app-font-size-xs);
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .filter-field input {
   width: 100%;
-  height: 42px;
-  padding: 0 14px;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-sm);
+  border-radius: 7px;
   background: var(--app-background-soft);
   color: var(--app-text-primary);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-sm);
+  font-size: 12px;
   outline: none;
-  transition:
-    border-color var(--app-transition),
-    box-shadow var(--app-transition),
-    background var(--app-transition);
+  box-sizing: border-box;
+  transition: 0.18s ease;
 }
 
 .filter-field input::placeholder {
@@ -161,19 +170,15 @@
 
 .search-button,
 .clear-button {
-  min-width: 90px;
-  height: 42px;
-  padding: 0 16px;
-  border-radius: var(--app-radius-sm);
+  min-width: 82px;
+  height: 40px;
+  padding: 0 15px;
+  border-radius: 7px;
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   cursor: pointer;
-  transition:
-    border-color var(--app-transition),
-    color var(--app-transition),
-    background var(--app-transition),
-    transform var(--app-transition);
+  transition: 0.18s ease;
 }
 
 .search-button {
@@ -185,7 +190,6 @@
 .search-button:hover {
   border-color: var(--app-primary-dark);
   background: var(--app-primary-dark);
-  transform: translateY(-1px);
 }
 
 .clear-button {
@@ -196,150 +200,234 @@
 
 .clear-button:hover {
   border-color: var(--app-primary);
-  background: var(--app-background-soft);
   color: var(--app-primary-dark);
+  background: var(--app-background-soft);
 }
 
 .error-message {
-  margin-bottom: var(--app-space-md);
-  padding: 11px 14px;
+  margin-bottom: 12px;
+  padding: 10px 13px;
   border: 1px solid rgba(214, 69, 69, 0.22);
-  border-radius: var(--app-radius-sm);
+  border-radius: 8px;
   background: rgba(214, 69, 69, 0.08);
   color: var(--app-danger);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
   font-weight: 600;
 }
 
 .result-info {
-  margin-bottom: var(--app-space-sm);
+  margin: 0 0 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--app-space-md);
+  gap: 12px;
   color: var(--app-text-secondary);
-  font-size: var(--app-font-size-xs);
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .loading-text {
   color: var(--app-primary-dark);
 }
 
+.page-header,
+.status-section,
+.filter-section,
+.result-info,
+.error-message {
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   ORDERS TABLE
+   ========================================================= */
+
 .orders-table-wrapper {
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-md);
+  border-radius: 10px;
   background: var(--app-surface);
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: auto;
   scrollbar-width: auto;
-  scrollbar-color: var(--app-text-muted) var(--app-background-soft);
+  scrollbar-color: #9aa7a1 #f1f5f3;
 }
 
 .orders-table-wrapper::-webkit-scrollbar {
+  width: 10px;
   height: 10px;
 }
 
 .orders-table-wrapper::-webkit-scrollbar-track {
-  background: var(--app-background-soft);
-  border-radius: var(--app-radius-round);
+  background: #f1f5f3;
 }
 
 .orders-table-wrapper::-webkit-scrollbar-thumb {
-  background: var(--app-text-muted);
-  border-radius: var(--app-radius-round);
-  border: 2px solid var(--app-background-soft);
-}
-
-.orders-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--app-text-secondary);
+  background: #9aa7a1;
+  border-radius: 999px;
+  border: 2px solid #f1f5f3;
 }
 
 .orders-table {
-  width: 100%;
-  min-width: 1650px;
-  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
 }
 
 .orders-table th,
 .orders-table td {
-  padding: 13px 14px;
+  height: 50px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--app-border);
   text-align: left;
   vertical-align: middle;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .orders-table th {
-  background: var(--app-background-soft);
-  color: var(--app-text-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 42px;
+  background: #f6f9f7;
+  color: #52615a;
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 11px;
   font-weight: 800;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 -1px 0 var(--app-border);
 }
 
 .orders-table td {
   background: var(--app-surface);
   color: var(--app-text-primary);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
   font-weight: 500;
 }
 
-.orders-table tbody tr {
-  transition: background var(--app-transition);
-}
-
 .orders-table tbody tr:hover td {
-  background: var(--app-background-soft);
+  background: #fbfdfc;
 }
 
 .orders-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* Readable widths */
+.orders-table th:nth-child(1),
+.orders-table td:nth-child(1) {
+  min-width: 330px;
+}
+
+.orders-table th:nth-child(2),
+.orders-table td:nth-child(2) {
+  min-width: 92px;
+}
+
+.orders-table th:nth-child(3),
+.orders-table td:nth-child(3) {
+  min-width: 115px;
+}
+
+.orders-table th:nth-child(4),
+.orders-table td:nth-child(4) {
+  min-width: 135px;
+}
+
+.orders-table th:nth-child(5),
+.orders-table td:nth-child(5) {
+  min-width: 112px;
+}
+
+.orders-table th:nth-child(6),
+.orders-table td:nth-child(6) {
+  min-width: 105px;
+}
+
+.orders-table th:nth-child(7),
+.orders-table td:nth-child(7),
+.orders-table th:nth-child(8),
+.orders-table td:nth-child(8),
+.orders-table th:nth-child(9),
+.orders-table td:nth-child(9) {
+  min-width: 100px;
+}
+
+.orders-table th:nth-child(10),
+.orders-table td:nth-child(10) {
+  min-width: 145px;
+}
+
+.orders-table th:nth-child(11),
+.orders-table td:nth-child(11) {
+  min-width: 100px;
+}
+
+.orders-table th:nth-child(12),
+.orders-table td:nth-child(12) {
+  min-width: 90px;
+}
+
+.orders-table th:nth-child(13),
+.orders-table td:nth-child(13) {
+  min-width: 90px;
+}
+
+/* Keep actions visible while scrolling horizontally */
 .actions-column,
 .actions-cell {
-  min-width: 390px;
+  position: sticky !important;
+  left: 0;
+  z-index: 20;
+  min-width: 330px;
+  max-width: 330px;
+  background: var(--app-surface) !important;
+  box-shadow: 8px 0 14px -14px rgba(20, 35, 27, 0.55);
+}
+
+.actions-column {
+  z-index: 50 !important;
+  background: #f6f9f7 !important;
 }
 
 .actions-cell {
-  position: relative;
+  overflow: visible;
 }
 
 .actions-list {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: var(--app-space-sm);
+  gap: 6px;
 }
 
 .action-button {
-  min-height: 32px;
-  padding: 0 11px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0 9px;
   border: 1px solid var(--app-primary);
-  border-radius: var(--app-radius-sm);
+  border-radius: 6px;
   background: var(--app-primary);
   color: var(--app-text-light);
   font-family: var(--app-font-body);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 800;
   text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
-  transition:
-    background var(--app-transition),
-    border-color var(--app-transition),
-    transform var(--app-transition),
-    opacity var(--app-transition);
+  transition: 0.18s ease;
 }
 
 .action-button:hover:not(:disabled) {
   background: var(--app-primary-dark);
   border-color: var(--app-primary-dark);
-  transform: translateY(-1px);
 }
 
 .action-button:disabled {
@@ -351,36 +439,26 @@
   background: var(--app-primary);
   border-color: var(--app-primary);
   color: var(--app-text-light);
-  text-transform: uppercase;
-}
-
-.whatsapp-action:hover:not(:disabled) {
-  background: var(--app-primary-dark);
-  border-color: var(--app-primary-dark);
 }
 
 .more-wrapper {
   position: relative;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .more-button {
-  min-width: 72px;
-  height: 32px;
-  padding: 0 12px;
+  min-width: 64px;
+  height: 30px;
+  padding: 0 9px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-sm);
+  border-radius: 6px;
   background: var(--app-surface);
   color: var(--app-text-primary);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
-  transition:
-    background var(--app-transition),
-    border-color var(--app-transition),
-    color var(--app-transition);
 }
 
 .more-button:hover {
@@ -391,38 +469,37 @@
 
 .more-menu {
   position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 500;
-  width: 220px;
-  padding: var(--app-space-sm);
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  z-index: 1000;
+  width: 190px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
+  gap: 2px;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-md);
+  border-radius: 9px;
   background: var(--app-surface);
-  box-shadow: var(--app-shadow-lg);
+  box-shadow: 0 14px 35px rgba(20, 28, 38, 0.18);
 }
 
 .more-menu button {
   width: 100%;
-  min-height: 40px;
-  padding: 0 12px;
+  min-height: 36px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   border: 0;
-  border-radius: var(--app-radius-sm);
+  border-radius: 6px;
   background: transparent;
   color: var(--app-text-primary);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 11px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  transition:
-    background var(--app-transition),
-    color var(--app-transition),
-    opacity var(--app-transition);
+  transition: 0.15s ease;
 }
 
 .more-menu button:hover:not(:disabled) {
@@ -446,12 +523,22 @@
 
 .more-menu .view-order-action {
   color: var(--app-primary-dark);
-  font-weight: 700;
+  font-weight: 800;
+}
+
+.order-number-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .order-number {
   color: var(--app-primary-dark);
   font-weight: 800;
+}
+
+.express-delivery-icon {
+  font-size: 14px;
 }
 
 .customer-name {
@@ -460,16 +547,16 @@
 }
 
 .status-badge {
-  min-height: 28px;
-  padding: 0 10px;
+  min-height: 26px;
+  padding: 0 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--app-radius-round);
+  border-radius: 999px;
   background: var(--app-surface-soft);
   color: var(--app-text-secondary);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   white-space: nowrap;
 }
 
@@ -504,7 +591,7 @@
   background: transparent;
   color: var(--app-primary-dark);
   font-family: var(--app-font-body);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -514,32 +601,35 @@
 }
 
 .storage-label {
-  min-height: 28px;
-  padding: 0 10px;
+  min-height: 27px;
+  padding: 0 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--app-radius-sm);
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   background: var(--app-background-soft);
   color: var(--app-text-primary);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
 }
 
+.editable-storage-label {
+  cursor: pointer;
+}
+
 .add-storage-button {
-  min-height: 30px;
-  padding: 0 10px;
+  min-height: 28px;
+  padding: 0 9px;
   border: 1px dashed var(--app-border);
-  border-radius: var(--app-radius-sm);
+  border-radius: 6px;
   background: var(--app-surface);
   color: var(--app-primary-dark);
   font-family: var(--app-font-body);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  transition:
-    border-color var(--app-transition),
-    background var(--app-transition);
 }
 
 .add-storage-button:hover {
@@ -551,12 +641,12 @@
 .no-badge,
 .payment-settled,
 .payment-pending {
-  min-height: 26px;
-  padding: 0 9px;
+  min-height: 25px;
+  padding: 0 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--app-radius-round);
+  border-radius: 999px;
   font-size: 10px;
   font-weight: 800;
 }
@@ -583,12 +673,13 @@
 
 .amount {
   color: var(--app-text-primary);
+  font-size: 12px;
   font-weight: 800;
 }
 
 .empty-orders {
   min-height: 220px;
-  padding: var(--app-space-2xl);
+  padding: 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -599,15 +690,15 @@
 .empty-orders h3 {
   margin: 0;
   font-family: var(--app-font-heading);
-  font-size: var(--app-font-size-md);
+  font-size: 16px;
   font-weight: 700;
   color: var(--app-text-primary);
 }
 
 .empty-orders p {
-  margin: var(--app-space-sm) 0 0;
+  margin: 8px 0 0;
   color: var(--app-text-muted);
-  font-size: var(--app-font-size-xs);
+  font-size: 12px;
 }
 
 .modal-overlay {
@@ -1162,3 +1253,199 @@
   }
 }
 
+
+
+/* =========================================================
+   RESPONSIVE TABLE / PAGE OVERRIDES
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .b2c-page {
+    padding: 14px;
+  }
+
+  .filter-field {
+    flex: 1 1 190px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .refresh-button {
+    width: 100%;
+  }
+
+  .status-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .status-tab {
+    flex: 0 0 auto;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-field,
+  .search-button,
+  .clear-button {
+    width: 100%;
+  }
+
+  .actions-column,
+  .actions-cell {
+    position: static !important;
+    min-width: 310px;
+    max-width: none;
+    box-shadow: none;
+  }
+}
+
+
+/* =========================================================
+   MORE MENU - FLOAT OVER ROWS
+   ========================================================= */
+
+.actions-cell {
+  position: sticky !important;
+  left: 0;
+  z-index: 40;
+  min-width: 330px;
+  max-width: 330px;
+  vertical-align: middle !important;
+  overflow: visible !important;
+  background: var(--app-surface) !important;
+}
+
+.actions-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.more-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.more-button {
+  min-width: 64px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--app-text-primary);
+  font-family: var(--app-font-body);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.more-button:hover {
+  border-color: var(--app-primary);
+  background: var(--app-background-soft);
+  color: var(--app-primary-dark);
+}
+
+.more-menu {
+  position: absolute !important;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  z-index: 9999 !important;
+  width: 180px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.14),
+    0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.more-menu button {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--app-text-primary);
+  font-family: var(--app-font-body);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.more-menu button:hover:not(:disabled) {
+  background: var(--app-background-soft);
+  color: var(--app-primary-dark);
+}
+
+.more-menu button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.more-menu .danger-action {
+  color: var(--app-danger);
+}
+
+.more-menu .danger-action:hover:not(:disabled) {
+  background: rgba(214, 69, 69, 0.08);
+  color: var(--app-danger);
+}
+
+.more-menu .view-order-action {
+  color: var(--app-primary-dark);
+  font-weight: 800;
+}
+
+/* =========================================================
+   FIX MORE DROPDOWN VISIBILITY
+   ========================================================= */
+
+.actions-cell:has(.more-menu) {
+  z-index: 5000 !important;
+}
+
+.more-wrapper:has(.more-menu) {
+  z-index: 5001 !important;
+}
+
+.more-menu {
+  position: absolute !important;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+
+  width: 180px;
+
+  z-index: 9999 !important;
+
+  background: #ffffff;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.16),
+    0 4px 10px rgba(0, 0, 0, 0.06);
+}

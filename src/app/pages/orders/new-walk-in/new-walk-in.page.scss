@@ -1,43 +1,16 @@
-:host {
-  display: block;
-  min-height: 100%;
-  background: #f5f6f7;
+
+
+.order-panel,
+
+.product-search {
+  flex: 0 0 auto;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.walkin-page {
-  min-height: calc(100vh - 64px);
-  display: grid;
-  grid-template-columns:
-    minmax(420px, 1fr)
-    minmax(560px, 1.15fr);
-  gap: 16px;
-  padding: 16px;
-  background: #f5f6f7;
-}
-
-.order-panel {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  border: 1px solid #e2e5e7;
-  border-radius: 12px;
-  overflow: hidden;
+.product-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .customer-section {
@@ -258,6 +231,60 @@ button {
   font-size: 14px;
 }
 
+.modal-quantity {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d5d7d8;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.modal-quantity button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  background: #f6f7f7;
+  color: #2f3538;
+  font-size: 18px;
+}
+
+.modal-quantity button:hover {
+  background: #eceeee;
+}
+
+.quantity-input {
+  width: 54px;
+  height: 38px;
+  padding: 0 4px;
+  border: none;
+  border-left: 1px solid #e1e4e5;
+  border-right: 1px solid #e1e4e5;
+  outline: none;
+  background: #fff;
+  color: #202527;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.quantity-input:focus {
+  background: #f8fffc;
+  box-shadow: inset 0 -2px 0 #27bd96;
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.quantity-input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
 
 .weight-input {
   width: 70px;
@@ -601,16 +628,6 @@ button {
 .create-order-button:disabled {
   background: #bac8c4;
   cursor: not-allowed;
-}
-
-.products-panel {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  border: 1px solid #e2e5e7;
-  border-radius: 12px;
-  overflow: hidden;
 }
 
 .product-search {
@@ -1062,10 +1079,7 @@ button {
   max-width: 1050px
 ) {
 
-  .walkin-page {
-    grid-template-columns:
-      1fr;
-  }
+  
 
   .delivery-control {
     width: 100%;
@@ -1080,10 +1094,7 @@ button {
   max-width: 600px
 ) {
 
-  .walkin-page {
-    padding: 8px;
-    gap: 8px;
-  }
+  
 
   .customer-section,
   .cart-section,
@@ -1527,3 +1538,120 @@ button {
   color: #9aa19e !important;
 }
 
+/* =========================================================
+   WALK-IN POS LAYOUT - FINAL
+   The page itself fills the available app content area.
+   Left order panel and right product list scroll independently.
+   ========================================================= */
+
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #f5f6f7;
+}
+
+.walkin-page {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(560px, 1.15fr);
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+  background: #f5f6f7;
+}
+
+.order-panel,
+.products-panel {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e5e7;
+  border-radius: 12px;
+}
+
+.order-panel {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.products-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.product-search {
+  flex: 0 0 auto;
+}
+
+.product-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.order-panel::-webkit-scrollbar,
+.product-list::-webkit-scrollbar,
+.product-modal-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.order-panel::-webkit-scrollbar-thumb,
+.product-list::-webkit-scrollbar-thumb,
+.product-modal-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #cccccc;
+}
+
+.order-panel::-webkit-scrollbar-track,
+.product-list::-webkit-scrollbar-track,
+.product-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Prevent left sections from overlapping */
+.customer-section,
+.cart-section,
+.left-summary,
+.bottom-options {
+  flex-shrink: 0;
+}
+
+.cart-section {
+  height: auto;
+  min-height: 220px;
+  overflow: visible;
+}
+
+.cart-items {
+  height: auto;
+  overflow: visible;
+}
+
+@media (max-width: 1050px) {
+  :host {
+    height: auto;
+    overflow: visible;
+  }
+
+  .walkin-page {
+    height: auto;
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .order-panel,
+  .products-panel,
+  .product-list {
+    overflow: visible;
+  }
+}

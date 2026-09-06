@@ -46,6 +46,9 @@ export class DashboardPage
     DashboardOrder | null =
       null;
 
+  confirmReadyOrder: DashboardOrder | null = null;
+    
+  updatingOrderId: string | null = null;
 
   constructor(
     private readonly apiService:
@@ -285,5 +288,109 @@ export class DashboardPage
     window.location.href =
       `tel:${this.selectedOrder.mobile}`;
   }
+
+  markReady(
+  order: DashboardOrder,
+  event: Event
+): void {
+
+  event.stopPropagation();
+
+  if (
+    order.status !== 'PROCESSING_AT_STORE' ||
+    this.updatingOrderId
+  ) {
+    return;
+  }
+
+  this.updatingOrderId = order.id;
+
+  this.apiService
+    .updateB2COrderStatus(
+      order.id,
+      'READY_ORDER'
+    )
+    .subscribe({
+
+      next: () => {
+        this.updatingOrderId = null;
+        this.loadDashboard();
+      },
+
+      error: error => {
+        console.error(
+          'Mark ready error',
+          error
+        );
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to mark order ready';
+
+        this.updatingOrderId = null;
+      }
+
+    });
+}
+
+openReadyConfirmation(
+  order: DashboardOrder,
+  event: Event
+): void {
+
+  event.stopPropagation();
+
+  if (
+    order.status !== 'PROCESSING_AT_STORE' ||
+    this.updatingOrderId
+  ) {
+    return;
+  }
+
+  this.confirmReadyOrder = order;
+}
+
+closeReadyConfirmation(): void {
+  this.confirmReadyOrder = null;
+}
+
+confirmMarkReady(): void {
+
+  if (!this.confirmReadyOrder) {
+    return;
+  }
+
+  const order = this.confirmReadyOrder;
+
+  this.updatingOrderId = order.id;
+
+  this.apiService
+    .updateB2COrderStatus(
+      order.id,
+      'READY_ORDER'
+    )
+    .subscribe({
+
+      next: () => {
+        this.updatingOrderId = null;
+        this.confirmReadyOrder = null;
+        this.loadDashboard();
+      },
+
+      error: error => {
+        console.error(
+          'Mark ready error',
+          error
+        );
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to mark order ready';
+
+        this.updatingOrderId = null;
+      }
+
+    });
+}
 
 }

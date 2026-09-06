@@ -16,11 +16,6 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
-/* =========================================
-   TOOLBAR
-========================================= */
-
 .dashboard-toolbar {
   margin-bottom: 10px;
 
@@ -58,11 +53,6 @@
   cursor: not-allowed;
 }
 
-
-/* =========================================
-   ERROR
-========================================= */
-
 .dashboard-error {
   margin-bottom: 10px;
 
@@ -91,11 +81,6 @@
 
   cursor: pointer;
 }
-
-
-/* =========================================
-   LOADING / EMPTY
-========================================= */
 
 .dashboard-loading,
 .dashboard-empty {
@@ -132,33 +117,38 @@
   font-size: 11px;
 }
 
-
-/* =========================================
-   MATRIX WRAPPER
-========================================= */
-
 .delivery-matrix-wrapper {
   width: 100%;
-
+  max-width: 100%;
   overflow-x: auto;
-  overflow-y: visible;
-
+  overflow-y: hidden;
   border-top: 1px solid #707070;
   border-left: 1px solid #707070;
-
-  background: #ffffff;
-
-  scrollbar-width: none;
+  background: #fff;
+  scrollbar-width: auto;
+  scrollbar-color: #8b9691 #eef2f0;
+  scroll-behavior: smooth;
 }
 
 .delivery-matrix-wrapper::-webkit-scrollbar {
-  display: none;
+  width: 12px;
+  height: 12px;
 }
 
+.delivery-matrix-wrapper::-webkit-scrollbar-track {
+  background: #eef2f0;
+  border-radius: 8px;
+}
 
-/* =========================================
-   MATRIX
-========================================= */
+.delivery-matrix-wrapper::-webkit-scrollbar-thumb {
+  background: #8b9691;
+  border-radius: 8px;
+  border: 2px solid #eef2f0;
+}
+
+.delivery-matrix-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #65716b;
+}
 
 .delivery-matrix {
   width: 100%;
@@ -176,11 +166,6 @@
   align-items: start;
 }
 
-
-/* =========================================
-   LEFT COLUMN
-========================================= */
-
 .matrix-label-column {
   position: sticky;
 
@@ -192,11 +177,6 @@
 
   border-right: 1px solid #707070;
 }
-
-
-/* =========================================
-   HEADER LABEL
-========================================= */
 
 .matrix-delivery-label {
   height: 44px;
@@ -219,11 +199,6 @@
 
   white-space: nowrap;
 }
-
-
-/* =========================================
-   SUMMARY LABELS
-========================================= */
 
 .matrix-total-label,
 .matrix-processing-label,
@@ -269,11 +244,6 @@
   font-weight: 700;
 }
 
-
-/* =========================================
-   ORDER LABEL CELL
-========================================= */
-
 .matrix-order-label {
   height: 45px;
 
@@ -297,11 +267,6 @@
   font-weight: 500;
 }
 
-
-/* =========================================
-   DATE COLUMN
-========================================= */
-
 .matrix-date-column {
   min-width: 420px;
 
@@ -309,11 +274,6 @@
 
   background: #ffffff;
 }
-
-
-/* =========================================
-   DATE HEADER
-========================================= */
 
 .matrix-date-header {
   height: 44px;
@@ -338,17 +298,9 @@
   white-space: nowrap;
 }
 
-
-/* first delivery date highlighted red like reference */
-
 .matrix-date-column:first-of-type .matrix-date-header {
   background: #f20b0b;
 }
-
-
-/* =========================================
-   SUMMARY CELLS
-========================================= */
 
 .matrix-total-cell,
 .matrix-processing-cell,
@@ -384,21 +336,11 @@
   background: #078b08;
 }
 
-
-/* =========================================
-   ORDER AREA
-========================================= */
-
 .matrix-orders {
   min-height: 540px;
 
   background: #ffffff;
 }
-
-
-/* =========================================
-   ORDER ROW
-========================================= */
 
 .matrix-order-row {
   width: 100%;
@@ -436,28 +378,13 @@
   filter: brightness(0.98);
 }
 
-
-/* =========================================
-   PROCESSING ROW
-========================================= */
-
 .matrix-order-row.processing-row {
   background: #ffffff;
 }
 
-
-/* =========================================
-   READY ROW
-========================================= */
-
 .matrix-order-row.ready-row {
   background: #a6ff2f;
 }
-
-
-/* =========================================
-   ORDER INDEX
-========================================= */
 
 .matrix-order-index {
   width: 30px;
@@ -472,11 +399,6 @@
   font-weight: 500;
 }
 
-
-/* =========================================
-   ORDER NUMBER
-========================================= */
-
 .matrix-order-number {
   flex-shrink: 0;
 
@@ -486,11 +408,6 @@
   font-weight: 500;
 }
 
-
-/* =========================================
-   DIVIDERS
-========================================= */
-
 .matrix-divider {
   flex-shrink: 0;
 
@@ -498,11 +415,6 @@
 
   font-size: 15px;
 }
-
-
-/* =========================================
-   PIECES
-========================================= */
 
 .matrix-pieces {
   flex-shrink: 0;
@@ -513,11 +425,6 @@
   font-weight: 500;
 }
 
-
-/* =========================================
-   AMOUNT
-========================================= */
-
 .matrix-amount {
   flex-shrink: 0;
 
@@ -527,11 +434,6 @@
   font-weight: 500;
 }
 
-
-/* =========================================
-   TIME
-========================================= */
-
 .matrix-time {
   flex-shrink: 0;
 
@@ -540,11 +442,6 @@
   font-size: 16px;
   font-weight: 500;
 }
-
-
-/* =========================================
-   PHONE
-========================================= */
 
 .matrix-phone-icon {
   margin-left: 5px;
@@ -556,11 +453,6 @@
   font-size: 18px;
   line-height: 1;
 }
-
-
-/* =========================================
-   CUSTOMER
-========================================= */
 
 .matrix-customer {
   min-width: 0;
@@ -580,11 +472,6 @@
   text-transform: uppercase;
 }
 
-
-/* =========================================
-   READY ICON
-========================================= */
-
 .matrix-ready-icon {
   min-width: 42px;
 
@@ -599,11 +486,6 @@
 
   text-align: center;
 }
-
-
-/* =========================================
-   PIECE BOX
-========================================= */
 
 .matrix-piece-box {
   width: 64px;
@@ -626,11 +508,6 @@
   font-weight: 500;
 }
 
-
-/* =========================================
-   EMPTY ROWS
-========================================= */
-
 .matrix-empty-row {
   height: 45px;
 
@@ -638,9 +515,6 @@
 
   background: #ffffff;
 }
-
-
-/* simulate empty spreadsheet area */
 
 .matrix-orders::after {
   content: '';
@@ -659,11 +533,6 @@
     );
 }
 
-
-/* =========================================
-   CALL OVERLAY
-========================================= */
-
 .call-overlay {
   position: fixed;
 
@@ -680,11 +549,6 @@
   background: rgba(0, 0, 0, 0.48);
 }
 
-
-/* =========================================
-   CALL POPUP
-========================================= */
-
 .call-popup {
   width: 100%;
   max-width: 430px;
@@ -699,11 +563,6 @@
 
   overflow: hidden;
 }
-
-
-/* =========================================
-   POPUP HEADER
-========================================= */
 
 .call-popup-header {
   padding: 15px 17px;
@@ -750,11 +609,6 @@
 
   cursor: pointer;
 }
-
-
-/* =========================================
-   POPUP BODY
-========================================= */
 
 .call-popup-body {
   padding: 20px;
@@ -834,11 +688,6 @@
   font-weight: 700;
 }
 
-
-/* =========================================
-   POPUP FOOTER
-========================================= */
-
 .call-popup-footer {
   padding: 12px 17px;
 
@@ -885,11 +734,6 @@
   background: var(--app-primary-dark);
 }
 
-
-/* =========================================
-   LAPTOP
-========================================= */
-
 @media (max-width: 1200px) {
 
   .delivery-matrix {
@@ -918,11 +762,6 @@
   }
 
 }
-
-
-/* =========================================
-   TABLET
-========================================= */
 
 @media (max-width: 900px) {
 
@@ -958,11 +797,6 @@
   }
 
 }
-
-
-/* =========================================
-   MOBILE
-========================================= */
 
 @media (max-width: 600px) {
 
@@ -1047,18 +881,10 @@
 }
 
 .delivery-matrix {
-  width: 100%;
-  min-width: max-content;
-
+  width: max-content;
+  min-width: 100%;
   display: grid;
-
-  grid-template-columns:
-    125px
-    repeat(
-      var(--date-count),
-      minmax(360px, 1fr)
-    );
-
+  grid-template-columns: 125px repeat(var(--date-count), minmax(360px, 1fr));
   align-items: stretch;
 }
 
@@ -1169,4 +995,97 @@
       #858585 39px,
       #858585 40px
     );
+}
+
+.matrix-status-tick {
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: #31b7a7;
+  font-size: 27px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.matrix-status-tick:hover {
+  transform: scale(1.12);
+}
+
+.matrix-status-tick:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.confirm-popup {
+  width: min(420px, 100%);
+  padding: 22px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+}
+
+.confirm-popup h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.confirm-popup p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-cancel,
+.confirm-ready {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.confirm-cancel {
+  border: 1px solid #d5dce0;
+  background: #fff;
+  color: #444;
+}
+
+.confirm-ready {
+  border: 1px solid #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
+
+.confirm-ready:hover {
+  background: #15803d;
+}
+
+.confirm-cancel:disabled,
+.confirm-ready:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
