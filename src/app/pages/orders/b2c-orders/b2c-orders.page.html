@@ -693,3 +693,76 @@
     </div>
   </div>
 }
+
+@if (
+  callModalOpen &&
+  selectedCallOrder
+) {
+  <div
+    class="modal-overlay"
+    (click)="closeCallModal()">
+
+    <div
+      class="payment-modal call-customer-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div>
+          <h2>Customer Contact</h2>
+          <p>{{ selectedCallOrder.orderNumber }}</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeCallModal()">
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="payment-order-info">
+          <div>
+            <span>Customer</span>
+            <strong>{{ selectedCallOrder.customerName }}</strong>
+          </div>
+
+          <div>
+            <span>Mobile</span>
+            <strong>{{ selectedCallOrder.mobile }}</strong>
+          </div>
+        </div>
+
+        <div class="call-number-box">
+          <span>Mobile Number</span>
+          <strong>{{ selectedCallOrder.mobile }}</strong>
+        </div>
+
+        @if (numberCopied) {
+          <div class="number-copied">
+            ✓ Number copied
+          </div>
+        }
+
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="cancel-button"
+          (click)="closeCallModal()">
+          Close
+        </button>
+
+        <button
+          type="button"
+          class="confirm-button"
+          (click)="copyCustomerNumber()">
+          {{ numberCopied ? 'Copied' : 'Copy Number' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

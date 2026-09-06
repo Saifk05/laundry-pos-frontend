@@ -82,6 +82,10 @@ export class B2cOrdersPage implements OnInit {
   readyStorageError = '';
   storageModalMode: 'MARK_READY' | 'EDIT' = 'MARK_READY';
 
+  callModalOpen = false;
+  selectedCallOrder: B2cOrderView | null = null;
+  numberCopied = false;
+
   businessName = 'Venkateshwara Fabric Works';
 
   constructor(
@@ -588,7 +592,31 @@ export class B2cOrdersPage implements OnInit {
       return;
     }
 
-    window.location.href = `tel:${order.mobile}`;
+    this.closeAllMoreMenus();
+    this.selectedCallOrder = order;
+    this.numberCopied = false;
+    this.callModalOpen = true;
+  }
+
+  closeCallModal(): void {
+    this.callModalOpen = false;
+    this.selectedCallOrder = null;
+    this.numberCopied = false;
+  }
+
+  copyCustomerNumber(): void {
+    if (!this.selectedCallOrder?.mobile) {
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(this.selectedCallOrder.mobile)
+      .then(() => {
+        this.numberCopied = true;
+      })
+      .catch((error: any) => {
+        console.error('Unable to copy mobile number', error);
+      });
   }
 
   viewOrder(order: B2cOrderView): void {
