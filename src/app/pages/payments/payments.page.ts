@@ -12,6 +12,10 @@ import {
 } from '@angular/forms';
 
 import {
+  HttpErrorResponse
+} from '@angular/common/http';
+
+import {
   MatFormFieldModule
 } from '@angular/material/form-field';
 
@@ -30,6 +34,10 @@ import {
 import {
   ApiService
 } from '../../../core/services/api.service';
+
+import {
+  NotificationService
+} from '../../../core/services/notification.service';
 
 import {
   PaymentReportDate,
@@ -93,7 +101,10 @@ export class PaymentsPage
 
   constructor(
     private readonly apiService:
-      ApiService
+      ApiService,
+
+    private readonly notificationService:
+      NotificationService
   ) {}
 
 
@@ -113,8 +124,9 @@ export class PaymentsPage
       !this.endDate
     ) {
 
-      this.errorMessage =
-        'Start date and end date are required';
+      this.showWarning(
+        'Start date and end date are required'
+      );
 
       return;
     }
@@ -124,8 +136,9 @@ export class PaymentsPage
       this.endDate
     ) {
 
-      this.errorMessage =
-        'Start date cannot be after end date';
+      this.showWarning(
+        'Start date cannot be after end date'
+      );
 
       return;
     }
@@ -142,8 +155,9 @@ export class PaymentsPage
       today
     ) {
 
-      this.errorMessage =
-        'Future dates cannot be selected';
+      this.showWarning(
+        'Future dates cannot be selected'
+      );
 
       return;
     }
@@ -187,7 +201,7 @@ export class PaymentsPage
 
         error: (
           error:
-            any
+            HttpErrorResponse
         ) => {
 
           console.error(
@@ -201,10 +215,18 @@ export class PaymentsPage
           this.payments =
             [];
 
+          const message =
+            this.getErrorMessage(
+              error,
+              'Unable to load payment report'
+            );
+
           this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to load payment report';
+            message;
+
+          void this.notificationService.error(
+            message
+          );
 
           this.loading =
             false;
@@ -234,8 +256,9 @@ export class PaymentsPage
       today
     ) {
 
-      this.errorMessage =
-        'Future dates cannot be selected';
+      this.showWarning(
+        'Future dates cannot be selected'
+      );
 
       return;
     }
@@ -245,8 +268,9 @@ export class PaymentsPage
       this.rangeEnd
     ) {
 
-      this.errorMessage =
-        'Start date cannot be after end date';
+      this.showWarning(
+        'Start date cannot be after end date'
+      );
 
       return;
     }
@@ -260,6 +284,9 @@ export class PaymentsPage
       this.formatLocalDate(
         this.rangeEnd
       );
+
+    this.errorMessage =
+      '';
 
     this.loadPaymentReport();
   }
@@ -287,6 +314,9 @@ export class PaymentsPage
 
     this.endDate =
       this.startDate;
+
+    this.errorMessage =
+      '';
 
     this.loadPaymentReport();
   }
@@ -318,6 +348,9 @@ export class PaymentsPage
 
     this.endDate =
       this.startDate;
+
+    this.errorMessage =
+      '';
 
     this.loadPaymentReport();
   }
@@ -362,6 +395,56 @@ export class PaymentsPage
       );
 
     return `${year}-${month}-${day}`;
+  }
+
+
+  private showWarning(
+    message:
+      string
+  ): void {
+
+    this.errorMessage =
+      message;
+
+    void this.notificationService.warning(
+      message
+    );
+  }
+
+
+  private getErrorMessage(
+    error:
+      HttpErrorResponse,
+
+    fallback:
+      string
+  ): string {
+
+    const backendMessage =
+      error?.error?.message;
+
+    if (
+      typeof backendMessage ===
+        'string' &&
+      backendMessage.trim()
+    ) {
+
+      return backendMessage.trim();
+    }
+
+    const legacyMessage =
+      error?.error?.error;
+
+    if (
+      typeof legacyMessage ===
+        'string' &&
+      legacyMessage.trim()
+    ) {
+
+      return legacyMessage.trim();
+    }
+
+    return fallback;
   }
 
 
@@ -517,6 +600,10 @@ export class PaymentsPage
     if (
       !order.mobile
     ) {
+
+      void this.notificationService.warning(
+        'Customer mobile number is not available'
+      );
 
       return;
     }

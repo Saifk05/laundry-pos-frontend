@@ -1,22 +1,15 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import {
-  CommonModule
-} from '@angular/common';
-
-import {
-  ApiService
-} from '../../../core/services/api.service';
+import { ApiService } from '../../../core/services/api.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 import {
   DashboardDeliveryDate,
   DashboardOrder,
   DashboardResponse
 } from '../../../core/models/dashboard.model';
-
 
 @Component({
   selector: 'app-dashboard',
@@ -27,160 +20,89 @@ import {
     CommonModule
   ]
 })
-export class DashboardPage
-  implements OnInit {
+export class DashboardPage implements OnInit {
 
   loading = false;
 
-  errorMessage = '';
+  dashboard: DashboardResponse | null = null;
 
-  dashboard:
-    DashboardResponse | null =
-      null;
+  deliveryDays: DashboardDeliveryDate[] = [];
 
-  deliveryDays:
-    DashboardDeliveryDate[] =
-      [];
-
-  selectedOrder:
-    DashboardOrder | null =
-      null;
+  selectedOrder: DashboardOrder | null = null;
 
   confirmReadyOrder: DashboardOrder | null = null;
-    
+
   updatingOrderId: string | null = null;
 
   constructor(
-    private readonly apiService:
-      ApiService
+    private readonly apiService: ApiService,
+    private readonly notificationService: NotificationService
   ) {}
 
-
   ngOnInit(): void {
-
     this.loadDashboard();
   }
 
-
-  /* =========================================
-     LOAD DASHBOARD
-  ========================================= */
-
   loadDashboard(): void {
-
-    this.loading =
-      true;
-
-    this.errorMessage =
-      '';
+    this.loading = true;
 
     this.apiService
       .getDashboard()
       .subscribe({
-
-        next: (
-          response:
-            DashboardResponse
-        ) => {
-
-          this.dashboard =
-            response;
-
-          this.deliveryDays =
-            response?.dates ?? [];
-
-          this.loading =
-            false;
+        next: (response: DashboardResponse) => {
+          this.dashboard = response;
+          this.deliveryDays = response?.dates ?? [];
+          this.loading = false;
         },
 
-        error: (
-          error:
-            any
-        ) => {
-
+        error: (error: HttpErrorResponse) => {
           console.error(
-            'Dashboard load error',
+            'Dashboard load error:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to load dashboard';
+          this.dashboard = null;
+          this.deliveryDays = [];
+          this.loading = false;
 
-          this.loading =
-            false;
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Unable to load dashboard'
+            )
+          );
         }
-
       });
   }
 
-
-  /* =========================================
-     SUMMARY
-  ========================================= */
-
-  get totalOrders():
-    number {
-
-    return this.dashboard
-      ?.totalOrders ?? 0;
+  get totalOrders(): number {
+    return this.dashboard?.totalOrders ?? 0;
   }
 
-
-  get processingOrders():
-    number {
-
-    return this.dashboard
-      ?.processingOrders ?? 0;
+  get processingOrders(): number {
+    return this.dashboard?.processingOrders ?? 0;
   }
 
-
-  get readyOrders():
-    number {
-
-    return this.dashboard
-      ?.readyOrders ?? 0;
+  get readyOrders(): number {
+    return this.dashboard?.readyOrders ?? 0;
   }
-
-
-  /* =========================================
-     ORDER HELPERS
-  ========================================= */
 
   isReadyOrder(
-    order:
-      DashboardOrder
+    order: DashboardOrder
   ): boolean {
-
-    return (
-      order.status ===
-      'READY_ORDER'
-    );
+    return order.status === 'READY_ORDER';
   }
-
 
   isProcessingOrder(
-    order:
-      DashboardOrder
+    order: DashboardOrder
   ): boolean {
-
-    return (
-      order.status ===
-      'PROCESSING_AT_STORE'
-    );
+    return order.status === 'PROCESSING_AT_STORE';
   }
 
-
   getStatusLabel(
-    order:
-      DashboardOrder
+    order: DashboardOrder
   ): string {
-
-    switch (
-      order.status
-    ) {
-
+    switch (order.status) {
       case 'NEW_ORDER':
         return 'New Order';
 
@@ -201,86 +123,46 @@ export class DashboardPage
     }
   }
 
-
-  /* =========================================
-     PIECES
-  ========================================= */
-
   formatPieces(
-    pieces:
-      number
+    pieces: number
   ): string {
-
     const value =
       Number(
         pieces ?? 0
       );
 
-    if (
-      Number.isInteger(
-        value
-      )
-    ) {
-
-      return value.toString();
-    }
-
-    return value.toFixed(
-      2
-    );
+    return Number.isInteger(value)
+      ? value.toString()
+      : value.toFixed(2);
   }
-
-
-  /* =========================================
-     MONEY
-  ========================================= */
 
   formatAmount(
-    amount:
-      number
+    amount: number
   ): string {
-
     return Number(
       amount ?? 0
-    ).toFixed(
-      2
-    );
+    ).toFixed(2);
   }
-
-
-  /* =========================================
-     CALL POPUP
-  ========================================= */
 
   openCallPopup(
-    order:
-      DashboardOrder
+    order: DashboardOrder
   ): void {
-
-    this.selectedOrder =
-      order;
+    this.selectedOrder = order;
   }
-
 
   closeCallPopup(): void {
-
-    this.selectedOrder =
-      null;
+    this.selectedOrder = null;
   }
 
-
   callNow(): void {
-
-    if (
-      !this.selectedOrder
-    ) {
-
+    if (!this.selectedOrder) {
       return;
     }
 
-    if (
-      !this.selectedOrder.mobile
-    ) {
+    if (!this.selectedOrder.mobile) {
+      void this.notificationService.warning(
+        'Customer mobile number is not available'
+      );
 
       return;
     }
@@ -290,107 +172,137 @@ export class DashboardPage
   }
 
   markReady(
-  order: DashboardOrder,
-  event: Event
-): void {
+    order: DashboardOrder,
+    event: Event
+  ): void {
+    event.stopPropagation();
 
-  event.stopPropagation();
+    if (
+      order.status !== 'PROCESSING_AT_STORE' ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
 
-  if (
-    order.status !== 'PROCESSING_AT_STORE' ||
-    this.updatingOrderId
-  ) {
-    return;
+    this.updateOrderToReady(
+      order
+    );
   }
 
-  this.updatingOrderId = order.id;
+  openReadyConfirmation(
+    order: DashboardOrder,
+    event: Event
+  ): void {
+    event.stopPropagation();
 
-  this.apiService
-    .updateB2COrderStatus(
-      order.id,
-      'READY_ORDER'
-    )
-    .subscribe({
+    if (
+      order.status !== 'PROCESSING_AT_STORE' ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
 
-      next: () => {
-        this.updatingOrderId = null;
-        this.loadDashboard();
-      },
-
-      error: error => {
-        console.error(
-          'Mark ready error',
-          error
-        );
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Unable to mark order ready';
-
-        this.updatingOrderId = null;
-      }
-
-    });
-}
-
-openReadyConfirmation(
-  order: DashboardOrder,
-  event: Event
-): void {
-
-  event.stopPropagation();
-
-  if (
-    order.status !== 'PROCESSING_AT_STORE' ||
-    this.updatingOrderId
-  ) {
-    return;
+    this.confirmReadyOrder = order;
   }
 
-  this.confirmReadyOrder = order;
-}
+  closeReadyConfirmation(): void {
+    if (this.updatingOrderId) {
+      return;
+    }
 
-closeReadyConfirmation(): void {
-  this.confirmReadyOrder = null;
-}
-
-confirmMarkReady(): void {
-
-  if (!this.confirmReadyOrder) {
-    return;
+    this.confirmReadyOrder = null;
   }
 
-  const order = this.confirmReadyOrder;
+  confirmMarkReady(): void {
+    if (!this.confirmReadyOrder) {
+      return;
+    }
 
-  this.updatingOrderId = order.id;
+    this.updateOrderToReady(
+      this.confirmReadyOrder
+    );
+  }
 
-  this.apiService
-    .updateB2COrderStatus(
-      order.id,
-      'READY_ORDER'
-    )
-    .subscribe({
+  private updateOrderToReady(
+    order: DashboardOrder
+  ): void {
+    if (this.updatingOrderId) {
+      return;
+    }
 
-      next: () => {
-        this.updatingOrderId = null;
-        this.confirmReadyOrder = null;
-        this.loadDashboard();
-      },
+    this.updatingOrderId =
+      order.id;
 
-      error: error => {
-        console.error(
-          'Mark ready error',
-          error
-        );
+    this.apiService
+      .updateB2COrderStatus(
+        order.id,
+        'READY_ORDER'
+      )
+      .subscribe({
+        next: () => {
+          this.updatingOrderId = null;
+          this.confirmReadyOrder = null;
 
-        this.errorMessage =
-          error?.error?.message ||
-          'Unable to mark order ready';
+          void this.notificationService.success(
+            `Order ${order.orderNumber} marked as ready`
+          );
 
-        this.updatingOrderId = null;
-      }
+          this.loadDashboard();
+        },
 
-    });
-}
+        error: (error: HttpErrorResponse) => {
+          console.error(
+            'Mark ready error:',
+            error
+          );
 
+          this.updatingOrderId = null;
+
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Unable to mark order ready'
+            )
+          );
+        }
+      });
+  }
+
+  refresh(): void {
+    if (
+      this.loading ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    this.loadDashboard();
+  }
+
+  private getErrorMessage(
+    error: HttpErrorResponse,
+    fallback: string
+  ): string {
+    const message =
+      error?.error?.message;
+
+    if (
+      typeof message === 'string' &&
+      message.trim()
+    ) {
+      return message.trim();
+    }
+
+    const legacyMessage =
+      error?.error?.error;
+
+    if (
+      typeof legacyMessage === 'string' &&
+      legacyMessage.trim()
+    ) {
+      return legacyMessage.trim();
+    }
+
+    return fallback;
+  }
 }

@@ -41,16 +41,12 @@ interface SelectedOrderItem {
   total: number;
 }
 
-
 @Component({
   selector: 'app-new-walk-in',
   standalone: true,
   templateUrl: './new-walk-in.page.html',
   styleUrls: ['./new-walk-in.page.scss'],
-  imports: [
-    CommonModule,
-    FormsModule
-  ]
+  imports: [ CommonModule, FormsModule]
 })
 export class NewWalkInPage
   implements OnInit {
@@ -71,11 +67,8 @@ export class NewWalkInPage
   selectedServiceIds: string[] = [];
   selectedPreferences: string[] = [];
   productComment = '';
-
   modalQuantity = 1;
-
   modalGarmentCount = 1;
-
   availablePreferences:
     string[] = [
       'Normal Wash',
@@ -91,7 +84,6 @@ export class NewWalkInPage
     value: string;
     label: string;
   }[] = [];
-
   deliveryTime = '';
   homeDelivery = false;
   expressDelivery = false;
@@ -115,7 +107,6 @@ export class NewWalkInPage
     ];
 
   discountAmount = 0;
-
   coupons: WalkInCoupon[] = [];
   couponDropdownOpen = false;
   couponApplied = false;
@@ -148,40 +139,28 @@ export class NewWalkInPage
     this.loadWalkInSetup();
     this.loadBusinessSettings();
   }
-
-
+  
   loadBusinessSettings(): void {
-
   this.apiService .getBusinessSettings()
     .subscribe({
         next: ( response: any ) => {
           this.businessName = response?.businessName ||
             'Venkateshwara Fabric Works';
-        },
-         error: (  error: any ) => {
-        }
-
+        },  error: (  error: any ) => {}
       });
   }
 
-
   loadWalkInSetup(): void {
-
     this.loading = true;
-
     this.errorMessage = '';
-
     this.apiService
       .getWalkInSetup()
       .subscribe({
-
         next: ( response: WalkInSetupResponse ) => {
-
           this.products = response.products ?? [];
           this.coupons =  response.coupons ?? [];
           this.expressCharges = response.expressCharges ?? [];
           this.loading = false;
-
           if ( this.isRetagMode && this.retagOrderId ) {
             this.loadRetagOrder();
             return;
@@ -191,236 +170,99 @@ export class NewWalkInPage
             this.loadRescheduleOrder();
           }
         },
-
         error: (error: any) => {
-
           this.errorMessage = 'Unable to load walk-in setup';
           this.loading = false;
-        }
-
-      });
+        }});
   }
 
-
-  private initializeOrderMode():
-    void {
-
+  private initializeOrderMode(): void {
     const mode = this.route.snapshot
         .queryParamMap
         .get('mode');
-
     const orderId = this.route.snapshot
         .queryParamMap
         .get('orderId');
-
     this.isRetagMode = mode === 'retag' && !!orderId;
     this.isRescheduleMode = mode === 'reschedule' && !!orderId;
     this.retagOrderId = this.isRetagMode
         ? orderId
         : null;
-
     this.rescheduleOrderId = this.isRescheduleMode
         ? orderId
         : null;
   }
 
-
-  private loadRetagOrder():
-    void {
-
-    if (
-      !this.retagOrderId
-    ) {
-
-      return;
-    }
-
+  private loadRetagOrder(): void {
+    if ( !this.retagOrderId) { return;}
     this.loadingRetagOrder = true;
     this.errorMessage = '';
     this.apiService
-      .getB2COrderById(
-        this.retagOrderId
-      )
+      .getB2COrderById( this.retagOrderId)
       .subscribe({
         next: ( response: B2COrderDetails ) => {
           this.populateRetagOrder( response );
           this.loadingRetagOrder = false;
         },
-
         error: ( error: any ) => {
           this.loadingRetagOrder = false;
-
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to load order for re-tag';
-        }
-
-      });
+          this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to load order for re-tag';
+        } });
   }
 
-
-  private loadRescheduleOrder():
-    void {
-
-    if (
-      !this.rescheduleOrderId
-    ) {
-
-      return;
-    }
-
-    this.loadingRetagOrder =
-      true;
-
-    this.errorMessage =
-      '';
-
-    this.apiService
-      .getB2COrderById(
-        this.rescheduleOrderId
-      )
-      .subscribe({
-
-        next: (
-          response:
-            B2COrderDetails
-        ) => {
-
-          this.populateRetagOrder(
-            response
-          );
-
-          this.customerMessage =
-            'Existing order loaded for reschedule';
-
-          this.loadingRetagOrder =
-            false;
+  private loadRescheduleOrder():  void {
+    if ( !this.rescheduleOrderId) { return; }
+    this.loadingRetagOrder = true;
+    this.errorMessage = '';
+    this.apiService .getB2COrderById( this.rescheduleOrderId ).subscribe({
+        next: ( response: B2COrderDetails) => {
+          this.populateRetagOrder( response);
+          this.customerMessage =  'Existing order loaded for reschedule';
+          this.loadingRetagOrder = false;
         },
-
-        error: (
-          error:
-            any
-        ) => {
-
-          this.loadingRetagOrder =
-            false;
-
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to load order for reschedule';
-        }
-
-      });
+        error: ( error: any ) => {
+          this.loadingRetagOrder = false;
+          this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to load order for reschedule';
+        }});
   }
 
 
-private populateRetagOrder(
-  order: B2COrderDetails
-): void {
-
-  this.retagOrderNumber =
-    order.orderNumber;
-
-  this.customerId =
-    order.customer.id;
-
-  this.customerName =
-    order.customer.name;
-
-  this.customerPhone =
-    order.customer.phone;
-
-  this.customerExists =
-    true;
-
-  this.customerMessage =
-    this.isRescheduleMode
+private populateRetagOrder( order: B2COrderDetails): void {
+  this.retagOrderNumber =  order.orderNumber;
+  this.customerId = order.customer.id;
+  this.customerName = order.customer.name;
+  this.customerPhone = order.customer.phone;
+  this.customerExists = true;
+  this.customerMessage =this.isRescheduleMode
       ? 'Existing order loaded for reschedule'
       : 'Existing order loaded for re-tag';
-
-  this.deliveryDate =
-    order.deliveryDate ?? '';
-
-  this.deliveryTime =
-    order.deliveryTime ?? '';
-
-  this.homeDelivery =
-    order.homeDelivery;
-
-  const groupedItems =
-    new Map<string, SelectedOrderItem>();
-
+  this.deliveryDate = order.deliveryDate ?? '';
+  this.deliveryTime = order.deliveryTime ?? '';
+  this.homeDelivery = order.homeDelivery;
+  const groupedItems = new Map<string, SelectedOrderItem>();
   for (const item of order.items ?? []) {
+    const product = this.products.find( currentProduct => currentProduct.id === item.productId);
+    const productType = product?.types.find( currentType => currentType.id === item.typeId );
+    const configuredService = productType?.services.find( service => service.id === item.serviceId );
+    const service = configuredService ??({
+        id: item.serviceId,
+        name:item.serviceName,
+        price: Number( item.unitPrice ),
+        active:true } as WalkInServicePrice);
 
-    const product =
-      this.products.find(
-        currentProduct =>
-          currentProduct.id ===
-          item.productId
-      );
-
-    const productType =
-      product?.types.find(
-        currentType =>
-          currentType.id ===
-          item.typeId
-      );
-
-    const configuredService =
-      productType?.services.find(
-        service =>
-          service.id ===
-          item.serviceId
-      );
-
-    const service =
-      configuredService ??
-      ({
-        id:
-          item.serviceId,
-
-        name:
-          item.serviceName,
-
-        price:
-          Number(
-            item.unitPrice
-          ),
-
-        active:
-          true
-      } as WalkInServicePrice);
-
-    const key = [
-      item.productId,
-      item.typeId,
-      item.unit,
+    const key = [ item.productId,
+      item.typeId, item.unit,
       Number(item.quantity)
     ].join('|');
 
-    const existingItem =
-      groupedItems.get(key);
-
+    const existingItem = groupedItems.get(key);
     if (existingItem) {
-
-      if (
-        !existingItem.serviceIds
-          .includes(item.serviceId)
+      if ( !existingItem.serviceIds.includes(item.serviceId)
       ) {
-        existingItem.serviceIds.push(
-          item.serviceId
-        );
+        existingItem.serviceIds.push( item.serviceId );
       }
-
-      if (
-        !existingItem.serviceNames
-          .includes(item.serviceName)
-      ) {
-        existingItem.serviceNames.push(
-          item.serviceName
-        );
+      if ( !existingItem.serviceNames .includes(item.serviceName)
+      ) { existingItem.serviceNames.push( item.serviceName );
       }
 
       if (
@@ -467,130 +309,56 @@ private populateRetagOrder(
       continue;
     }
 
-    const quantity =
-      Number(item.quantity);
-
-    const garmentCount =
-      item.unit === 'KG'
+    const quantity =  Number(item.quantity);
+    const garmentCount = item.unit === 'KG'
         ? Math.max(
-            1,
-            Number(
+            1, Number(
               item.garmentCount ?? 1
             )
           )
-        : Math.max(
-            1,
-            quantity
-          );
+        : Math.max( 1,quantity);
 
     groupedItems.set(
       key,
       {
-        id:
-          item.id,
-
-        productId:
-          item.productId,
-
-        productName:
-          item.productName,
-
-        typeId:
-          item.typeId,
-
-        typeName:
-          item.typeName,
-
-        serviceIds: [
-          item.serviceId
-        ],
-
-        serviceNames: [
-          item.serviceName
-        ],
-
-        services: [
-          service
-        ],
-
-        unitPrice:
-          Number(
-            service.price
-          ),
-
-        quantity:
-          quantity,
-
-        garmentCount:
-          garmentCount,
-
-        unit:
-          item.unit,
-
-        preferences:
-          [],
-
-        comment:
-          '',
-
-        total:
-          Number(service.price) *
-          quantity
-      } as SelectedOrderItem
+        id: item.id,
+        productId: item.productId,
+        productName: item.productName,
+        typeId: item.typeId,
+        typeName: item.typeName,
+        serviceIds: [ item.serviceId ],
+        serviceNames: [ item.serviceName ],
+        services: [ service],
+        unitPrice: Number( service.price ),
+        quantity: quantity,
+        garmentCount: garmentCount,
+        unit: item.unit,
+        preferences: [],
+        comment: '',
+        total: Number(service.price) * quantity } as SelectedOrderItem
     );
   }
 
-  this.orderItems =
-    Array.from(
+  this.orderItems = Array.from(
       groupedItems.values()
     );
 
-  this.discountAmount =
-    0;
+  this.discountAmount = 0;
+  this.couponApplied = false;
+  this.selectedCouponId = null;
+  this.couponCode = '';
+  this.couponDiscount = 0;
+  if ( order.couponCode) {
+    const coupon = this.coupons.find(
+        currentCoupon =>  currentCoupon.code ===
+          order.couponCode);
 
-  this.couponApplied =
-    false;
-
-  this.selectedCouponId =
-    null;
-
-  this.couponCode =
-    '';
-
-  this.couponDiscount =
-    0;
-
-  if (
-    order.couponCode
-  ) {
-
-    const coupon =
-      this.coupons.find(
-        currentCoupon =>
-          currentCoupon.code ===
-          order.couponCode
-      );
-
-    this.couponApplied =
-      true;
-
-    this.selectedCouponId =
-      coupon?.id ?? null;
-
-    this.couponCode =
-      order.couponCode;
-
-    this.couponDiscount =
-      Number(
-        order.discountAmount ?? 0
-      );
-
+    this.couponApplied =  true;
+    this.selectedCouponId =  coupon?.id ?? null;
+    this.couponCode = order.couponCode;
+    this.couponDiscount = Number(order.discountAmount ?? 0 );
   } else {
-
-    this.discountAmount =
-      Number(
-        order.discountAmount ?? 0
-      );
+    this.discountAmount = Number(order.discountAmount ?? 0);
   }
 
   const expressPercentage =
@@ -599,16 +367,9 @@ private populateRetagOrder(
       0
     );
 
-  this.expressDelivery =
-    expressPercentage > 0;
-
-  this.expressPercentage =
-    expressPercentage;
-
-  if (
-    this.expressDelivery
-  ) {
-
+  this.expressDelivery = expressPercentage > 0;
+  this.expressPercentage =  expressPercentage;
+  if (this.expressDelivery ) {
     const expressCharge =
       this.expressCharges.find(
         charge =>
@@ -618,156 +379,69 @@ private populateRetagOrder(
           expressPercentage
       );
 
-    this.selectedExpressChargeId =
-      expressCharge?.id ?? null;
-
-  } else {
-
-    this.selectedExpressChargeId =
-      null;
+    this.selectedExpressChargeId = expressCharge?.id ?? null;
+  } else {this.selectedExpressChargeId = null;
   }
 }
 
-  cancelRetag():
-    void {
-
+  cancelRetag(): void {
     this.router.navigate(
       ['/app/b2c-orders']
     );
   }
 
-
   checkCustomer(): void {
-
-    const phone =
-      this.customerPhone.trim();
-
-    if (!phone) {
-
-      this.resetCustomerLookup();
-
+    const phone =  this.customerPhone.trim();
+    if (!phone) { this.resetCustomerLookup();
       return;
     }
 
     if (phone.length !== 10) {
-
-      this.customerMessage =
-        'Enter valid 10 digit mobile number';
-
+      this.customerMessage = 'Enter valid 10 digit mobile number';
       return;
     }
-
     this.checkingCustomer = true;
-
     this.customerMessage = '';
-
-    this.apiService
-      .getCustomerByPhone(phone)
-      .subscribe({
-
-        next: (
-          response:
-            CustomerResponse
-        ) => {
-
-          this.checkingCustomer =
-            false;
-
-          this.customerExists =
-            response.exists;
-
-          this.customerId =
-            response.id;
-
-          if (
-            response.exists &&
-            response.name
-          ) {
-
-            this.customerName =
-              response.name;
-
-            this.customerMessage =
-              'Existing customer found';
-
+    this.apiService .getCustomerByPhone(phone)
+      .subscribe({ next: ( response: CustomerResponse ) => {
+          this.checkingCustomer = false;
+          this.customerExists = response.exists;
+          this.customerId = response.id;
+          if ( response.exists && response.name) {
+            this.customerName = response.name;
+            this.customerMessage = 'Existing customer found';
           } else {
-
-            this.customerId =
-              null;
-
-            this.customerExists =
-              false;
-
-            this.customerName =
-              '';
-
-            this.customerMessage =
-              'New customer';
-          }
-        },
-
+            this.customerId = null;
+            this.customerExists = false;
+            this.customerName = '';
+            this.customerMessage ='New customer';
+          }},
         error: (error: any) => {
-
-          this.checkingCustomer =
-            false;
-
-          this.customerExists =
-            false;
-
-          this.customerId =
-            null;
-
-          if (
-            error.status === 404
-          ) {
-
-            this.customerName =
-              '';
-
-            this.customerMessage =
-              'New customer';
-
+          this.checkingCustomer = false;
+          this.customerExists = false;
+          this.customerId = null;
+          if ( error.status === 404) {
+            this.customerName = '';
+            this.customerMessage = 'New customer';
             return;
           }
-
-          this.customerMessage =
-            'Unable to check customer';
-        }
-
-      });
+          this.customerMessage ='Unable to check customer';
+        }});
   }
 
-
-  private resetCustomerLookup():
-    void {
-
-    this.customerId =
-      null;
-
-    this.customerExists =
-      false;
-
-    this.customerMessage =
-      '';
+  private resetCustomerLookup(): void {
+    this.customerId = null;
+    this.customerExists =  false;
+    this.customerMessage = '';
   }
 
-
-  get filteredProducts():
-    WalkInProduct[] {
-
-    const search =
-      this.searchText
+  get filteredProducts():  WalkInProduct[] {
+    const search = this.searchText
         .trim()
         .toLowerCase();
-
     return this.products.filter(
-      (
-        product:
-          WalkInProduct
-      ) =>
-
-        !search ||
-        product.name
+      ( product: WalkInProduct ) =>
+        !search || product.name
           .toLowerCase()
           .includes(search)
     );
@@ -1276,23 +950,13 @@ get totalPieces(): number {
 }
 
 
-  get grossTotal():
-    number {
-
+  get grossTotal():    number {
     return this.orderItems
-      .reduce(
-        (
-          total:
-            number,
-          item:
-            SelectedOrderItem
-        ) =>
-          total +
-          item.total,
-        0
-      );
+      .reduce((
+          total: number,
+          item:  SelectedOrderItem
+        ) => total + item.total, 0 );
   }
-
 
   get expressAmount():
     number {

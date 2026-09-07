@@ -193,6 +193,8 @@ ion-button {
 //   height: 0;
 // }
 
+
+
 @media (max-width: 992px) {
   :root {
     --app-page-padding: 28px;
@@ -304,4 +306,149 @@ ion-button {
   .mat-calendar-body-cell:hover
   .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
   background: #ecfdf5 !important;
+}
+
+
+
+ion-toast.app-notification-toast {
+  --width: 340px;
+  --max-width: 340px;
+  --min-height: 46px;
+  --border-radius: 10px;
+  --box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+  --start: auto;
+  --end: 18px;
+  font-family: var(--app-font-body);
+  z-index: 99999;
+  animation: toastEnter 0.28s ease-out;
+}
+
+ion-toast.app-notification-toast::part(container) {
+  min-height: 46px;
+  padding: 0 2px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+ion-toast.app-notification-toast::part(message) {
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+ion-toast.app-notification-toast::part(icon) {
+  width: 18px;
+  height: 18px;
+  margin-left: 9px;
+  font-size: 18px;
+  animation: toastIconPop 0.35s ease-out;
+}
+
+ion-toast.app-notification-toast::part(button) {
+  min-width: 30px;
+  padding-inline: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+ion-toast.app-notification-success {
+  --background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  --color: #166534;
+}
+
+ion-toast.app-notification-success::part(container) {
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #16a34a;
+}
+
+ion-toast.app-notification-success::part(icon),
+ion-toast.app-notification-success::part(button) {
+  color: #16a34a;
+}
+
+ion-toast.app-notification-error {
+  --background: linear-gradient(135deg, #fff1f2, #fef2f2);
+  --color: #991b1b;
+}
+
+ion-toast.app-notification-error::part(container) {
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+}
+
+ion-toast.app-notification-error::part(icon) {
+  color: #dc2626;
+}
+
+ion-toast.app-notification-error::part(button) {
+  color: #991b1b;
+}
+
+ion-toast.app-notification-warning {
+  --background: linear-gradient(135deg, #fffbeb, #fefce8);
+  --color: #92400e;
+}
+
+ion-toast.app-notification-warning::part(container) {
+  border: 1px solid #fde68a;
+  border-left: 4px solid #d97706;
+}
+
+ion-toast.app-notification-warning::part(icon),
+ion-toast.app-notification-warning::part(button) {
+  color: #d97706;
+}
+
+ion-toast.app-notification-info {
+  --background: linear-gradient(135deg, #eff6ff, #ecfeff);
+  --color: #0c4a6e;
+}
+
+ion-toast.app-notification-info::part(container) {
+  border: 1px solid #bae6fd;
+  border-left: 4px solid #0284c7;
+}
+
+ion-toast.app-notification-info::part(icon),
+ion-toast.app-notification-info::part(button) {
+  color: #0284c7;
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toastIconPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  70% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  ion-toast.app-notification-toast {
+    --width: calc(100% - 32px);
+    --max-width: calc(100% - 32px);
+    --start: 16px;
+    --end: 16px;
+  }
 }

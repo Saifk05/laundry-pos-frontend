@@ -1,7 +1,5 @@
 <div class="add-product-page">
 
-  <!-- PAGE HEADER -->
-
   <div class="page-header">
 
     <div class="header-left">
@@ -9,54 +7,35 @@
       <button
         type="button"
         class="back-button"
+        [disabled]="loading"
         (click)="cancel()">
         ←
       </button>
 
       <div>
         <h1>Add Product</h1>
-
-        <p>
-          Create a laundry product and configure its services
-        </p>
+        <p>Create a laundry product and configure its services</p>
       </div>
 
     </div>
 
   </div>
 
-
-  <!-- FORM -->
-
   <form
     class="product-form"
     [formGroup]="productForm"
     (ngSubmit)="saveProduct()">
 
-
-    <!-- =========================================
-         PRODUCT DETAILS
-    ========================================== -->
-
     <section class="form-card">
 
       <div class="section-header">
-
         <div>
           <h2>Product Details</h2>
-
-          <p>
-            Basic information about the laundry product
-          </p>
+          <p>Basic information about the laundry product</p>
         </div>
-
       </div>
 
-
       <div class="form-content">
-
-
-        <!-- PRODUCT NAME -->
 
         <div class="form-group full-width">
 
@@ -72,92 +51,46 @@
             placeholder="Example: Shirt">
 
           @if (
-            productForm.get('name')?.touched &&
-            productForm.get('name')?.hasError('required')
+            productForm.controls.name.touched &&
+            productForm.controls.name.hasError('required')
           ) {
-
             <small class="error-text">
               Product name is required.
             </small>
+          }
 
+          @if (
+            productForm.controls.name.touched &&
+            productForm.controls.name.hasError('maxlength')
+          ) {
+            <small class="error-text">
+              Product name cannot exceed 100 characters.
+            </small>
           }
 
         </div>
 
+        <div class="form-group pricing-unit-field">
 
-        <!-- CATEGORY + UNIT -->
+          <label for="unit">
+            Pricing Unit
+            <span class="required">*</span>
+          </label>
 
-        <div class="form-row">
+          <select
+            id="unit"
+            formControlName="unit">
 
-          <div class="form-group">
-
-            <label for="category">
-              Category
-              <span class="required">*</span>
-            </label>
-
-            <select
-              id="category"
-              formControlName="category">
-
-              <option
-                value=""
-                disabled>
-                Select category
-              </option>
-
-              @for (
-                category of categories;
-                track category
-              ) {
-
-                <option [value]="category">
-                  {{ category }}
-                </option>
-
-              }
-
-            </select>
-
-            @if (
-              productForm.get('category')?.touched &&
-              productForm.get('category')?.hasError('required')
+            @for (
+              unit of units;
+              track unit.value
             ) {
-
-              <small class="error-text">
-                Category is required.
-              </small>
-
+              <option [value]="unit.value">
+                {{ unit.label }}
+              </option>
             }
 
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="unit">
-              Pricing Unit
-              <span class="required">*</span>
-            </label>
-
-            <select
-              id="unit"
-              formControlName="unit">
-
-              @for (
-                unit of units;
-                track unit.value
-              ) {
-
-                <option [value]="unit.value">
-                  {{ unit.label }}
-                </option>
-
-              }
-
-            </select>
-
-          </div>
+          </select>
 
         </div>
 
@@ -165,21 +98,13 @@
 
     </section>
 
-
-    <!-- =========================================
-         PRODUCT TYPES
-    ========================================== -->
-
     <section class="form-card">
 
       <div class="section-header">
 
         <div>
           <h2>Product Types</h2>
-
-          <p>
-            Add the types customers can choose in New Walk-in
-          </p>
+          <p>Add the types customers can choose in New Walk-in</p>
         </div>
 
         <span class="optional-label">
@@ -187,7 +112,6 @@
         </span>
 
       </div>
-
 
       <div class="form-content">
 
@@ -210,6 +134,7 @@
                 <button
                   type="button"
                   aria-label="Remove product type"
+                  [disabled]="loading"
                   (click)="removeType(i)">
                   ×
                 </button>
@@ -222,28 +147,25 @@
 
         }
 
-
         <div class="add-type-row">
 
           <input
             type="text"
             [(ngModel)]="newType"
             [ngModelOptions]="{ standalone: true }"
+            [disabled]="loading"
             (keydown)="onTypeKeydown($event)"
             placeholder="Example: Kids, Cotton, Formal">
 
           <button
             type="button"
             class="secondary-button"
-            [disabled]="!newType.trim()"
+            [disabled]="loading || !newType.trim()"
             (click)="addType()">
-
             + Add Type
-
           </button>
 
         </div>
-
 
         <p class="field-help">
           Examples: Kids, Silk, Cotton, Casual, Formal, Leather,
@@ -254,38 +176,24 @@
 
     </section>
 
-
-    <!-- =========================================
-         SERVICES & PRICING
-    ========================================== -->
-
     <section class="form-card">
 
       <div class="section-header">
 
         <div>
           <h2>Services & Pricing</h2>
-
-          <p>
-            Configure the services available for this product
-          </p>
+          <p>Configure the services available for this product</p>
         </div>
 
       </div>
 
-
       <div class="form-content">
 
         <div class="service-table-header">
-
           <span>Service Name</span>
-
           <span>Price</span>
-
           <span></span>
-
         </div>
-
 
         <div
           class="service-list"
@@ -301,9 +209,6 @@
               class="service-row"
               [formGroupName]="i">
 
-
-              <!-- SERVICE NAME -->
-
               <div class="service-field">
 
                 <input
@@ -312,20 +217,24 @@
                   placeholder="Example: Dry Clean">
 
                 @if (
-                  serviceGroup.get('name')?.touched &&
-                  serviceGroup.get('name')?.hasError('required')
+                  serviceGroup.controls.name.touched &&
+                  serviceGroup.controls.name.hasError('required')
                 ) {
-
                   <small class="error-text">
                     Service name is required.
                   </small>
+                }
 
+                @if (
+                  serviceGroup.controls.name.touched &&
+                  serviceGroup.controls.name.hasError('maxlength')
+                ) {
+                  <small class="error-text">
+                    Service name cannot exceed 100 characters.
+                  </small>
                 }
 
               </div>
-
-
-              <!-- PRICE -->
 
               <div class="service-field">
 
@@ -345,41 +254,32 @@
                 </div>
 
                 @if (
-                  serviceGroup.get('price')?.touched &&
-                  serviceGroup.get('price')?.hasError('required')
+                  serviceGroup.controls.price.touched &&
+                  serviceGroup.controls.price.hasError('required')
                 ) {
-
                   <small class="error-text">
                     Price is required.
                   </small>
-
                 }
 
                 @if (
-                  serviceGroup.get('price')?.touched &&
-                  serviceGroup.get('price')?.hasError('min')
+                  serviceGroup.controls.price.touched &&
+                  serviceGroup.controls.price.hasError('min')
                 ) {
-
                   <small class="error-text">
                     Price cannot be negative.
                   </small>
-
                 }
 
               </div>
-
-
-              <!-- DELETE -->
 
               <button
                 type="button"
                 class="delete-service-button"
                 aria-label="Remove service"
-                [disabled]="services.length === 1"
+                [disabled]="loading || services.length === 1"
                 (click)="removeService(i)">
-
                 ×
-
               </button>
 
             </div>
@@ -388,42 +288,38 @@
 
         </div>
 
-
         <button
           type="button"
           class="add-service-button"
+          [disabled]="loading"
           (click)="addService()">
-
           + Add Another Service
-
         </button>
 
       </div>
 
     </section>
 
-
-    <!-- =========================================
-         ACTIONS
-    ========================================== -->
-
     <div class="form-actions">
 
       <button
         type="button"
         class="cancel-button"
+        [disabled]="loading"
         (click)="cancel()">
-
         Cancel
-
       </button>
-
 
       <button
         type="submit"
-        class="save-button">
+        class="save-button"
+        [disabled]="loading">
 
-        Save Product
+        @if (loading) {
+          Saving...
+        } @else {
+          Save Product
+        }
 
       </button>
 

@@ -8,12 +8,20 @@ import {
 } from '@angular/common';
 
 import {
+  HttpErrorResponse
+} from '@angular/common/http';
+
+import {
   FormsModule
 } from '@angular/forms';
 
 import {
   ApiService
 } from '../../../../core/services/api.service';
+
+import {
+  NotificationService
+} from '../../../../core/services/notification.service';
 
 import {
   PricingUnit,
@@ -79,14 +87,6 @@ export class ServicesPage
   editingProductId:
     string | null =
       null;
-
-  errorMessage = '';
-
-  successMessage = '';
-
-  bulkErrorMessage = '';
-
-  bulkSuccessMessage = '';
 
   selectedBulkFile: File | null = null;
 
@@ -173,8 +173,8 @@ export class ServicesPage
 
 
   constructor(
-    private readonly apiService:
-      ApiService
+    private readonly apiService: ApiService,
+    private readonly notificationService: NotificationService
   ) {}
 
 
@@ -188,9 +188,6 @@ export class ServicesPage
 
     this.loading =
       true;
-
-    this.errorMessage =
-      '';
 
     this.apiService
       .getProducts()
@@ -219,7 +216,7 @@ export class ServicesPage
 
         error: (
           error:
-            any
+            HttpErrorResponse
         ) => {
 
           console.error(
@@ -227,10 +224,12 @@ export class ServicesPage
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Failed to load products';
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Failed to load products'
+            )
+          );
 
           this.loading =
             false;
@@ -314,12 +313,6 @@ export class ServicesPage
       return;
     }
 
-    this.errorMessage =
-      '';
-
-    this.successMessage =
-      '';
-
     this.search =
       '';
 
@@ -365,9 +358,6 @@ export class ServicesPage
 
     this.arrangeMode =
       false;
-
-    this.errorMessage =
-      '';
   }
 
 
@@ -547,12 +537,6 @@ export class ServicesPage
     this.arrangementSaving =
       true;
 
-    this.errorMessage =
-      '';
-
-    this.successMessage =
-      '';
-
     this.apiService
       .reorderProducts(
         request
@@ -587,13 +571,14 @@ export class ServicesPage
           this.arrangementSaving =
             false;
 
-          this.successMessage =
-            'Product arrangement saved successfully';
+          void this.notificationService.success(
+            'Product arrangement saved successfully'
+          );
         },
 
         error: (
           error:
-            any
+            HttpErrorResponse
         ) => {
 
           console.error(
@@ -601,10 +586,12 @@ export class ServicesPage
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Failed to save product arrangement';
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Failed to save product arrangement'
+            )
+          );
 
           this.arrangementSaving =
             false;
@@ -625,12 +612,6 @@ export class ServicesPage
 
     this.editingProductId =
       null;
-
-    this.errorMessage =
-      '';
-
-    this.successMessage =
-      '';
 
     this.resetProductForm();
 
@@ -653,12 +634,6 @@ export class ServicesPage
 
     this.editingProductId =
       product.id;
-
-    this.errorMessage =
-      '';
-
-    this.successMessage =
-      '';
 
     this.productForm = {
 
@@ -880,13 +855,6 @@ export class ServicesPage
     }
 
 
-    this.errorMessage =
-      '';
-
-    this.successMessage =
-      '';
-
-
     if (
       this.editingProductId !==
       null
@@ -920,8 +888,9 @@ export class ServicesPage
       !productName
     ) {
 
-      this.errorMessage =
-        'Product name is required';
+      void this.notificationService.warning(
+        'Product name is required'
+      );
 
       return null;
     }
@@ -946,8 +915,9 @@ export class ServicesPage
         !typeName
       ) {
 
-        this.errorMessage =
-          'Product type name is required';
+        void this.notificationService.warning(
+          'Product type name is required'
+        );
 
         return null;
       }
@@ -972,8 +942,9 @@ export class ServicesPage
         0
       ) {
 
-        this.errorMessage =
-          `At least one service is required for ${typeName}`;
+        void this.notificationService.warning(
+          `At least one service is required for ${typeName}`
+        );
 
         return null;
       }
@@ -1008,8 +979,9 @@ export class ServicesPage
       0
     ) {
 
-      this.errorMessage =
-        'At least one product type is required';
+      void this.notificationService.warning(
+        'At least one product type is required'
+      );
 
       return null;
     }
@@ -1077,15 +1049,16 @@ export class ServicesPage
           this.loading =
             false;
 
-          this.successMessage =
-            'Product created successfully';
-
           this.closeProductForm();
+
+          void this.notificationService.success(
+            'Product created successfully'
+          );
         },
 
         error: (
           error:
-            any
+            HttpErrorResponse
         ) => {
 
           console.error(
@@ -1093,10 +1066,12 @@ export class ServicesPage
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Failed to create product';
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Failed to create product'
+            )
+          );
 
           this.loading =
             false;
@@ -1142,15 +1117,16 @@ export class ServicesPage
           this.loading =
             false;
 
-          this.successMessage =
-            'Product updated successfully';
-
           this.closeProductForm();
+
+          void this.notificationService.success(
+            'Product updated successfully'
+          );
         },
 
         error: (
           error:
-            any
+            HttpErrorResponse
         ) => {
 
           console.error(
@@ -1158,10 +1134,12 @@ export class ServicesPage
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Failed to update product';
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Failed to update product'
+            )
+          );
 
           this.loading =
             false;
@@ -1185,12 +1163,6 @@ export class ServicesPage
 
     this.selectedBulkFile =
       null;
-
-    this.bulkErrorMessage =
-      '';
-
-    this.bulkSuccessMessage =
-      '';
   }
 
 
@@ -1208,12 +1180,6 @@ export class ServicesPage
 
     this.selectedBulkFile =
       null;
-
-    this.bulkErrorMessage =
-      '';
-
-    this.bulkSuccessMessage =
-      '';
   }
 
 
@@ -1236,12 +1202,6 @@ export class ServicesPage
       return;
     }
 
-    this.bulkErrorMessage =
-      '';
-
-    this.bulkSuccessMessage =
-      '';
-
     const isPdf =
       file.type ===
         'application/pdf' ||
@@ -1258,8 +1218,9 @@ export class ServicesPage
       this.selectedBulkFile =
         null;
 
-      this.bulkErrorMessage =
-        'Please select a PDF file';
+      void this.notificationService.warning(
+        'Please select a PDF file'
+      );
 
       input.value =
         '';
@@ -1278,8 +1239,9 @@ export class ServicesPage
       this.selectedBulkFile =
         null;
 
-      this.bulkErrorMessage =
-        'PDF file size cannot exceed 10 MB';
+      void this.notificationService.warning(
+        'PDF file size cannot exceed 10 MB'
+      );
 
       input.value =
         '';
@@ -1303,12 +1265,6 @@ export class ServicesPage
 
     this.selectedBulkFile =
       null;
-
-    this.bulkErrorMessage =
-      '';
-
-    this.bulkSuccessMessage =
-      '';
   }
 
 
@@ -1318,20 +1274,15 @@ submitBulkUpload(): void {
     !this.selectedBulkFile
   ) {
 
-    this.bulkErrorMessage =
-      'Please select a PDF file';
+    void this.notificationService.warning(
+      'Please select a PDF file'
+    );
 
     return;
   }
 
   this.bulkLoading =
     true;
-
-  this.bulkErrorMessage =
-    '';
-
-  this.bulkSuccessMessage =
-    '';
 
   this.apiService
     .bulkUploadProductsPdf(
@@ -1347,8 +1298,9 @@ submitBulkUpload(): void {
         this.bulkLoading =
           false;
 
-        this.bulkSuccessMessage =
-          `${response.totalProducts} products processed. ${response.createdProducts} created and ${response.updatedProducts} updated.`;
+        void this.notificationService.success(
+          `${response.totalProducts} products processed. ${response.createdProducts} created and ${response.updatedProducts} updated.`
+        );
 
         this.products =
           this.mergeBulkProducts(
@@ -1370,7 +1322,7 @@ submitBulkUpload(): void {
 
       error: (
         error:
-          any
+          HttpErrorResponse
       ) => {
 
         console.error(
@@ -1378,10 +1330,12 @@ submitBulkUpload(): void {
           error
         );
 
-        this.bulkErrorMessage =
-          error?.error?.message ||
-          error?.error?.error ||
-          'PDF bulk upload failed';
+        void this.notificationService.error(
+          this.getErrorMessage(
+            error,
+            'PDF bulk upload failed'
+          )
+        );
 
         this.bulkLoading =
           false;
@@ -1452,12 +1406,6 @@ submitBulkUpload(): void {
       return;
     }
 
-    this.errorMessage =
-      '';
-
-    this.successMessage =
-      '';
-
 
     this.apiService
       .deleteProduct(
@@ -1481,13 +1429,14 @@ submitBulkUpload(): void {
                     : item
               );
 
-          this.successMessage =
-            'Product deactivated successfully';
+          void this.notificationService.success(
+            'Product deactivated successfully'
+          );
         },
 
         error: (
           error:
-            any
+            HttpErrorResponse
         ) => {
 
           console.error(
@@ -1495,10 +1444,12 @@ submitBulkUpload(): void {
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Failed to deactivate product';
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Failed to deactivate product'
+            )
+          );
         }
 
       });
@@ -1603,6 +1554,37 @@ submitBulkUpload(): void {
     }
 
     this.loadProducts();
+  }
+
+
+  private getErrorMessage(
+    error: HttpErrorResponse,
+    fallback: string
+  ): string {
+
+    const message =
+      error?.error?.message;
+
+    if (
+      typeof message === 'string' &&
+      message.trim()
+    ) {
+
+      return message.trim();
+    }
+
+    const legacyMessage =
+      error?.error?.error;
+
+    if (
+      typeof legacyMessage === 'string' &&
+      legacyMessage.trim()
+    ) {
+
+      return legacyMessage.trim();
+    }
+
+    return fallback;
   }
 
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   FormControl,
   FormGroup,
@@ -8,6 +9,7 @@ import {
 } from '@angular/forms';
 
 import { ApiService } from '../../../../../src/core/services/api.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 import {
   Coupon,
@@ -111,7 +113,8 @@ export class CouponsPage implements OnInit {
     });
 
   constructor(
-    private readonly apiService: ApiService
+    private readonly apiService: ApiService,
+    private readonly notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -141,16 +144,22 @@ export class CouponsPage implements OnInit {
           this.loading = false;
         },
 
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
 
           console.error(
             'Failed to load coupons:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to load coupons';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to load coupons'
+            );
+
+          void this.notificationService.error(
+            message
+          );
 
           this.loading = false;
         }
@@ -365,22 +374,29 @@ export class CouponsPage implements OnInit {
 
           this.loading = false;
 
-          this.successMessage =
-            'Coupon created successfully';
+          void this.notificationService.success(
+            'Coupon created successfully'
+          );
 
           this.closeCouponForm();
         },
 
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
 
           console.error(
             'Failed to create coupon:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to create coupon';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to create coupon'
+            );
+
+          void this.notificationService.error(
+            message
+          );
 
           this.loading = false;
         }
@@ -421,22 +437,29 @@ export class CouponsPage implements OnInit {
 
           this.loading = false;
 
-          this.successMessage =
-            'Coupon updated successfully';
+          void this.notificationService.success(
+            'Coupon updated successfully'
+          );
 
           this.closeCouponForm();
         },
 
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
 
           console.error(
             'Failed to update coupon:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to update coupon';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to update coupon'
+            );
+
+          void this.notificationService.error(
+            message
+          );
 
           this.loading = false;
         }
@@ -490,22 +513,29 @@ export class CouponsPage implements OnInit {
                   : item
             );
 
-          this.successMessage =
+          void this.notificationService.success(
             updatedCoupon.active
               ? 'Coupon activated successfully'
-              : 'Coupon deactivated successfully';
+              : 'Coupon deactivated successfully'
+          );
         },
 
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
 
           console.error(
             'Failed to update coupon status:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to update coupon status';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to update coupon status'
+            );
+
+          void this.notificationService.error(
+            message
+          );
         }
 
       });
@@ -538,24 +568,55 @@ export class CouponsPage implements OnInit {
                   : item
             );
 
-          this.successMessage =
-            'Coupon deactivated successfully';
+          void this.notificationService.success(
+            'Coupon deactivated successfully'
+          );
         },
 
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
 
           console.error(
             'Failed to deactivate coupon:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to deactivate coupon';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to deactivate coupon'
+            );
+
+          void this.notificationService.error(
+            message
+          );
         }
 
       });
   }
+
+  /* =========================================
+     ERROR MESSAGE
+  ========================================= */
+
+  private getErrorMessage(
+    error: HttpErrorResponse,
+    fallback: string
+  ): string {
+
+    const backendMessage =
+      error?.error?.message;
+
+    if (
+      typeof backendMessage === 'string' &&
+      backendMessage.trim()
+    ) {
+
+      return backendMessage.trim();
+    }
+
+    return fallback;
+  }
+
 
   /* =========================================
      DISPLAY HELPERS

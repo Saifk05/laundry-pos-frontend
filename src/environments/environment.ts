@@ -6,6 +6,8 @@
 export const environment = {
   production: false,
   clientUrl: 'http://localhost:8080'
+    // clientUrl: 'https://laundry-pos-backend.onrender.com'
+
 };
 
 

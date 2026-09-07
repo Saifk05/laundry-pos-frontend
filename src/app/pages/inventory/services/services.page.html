@@ -172,27 +172,7 @@
     </div>
 
   }
-
-
-  @if (successMessage && !showProductForm) {
-
-    <div class="page-success-message">
-      {{ successMessage }}
-    </div>
-
-  }
-
-
-  @if (errorMessage && !showProductForm) {
-
-    <div class="page-error-message">
-      {{ errorMessage }}
-    </div>
-
-  }
-
-
-  @if (loading && products.length === 0) {
+@if (loading && products.length === 0) {
 
     <div class="loading-state">
 
@@ -939,18 +919,7 @@
             </div>
 
           }
-
-
-          @if (errorMessage) {
-
-            <div class="error-text">
-              {{ errorMessage }}
-            </div>
-
-          }
-
-
-          <div class="modal-actions">
+<div class="modal-actions">
 
             <button
               type="button"
@@ -1119,24 +1088,7 @@
             </div>
 
           }
-
-          @if (bulkErrorMessage) {
-
-            <div class="error-text">
-              {{ bulkErrorMessage }}
-            </div>
-
-          }
-
-          @if (bulkSuccessMessage) {
-
-            <div class="bulk-success-text">
-              {{ bulkSuccessMessage }}
-            </div>
-
-          }
-
-          <div class="modal-actions">
+<div class="modal-actions">
 
             <button
               type="button"

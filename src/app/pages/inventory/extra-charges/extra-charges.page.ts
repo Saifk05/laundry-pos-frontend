@@ -3,7 +3,13 @@ import {
   OnInit
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule
+} from '@angular/common';
+
+import {
+  HttpErrorResponse
+} from '@angular/common/http';
 
 import {
   FormControl,
@@ -12,7 +18,13 @@ import {
   Validators
 } from '@angular/forms';
 
-import { ApiService } from '../../../../../src/core/services/api.service';
+import {
+  ApiService
+} from '../../../../../src/core/services/api.service';
+
+import {
+  NotificationService
+} from '../../../../core/services/notification.service';
 
 import {
   ExpressCharge,
@@ -38,13 +50,18 @@ interface ExtraChargeForm {
     ReactiveFormsModule
   ]
 })
-export class ExtraChargesPage implements OnInit {
+export class ExtraChargesPage
+  implements OnInit {
 
   showChargeForm = false;
 
-  editingChargeId: string | null = null;
+  editingChargeId:
+    string | null =
+      null;
 
-  charges: ExpressCharge[] = [];
+  charges:
+    ExpressCharge[] =
+      [];
 
   loading = false;
 
@@ -52,20 +69,20 @@ export class ExtraChargesPage implements OnInit {
 
   successMessage = '';
 
-
   chargeForm =
     new FormGroup<ExtraChargeForm>({
 
-      name: new FormControl(
-        'Express Delivery',
-        {
-          nonNullable: true,
-          validators: [
-            Validators.required,
-            Validators.maxLength(100)
-          ]
-        }
-      ),
+      name:
+        new FormControl(
+          'Express Delivery',
+          {
+            nonNullable: true,
+            validators: [
+              Validators.required,
+              Validators.maxLength(100)
+            ]
+          }
+        ),
 
       percentage:
         new FormControl<number | null>(
@@ -91,7 +108,11 @@ export class ExtraChargesPage implements OnInit {
 
 
   constructor(
-    private readonly apiService: ApiService
+    private readonly apiService:
+      ApiService,
+
+    private readonly notificationService:
+      NotificationService
   ) {}
 
 
@@ -101,22 +122,17 @@ export class ExtraChargesPage implements OnInit {
   }
 
 
-  /* =========================================
-     LOAD EXPRESS CHARGES
-  ========================================= */
-
   loadCharges(): void {
 
     this.loading = true;
-
-    this.errorMessage = '';
 
     this.apiService
       .getExpressCharges()
       .subscribe({
 
         next: (
-          response: ExpressChargeListResponse
+          response:
+            ExpressChargeListResponse
         ) => {
 
           this.charges =
@@ -127,16 +143,25 @@ export class ExtraChargesPage implements OnInit {
           this.loading = false;
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            HttpErrorResponse
+        ) => {
 
           console.error(
             'Failed to load express charges:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to load express charges';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to load express charges'
+            );
+
+          void this.notificationService.error(
+            message
+          );
 
           this.loading = false;
         }
@@ -145,30 +170,24 @@ export class ExtraChargesPage implements OnInit {
   }
 
 
-  /* =========================================
-     ACTIVE CHARGES
-  ========================================= */
-
   get activeCharges(): number {
 
-    return this.charges.filter(
-      (charge: ExpressCharge) =>
-        charge.active
-    ).length;
+    return this.charges
+      .filter(
+        (
+          charge:
+            ExpressCharge
+        ) =>
+          charge.active
+      )
+      .length;
   }
 
 
-  /* =========================================
-     ADD
-  ========================================= */
-
   addCharge(): void {
 
-    this.editingChargeId = null;
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
+    this.editingChargeId =
+      null;
 
     this.chargeForm.reset({
       name: 'Express Delivery',
@@ -176,27 +195,20 @@ export class ExtraChargesPage implements OnInit {
       active: true
     });
 
-    this.showChargeForm = true;
+    this.showChargeForm =
+      true;
   }
 
 
-  /* =========================================
-     EDIT
-  ========================================= */
-
   editCharge(
-    charge: ExpressCharge
+    charge:
+      ExpressCharge
   ): void {
 
     this.editingChargeId =
       charge.id;
 
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
     this.chargeForm.setValue({
-
       name:
         charge.name,
 
@@ -205,22 +217,20 @@ export class ExtraChargesPage implements OnInit {
 
       active:
         charge.active
-
     });
 
-    this.showChargeForm = true;
+    this.showChargeForm =
+      true;
   }
 
 
-  /* =========================================
-     CLOSE FORM
-  ========================================= */
-
   closeChargeForm(): void {
 
-    this.showChargeForm = false;
+    this.showChargeForm =
+      false;
 
-    this.editingChargeId = null;
+    this.editingChargeId =
+      null;
 
     this.chargeForm.reset({
       name: 'Express Delivery',
@@ -230,64 +240,73 @@ export class ExtraChargesPage implements OnInit {
   }
 
 
-  /* =========================================
-     SAVE
-  ========================================= */
-
   saveCharge(): void {
 
-    this.chargeForm.markAllAsTouched();
+    this.chargeForm
+      .markAllAsTouched();
 
-    if (this.chargeForm.invalid) {
+    if (
+      this.chargeForm.invalid
+    ) {
+
+      void this.notificationService.warning(
+        'Please enter valid express charge details'
+      );
+
       return;
     }
 
     const value =
-      this.chargeForm.getRawValue();
+      this.chargeForm
+        .getRawValue();
 
     const percentage =
-      Number(value.percentage);
-
-    /*
-     * Frontend duplicate check.
-     * Backend also prevents duplicate percentages.
-     */
+      Number(
+        value.percentage
+      );
 
     const duplicate =
       this.charges.some(
-        (charge: ExpressCharge) =>
-          Number(charge.percentage) ===
-            percentage &&
+        (
+          charge:
+            ExpressCharge
+        ) =>
+          Number(
+            charge.percentage
+          ) === percentage &&
           charge.id !==
             this.editingChargeId
       );
 
-    if (duplicate) {
+    if (
+      duplicate
+    ) {
 
-      this.errorMessage =
-        'This express charge percentage already exists.';
+      void this.notificationService.error(
+        'This express charge percentage already exists'
+      );
 
       return;
     }
 
-    const request: ExpressChargeRequest = {
+    const request:
+      ExpressChargeRequest = {
 
-      name:
-        value.name.trim(),
+        name:
+          value.name
+            .trim(),
 
-      percentage:
-        percentage,
+        percentage:
+          percentage,
 
-      active:
-        value.active
+        active:
+          value.active
+      };
 
-    };
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
-    if (this.editingChargeId !== null) {
+    if (
+      this.editingChargeId !==
+        null
+    ) {
 
       this.updateCharge(
         this.editingChargeId,
@@ -297,26 +316,29 @@ export class ExtraChargesPage implements OnInit {
       return;
     }
 
-    this.createCharge(request);
+    this.createCharge(
+      request
+    );
   }
 
 
-  /* =========================================
-     CREATE
-  ========================================= */
-
   private createCharge(
-    request: ExpressChargeRequest
+    request:
+      ExpressChargeRequest
   ): void {
 
-    this.loading = true;
+    this.loading =
+      true;
 
     this.apiService
-      .createExpressCharge(request)
+      .createExpressCharge(
+        request
+      )
       .subscribe({
 
         next: (
-          charge: ExpressCharge
+          charge:
+            ExpressCharge
         ) => {
 
           this.charges = [
@@ -326,42 +348,54 @@ export class ExtraChargesPage implements OnInit {
 
           this.sortCharges();
 
-          this.loading = false;
-
-          this.successMessage =
-            'Express charge created successfully';
+          this.loading =
+            false;
 
           this.closeChargeForm();
+
+          void this.notificationService.success(
+            'Express charge created successfully'
+          );
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            HttpErrorResponse
+        ) => {
 
           console.error(
             'Failed to create express charge:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to create express charge';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to create express charge'
+            );
 
-          this.loading = false;
+          void this.notificationService.error(
+            message
+          );
+
+          this.loading =
+            false;
         }
 
       });
   }
 
 
-  /* =========================================
-     UPDATE
-  ========================================= */
-
   private updateCharge(
-    chargeId: string,
-    request: ExpressChargeRequest
+    chargeId:
+      string,
+
+    request:
+      ExpressChargeRequest
   ): void {
 
-    this.loading = true;
+    this.loading =
+      true;
 
     this.apiService
       .updateExpressCharge(
@@ -371,60 +405,69 @@ export class ExtraChargesPage implements OnInit {
       .subscribe({
 
         next: (
-          updatedCharge: ExpressCharge
+          updatedCharge:
+            ExpressCharge
         ) => {
 
           this.charges =
             this.charges.map(
-              (charge: ExpressCharge) =>
+              (
+                charge:
+                  ExpressCharge
+              ) =>
                 charge.id ===
-                updatedCharge.id
+                  updatedCharge.id
                   ? updatedCharge
                   : charge
             );
 
           this.sortCharges();
 
-          this.loading = false;
-
-          this.successMessage =
-            'Express charge updated successfully';
+          this.loading =
+            false;
 
           this.closeChargeForm();
+
+          void this.notificationService.success(
+            'Express charge updated successfully'
+          );
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            HttpErrorResponse
+        ) => {
 
           console.error(
             'Failed to update express charge:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to update express charge';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to update express charge'
+            );
 
-          this.loading = false;
+          void this.notificationService.error(
+            message
+          );
+
+          this.loading =
+            false;
         }
 
       });
   }
 
 
-  /* =========================================
-     ACTIVE / INACTIVE
-  ========================================= */
-
   toggleStatus(
-    charge: ExpressCharge
+    charge:
+      ExpressCharge
   ): void {
 
     const newStatus =
       !charge.active;
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
 
     this.apiService
       .updateExpressChargeStatus(
@@ -434,51 +477,58 @@ export class ExtraChargesPage implements OnInit {
       .subscribe({
 
         next: (
-          updatedCharge: ExpressCharge
+          updatedCharge:
+            ExpressCharge
         ) => {
 
           this.charges =
             this.charges.map(
-              (item: ExpressCharge) =>
+              (
+                item:
+                  ExpressCharge
+              ) =>
                 item.id ===
-                updatedCharge.id
+                  updatedCharge.id
                   ? updatedCharge
                   : item
             );
 
-          this.successMessage =
+          void this.notificationService.success(
             updatedCharge.active
               ? 'Express charge activated successfully'
-              : 'Express charge deactivated successfully';
+              : 'Express charge deactivated successfully'
+          );
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            HttpErrorResponse
+        ) => {
 
           console.error(
             'Failed to update express charge status:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to update express charge status';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to update express charge status'
+            );
+
+          void this.notificationService.error(
+            message
+          );
         }
 
       });
   }
 
 
-  /* =========================================
-     DELETE / DEACTIVATE
-  ========================================= */
-
   deleteCharge(
-    charge: ExpressCharge
+    charge:
+      ExpressCharge
   ): void {
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
 
     this.apiService
       .deleteExpressCharge(
@@ -490,8 +540,12 @@ export class ExtraChargesPage implements OnInit {
 
           this.charges =
             this.charges.map(
-              (item: ExpressCharge) =>
-                item.id === charge.id
+              (
+                item:
+                  ExpressCharge
+              ) =>
+                item.id ===
+                  charge.id
                   ? {
                       ...item,
                       active: false
@@ -499,29 +553,59 @@ export class ExtraChargesPage implements OnInit {
                   : item
             );
 
-          this.successMessage =
-            'Express charge deactivated successfully';
+          void this.notificationService.success(
+            'Express charge deactivated successfully'
+          );
         },
 
-        error: (error: any) => {
+        error: (
+          error:
+            HttpErrorResponse
+        ) => {
 
           console.error(
             'Failed to deactivate express charge:',
             error
           );
 
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to deactivate express charge';
+          const message =
+            this.getErrorMessage(
+              error,
+              'Failed to deactivate express charge'
+            );
+
+          void this.notificationService.error(
+            message
+          );
         }
 
       });
   }
 
 
-  /* =========================================
-     SORT
-  ========================================= */
+  private getErrorMessage(
+    error:
+      HttpErrorResponse,
+
+    fallback:
+      string
+  ): string {
+
+    const backendMessage =
+      error?.error?.message;
+
+    if (
+      typeof backendMessage ===
+        'string' &&
+      backendMessage.trim()
+    ) {
+
+      return backendMessage.trim();
+    }
+
+    return fallback;
+  }
+
 
   private sortCharges(): void {
 
@@ -529,11 +613,18 @@ export class ExtraChargesPage implements OnInit {
       ...this.charges
     ].sort(
       (
-        a: ExpressCharge,
-        b: ExpressCharge
+        a:
+          ExpressCharge,
+
+        b:
+          ExpressCharge
       ) =>
-        Number(a.percentage) -
-        Number(b.percentage)
+        Number(
+          a.percentage
+        ) -
+        Number(
+          b.percentage
+        )
     );
   }
 
