@@ -334,35 +334,29 @@ export class ApiService {
      B2C ORDERS
   ========================================= */
 
-  getB2COrders(
-    status?: B2COrderStatus | null,
-    search?: string
-  ): Observable<B2COrderListResponse> {
+getB2COrders(
+  status?: B2COrderStatus | null,
+  search?: string,
+  fromDate?: string,
+  toDate?: string,
+  cursor?: string | null,
+  limit = 10
+): Observable<B2COrderListResponse> {
 
-    const params: {
-      status?: string;
-      search?: string;
-    } = {};
+  const params = {
+    status: status ?? '',
+    search: search?.trim() ?? '',
+    fromDate: fromDate ?? '',
+    toDate: toDate ?? '',
+    cursor: cursor ?? '',
+    limit
+  };
 
-    if (status) {
-      params.status = status;
-    }
-
-    if (
-      search &&
-      search.trim()
-    ) {
-      params.search =
-        search.trim();
-    }
-
-    return this.http.get<B2COrderListResponse>(
-      `${this.baseUrl}/orders`,
-      {
-        params
-      }
-    );
-  }
+  return this.http.get<B2COrderListResponse>(
+    `${this.baseUrl}/orders`,
+    { params }
+  );
+}
 
 
   getB2COrderById(

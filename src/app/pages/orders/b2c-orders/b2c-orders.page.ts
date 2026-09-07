@@ -1,5 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule
+} from '@angular/forms';
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  NativeDateAdapter
+} from '@angular/material/core';
+
 import { Router } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import {
@@ -13,6 +30,85 @@ import {
   PaymentRequest,
   SettlementOrder
 } from '../../../../core/models/settlement.model';
+
+const B2C_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY'
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY'
+  }
+};
+
+class B2cDateAdapter extends NativeDateAdapter {
+
+  override parse(value: any): Date | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    if (value instanceof Date) {
+      return this.isValid(value) ? value : null;
+    }
+
+    const text = String(value).trim();
+
+    const match = text.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+    if (!match) {
+      return null;
+    }
+
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const year = Number(match[3]);
+
+    const date = new Date(
+      year,
+      month,
+      day
+    );
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
+  }
+
+  override format(
+    date: Date,
+    displayFormat: any
+  ): string {
+
+    if (!this.isValid(date)) {
+      throw Error(
+        'B2cDateAdapter: Cannot format invalid date.'
+      );
+    }
+
+    const day = String(
+      date.getDate()
+    ).padStart(2, '0');
+
+    const month = String(
+      date.getMonth() + 1
+    ).padStart(2, '0');
+
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+}
 
 interface B2cOrderView {
   id: string;
@@ -39,18 +135,54 @@ interface B2cOrderView {
   standalone: true,
   templateUrl: './b2c-orders.page.html',
   styleUrls: ['./b2c-orders.page.scss'],
-  imports: [FormsModule]
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule
+  ],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: B2cDateAdapter
+    },
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'en-GB'
+    },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: B2C_DATE_FORMATS
+    }
+  ]
 })
 export class B2cOrdersPage implements OnInit {
   loading = false;
   actionLoading = false;
   errorMessage = '';
-
   selectedStatus = 'All';
   customerNameSearch = '';
   orderNumberSearch = '';
   mobileSearch = '';
+  fromDate = this.getDefaultFromDate();
+  toDate = this.getTodayDate();
+  range = new FormGroup({
+    start: new FormControl<Date | null>(
+      this.parseLocalDate(this.fromDate)
+    ),
+    end: new FormControl<Date | null>(
+      this.parseLocalDate(this.toDate)
+    )
+  });
 
+  nextCursor: string | null = null;
+  currentCursor: string | null = null;
+  cursorHistory: Array<string | null> = [];
+  hasMore = false;
+  pageLimit = 10;
+  readonly pageSizeOptions = [5, 10, 15, 25, 50, 100];
   statuses: string[] = [
     'All',
     'Tagged',
@@ -61,14 +193,12 @@ export class B2cOrdersPage implements OnInit {
   ];
 
   orders: B2cOrderView[] = [];
-
   paymentModalOpen = false;
   selectedPaymentOrder: SettlementOrder | null = null;
   paymentAmount: number | null = null;
   selectedPaymentMethod: PaymentMethod = 'CASH';
   paymentReference = '';
   paymentError = '';
-
   paymentMethods: { label: string; value: PaymentMethod }[] = [
     { label: 'Cash', value: 'CASH' },
     { label: 'UPI', value: 'UPI' },
@@ -81,11 +211,9 @@ export class B2cOrdersPage implements OnInit {
   readyStorageLabel = '';
   readyStorageError = '';
   storageModalMode: 'MARK_READY' | 'EDIT' = 'MARK_READY';
-
   callModalOpen = false;
   selectedCallOrder: B2cOrderView | null = null;
   numberCopied = false;
-
   businessName = 'Venkateshwara Fabric Works';
 
   constructor(
@@ -109,25 +237,37 @@ export class B2cOrdersPage implements OnInit {
     });
   }
 
-  loadOrders(): void {
+  loadOrders(cursor: string | null = null): void {
     this.loading = true;
     this.errorMessage = '';
 
     this.apiService
-      .getB2COrders(this.getBackendStatus(), this.getSearchValue())
+      .getB2COrders(
+        this.getBackendStatus(),
+        this.getSearchValue(),
+        this.fromDate || undefined,
+        this.toDate || undefined,
+        cursor,
+        this.pageLimit
+      )
       .subscribe({
         next: (response: B2COrderListResponse) => {
-          this.orders = (response.orders ?? []).map((order: B2COrder) =>
+          this.orders = (response.orders ?? []).map(order =>
             this.toViewOrder(order)
           );
+
+          this.currentCursor = cursor;
+          this.nextCursor = response.nextCursor ?? null;
+          this.hasMore = response.hasMore ?? false;
           this.loading = false;
         },
+
         error: (error: any) => {
-          console.error('Load B2C orders error', error);
           this.errorMessage =
             error?.error?.message ||
             error?.error?.error ||
             'Unable to load orders';
+
           this.loading = false;
         }
       });
@@ -157,29 +297,15 @@ export class B2cOrdersPage implements OnInit {
 
   get filteredOrders(): B2cOrderView[] {
     return this.orders.filter((order: B2cOrderView) => {
-      const matchesStatus =
-        this.selectedStatus === 'All' ||
-        this.getStatusLabel(order.status) === this.selectedStatus;
-
+      const matchesStatus = this.selectedStatus === 'All' || this.getStatusLabel(order.status) === this.selectedStatus;
       const orderSearch = this.orderNumberSearch.trim().toLowerCase();
       const customerSearch = this.customerNameSearch.trim().toLowerCase();
       const mobileSearch = this.mobileSearch.trim();
-
-      const matchesOrderNumber =
-        !orderSearch || order.orderNumber.toLowerCase().includes(orderSearch);
-
-      const matchesCustomerName =
-        !customerSearch ||
-        (order.customerName ?? '').toLowerCase().includes(customerSearch);
-
-      const matchesMobile =
-        !mobileSearch || order.mobile.includes(mobileSearch);
-
+      const matchesOrderNumber = !orderSearch || order.orderNumber.toLowerCase().includes(orderSearch);
+      const matchesCustomerName =  !customerSearch || (order.customerName ?? '').toLowerCase().includes(customerSearch);
+      const matchesMobile = !mobileSearch || order.mobile.includes(mobileSearch);
       return (
-        matchesStatus &&
-        matchesOrderNumber &&
-        matchesCustomerName &&
-        matchesMobile
+        matchesStatus && matchesOrderNumber && matchesCustomerName && matchesMobile
       );
     });
   }
@@ -187,16 +313,58 @@ export class B2cOrdersPage implements OnInit {
   selectStatus(status: string): void {
     this.selectedStatus = status;
     this.closeAllMoreMenus();
+    this.resetPagination();
     this.loadOrders();
   }
 
   searchOrders(): void {
     this.closeAllMoreMenus();
+    const start = this.range.controls.start.value;
+    const end = this.range.controls.end.value;
+    if (start) { this.fromDate = this.toLocalDateString(start); }
+    if (end) { this.toDate = this.toLocalDateString(end);}
+    if (this.fromDate && this.toDate && this.fromDate > this.toDate) {
+      this.errorMessage = 'From date cannot be after to date';
+      return;
+    }
+    this.errorMessage = '';
+    this.resetPagination();
+    this.loadOrders();
+  }
 
-    if (this.customerNameSearch.trim()) {
+  applyDateFilter(): void {
+    this.searchOrders();
+  }
+
+  nextPage(): void {
+    if (this.loading || !this.hasMore || !this.nextCursor) {
       return;
     }
 
+    this.cursorHistory.push(this.currentCursor);
+    this.loadOrders(this.nextCursor);
+  }
+
+  previousPage(): void {
+    if (this.loading || this.cursorHistory.length === 0) {
+      return;
+    }
+
+    const previousCursor = this.cursorHistory.pop() ?? null;
+    this.loadOrders(previousCursor);
+  }
+
+  get canGoPrevious(): boolean {
+    return this.cursorHistory.length > 0;
+  }
+
+  get currentPage(): number {
+    return this.cursorHistory.length + 1;
+  }
+
+  onPageLimitChange(): void {
+    this.closeAllMoreMenus();
+    this.resetPagination();
     this.loadOrders();
   }
 
@@ -205,13 +373,60 @@ export class B2cOrdersPage implements OnInit {
     this.orderNumberSearch = '';
     this.mobileSearch = '';
     this.customerNameSearch = '';
+
+    this.fromDate = this.getDefaultFromDate();
+    this.toDate = this.getTodayDate();
+
+    this.range.setValue({
+      start: this.parseLocalDate(this.fromDate),
+      end: this.parseLocalDate(this.toDate)
+    });
+
     this.closeAllMoreMenus();
+    this.resetPagination();
     this.loadOrders();
   }
 
+  private resetPagination(): void {
+    this.currentCursor = null;
+    this.nextCursor = null;
+    this.cursorHistory = [];
+    this.hasMore = false;
+  }
+
+  private parseLocalDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(
+      year,
+      month - 1,
+      day
+    );
+  }
+
   private getSearchValue(): string {
-    const orderNumber = this.orderNumberSearch.trim();
-    return orderNumber || this.mobileSearch.trim();
+    return (
+      this.orderNumberSearch.trim() ||
+      this.mobileSearch.trim() ||
+      this.customerNameSearch.trim()
+    );
+  }
+
+  private getTodayDate(): string {
+    return this.toLocalDateString(new Date());
+  }
+
+  private getDefaultFromDate(): string {
+    const date = new Date();
+    date.setDate(date.getDate() - 6);
+    return this.toLocalDateString(date);
+  }
+
+  private toLocalDateString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private getBackendStatus(): B2COrderStatus | null {
@@ -264,7 +479,6 @@ export class B2cOrdersPage implements OnInit {
     this.errorMessage = '';
     this.actionLoading = true;
     this.closeAllMoreMenus();
-
     this.apiService
       .updateB2COrderStatus(order.id, 'PROCESSING_AT_STORE')
       .subscribe({
@@ -293,7 +507,6 @@ export class B2cOrdersPage implements OnInit {
     if (this.actionLoading) {
       return;
     }
-
     this.readyStorageModalOpen = false;
     this.selectedReadyOrder = null;
     this.readyStorageLabel = '';
@@ -307,7 +520,6 @@ export class B2cOrdersPage implements OnInit {
     }
 
     const storageLabel = this.readyStorageLabel.trim();
-
     if (!storageLabel) {
       this.readyStorageError = 'Storage label is required';
       return;
@@ -316,13 +528,10 @@ export class B2cOrdersPage implements OnInit {
     this.readyStorageError = '';
     this.errorMessage = '';
     this.actionLoading = true;
-
     const orderId = this.selectedReadyOrder.id;
-
     this.apiService.updateB2CStorageLabel(orderId, storageLabel).subscribe({
       next: (storageResponse: B2COrder) => {
         this.updateLocalOrder(storageResponse);
-
         this.apiService.markB2COrderReady(orderId).subscribe({
           next: (readyResponse: B2COrder) => {
             this.updateLocalOrder(readyResponse);
@@ -334,28 +543,19 @@ export class B2cOrdersPage implements OnInit {
           },
           error: (error: any) => {
             this.actionLoading = false;
-            this.readyStorageError =
-              error?.error?.message ||
-              error?.error?.error ||
-              'Storage label saved, but unable to mark order ready';
-          }
-        });
+            this.readyStorageError = error?.error?.message || error?.error?.error || 'Storage label saved, but unable to mark order ready';
+          }});
       },
       error: (error: any) => {
         this.actionLoading = false;
-        this.readyStorageError =
-          error?.error?.message ||
-          error?.error?.error ||
-          'Unable to update storage label';
-      }
-    });
+        this.readyStorageError = error?.error?.message || error?.error?.error || 'Unable to update storage label';
+      }});
   }
 
   markDelivered(order: B2cOrderView): void {
     this.errorMessage = '';
     this.actionLoading = true;
     this.closeAllMoreMenus();
-
     this.apiService.markB2COrderDelivered(order.id).subscribe({
       next: (response: B2COrder) => {
         this.updateLocalOrder(response);
@@ -371,7 +571,6 @@ export class B2cOrdersPage implements OnInit {
     this.errorMessage = '';
     this.actionLoading = true;
     this.closeAllMoreMenus();
-
     this.apiService.cancelB2COrder(order.id).subscribe({
       next: (response: B2COrder) => {
         this.updateLocalOrder(response);
@@ -387,7 +586,6 @@ export class B2cOrdersPage implements OnInit {
     this.closeAllMoreMenus();
     this.errorMessage = '';
     this.paymentError = '';
-
     if (order.status === 'CANCELLED') {
       this.errorMessage = 'Payment cannot be added to cancelled order';
       return;
@@ -398,16 +596,13 @@ export class B2cOrdersPage implements OnInit {
     }
 
     this.actionLoading = true;
-
     this.apiService.getSettlementById(order.id).subscribe({
       next: (response: SettlementOrder) => {
         this.actionLoading = false;
-
         if (response.paymentStatus === 'SETTLED') {
           order.settled = true;
           return;
         }
-
         this.selectedPaymentOrder = response;
         this.paymentAmount = Number(response.balanceAmount);
         this.selectedPaymentMethod = 'CASH';
@@ -425,7 +620,6 @@ export class B2cOrdersPage implements OnInit {
     if (this.actionLoading) {
       return;
     }
-
     this.paymentModalOpen = false;
     this.selectedPaymentOrder = null;
     this.paymentAmount = null;
@@ -438,7 +632,6 @@ export class B2cOrdersPage implements OnInit {
     if (!this.selectedPaymentOrder) {
       return;
     }
-
     this.paymentAmount = Number(this.selectedPaymentOrder.balanceAmount);
   }
 
@@ -446,7 +639,6 @@ export class B2cOrdersPage implements OnInit {
     if (!this.selectedPaymentOrder) {
       return 0;
     }
-
     const balance = Number(this.selectedPaymentOrder.balanceAmount ?? 0);
     const amount = Number(this.paymentAmount ?? 0);
     return Math.max(balance - amount, 0);
@@ -456,9 +648,7 @@ export class B2cOrdersPage implements OnInit {
     if (!this.selectedPaymentOrder) {
       return;
     }
-
     this.paymentError = '';
-
     const amount = Number(this.paymentAmount);
     const balance = Number(this.selectedPaymentOrder.balanceAmount);
 
@@ -482,16 +672,11 @@ export class B2cOrdersPage implements OnInit {
 
     const orderId = this.selectedPaymentOrder.id;
     this.actionLoading = true;
-
     this.apiService.addSettlementPayment(orderId, request).subscribe({
       next: (response: SettlementOrder) => {
         this.actionLoading = false;
-
         this.orders = this.orders.map((order: B2cOrderView) => {
-          if (order.id !== response.id) {
-            return order;
-          }
-
+          if (order.id !== response.id) { return order; }
           return {
             ...order,
             settled: response.paymentStatus === 'SETTLED',
@@ -502,11 +687,7 @@ export class B2cOrdersPage implements OnInit {
         this.closePaymentModal();
       },
       error: (error: any) => {
-        console.error('Add payment error', error);
-        this.paymentError =
-          error?.error?.message ||
-          error?.error?.error ||
-          'Unable to add payment';
+        this.paymentError = error?.error?.message || error?.error?.error || 'Unable to add payment';
         this.actionLoading = false;
       }
     });
@@ -514,7 +695,6 @@ export class B2cOrdersPage implements OnInit {
 
   reschedule(order: B2cOrderView): void {
     this.closeAllMoreMenus();
-
     this.router.navigate(['/app/new-walk-in'], {
       queryParams: {
         mode: 'reschedule',
@@ -529,8 +709,7 @@ export class B2cOrdersPage implements OnInit {
     this.readyStorageError = '';
     this.storageModalMode = 'EDIT';
     this.selectedReadyOrder = order;
-    this.readyStorageLabel =
-      order.storageLabel && order.storageLabel !== '-' ? order.storageLabel : '';
+    this.readyStorageLabel = order.storageLabel && order.storageLabel !== '-' ? order.storageLabel : '';
     this.readyStorageModalOpen = true;
   }
 
@@ -604,11 +783,7 @@ export class B2cOrdersPage implements OnInit {
     this.numberCopied = false;
   }
 
-  copyCustomerNumber(): void {
-    if (!this.selectedCallOrder?.mobile) {
-      return;
-    }
-
+  copyCustomerNumber(): void { if (!this.selectedCallOrder?.mobile) { return; }
     navigator.clipboard
       .writeText(this.selectedCallOrder.mobile)
       .then(() => {
@@ -673,8 +848,7 @@ private printReceipt(order: B2COrderDetails): void {
       'receiptTermsAndConditions'
     ) ?? '';
 
-  const escapedTermsAndConditions =
-    termsAndConditions
+  const escapedTermsAndConditions = termsAndConditions
       .split(/\r?\n/)
       .map(line => line.trim())
       .filter(line => line)
@@ -682,14 +856,12 @@ private printReceipt(order: B2COrderDetails): void {
       .join('');
 
   const itemsHtml = order.items
-    .map(
-      item => `
+    .map( item => `
         <tr>
           <td>
             ${item.productName}${item.typeName ? ` (${item.typeName})` : ''}
             <br>
             <small>${item.serviceName}</small>
-
             ${
               item.unit === 'KG' && Number(item.garmentCount) > 0
                 ? `
@@ -940,13 +1112,11 @@ private printReceipt(order: B2COrderDetails): void {
                   <div class="terms-title">
                     Terms & Conditions
                   </div>
-
                   ${escapedTermsAndConditions}
                 </div>
               `
               : ''
           }
-
         </div>
 
         <script>
@@ -965,40 +1135,26 @@ private printReceipt(order: B2COrderDetails): void {
   printWindow.focus();
 }
 
-
-private printQrTags(
-  order: B2COrderDetails
-): void {
-
-  const deliveryDate =
-    order.deliveryDate
+private printQrTags(order: B2COrderDetails ): void {
+  const deliveryDate = order.deliveryDate
       ? new Date(order.deliveryDate + 'T00:00:00')
       : null;
 
-  const formattedDate =
-    deliveryDate
-      ? deliveryDate.toLocaleDateString(
-          'en-GB',
-          {
+  const formattedDate = deliveryDate ? deliveryDate.toLocaleDateString('en-GB', {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
-          }
-        )
+          } )
       : '-';
 
-  const groupedItems =
-    new Map<
-      string,
-      {
+  const groupedItems = new Map< string, {
         productName: string;
         typeName: string;
         unit: string;
         quantity: number;
         garmentCount: number;
         serviceNames: string[];
-      }
-    >();
+      } >();
 
   for (const item of order.items) {
 
@@ -1006,116 +1162,48 @@ private printQrTags(
       item.productName,
       item.typeName ?? '',
       item.unit,
-      Number(item.quantity)
-    ].join('|');
+      Number(item.quantity)].join('|');
 
-    const existingItem =
-      groupedItems.get(key);
+    const existingItem = groupedItems.get(key);
 
     if (existingItem) {
-
-      if (
-        !existingItem.serviceNames
-          .includes(item.serviceName)
-      ) {
-
-        existingItem.serviceNames.push(
-          item.serviceName
-        );
+      if ( !existingItem.serviceNames.includes(item.serviceName)) {
+        existingItem.serviceNames.push( item.serviceName);
       }
-
       continue;
     }
 
-    groupedItems.set(
-      key,
+    groupedItems.set(key,
       {
-        productName:
-          item.productName,
-
-        typeName:
-          item.typeName ?? '',
-
-        unit:
-          item.unit,
-
-        quantity:
-          Number(item.quantity),
-
-        garmentCount:
-          item.unit === 'KG'
-            ? Math.max(
-                1,
-                Number(
-                  item.garmentCount ?? 1
-                )
-              )
-            : Math.max(
-                1,
-                Number(item.quantity)
-              ),
-
-        serviceNames: [
-          item.serviceName
-        ]
-      }
-    );
+        productName: item.productName,
+        typeName: item.typeName ?? '',
+        unit: item.unit,
+        quantity: Number(item.quantity),
+        garmentCount:item.unit === 'KG'
+            ? Math.max(1, Number( item.garmentCount ?? 1))
+            : Math.max( 1,Number(item.quantity)),
+        serviceNames: [ item.serviceName ]});
   }
 
-  const groupedOrderItems =
-    Array.from(
-      groupedItems.values()
+  const groupedOrderItems = Array.from( groupedItems.values());
+  const totalItemCount = groupedOrderItems.reduce(( total, item ) => {
+        if ( item.unit === 'KG') {
+          return ( total + Math.max( 1, Number( item.garmentCount ?? 1
+              ))
+          );}
+        return (total + Math.max( 1, Math.floor( Number( item.quantity ?? 1
+              ))
+          ));
+      }, 0
     );
 
-  const totalItemCount =
-    groupedOrderItems.reduce(
-      (
-        total,
-        item
-      ) => {
-
-        if (
-          item.unit === 'KG'
-        ) {
-
-          return (
-            total +
-            Math.max(
-              1,
-              Number(
-                item.garmentCount ?? 1
-              )
-            )
-          );
-        }
-
-        return (
-          total +
-          Math.max(
-            1,
-            Math.floor(
-              Number(
-                item.quantity ?? 1
-              )
-            )
-          )
-        );
-      },
-      0
-    );
-
-  const getServiceCode = (
-    serviceName: string
-  ): string => {
-
-    const normalized =
-      serviceName
+  const getServiceCode = ( serviceName: string ): string => {
+    const normalized = serviceName
         .trim()
         .toLowerCase();
 
     const serviceCodeMap:
       Record<string, string> = {
-
       'starching': 'ST',
       'dry clean': 'DC',
       'steam press': 'SP',
@@ -1125,12 +1213,7 @@ private printQrTags(
       'wash and fold': 'WF'
     };
 
-    if (
-      serviceCodeMap[
-        normalized
-      ]
-    ) {
-
+    if ( serviceCodeMap[ normalized]) {
       return serviceCodeMap[
         normalized
       ];
@@ -1214,53 +1297,33 @@ private printQrTags(
         shoeIndex++
       ) {
 
-        const sideLabels = [
-          'Left',
-          'Right'
-        ];
-
-        for (
-          const sideLabel
-          of sideLabels
-        ) {
-
+        const sideLabels = [ 'Left', 'Right' ];
+        for ( const sideLabel of sideLabels) {
           tagsHtml += `
             <section class="tag">
-
               <div class="business-name">
                 ${this.businessName}
               </div>
-
               <div class="customer-name">
                 ${order.customer.name}
               </div>
-
               <div class="order-number">
                 #${order.orderNumber}
               </div>
-
               <div class="order-date">
                 ${formattedDate}
               </div>
-
               <div class="service-code">
                 ${serviceCode}
               </div>
-
               <div class="product-name">
                 ${productDisplay}
               </div>
-
               <div class="tag-number">
                 T${totalItemCount}
               </div>
-
             </section>
-          `;
-        }
-      }
-
-      continue;
+          `; }} continue;
     }
 
     for (
@@ -1271,42 +1334,32 @@ private printQrTags(
 
       tagsHtml += `
         <section class="tag">
-
           <div class="business-name">
             ${this.businessName}
           </div>
-
           <div class="customer-name">
             ${order.customer.name}
           </div>
-
           <div class="order-number">
             #${order.orderNumber}
           </div>
-
           <div class="order-date">
             ${formattedDate}
           </div>
-
           <div class="service-code">
             ${serviceCode}
           </div>
-
           <div class="product-name">
             ${productDisplay}
           </div>
-
           <div class="tag-number">
             T${totalItemCount}
           </div>
-
         </section>
       `;
-    }
-  }
+    }}
 
-  const printWindow =
-    window.open(
+  const printWindow = window.open(
       '',
       '_blank',
       `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
@@ -1610,9 +1663,7 @@ private printQrTags(
   }
 
   private handleActionError(error: any, fallbackMessage: string): void {
-    console.error(fallbackMessage, error);
     this.actionLoading = false;
-    this.errorMessage =
-      error?.error?.message || error?.error?.error || fallbackMessage;
+    this.errorMessage = error?.error?.message || error?.error?.error || fallbackMessage;
   }
 }
