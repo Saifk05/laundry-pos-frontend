@@ -8,8 +8,31 @@ import {
 } from '@angular/common';
 
 import {
-  FormsModule
+  FormsModule,
+  ReactiveFormsModule,
+  FormControl,
+  FormGroup
 } from '@angular/forms';
+
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  NativeDateAdapter
+} from '@angular/material/core';
+
+import {
+  MatDatepickerModule
+} from '@angular/material/datepicker';
+
+import {
+  MatFormFieldModule
+} from '@angular/material/form-field';
+
+import {
+  MatInputModule
+} from '@angular/material/input';
 
 import {
   ApiService
@@ -32,6 +55,111 @@ import {
 } from '../../../core/models/settlement.model';
 
 
+const BILL_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY'
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY'
+  }
+};
+
+class BillDateAdapter extends NativeDateAdapter {
+
+  override parse(
+    value: any
+  ): Date | null {
+
+    if (
+      value == null ||
+      value === ''
+    ) {
+      return null;
+    }
+
+    if (value instanceof Date) {
+      return this.isValid(value)
+        ? value
+        : null;
+    }
+
+    const text =
+      String(value).trim();
+
+    const match =
+      text.match(
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+      );
+
+    if (!match) {
+      return null;
+    }
+
+    const day =
+      Number(match[1]);
+
+    const month =
+      Number(match[2]) - 1;
+
+    const year =
+      Number(match[3]);
+
+    const date =
+      new Date(
+        year,
+        month,
+        day
+      );
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
+  }
+
+  override format(
+    date: Date,
+    displayFormat: any
+  ): string {
+
+    if (!this.isValid(date)) {
+      throw Error(
+        'BillDateAdapter: Cannot format invalid date.'
+      );
+    }
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+    const year =
+      date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+}
+
+
 @Component({
   selector: 'app-bill',
   standalone: true,
@@ -39,7 +167,26 @@ import {
   styleUrls: ['./bill.page.scss'],
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule
+  ],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: BillDateAdapter
+    },
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'en-GB'
+    },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: BILL_DATE_FORMATS
+    }
   ]
 })
 export class BillPage
@@ -112,11 +259,56 @@ export class BillPage
   orderIdSearch =
     '';
 
-  createdDate =
-    '';
+  fromDate =
+    this.getDefaultFromDate();
+
+  toDate =
+    this.getTodayDate();
+
+  range =
+    new FormGroup({
+      start:
+        new FormControl<Date | null>(
+          this.parseLocalDate(
+            this.fromDate
+          )
+        ),
+      end:
+        new FormControl<Date | null>(
+          this.parseLocalDate(
+            this.toDate
+          )
+        )
+    });
 
   deliveredDate =
     '';
+
+  nextCursor:
+    string | null =
+      null;
+
+  currentCursor:
+    string | null =
+      null;
+
+  cursorHistory:
+    Array<string | null> =
+      [];
+
+  hasMore =
+    false;
+
+  pageLimit =
+    10;
+
+  readonly pageSizeOptions =
+    [
+      10,
+      25,
+      50,
+      100
+    ];
 
   invoiceStatus =
     'ALL';
@@ -175,7 +367,9 @@ export class BillPage
     this.loadInvoices();
   }
 
-  loadInvoices(): void {
+  loadInvoices(
+    cursor: string | null = null
+  ): void {
 
     this.loading =
       true;
@@ -184,7 +378,12 @@ export class BillPage
       '';
 
     this.apiService
-      .getBills()
+      .getBills(
+        this.fromDate || undefined,
+        this.toDate || undefined,
+        cursor,
+        this.pageLimit
+      )
       .subscribe({
 
         next: (
@@ -197,6 +396,15 @@ export class BillPage
 
           this.invoices =
             response?.bills ?? [];
+
+          this.currentCursor =
+            cursor;
+
+          this.nextCursor =
+            response?.nextCursor ?? null;
+
+          this.hasMore =
+            response?.hasMore ?? false;
 
           this.loading =
             false;
@@ -261,14 +469,6 @@ export class BillPage
             invoice.status ===
               this.invoiceStatus;
 
-          const matchesCreatedDate =
-            !this.createdDate ||
-
-            invoice.createdAt
-              .startsWith(
-                this.createdDate
-              );
-
           const matchesDeliveryDate =
             !this.deliveredDate ||
 
@@ -283,7 +483,6 @@ export class BillPage
           return (
             matchesOrder &&
             matchesStatus &&
-            matchesCreatedDate &&
             matchesDeliveryDate
           );
         }
@@ -497,13 +696,65 @@ export class BillPage
     );
   }
 
+  searchBills(): void {
+
+    const start =
+      this.range.controls.start.value;
+
+    const end =
+      this.range.controls.end.value;
+
+    if (start && end) {
+      this.fromDate =
+        this.toLocalDateString(start);
+
+      this.toDate =
+        this.toLocalDateString(end);
+    }
+
+    if (
+      this.fromDate &&
+      this.toDate &&
+      this.fromDate > this.toDate
+    ) {
+      this.errorMessage =
+        'From date cannot be after to date';
+
+      return;
+    }
+
+    this.errorMessage =
+      '';
+
+    this.resetPagination();
+    this.loadInvoices();
+  }
+
+  applyDateFilter(): void {
+    this.searchBills();
+  }
+
   clearFilters(): void {
 
     this.orderIdSearch =
       '';
 
-    this.createdDate =
-      '';
+    this.fromDate =
+      this.getDefaultFromDate();
+
+    this.toDate =
+      this.getTodayDate();
+
+    this.range.setValue({
+      start:
+        this.parseLocalDate(
+          this.fromDate
+        ),
+      end:
+        this.parseLocalDate(
+          this.toDate
+        )
+    });
 
     this.deliveredDate =
       '';
@@ -513,11 +764,63 @@ export class BillPage
 
     this.sortBy =
       'Created Date Desc';
+
+    this.resetPagination();
+    this.loadInvoices();
   }
 
   refresh(): void {
-
+    this.resetPagination();
     this.loadInvoices();
+  }
+
+  onPageLimitChange(): void {
+    this.resetPagination();
+    this.loadInvoices();
+  }
+
+  nextPage(): void {
+
+    if (
+      this.loading ||
+      !this.hasMore ||
+      !this.nextCursor
+    ) {
+      return;
+    }
+
+    this.cursorHistory.push(
+      this.currentCursor
+    );
+
+    this.loadInvoices(
+      this.nextCursor
+    );
+  }
+
+  previousPage(): void {
+
+    if (
+      this.loading ||
+      this.cursorHistory.length === 0
+    ) {
+      return;
+    }
+
+    const previousCursor =
+      this.cursorHistory.pop() ?? null;
+
+    this.loadInvoices(
+      previousCursor
+    );
+  }
+
+  get canGoPrevious(): boolean {
+    return this.cursorHistory.length > 0;
+  }
+
+  get currentPage(): number {
+    return this.cursorHistory.length + 1;
   }
 
   receipt(
@@ -995,5 +1298,80 @@ export class BillPage
       ? status.split('_').join(' ')
       : '';
   }
+
+
+  private resetPagination(): void {
+    this.currentCursor = null;
+    this.nextCursor = null;
+    this.cursorHistory = [];
+    this.hasMore = false;
+  }
+
+  private getTodayDate(): string {
+    return this.toLocalDateString(
+      new Date()
+    );
+  }
+
+  private getDefaultFromDate(): string {
+
+    const date =
+      new Date();
+
+    date.setDate(
+      date.getDate() - 6
+    );
+
+    return this.toLocalDateString(
+      date
+    );
+  }
+
+  private toLocalDateString(
+    date: Date
+  ): string {
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private parseLocalDate(
+    value: string
+  ): Date {
+
+    const [
+      year,
+      month,
+      day
+    ] =
+      value
+        .split('-')
+        .map(Number);
+
+    return new Date(
+      year,
+      month - 1,
+      day
+    );
+  }
+
 
 }

@@ -535,13 +535,25 @@ getB2COrders(
   );
 }
 
-getBills():
-    Observable<BillListResponse> {
+getBills(
+  fromDate?: string,
+  toDate?: string,
+  cursor?: string | null,
+  limit = 10
+): Observable<BillListResponse> {
 
-    return this.http.get<BillListResponse>(
-      `${this.baseUrl}/bills`
-    );
-  }
+  const params = {
+    fromDate: fromDate ?? '',
+    toDate: toDate ?? '',
+    cursor: cursor ?? '',
+    limit
+  };
+
+  return this.http.get<BillListResponse>(
+    `${this.baseUrl}/bills`,
+    { params }
+  );
+}
 
 
 //   getBills():

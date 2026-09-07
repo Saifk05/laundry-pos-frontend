@@ -27,9 +27,7 @@ export interface Bill {
   grossTotal: number;
   createdAt: string;
   paidAt: string | null;
-
   deliveryDate: string | null;
-
   deliveredAt: string | null;
   orderStatus: BillOrderStatus;
 }
@@ -46,4 +44,6 @@ export interface BillListResponse {
   totalDiscountAmount: number;
   totalGrossAmount: number;
   bills: Bill[];
+  nextCursor: string | null;
+  hasMore: boolean;
 }

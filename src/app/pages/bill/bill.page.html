@@ -45,27 +45,41 @@
 
     </div>
 
-    <div class="filter-field">
+    <div class="filter-field date-filter-field">
 
       <label>
-        Created Date
+        Date Range
       </label>
 
-      <input
-        type="date"
-        [(ngModel)]="createdDate">
+      <mat-form-field
+        appearance="outline"
+        class="date-range-field">
 
-    </div>
+        <mat-date-range-input
+          [formGroup]="range"
+          [rangePicker]="picker">
 
-    <div class="filter-field">
+          <input
+            matStartDate
+            formControlName="start"
+            placeholder="Start date">
 
-      <label>
-        Delivery Date
-      </label>
+          <input
+            matEndDate
+            formControlName="end"
+            placeholder="End date">
 
-      <input
-        type="date"
-        [(ngModel)]="deliveredDate">
+        </mat-date-range-input>
+
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker">
+        </mat-datepicker-toggle>
+
+        <mat-date-range-picker #picker>
+        </mat-date-range-picker>
+
+      </mat-form-field>
 
     </div>
 
@@ -123,32 +137,29 @@
 
     </div>
 
-  </section>
-
-  <section class="invoice-actions">
-
     <button
       type="button"
       class="load-button"
       [disabled]="loading"
-      (click)="loadInvoices()">
+      (click)="searchBills()">
 
-      Load Invoices
+      Search
 
     </button>
 
     <button
       type="button"
       class="clear-button"
+      [disabled]="loading"
       (click)="clearFilters()">
 
-      Clear Filters
+      Clear
 
     </button>
 
   </section>
 
-  @if (errorMessage) {
+  <!-- @if (errorMessage) {
 
     <div class="bill-error">
 
@@ -166,7 +177,7 @@
 
     </div>
 
-  }
+  } -->
 
   @if (loading) {
 
@@ -536,7 +547,26 @@
 
               <td>
 
-                <span class="order-status">
+                <span
+                  class="order-status"
+                  [class.status-new]="
+                    invoice.orderStatus === 'NEW_ORDER'
+                  "
+                  [class.status-tagged]="
+                    invoice.orderStatus === 'TAGGED'
+                  "
+                  [class.status-processing]="
+                    invoice.orderStatus === 'PROCESSING_AT_STORE'
+                  "
+                  [class.status-ready]="
+                    invoice.orderStatus === 'READY_ORDER'
+                  "
+                  [class.status-delivered]="
+                    invoice.orderStatus === 'DELIVERED'
+                  "
+                  [class.status-cancelled]="
+                    invoice.orderStatus === 'CANCELLED'
+                  ">
 
                   {{
                     formatOrderStatus(
@@ -573,6 +603,67 @@
         </div>
 
       }
+
+    </section>
+
+    <section class="invoice-pagination">
+
+      <div class="page-size-control">
+
+        <label>
+          Rows
+        </label>
+
+        <select
+          [(ngModel)]="pageLimit"
+          [disabled]="loading"
+          (change)="onPageLimitChange()">
+
+          @for (
+            size of pageSizeOptions;
+            track size
+          ) {
+
+            <option
+              [ngValue]="size">
+
+              {{ size }}
+
+            </option>
+
+          }
+
+        </select>
+
+      </div>
+
+      <div class="pagination-controls">
+
+        <button
+          type="button"
+          class="pagination-button"
+          [disabled]="loading || !canGoPrevious"
+          (click)="previousPage()">
+
+          Previous
+
+        </button>
+
+        <span class="page-number">
+          Page {{ currentPage }}
+        </span>
+
+        <button
+          type="button"
+          class="pagination-button"
+          [disabled]="loading || !hasMore || !nextCursor"
+          (click)="nextPage()">
+
+          Next
+
+        </button>
+
+      </div>
 
     </section>
 
