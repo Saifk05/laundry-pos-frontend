@@ -200,16 +200,15 @@
             <th>Status</th>
             <th>Invoice No.</th>
             <th>Order No.</th>
-            <th>Paid Amt</th>
-            <th>Due Amt</th>
-            <th>Taxable Amt</th>
+            <th>Subtotal</th>
+            <th>Discount</th>
+            <th>Express</th>
             <th>CGST</th>
             <th>SGST</th>
-            <th>Total Tax</th>
+            <th>Tax</th>
             <th>Total</th>
-            <th>Express Amt</th>
-            <th>Discount Amt</th>
-            <th>Gross Total</th>
+            <th>Paid</th>
+            <th>Due</th>
             <th>Created At</th>
             <th>Paid At</th>
             <th>Delivery Date</th>
@@ -219,63 +218,29 @@
 
         <tbody>
           <tr class="summary-row">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-            <td>
-              <strong>Total</strong>
-            </td>
-
-            <td>₹{{ formatAmount(totalPaid) }}</td>
-            <td>₹{{ formatAmount(totalDue) }}</td>
-            <td>₹{{ formatAmount(totalTaxableAmount) }}</td>
+            <td></td><td></td><td></td><td></td>
+            <td><strong>Total</strong></td>
+            <td><strong>₹{{ formatAmount(grossTotal) }}</strong></td>
+            <td>₹{{ formatAmount(totalDiscount) }}</td>
+            <td>₹{{ formatAmount(totalExpress) }}</td>
             <td>₹{{ formatAmount(totalCgstAmount) }}</td>
             <td>₹{{ formatAmount(totalSgstAmount) }}</td>
             <td>₹{{ formatAmount(totalTaxAmount) }}</td>
-            <td>
-              <strong>₹{{ formatAmount(totalAmount) }}</strong>
-            </td>
-            <td>₹{{ formatAmount(totalExpress) }}</td>
-            <td>₹{{ formatAmount(totalDiscount) }}</td>
-            <td>
-              <strong>₹{{ formatAmount(grossTotal) }}</strong>
-            </td>
-
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td><strong>₹{{ formatAmount(totalAmount) }}</strong></td>
+            <td>₹{{ formatAmount(totalPaid) }}</td>
+            <td>₹{{ formatAmount(totalDue) }}</td>
+            <td></td><td></td><td></td><td></td>
           </tr>
 
-          @for (
-            invoice of filteredInvoices;
-            track invoice.orderId;
-            let index = $index
-          ) {
+          @for (invoice of filteredInvoices; track invoice.orderId; let index = $index) {
             <tr>
               <td>{{ index + 1 }}</td>
 
               <td>
                 <div class="row-actions">
-                  <button
-                    type="button"
-                    class="receipt-button"
-                    (click)="receipt(invoice)">
-                    Receipt
-                  </button>
-
-                  @if (
-                    invoice.status !== 'CANCELLED' &&
-                    invoice.dueAmount > 0
-                  ) {
-                    <button
-                      type="button"
-                      class="settle-button"
-                      (click)="settle(invoice)">
-                      Settle
-                    </button>
+                  <button type="button" class="receipt-button" (click)="receipt(invoice)">Receipt</button>
+                  @if (invoice.status !== 'CANCELLED' && invoice.dueAmount > 0) {
+                    <button type="button" class="settle-button" (click)="settle(invoice)">Settle</button>
                   }
                 </div>
               </td>
@@ -291,42 +256,17 @@
                 </span>
               </td>
 
-              <td>
-                <strong class="invoice-number">
-                  {{ invoice.invoiceNumber }}
-                </strong>
-              </td>
+              <td><strong class="invoice-number">{{ invoice.invoiceNumber }}</strong></td>
+              <td><strong class="order-number">{{ invoice.orderNumber }}</strong></td>
 
-              <td>
-                <strong class="order-number">
-                  {{ invoice.orderNumber }}
-                </strong>
-              </td>
-
-              <td>
-                <span class="paid-value">
-                  ₹{{ formatAmount(invoice.paidAmount) }}
-                </span>
-              </td>
-
-              <td>
-                <span
-                  [class.due-value]="invoice.dueAmount > 0"
-                  [class.no-due-value]="invoice.dueAmount === 0">
-                  ₹{{ formatAmount(invoice.dueAmount) }}
-                </span>
-              </td>
-
-              <td>
-                ₹{{ formatAmount(invoice.taxableAmount) }}
-              </td>
+              <td><strong>₹{{ formatAmount(invoice.grossTotal) }}</strong></td>
+              <td>₹{{ formatAmount(invoice.discountAmount) }}</td>
+              <td>₹{{ formatAmount(invoice.expressAmount) }}</td>
 
               <td>
                 @if (invoice.taxIncluded && invoice.cgstAmount > 0) {
-                  <span>
-                    ₹{{ formatAmount(invoice.cgstAmount) }}
-                    <small>({{ formatAmount(invoice.cgstPercentage) }}%)</small>
-                  </span>
+                  ₹{{ formatAmount(invoice.cgstAmount) }}
+                  <small>({{ formatAmount(invoice.cgstPercentage) }}%)</small>
                 } @else {
                   ₹0.00
                 }
@@ -334,10 +274,8 @@
 
               <td>
                 @if (invoice.taxIncluded && invoice.sgstAmount > 0) {
-                  <span>
-                    ₹{{ formatAmount(invoice.sgstAmount) }}
-                    <small>({{ formatAmount(invoice.sgstPercentage) }}%)</small>
-                  </span>
+                  ₹{{ formatAmount(invoice.sgstAmount) }}
+                  <small>({{ formatAmount(invoice.sgstPercentage) }}%)</small>
                 } @else {
                   ₹0.00
                 }
@@ -354,39 +292,22 @@
                 }
               </td>
 
-              <td>
-                <strong>
-                  ₹{{ formatAmount(invoice.total) }}
-                </strong>
-              </td>
+              <td><strong>₹{{ formatAmount(invoice.total) }}</strong></td>
+              <td><span class="paid-value">₹{{ formatAmount(invoice.paidAmount) }}</span></td>
 
               <td>
-                ₹{{ formatAmount(invoice.expressAmount) }}
+                <span
+                  [class.due-value]="invoice.dueAmount > 0"
+                  [class.no-due-value]="invoice.dueAmount === 0">
+                  ₹{{ formatAmount(invoice.dueAmount) }}
+                </span>
               </td>
 
-              <td>
-                ₹{{ formatAmount(invoice.discountAmount) }}
-              </td>
-
-              <td>
-                <strong>
-                  ₹{{ formatAmount(invoice.grossTotal) }}
-                </strong>
-              </td>
-
-              <td>
-                {{
-                  invoice.createdAt
-                    | date:'dd-MM-yyyy hh:mm a'
-                }}
-              </td>
+              <td>{{ invoice.createdAt | date:'dd-MM-yyyy hh:mm a' }}</td>
 
               <td>
                 @if (invoice.paidAt) {
-                  {{
-                    invoice.paidAt
-                      | date:'dd-MM-yyyy hh:mm a'
-                  }}
+                  {{ invoice.paidAt | date:'dd-MM-yyyy hh:mm a' }}
                 } @else {
                   -
                 }
@@ -394,10 +315,7 @@
 
               <td>
                 @if (invoice.deliveryDate) {
-                  {{
-                    invoice.deliveryDate
-                      | date:'dd-MM-yyyy'
-                  }}
+                  {{ invoice.deliveryDate | date:'dd-MM-yyyy' }}
                 } @else {
                   -
                 }
@@ -420,9 +338,7 @@
         </tbody>
       </table>
 
-      @if (
-        filteredInvoices.length === 0
-      ) {
+      @if (filteredInvoices.length === 0) {
         <div class="empty-invoices">
           <h3>No invoices found</h3>
           <p>Try changing the invoice filters.</p>
