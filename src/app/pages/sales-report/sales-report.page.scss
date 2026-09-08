@@ -608,3 +608,303 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================
+   FILTER BAR
+========================================= */
+
+.filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+
+  padding: 14px;
+
+  background: #ffffff;
+
+  border: 1px solid #e3e9e6;
+  border-radius: 12px;
+}
+
+
+/* =========================================
+   DATE RANGE
+========================================= */
+
+.compact-date-filter {
+  width: 280px;
+  min-width: 280px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.compact-date-filter > label {
+  padding-left: 2px;
+
+  color: #25332c;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/* Material field */
+
+.compact-date-range {
+  width: 100%;
+}
+
+
+/* Remove Material bottom space */
+
+.compact-date-range ::ng-deep
+.mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+
+/* Main date box */
+
+.compact-date-range ::ng-deep
+.mat-mdc-text-field-wrapper {
+  height: 42px;
+
+  padding: 0 6px 0 10px;
+
+  background: #f8faf9;
+
+  border-radius: 7px;
+}
+
+
+/* Vertical alignment */
+
+.compact-date-range ::ng-deep
+.mat-mdc-form-field-flex {
+  height: 42px;
+
+  align-items: center;
+}
+
+
+/* Remove large Material padding */
+
+.compact-date-range ::ng-deep
+.mat-mdc-form-field-infix {
+  min-height: 42px;
+
+  padding-top: 10px;
+  padding-bottom: 8px;
+}
+
+
+/* Date text */
+
+.compact-date-range ::ng-deep
+.mat-date-range-input-container {
+  display: flex;
+  align-items: center;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  color: #25332c;
+}
+
+
+/* Date inputs */
+
+.compact-date-range ::ng-deep
+.mat-date-range-input-start-wrapper,
+.compact-date-range ::ng-deep
+.mat-date-range-input-end-wrapper {
+  flex: 1;
+}
+
+
+/* Separator */
+
+.compact-date-range ::ng-deep
+.mat-date-range-input-separator {
+  margin: 0 7px;
+
+  color: #77827c;
+}
+
+
+/* Calendar button */
+
+.compact-date-range ::ng-deep
+.mat-mdc-icon-button {
+  width: 32px;
+  height: 32px;
+
+  padding: 4px;
+}
+
+
+/* Calendar icon */
+
+.compact-date-range ::ng-deep
+.mat-datepicker-toggle-default-icon {
+  width: 18px;
+  height: 18px;
+
+  color: #617069;
+}
+
+
+/* Normal outline */
+
+.compact-date-range ::ng-deep
+.mdc-notched-outline__leading,
+.compact-date-range ::ng-deep
+.mdc-notched-outline__notch,
+.compact-date-range ::ng-deep
+.mdc-notched-outline__trailing {
+  border-color: #dce4e0 !important;
+  border-width: 1px !important;
+}
+
+
+/* Focus outline */
+
+.compact-date-range.mat-focused ::ng-deep
+.mdc-notched-outline__leading,
+.compact-date-range.mat-focused ::ng-deep
+.mdc-notched-outline__notch,
+.compact-date-range.mat-focused ::ng-deep
+.mdc-notched-outline__trailing {
+  border-color: #16a34a !important;
+}
+
+
+/* =========================================
+   QUICK ACTIONS
+========================================= */
+
+.quick-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.quick-actions button {
+  height: 42px;
+
+  padding: 0 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce4e0;
+  border-radius: 8px;
+
+  color: #46534d;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.15s ease;
+}
+
+
+.quick-actions button:hover {
+  border-color: #22c55e;
+
+  background: #f5fbf7;
+
+  color: #15803d;
+}
+
+
+.quick-actions button.active {
+  border-color: #22c55e;
+
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+
+/* =========================================
+   REFRESH
+========================================= */
+
+.refresh-button {
+  height: 42px;
+
+  margin-left: auto;
+
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #16a34a;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.refresh-button:hover:not(:disabled) {
+  background: #15803d;
+}
+
+
+.refresh-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+
+  .refresh-button {
+    margin-left: 0;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .compact-date-filter {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .quick-actions {
+    width: 100%;
+
+    flex-wrap: wrap;
+  }
+
+  .quick-actions button {
+    flex: 1;
+  }
+
+}

@@ -12,20 +12,29 @@
   width: 100%;
   min-height: 100%;
   padding: 22px;
+
   background: var(--app-background-soft);
   color: var(--app-text-primary);
 }
+
+
+/* =========================================
+   PAGE HEADING
+========================================= */
 
 .page-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   margin-bottom: 18px;
 }
 
 .page-heading h1 {
   margin: 0;
+
   color: var(--app-text-primary);
+
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -33,19 +42,25 @@
 
 .page-heading p {
   margin: 5px 0 0;
+
   color: var(--app-text-secondary);
+
   font-size: 13px;
   font-weight: 500;
 }
 
+
+/* =========================================
+   FILTER BAR
+========================================= */
+
 .filter-bar {
   width: 100%;
-  min-height: 74px;
   margin-bottom: 18px;
   padding: 12px 14px;
 
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 12px;
 
   border: 1px solid var(--app-border);
@@ -54,110 +69,174 @@
   background: var(--app-surface);
 }
 
-.date-range {
+
+/* =========================================
+   DATE RANGE GROUP
+========================================= */
+
+.date-range-group {
   display: flex;
-  align-items: center;
-  min-width: 300px;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.material-date-range {
-  width: 310px;
+.date-range-group > label {
+  margin-left: 2px;
+
+  color: var(--app-text-primary);
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.date-and-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* =========================================
+   COMPACT DATE RANGE
+========================================= */
+
+.compact-date-range {
+  width: 315px;
+  min-width: 315px;
   margin: 0;
 }
 
-:host ::ng-deep .material-date-range .mat-mdc-form-field-subscript-wrapper {
+:host ::ng-deep
+.compact-date-range
+.mat-mdc-form-field-subscript-wrapper {
   display: none;
 }
 
-:host ::ng-deep .material-date-range .mat-mdc-text-field-wrapper {
-  height: 46px;
-  padding: 0 12px;
-  border-radius: 9px;
-  background: var(--app-surface);
+:host ::ng-deep
+.compact-date-range
+.mat-mdc-text-field-wrapper {
+  height: 40px;
+
+  padding: 0 6px 0 10px;
+
+  border-radius: 7px;
+
+  background: var(--app-surface-soft);
 }
 
-:host ::ng-deep .material-date-range .mat-mdc-form-field-flex {
-  height: 46px;
+:host ::ng-deep
+.compact-date-range
+.mat-mdc-form-field-flex {
+  height: 40px;
   align-items: center;
 }
 
-:host ::ng-deep .material-date-range .mat-mdc-form-field-infix {
-  min-height: 46px;
-  padding-top: 11px;
+:host ::ng-deep
+.compact-date-range
+.mat-mdc-form-field-infix {
+  min-height: 40px;
+
+  padding-top: 9px;
   padding-bottom: 7px;
 }
 
-:host ::ng-deep .material-date-range input {
+:host ::ng-deep
+.compact-date-range
+.mat-date-range-input-container {
+  font-size: 11px;
+  font-weight: 600;
+
   color: var(--app-text-primary);
-  font-size: 12px;
+}
+
+:host ::ng-deep
+.compact-date-range input {
+  color: var(--app-text-primary);
+
+  font-size: 11px;
   font-weight: 600;
 }
 
-:host ::ng-deep .material-date-range input::placeholder {
+:host ::ng-deep
+.compact-date-range input::placeholder {
   color: var(--app-text-muted);
   opacity: 1;
 }
 
-:host ::ng-deep .material-date-range .mat-mdc-floating-label {
-  color: var(--app-text-secondary);
-  font-size: 12px;
-  font-weight: 600;
+:host ::ng-deep
+.compact-date-range
+.mat-date-range-input-separator {
+  margin: 0 7px;
+
+  color: var(--app-text-muted);
 }
 
-:host
-  ::ng-deep
-  .material-date-range
-  .mdc-notched-outline__leading,
-:host
-  ::ng-deep
-  .material-date-range
-  .mdc-notched-outline__notch,
-:host
-  ::ng-deep
-  .material-date-range
-  .mdc-notched-outline__trailing {
-  border-color: var(--app-border) !important;
+
+/* Calendar button */
+
+:host ::ng-deep
+.compact-date-range
+.mat-mdc-icon-button {
+  width: 30px;
+  height: 30px;
+
+  padding: 3px;
 }
 
-:host
-  ::ng-deep
-  .material-date-range:hover
-  .mdc-notched-outline__leading,
-:host
-  ::ng-deep
-  .material-date-range:hover
-  .mdc-notched-outline__notch,
-:host
-  ::ng-deep
-  .material-date-range:hover
-  .mdc-notched-outline__trailing {
-  border-color: #9bc4aa !important;
-}
+:host ::ng-deep
+.compact-date-range
+.mat-datepicker-toggle-default-icon {
+  width: 17px;
+  height: 17px;
 
-:host
-  ::ng-deep
-  .material-date-range.mat-focused
-  .mdc-notched-outline__leading,
-:host
-  ::ng-deep
-  .material-date-range.mat-focused
-  .mdc-notched-outline__notch,
-:host
-  ::ng-deep
-  .material-date-range.mat-focused
-  .mdc-notched-outline__trailing {
-  border-color: var(--app-primary) !important;
-  border-width: 1.5px !important;
-}
-
-:host ::ng-deep .material-date-range .mat-datepicker-toggle {
   color: var(--app-primary-dark);
 }
 
-:host ::ng-deep .material-date-range .mat-datepicker-toggle button {
-  width: 34px;
-  height: 34px;
+
+/* Date outline */
+
+:host ::ng-deep
+.compact-date-range
+.mdc-notched-outline__leading,
+:host ::ng-deep
+.compact-date-range
+.mdc-notched-outline__notch,
+:host ::ng-deep
+.compact-date-range
+.mdc-notched-outline__trailing {
+  border-color: var(--app-border) !important;
+  border-width: 1px !important;
 }
+
+:host ::ng-deep
+.compact-date-range:hover
+.mdc-notched-outline__leading,
+:host ::ng-deep
+.compact-date-range:hover
+.mdc-notched-outline__notch,
+:host ::ng-deep
+.compact-date-range:hover
+.mdc-notched-outline__trailing {
+  border-color: #9bc4aa !important;
+}
+
+:host ::ng-deep
+.compact-date-range.mat-focused
+.mdc-notched-outline__leading,
+:host ::ng-deep
+.compact-date-range.mat-focused
+.mdc-notched-outline__notch,
+:host ::ng-deep
+.compact-date-range.mat-focused
+.mdc-notched-outline__trailing {
+  border-color: var(--app-primary) !important;
+}
+
+
+/* =========================================
+   QUICK DATE ACTIONS
+========================================= */
 
 .quick-date-actions {
   display: flex;
@@ -165,82 +244,109 @@
   gap: 8px;
 }
 
-.quick-date-button,
-.refresh-button {
-  height: 42px;
+.quick-date-button {
+  height: 40px;
+  min-width: 86px;
+
   padding: 0 16px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
+  border: 1px solid var(--app-border);
   border-radius: 8px;
+
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
 
   font-family: inherit;
   font-size: 11px;
   font-weight: 700;
 
-  cursor: pointer;
   white-space: nowrap;
 
+  cursor: pointer;
+
   transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.quick-date-button {
-  min-width: 92px;
-
-  border: 1px solid var(--app-border);
-
-  background: var(--app-surface);
-  color: var(--app-text-secondary);
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .quick-date-button:hover:not(:disabled) {
   border-color: var(--app-primary);
+
   background: var(--app-primary-light);
   color: var(--app-primary-dark);
-  transform: translateY(-1px);
 }
 
-.quick-date-button:active:not(:disabled) {
-  transform: translateY(0);
+.quick-date-button.active {
+  border-color: var(--app-primary);
+
+  background: var(--app-primary-light);
+  color: var(--app-primary-dark);
 }
+
+.quick-date-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   REFRESH BUTTON
+========================================= */
 
 .refresh-button {
+  height: 40px;
   min-width: 96px;
+
   margin-left: auto;
+  padding: 0 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   border: 1px solid var(--app-primary);
+  border-radius: 8px;
 
   background: var(--app-primary);
   color: #ffffff;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .refresh-button:hover:not(:disabled) {
   border-color: var(--app-primary-dark);
+
   background: var(--app-primary-dark);
 
   box-shadow:
     0 4px 10px rgba(22, 163, 74, 0.14);
-
-  transform: translateY(-1px);
 }
 
-.refresh-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.quick-date-button:disabled,
 .refresh-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
 }
+
+
+/* =========================================
+   ERROR
+========================================= */
 
 .payment-error {
   width: 100%;
@@ -264,6 +370,7 @@
 
 .payment-error button {
   padding: 0;
+
   border: 0;
 
   background: transparent;
@@ -274,12 +381,18 @@
   cursor: pointer;
 }
 
+
+/* =========================================
+   SUMMARY
+========================================= */
+
 .payment-summary {
   width: 100%;
   margin-bottom: 18px;
 
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -317,12 +430,14 @@
 
 .summary-item span {
   color: var(--app-text-secondary);
+
   font-size: 11px;
   font-weight: 600;
 }
 
 .summary-item strong {
   color: var(--app-text-primary);
+
   font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -335,6 +450,11 @@
 .cash-summary {
   border-left: 4px solid var(--app-success);
 }
+
+
+/* =========================================
+   LOADING
+========================================= */
 
 .payments-loading {
   width: 100%;
@@ -354,6 +474,11 @@
   font-weight: 600;
 }
 
+
+/* =========================================
+   PAYMENTS TABLE
+========================================= */
+
 .payments-table {
   width: 100%;
 
@@ -366,7 +491,9 @@
   overflow-y: hidden;
 
   scrollbar-width: auto;
-  scrollbar-color: var(--app-text-muted) var(--app-background-soft);
+  scrollbar-color:
+    var(--app-text-muted)
+    var(--app-background-soft);
 }
 
 .payments-table::-webkit-scrollbar {
@@ -386,6 +513,11 @@
 .payments-table::-webkit-scrollbar-thumb:hover {
   background: var(--app-text-secondary);
 }
+
+
+/* =========================================
+   TABLE HEADER + ROW
+========================================= */
 
 .table-header,
 .payment-row {
@@ -445,6 +577,11 @@
   padding: 0 12px;
 }
 
+
+/* =========================================
+   ROW VALUES
+========================================= */
+
 .expand-icon {
   display: flex;
   align-items: center;
@@ -472,6 +609,7 @@
 
 .total-value {
   color: var(--app-primary-dark);
+
   font-weight: 800;
 }
 
@@ -494,6 +632,11 @@
   font-weight: 800;
 }
 
+
+/* =========================================
+   PAYMENT DETAILS
+========================================= */
+
 .payment-details {
   width: 100%;
   padding: 14px;
@@ -507,6 +650,11 @@
   background: var(--app-surface-soft);
 }
 
+
+/* =========================================
+   PAYMENT METHOD SECTION
+========================================= */
+
 .payment-method-section {
   width: 100%;
 
@@ -519,7 +667,9 @@
   overflow-y: hidden;
 
   scrollbar-width: auto;
-  scrollbar-color: var(--app-text-muted) var(--app-background-soft);
+  scrollbar-color:
+    var(--app-text-muted)
+    var(--app-background-soft);
 }
 
 .payment-method-section::-webkit-scrollbar {
@@ -540,6 +690,11 @@
   background: var(--app-text-secondary);
 }
 
+
+/* =========================================
+   METHOD HEADER
+========================================= */
+
 .method-header {
   min-width: 720px;
   min-height: 46px;
@@ -557,6 +712,7 @@
 
 .method-header strong {
   color: var(--app-text-primary);
+
   font-size: 12px;
   font-weight: 800;
 }
@@ -576,6 +732,11 @@
 .other-header {
   border-left: 4px solid var(--app-text-muted);
 }
+
+
+/* =========================================
+   ORDER PAYMENT LIST
+========================================= */
 
 .order-payment-list {
   width: 100%;
@@ -611,6 +772,11 @@
   background: var(--app-background-soft);
 }
 
+
+/* =========================================
+   ORDER INFO
+========================================= */
+
 .order-payment-main {
   min-width: 0;
 
@@ -621,6 +787,7 @@
 
 .order-number {
   color: var(--app-primary-dark);
+
   font-size: 11px;
   font-weight: 800;
 }
@@ -637,6 +804,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+
+/* =========================================
+   MOBILE
+========================================= */
 
 .order-payment-mobile {
   min-width: 0;
@@ -662,6 +834,11 @@
   text-decoration: underline;
 }
 
+
+/* =========================================
+   TIME + AMOUNT
+========================================= */
+
 .order-payment-time {
   color: var(--app-text-secondary);
 
@@ -681,6 +858,11 @@
 
   white-space: nowrap;
 }
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
 
 .payments-empty {
   min-height: 220px;
@@ -711,7 +893,13 @@
   font-size: 10px;
 }
 
+
+/* =========================================
+   RESPONSIVE - TABLET
+========================================= */
+
 @media (max-width: 1200px) {
+
   .filter-bar {
     flex-wrap: wrap;
   }
@@ -724,9 +912,16 @@
     grid-template-columns:
       repeat(3, minmax(0, 1fr));
   }
+
 }
 
-@media (max-width: 900px) {
+
+/* =========================================
+   RESPONSIVE - SMALL TABLET
+========================================= */
+
+@media (max-width: 950px) {
+
   .payments-page {
     padding: 16px;
   }
@@ -735,29 +930,45 @@
     align-items: stretch;
   }
 
-  .date-range {
+  .date-range-group {
     width: 100%;
   }
 
-  .material-date-range {
+  .date-and-actions {
     width: 100%;
+
+    flex-wrap: wrap;
+  }
+
+  .compact-date-range {
+    width: 315px;
+    min-width: 315px;
   }
 
   .quick-date-actions {
     flex: 1;
+
+    flex-wrap: wrap;
   }
 
-  .quick-date-button {
-    flex: 1;
+  .refresh-button {
+    margin-left: 0;
   }
 
   .payment-summary {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
   }
+
 }
 
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
 @media (max-width: 650px) {
+
   .payments-page {
     padding: 12px;
   }
@@ -776,10 +987,24 @@
 
   .filter-bar {
     padding: 12px;
+
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .date-range {
+  .date-range-group {
+    width: 100%;
+  }
+
+  .date-and-actions {
+    width: 100%;
+
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compact-date-range {
+    width: 100%;
     min-width: 0;
   }
 
@@ -793,10 +1018,12 @@
 
   .quick-date-button {
     width: 100%;
+    min-width: 0;
   }
 
   .refresh-button {
     width: 100%;
+
     margin-left: 0;
   }
 
@@ -807,9 +1034,16 @@
   .summary-item {
     min-height: 82px;
   }
+
 }
 
+
+/* =========================================
+   RESPONSIVE - SMALL MOBILE
+========================================= */
+
 @media (max-width: 420px) {
+
   .quick-date-actions {
     grid-template-columns: 1fr;
   }
@@ -817,4 +1051,5 @@
   .page-heading h1 {
     font-size: 22px;
   }
+
 }

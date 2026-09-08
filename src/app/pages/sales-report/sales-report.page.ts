@@ -8,8 +8,30 @@ import {
 } from '@angular/common';
 
 import {
-  FormsModule
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule
 } from '@angular/forms';
+
+import {
+  MatFormFieldModule
+} from '@angular/material/form-field';
+
+import {
+  MatDatepickerModule
+} from '@angular/material/datepicker';
+
+import {
+  MatInputModule
+} from '@angular/material/input';
+
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  NativeDateAdapter
+} from '@angular/material/core';
 
 import {
   ApiService
@@ -24,26 +46,238 @@ import {
 } from '../../../core/models/sales-report.model';
 
 
+const SALES_DATE_FORMATS = {
+
+  parse: {
+    dateInput: 'DD/MM/YYYY'
+  },
+
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY'
+  }
+
+};
+
+
+class SalesDateAdapter
+  extends NativeDateAdapter {
+
+  override parse(
+    value: any
+  ): Date | null {
+
+    if (
+      value == null ||
+      value === ''
+    ) {
+
+      return null;
+    }
+
+
+    if (
+      value instanceof Date
+    ) {
+
+      return this.isValid(value)
+        ? value
+        : null;
+    }
+
+
+    const text =
+      String(value).trim();
+
+
+    const match =
+      text.match(
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+      );
+
+
+    if (!match) {
+
+      return null;
+    }
+
+
+    const day =
+      Number(match[1]);
+
+    const month =
+      Number(match[2]) - 1;
+
+    const year =
+      Number(match[3]);
+
+
+    const date =
+      new Date(
+        year,
+        month,
+        day
+      );
+
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month ||
+      date.getDate() !== day
+    ) {
+
+      return null;
+    }
+
+
+    return date;
+  }
+
+
+  override format(
+    date: Date,
+    displayFormat: any
+  ): string {
+
+    if (
+      !this.isValid(date)
+    ) {
+
+      throw Error(
+        'SalesDateAdapter: Cannot format invalid date.'
+      );
+    }
+
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    const year =
+      date.getFullYear();
+
+
+    return `${day}/${month}/${year}`;
+  }
+
+}
+
+
+type DatePreset =
+  | 'TODAY'
+  | 'YESTERDAY'
+  | 'THIS_WEEK'
+  | 'THIS_MONTH'
+  | 'CUSTOM';
+
+
 @Component({
-  selector: 'app-sales-report',
-  templateUrl: './sales-report.page.html',
-  styleUrls: ['./sales-report.page.scss'],
-  standalone: true,
+
+  selector:
+    'app-sales-report',
+
+  templateUrl:
+    './sales-report.page.html',
+
+  styleUrls: [
+    './sales-report.page.scss'
+  ],
+
+  standalone:
+    true,
+
   imports: [
+
     CommonModule,
-    FormsModule
+
+    ReactiveFormsModule,
+
+    MatFormFieldModule,
+
+    MatDatepickerModule,
+
+    MatInputModule,
+
+    MatNativeDateModule
+
+  ],
+
+  providers: [
+
+    {
+      provide:
+        DateAdapter,
+
+      useClass:
+        SalesDateAdapter
+    },
+
+    {
+      provide:
+        MAT_DATE_FORMATS,
+
+      useValue:
+        SALES_DATE_FORMATS
+    },
+
+    {
+      provide:
+        MAT_DATE_LOCALE,
+
+      useValue:
+        'en-GB'
+    }
+
   ]
+
 })
 export class SalesReportPage
   implements OnInit {
 
-  startDate = '';
 
-  endDate = '';
+  range =
+    new FormGroup({
 
-  loading = false;
+      start:
+        new FormControl<Date | null>(
+          null
+        ),
 
-  errorMessage = '';
+      end:
+        new FormControl<Date | null>(
+          null
+        )
+
+    });
+
+
+  activePreset:
+    DatePreset =
+      'TODAY';
+
+
+  loading =
+    false;
+
+
+  errorMessage =
+    '';
 
 
   summary:
@@ -63,6 +297,7 @@ export class SalesReportPage
 
       totalExpressOrders:
         0
+
     };
 
 
@@ -95,28 +330,47 @@ export class SalesReportPage
 
   loadSalesReport(): void {
 
+    const start =
+      this.range.controls.start.value;
+
+    const end =
+      this.range.controls.end.value;
+
+
     if (
-      !this.startDate ||
-      !this.endDate
+      !start ||
+      !end
     ) {
 
       this.errorMessage =
-        'Start date and end date are required';
+        'Please select a complete date range.';
 
       return;
     }
 
 
     if (
-      this.startDate >
-      this.endDate
+      start.getTime() >
+      end.getTime()
     ) {
 
       this.errorMessage =
-        'Start date cannot be after end date';
+        'From date cannot be after To date.';
 
       return;
     }
+
+
+    const startDate =
+      this.formatDateForApi(
+        start
+      );
+
+
+    const endDate =
+      this.formatDateForApi(
+        end
+      );
 
 
     this.loading =
@@ -128,8 +382,8 @@ export class SalesReportPage
 
     this.apiService
       .getSalesReport(
-        this.startDate,
-        this.endDate
+        startDate,
+        endDate
       )
       .subscribe({
 
@@ -139,20 +393,29 @@ export class SalesReportPage
         ) => {
 
           this.summary =
-            response.summary;
+            response?.summary ??
+            this.emptySummary();
+
 
           this.productSales =
-            response.productSales ?? [];
+            response?.productSales ??
+            [];
+
 
           this.serviceSales =
-            response.serviceSales ?? [];
+            response?.serviceSales ??
+            [];
+
 
           this.orders =
-            response.orders ?? [];
+            response?.orders ??
+            [];
+
 
           this.loading =
             false;
         },
+
 
         error: (
           error:
@@ -164,103 +427,134 @@ export class SalesReportPage
             error
           );
 
+
           this.errorMessage =
             error?.error?.message ||
             error?.error?.error ||
-            'Unable to load sales report';
+            'Unable to load sales report.';
+
 
           this.resetReport();
+
 
           this.loading =
             false;
         }
 
       });
+
+  }
+
+
+  onDateRangeChange(): void {
+
+    const start =
+      this.range.controls.start.value;
+
+    const end =
+      this.range.controls.end.value;
+
+
+    if (
+      start &&
+      end
+    ) {
+
+      this.activePreset =
+        'CUSTOM';
+
+
+      this.loadSalesReport();
+    }
+
   }
 
 
   setToday(): void {
 
     const today =
-      this.formatLocalDate(
+      this.stripTime(
         new Date()
       );
 
-    this.startDate =
-      today;
 
-    this.endDate =
-      today;
+    this.setRange(
+      today,
+      today,
+      'TODAY'
+    );
 
-    this.loadSalesReport();
   }
 
 
   setYesterday(): void {
 
     const yesterday =
-      new Date();
+      this.stripTime(
+        new Date()
+      );
+
 
     yesterday.setDate(
       yesterday.getDate() - 1
     );
 
-    const date =
-      this.formatLocalDate(
-        yesterday
-      );
 
-    this.startDate =
-      date;
+    this.setRange(
+      yesterday,
+      yesterday,
+      'YESTERDAY'
+    );
 
-    this.endDate =
-      date;
-
-    this.loadSalesReport();
   }
 
 
   setThisWeek(): void {
 
     const today =
-      new Date();
+      this.stripTime(
+        new Date()
+      );
+
 
     const day =
       today.getDay();
+
 
     const difference =
       day === 0
         ? -6
         : 1 - day;
 
+
     const monday =
       new Date(
         today
       );
+
 
     monday.setDate(
       today.getDate() +
       difference
     );
 
-    this.startDate =
-      this.formatLocalDate(
-        monday
-      );
 
-    this.endDate =
-      this.formatLocalDate(
-        today
-      );
+    this.setRange(
+      monday,
+      today,
+      'THIS_WEEK'
+    );
 
-    this.loadSalesReport();
   }
 
 
   setThisMonth(): void {
 
     const today =
-      new Date();
+      this.stripTime(
+        new Date()
+      );
+
 
     const firstDay =
       new Date(
@@ -269,17 +563,13 @@ export class SalesReportPage
         1
       );
 
-    this.startDate =
-      this.formatLocalDate(
-        firstDay
-      );
 
-    this.endDate =
-      this.formatLocalDate(
-        today
-      );
+    this.setRange(
+      firstDay,
+      today,
+      'THIS_MONTH'
+    );
 
-    this.loadSalesReport();
   }
 
 
@@ -289,21 +579,11 @@ export class SalesReportPage
   }
 
 
-  onDateChange(): void {
-
-    if (
-      this.startDate &&
-      this.endDate
-    ) {
-
-      this.loadSalesReport();
-    }
-  }
-
-
   formatAmount(
     amount:
-      number | null | undefined
+      number |
+      null |
+      undefined
   ): string {
 
     return Number(
@@ -311,6 +591,7 @@ export class SalesReportPage
     ).toFixed(
       2
     );
+
   }
 
 
@@ -324,29 +605,139 @@ export class SalesReportPage
     ) {
 
       case 'TAGGED':
+
         return 'Tagged';
 
+
       case 'PROCESSING_AT_STORE':
+
         return 'Processing At Store';
 
+
       case 'READY_ORDER':
+
         return 'Ready Order';
 
+
       case 'DELIVERED':
+
         return 'Delivered';
 
+
       case 'CANCELLED':
+
         return 'Cancelled';
 
+
       default:
+
         return status;
+
     }
+
+  }
+
+
+  private setRange(
+    start: Date,
+    end: Date,
+    preset: DatePreset
+  ): void {
+
+    this.activePreset =
+      preset;
+
+
+    this.range.setValue(
+      {
+
+        start:
+          new Date(start),
+
+        end:
+          new Date(end)
+
+      },
+      {
+        emitEvent:
+          false
+      }
+    );
+
+
+    this.loadSalesReport();
+
+  }
+
+
+  private stripTime(
+    date: Date
+  ): Date {
+
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+  }
+
+
+  private formatDateForApi(
+    date: Date
+  ): string {
+
+    const year =
+      date.getFullYear();
+
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    return `${year}-${month}-${day}`;
+
   }
 
 
   private resetReport(): void {
 
-    this.summary = {
+    this.summary =
+      this.emptySummary();
+
+
+    this.productSales =
+      [];
+
+
+    this.serviceSales =
+      [];
+
+
+    this.orders =
+      [];
+
+  }
+
+
+  private emptySummary():
+    SalesReportSummary {
+
+    return {
 
       totalSales:
         0,
@@ -362,44 +753,9 @@ export class SalesReportPage
 
       totalExpressOrders:
         0
+
     };
 
-    this.productSales =
-      [];
-
-    this.serviceSales =
-      [];
-
-    this.orders =
-      [];
-  }
-
-
-  private formatLocalDate(
-    date:
-      Date
-  ): string {
-
-    const year =
-      date.getFullYear();
-
-    const month =
-      String(
-        date.getMonth() + 1
-      ).padStart(
-        2,
-        '0'
-      );
-
-    const day =
-      String(
-        date.getDate()
-      ).padStart(
-        2,
-        '0'
-      );
-
-    return `${year}-${month}-${day}`;
   }
 
 }

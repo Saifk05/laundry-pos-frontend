@@ -27,70 +27,120 @@
 
   <section class="filter-bar">
 
-<div class="date-range">
+    <div class="date-range-group">
 
-  <mat-form-field
-    appearance="outline"
-    class="material-date-range">
+      <label>
+        Date Range
+      </label>
 
-    <mat-label>
-      Select date range
-    </mat-label>
-
-    <mat-date-range-input
-      [rangePicker]="picker">
-
-      <input
-        matStartDate
-        [(ngModel)]="rangeStart"
-        placeholder="Start date">
-
-      <input
-        matEndDate
-        [(ngModel)]="rangeEnd"
-        placeholder="End date"
-        (dateChange)="onDateRangeChange()">
-
-    </mat-date-range-input>
-
-    <mat-datepicker-toggle
-      matIconSuffix
-      [for]="picker">
-    </mat-datepicker-toggle>
-
-    <mat-date-range-picker
-      #picker>
-    </mat-date-range-picker>
-
-  </mat-form-field>
-
-</div>
+      <div class="date-and-actions">
 
 
-    <div class="quick-date-actions">
+        <!-- DATE RANGE -->
 
-      <button
-        type="button"
-        class="quick-date-button"
-        [disabled]="loading"
-        (click)="setToday()">
+        <mat-form-field
+          appearance="outline"
+          class="compact-date-range">
 
-        Today
+          <mat-date-range-input
+            [rangePicker]="picker">
 
-      </button>
+            <input
+              matStartDate
+              [(ngModel)]="rangeStart"
+              [max]="maxDate"
+              placeholder="From date">
 
-      <button
-        type="button"
-        class="quick-date-button"
-        [disabled]="loading"
-        (click)="setYesterday()">
+            <input
+              matEndDate
+              [(ngModel)]="rangeEnd"
+              [max]="maxDate"
+              placeholder="To date"
+              (dateChange)="onDateRangeChange()">
 
-        Yesterday
+          </mat-date-range-input>
 
-      </button>
+
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker">
+          </mat-datepicker-toggle>
+
+
+          <mat-date-range-picker
+            #picker>
+          </mat-date-range-picker>
+
+        </mat-form-field>
+
+
+        <!-- QUICK DATE ACTIONS -->
+
+        <div class="quick-date-actions">
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'TODAY'
+            "
+            [disabled]="loading"
+            (click)="setToday()">
+
+            Today
+
+          </button>
+
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'YESTERDAY'
+            "
+            [disabled]="loading"
+            (click)="setYesterday()">
+
+            Yesterday
+
+          </button>
+
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'THIS_WEEK'
+            "
+            [disabled]="loading"
+            (click)="setThisWeek()">
+
+            This Week
+
+          </button>
+
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'THIS_MONTH'
+            "
+            [disabled]="loading"
+            (click)="setThisMonth()">
+
+            This Month
+
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
+
+    <!-- REFRESH -->
 
     <button
       type="button"
@@ -111,31 +161,6 @@
     </button>
 
   </section>
-
-
-  <!-- =========================================
-       ERROR
-  ========================================== -->
-
-  @if (errorMessage) {
-
-    <div class="payment-error">
-
-      <span>
-        {{ errorMessage }}
-      </span>
-
-      <button
-        type="button"
-        (click)="errorMessage = ''">
-
-        ×
-
-      </button>
-
-    </div>
-
-  }
 
 
   <!-- =========================================
@@ -297,9 +322,13 @@
           <div class="expand-icon">
 
             @if (payment.expanded) {
+
               ▲
+
             } @else {
+
               ▼
+
             }
 
           </div>
@@ -309,7 +338,7 @@
 
           <div class="payment-date">
 
-            {{ payment.date | date:'dd-MM-yyyy' }}
+            {{ payment.date | date:'dd/MM/yyyy' }}
 
           </div>
 
@@ -462,7 +491,7 @@
                         {{
                           order.paidAt
                             | date:
-                              'dd-MM-yyyy hh:mm a'
+                              'dd/MM/yyyy hh:mm a'
                         }}
 
                       </div>
@@ -560,7 +589,7 @@
                         {{
                           order.paidAt
                             | date:
-                              'dd-MM-yyyy hh:mm a'
+                              'dd/MM/yyyy hh:mm a'
                         }}
 
                       </div>
@@ -658,7 +687,7 @@
                         {{
                           order.paidAt
                             | date:
-                              'dd-MM-yyyy hh:mm a'
+                              'dd/MM/yyyy hh:mm a'
                         }}
 
                       </div>
@@ -756,7 +785,7 @@
                         {{
                           order.paidAt
                             | date:
-                              'dd-MM-yyyy hh:mm a'
+                              'dd/MM/yyyy hh:mm a'
                         }}
 
                       </div>
