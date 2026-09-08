@@ -908,3 +908,105 @@
   }
 
 }
+
+/* =========================================
+   EMPTY STATES
+========================================= */
+
+.empty-table-state,
+.empty-orders {
+  width: 100%;
+  min-height: 96px;
+
+  padding: 18px 16px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  text-align: center;
+
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+}
+
+.empty-table-state strong,
+.empty-orders strong {
+  display: block;
+
+  color: var(--app-text-primary);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.empty-table-state span,
+.empty-orders span {
+  display: block;
+
+  color: var(--app-text-secondary);
+
+  font-size: 10px;
+  font-weight: 500;
+
+  line-height: 1.5;
+}
+
+
+/* Slightly more space for sales orders */
+
+.empty-orders {
+  min-height: 110px;
+
+  border-top: 1px solid var(--app-border);
+}
+
+/* =========================================
+   TABLE LOADING STATE
+========================================= */
+
+.table-loading {
+  width: 100%;
+  min-height: 96px;
+  padding: 18px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--app-text-secondary);
+  background: var(--app-surface);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+/* =========================================
+   ORDERS LOADING STATE
+========================================= */
+
+.loading-state {
+  width: 100%;
+  min-height: 110px;
+  padding: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-top: 1px solid var(--app-border);
+
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-align: center;
+}
