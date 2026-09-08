@@ -474,7 +474,7 @@ export class BillPage
 
             (
               invoice.deliveryDate !== null &&
-              invoice.deliveryDate 
+              invoice.deliveryDate
                 .startsWith(
                   this.deliveredDate
                 )
@@ -504,10 +504,10 @@ export class BillPage
             Bill
         ) =>
           Number(
-            b.grossTotal
+            b.total ?? 0
           ) -
           Number(
-            a.grossTotal
+            a.total ?? 0
           )
       );
 
@@ -518,12 +518,24 @@ export class BillPage
 
       result.sort(
         (
-          a: Bill,
-          b: Bill
-        ) => Number( a.grossTotal ) - Number( b.grossTotal )
+          a:
+            Bill,
+          b:
+            Bill
+        ) =>
+          Number(
+            a.total ?? 0
+          ) -
+          Number(
+            b.total ?? 0
+          )
       );
 
-    } else if ( this.sortBy === 'Created Date Asc') {
+    } else if (
+      this.sortBy ===
+        'Created Date Asc'
+    ) {
+
       result.sort(
         (
           a:
@@ -560,6 +572,7 @@ export class BillPage
     return result;
   }
 
+
   get totalPaid():
     number {
 
@@ -578,6 +591,7 @@ export class BillPage
     );
   }
 
+
   get totalDue():
     number {
 
@@ -595,6 +609,7 @@ export class BillPage
       0
     );
   }
+
 
   get totalAmount():
     number {
@@ -615,22 +630,110 @@ export class BillPage
   }
 
 
+  get totalTaxableAmount():
+    number {
+
+    return this.filteredInvoices.reduce(
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.taxableAmount ?? 0
+        ),
+      0
+    );
+  }
+
+
+  get totalCgstAmount():
+    number {
+
+    return this.filteredInvoices.reduce(
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.cgstAmount ?? 0
+        ),
+      0
+    );
+  }
+
+
+  get totalSgstAmount():
+    number {
+
+    return this.filteredInvoices.reduce(
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.sgstAmount ?? 0
+        ),
+      0
+    );
+  }
+
+
+  get totalTaxAmount():
+    number {
+
+    return this.filteredInvoices.reduce(
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.totalTaxAmount ?? 0
+        ),
+      0
+    );
+  }
+
+
   get totalExpress():
     number {
 
     return this.filteredInvoices.reduce(
-      ( total: number, invoice:Bill ) =>
-        total + Number( invoice.expressAmount ?? 0 ), 0
+      (
+        total:
+          number,
+        invoice:
+          Bill
+      ) =>
+        total +
+        Number(
+          invoice.expressAmount ?? 0
+        ),
+      0
     );
   }
+
 
   get totalDiscount():
     number {
 
     return this.filteredInvoices.reduce(
       (
-        total: number,
-        invoice: Bill
+        total:
+          number,
+        invoice:
+          Bill
       ) =>
         total +
         Number(
@@ -639,6 +742,7 @@ export class BillPage
       0
     );
   }
+
 
   get grossTotal():
     number {
@@ -657,6 +761,7 @@ export class BillPage
       0
     );
   }
+
 
   getStatusLabel(
     status:
@@ -1151,7 +1256,7 @@ export class BillPage
 
     return Number(
       this.settlementInvoice
-        ?.grossTotal ?? 0
+        ?.total ?? 0
     );
   }
 

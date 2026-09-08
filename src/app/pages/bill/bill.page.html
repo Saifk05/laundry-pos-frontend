@@ -192,131 +192,61 @@
   @if (!loading) {
 
     <section class="invoice-table-wrapper">
-
       <table class="invoice-table">
-
         <thead>
-
           <tr>
-
             <th>#</th>
-
-            <th>
-              Actions
-            </th>
-
-            <th>
-              Status
-            </th>
-
-            <th>
-              Invoice No.
-            </th>
-
-            <th>
-              Order No.
-            </th>
-
-            <th>
-              Paid Amt
-            </th>
-
-            <th>
-              Due Amt
-            </th>
-
-            <th>
-              Total
-            </th>
-<th>
-              Express Amt
-            </th>
-
-            <th>
-              Discount Amt
-            </th>
-
-            <th>
-              Gross Total
-            </th>
-
-            <th>
-              Created At
-            </th>
-
-            <th>
-              Paid At
-            </th>
-
-            <th>
-              Delivery Date
-            </th>
-
-            <!-- <th>
-              Delivered At
-            </th> -->
-
-            <th>
-              Order Status
-            </th>
-
+            <th>Actions</th>
+            <th>Status</th>
+            <th>Invoice No.</th>
+            <th>Order No.</th>
+            <th>Paid Amt</th>
+            <th>Due Amt</th>
+            <th>Taxable Amt</th>
+            <th>CGST</th>
+            <th>SGST</th>
+            <th>Total Tax</th>
+            <th>Total</th>
+            <th>Express Amt</th>
+            <th>Discount Amt</th>
+            <th>Gross Total</th>
+            <th>Created At</th>
+            <th>Paid At</th>
+            <th>Delivery Date</th>
+            <th>Order Status</th>
           </tr>
-
         </thead>
 
         <tbody>
-
           <tr class="summary-row">
-
             <td></td>
-
             <td></td>
-
             <td></td>
-
             <td></td>
 
             <td>
-              <strong>
-                Total
-              </strong>
+              <strong>Total</strong>
             </td>
 
+            <td>₹{{ formatAmount(totalPaid) }}</td>
+            <td>₹{{ formatAmount(totalDue) }}</td>
+            <td>₹{{ formatAmount(totalTaxableAmount) }}</td>
+            <td>₹{{ formatAmount(totalCgstAmount) }}</td>
+            <td>₹{{ formatAmount(totalSgstAmount) }}</td>
+            <td>₹{{ formatAmount(totalTaxAmount) }}</td>
             <td>
-              ₹{{ formatAmount(totalPaid) }}
+              <strong>₹{{ formatAmount(totalAmount) }}</strong>
             </td>
-
+            <td>₹{{ formatAmount(totalExpress) }}</td>
+            <td>₹{{ formatAmount(totalDiscount) }}</td>
             <td>
-              ₹{{ formatAmount(totalDue) }}
-            </td>
-
-            <td>
-              ₹{{ formatAmount(totalAmount) }}
-            </td>
-<td>
-              ₹{{ formatAmount(totalExpress) }}
-            </td>
-
-            <td>
-              ₹{{ formatAmount(totalDiscount) }}
-            </td>
-
-            <td>
-              <strong>
-                ₹{{ formatAmount(grossTotal) }}
-              </strong>
+              <strong>₹{{ formatAmount(grossTotal) }}</strong>
             </td>
 
             <td></td>
-
             <td></td>
-
             <td></td>
-
             <td></td>
-
-            <td></td>
-
           </tr>
 
           @for (
@@ -324,286 +254,180 @@
             track invoice.orderId;
             let index = $index
           ) {
-
             <tr>
+              <td>{{ index + 1 }}</td>
 
               <td>
-                {{ index + 1 }}
-              </td>
-
-              <td>
-
                 <div class="row-actions">
-
                   <button
                     type="button"
                     class="receipt-button"
                     (click)="receipt(invoice)">
-
                     Receipt
-
                   </button>
 
                   @if (
                     invoice.status !== 'CANCELLED' &&
                     invoice.dueAmount > 0
                   ) {
-
                     <button
                       type="button"
                       class="settle-button"
                       (click)="settle(invoice)">
-
                       Settle
-
                     </button>
-
                   }
-
                 </div>
-
               </td>
 
               <td>
-
                 <span
                   class="invoice-status"
-
-                  [class.status-draft]="
-                    invoice.status === 'DRAFT'
-                  "
-
-                  [class.status-paid]="
-                    invoice.status === 'PAID'
-                  "
-
-                  [class.status-partial]="
-                    invoice.status === 'PARTIALLY_PAID'
-                  "
-
-                  [class.status-cancelled]="
-                    invoice.status === 'CANCELLED'
-                  ">
-
-                  {{
-                    getStatusLabel(
-                      invoice.status
-                    )
-                  }}
-
+                  [class.status-draft]="invoice.status === 'DRAFT'"
+                  [class.status-paid]="invoice.status === 'PAID'"
+                  [class.status-partial]="invoice.status === 'PARTIALLY_PAID'"
+                  [class.status-cancelled]="invoice.status === 'CANCELLED'">
+                  {{ getStatusLabel(invoice.status) }}
                 </span>
-
               </td>
 
               <td>
-
                 <strong class="invoice-number">
-
                   {{ invoice.invoiceNumber }}
-
                 </strong>
-
               </td>
 
               <td>
-
                 <strong class="order-number">
-
                   {{ invoice.orderNumber }}
-
                 </strong>
-
               </td>
 
               <td>
-
                 <span class="paid-value">
-
-                  ₹{{ formatAmount(
-                    invoice.paidAmount
-                  ) }}
-
+                  ₹{{ formatAmount(invoice.paidAmount) }}
                 </span>
-
               </td>
 
               <td>
-
                 <span
-                  [class.due-value]="
-                    invoice.dueAmount > 0
-                  "
-
-                  [class.no-due-value]="
-                    invoice.dueAmount === 0
-                  ">
-
-                  ₹{{ formatAmount(
-                    invoice.dueAmount
-                  ) }}
-
+                  [class.due-value]="invoice.dueAmount > 0"
+                  [class.no-due-value]="invoice.dueAmount === 0">
+                  ₹{{ formatAmount(invoice.dueAmount) }}
                 </span>
-
               </td>
 
               <td>
-
-                ₹{{ formatAmount(
-                  invoice.total
-                ) }}
-
-              </td>
-<td>
-
-                ₹{{ formatAmount(
-                  invoice.expressAmount
-                ) }}
-
+                ₹{{ formatAmount(invoice.taxableAmount) }}
               </td>
 
               <td>
-
-                ₹{{ formatAmount(
-                  invoice.discountAmount
-                ) }}
-
+                @if (invoice.taxIncluded && invoice.cgstAmount > 0) {
+                  <span>
+                    ₹{{ formatAmount(invoice.cgstAmount) }}
+                    <small>({{ formatAmount(invoice.cgstPercentage) }}%)</small>
+                  </span>
+                } @else {
+                  ₹0.00
+                }
               </td>
 
               <td>
+                @if (invoice.taxIncluded && invoice.sgstAmount > 0) {
+                  <span>
+                    ₹{{ formatAmount(invoice.sgstAmount) }}
+                    <small>({{ formatAmount(invoice.sgstPercentage) }}%)</small>
+                  </span>
+                } @else {
+                  ₹0.00
+                }
+              </td>
 
+              <td>
+                @if (invoice.taxIncluded && invoice.totalTaxAmount > 0) {
+                  <strong>
+                    ₹{{ formatAmount(invoice.totalTaxAmount) }}
+                    <small>({{ formatAmount(invoice.totalTaxPercentage) }}%)</small>
+                  </strong>
+                } @else {
+                  ₹0.00
+                }
+              </td>
+
+              <td>
                 <strong>
-
-                  ₹{{ formatAmount(
-                    invoice.grossTotal
-                  ) }}
-
+                  ₹{{ formatAmount(invoice.total) }}
                 </strong>
-
               </td>
 
               <td>
+                ₹{{ formatAmount(invoice.expressAmount) }}
+              </td>
 
+              <td>
+                ₹{{ formatAmount(invoice.discountAmount) }}
+              </td>
+
+              <td>
+                <strong>
+                  ₹{{ formatAmount(invoice.grossTotal) }}
+                </strong>
+              </td>
+
+              <td>
                 {{
                   invoice.createdAt
-                    | date:
-                      'dd-MM-yyyy hh:mm a'
+                    | date:'dd-MM-yyyy hh:mm a'
                 }}
-
               </td>
 
               <td>
-
                 @if (invoice.paidAt) {
-
                   {{
                     invoice.paidAt
-                      | date:
-                        'dd-MM-yyyy hh:mm a'
+                      | date:'dd-MM-yyyy hh:mm a'
                   }}
-
                 } @else {
-
                   -
-
                 }
-
               </td>
 
               <td>
-
                 @if (invoice.deliveryDate) {
-
                   {{
                     invoice.deliveryDate
-                      | date:
-                        'dd-MM-yyyy'
+                      | date:'dd-MM-yyyy'
                   }}
-
                 } @else {
-
                   -
-
                 }
-
               </td>
-
-              <!-- <td>
-
-                @if (invoice.deliveredAt) {
-
-                  {{
-                    invoice.deliveredAt
-                      | date:
-                        'dd-MM-yyyy hh:mm a'
-                  }}
-
-                } @else {
-
-                  -
-
-                }
-
-              </td> -->
 
               <td>
-
                 <span
                   class="order-status"
-                  [class.status-new]="
-                    invoice.orderStatus === 'NEW_ORDER'
-                  "
-                  [class.status-tagged]="
-                    invoice.orderStatus === 'TAGGED'
-                  "
-                  [class.status-processing]="
-                    invoice.orderStatus === 'PROCESSING_AT_STORE'
-                  "
-                  [class.status-ready]="
-                    invoice.orderStatus === 'READY_ORDER'
-                  "
-                  [class.status-delivered]="
-                    invoice.orderStatus === 'DELIVERED'
-                  "
-                  [class.status-cancelled]="
-                    invoice.orderStatus === 'CANCELLED'
-                  ">
-
-                  {{
-                    formatOrderStatus(
-                      invoice.orderStatus
-                    )
-                  }}
-
+                  [class.status-new]="invoice.orderStatus === 'NEW_ORDER'"
+                  [class.status-tagged]="invoice.orderStatus === 'TAGGED'"
+                  [class.status-processing]="invoice.orderStatus === 'PROCESSING_AT_STORE'"
+                  [class.status-ready]="invoice.orderStatus === 'READY_ORDER'"
+                  [class.status-delivered]="invoice.orderStatus === 'DELIVERED'"
+                  [class.status-cancelled]="invoice.orderStatus === 'CANCELLED'">
+                  {{ formatOrderStatus(invoice.orderStatus) }}
                 </span>
-
               </td>
-
             </tr>
-
           }
-
         </tbody>
-
       </table>
 
       @if (
         filteredInvoices.length === 0
       ) {
-
         <div class="empty-invoices">
-
-          <h3>
-            No invoices found
-          </h3>
-
-          <p>
-            Try changing the invoice filters.
-          </p>
-
+          <h3>No invoices found</h3>
+          <p>Try changing the invoice filters.</p>
         </div>
-
       }
-
     </section>
 
     <section class="invoice-pagination">
@@ -1001,148 +825,104 @@
           <div class="receipt-divider"></div>
 
           <div class="receipt-totals">
+            <div class="receipt-total-row">
+              <span>Subtotal</span>
+              <strong>
+                ₹{{ formatAmount(receiptOrder.subtotal) }}
+              </strong>
+            </div>
+
+            @if (receiptOrder.discountAmount > 0) {
+              <div class="receipt-total-row">
+                <span>Discount</span>
+                <strong class="receipt-discount">
+                  - ₹{{ formatAmount(receiptOrder.discountAmount) }}
+                </strong>
+              </div>
+            }
+
+            @if (receiptOrder.couponCode) {
+              <div class="receipt-total-row">
+                <span>Coupon</span>
+                <strong>{{ receiptOrder.couponCode }}</strong>
+              </div>
+            }
+
+            @if (receiptOrder.expressChargeAmount > 0) {
+              <div class="receipt-total-row">
+                <span>
+                  Express Charge
+                  @if (receiptOrder.expressChargePercentage) {
+                    ({{ receiptOrder.expressChargePercentage }}%)
+                  }
+                </span>
+
+                <strong>
+                  ₹{{ formatAmount(receiptOrder.expressChargeAmount) }}
+                </strong>
+              </div>
+            }
 
             <div class="receipt-total-row">
-
-              <span>
-                Subtotal
-              </span>
-
+              <span>Taxable Amount</span>
               <strong>
-
-                ₹{{ formatAmount(
-                  receiptOrder.subtotal
-                ) }}
-
+                ₹{{ formatAmount(selectedInvoice.taxableAmount) }}
               </strong>
-
             </div>
 
             @if (
-              receiptOrder.discountAmount > 0
+              selectedInvoice.taxIncluded &&
+              selectedInvoice.totalTaxAmount > 0
             ) {
-
               <div class="receipt-total-row">
-
                 <span>
-                  Discount
+                  CGST ({{ formatAmount(selectedInvoice.cgstPercentage) }}%)
                 </span>
-
-                <strong class="receipt-discount">
-
-                  - ₹{{ formatAmount(
-                    receiptOrder.discountAmount
-                  ) }}
-
-                </strong>
-
-              </div>
-
-            }
-
-            @if (
-              receiptOrder.couponCode
-            ) {
-
-              <div class="receipt-total-row">
-
-                <span>
-                  Coupon
-                </span>
-
                 <strong>
-                  {{ receiptOrder.couponCode }}
+                  ₹{{ formatAmount(selectedInvoice.cgstAmount) }}
                 </strong>
-
               </div>
-
-            }
-
-            @if (
-              receiptOrder.expressChargeAmount > 0
-            ) {
 
               <div class="receipt-total-row">
-
                 <span>
-
-                  Express Charge
-
-                  @if (
-                    receiptOrder.expressChargePercentage
-                  ) {
-
-                    ({{
-                      receiptOrder.expressChargePercentage
-                    }}%)
-
-                  }
-
+                  SGST ({{ formatAmount(selectedInvoice.sgstPercentage) }}%)
                 </span>
-
                 <strong>
-
-                  ₹{{ formatAmount(
-                    receiptOrder.expressChargeAmount
-                  ) }}
-
+                  ₹{{ formatAmount(selectedInvoice.sgstAmount) }}
                 </strong>
-
               </div>
 
+              <div class="receipt-total-row">
+                <span>
+                  Total Tax ({{ formatAmount(selectedInvoice.totalTaxPercentage) }}%)
+                </span>
+                <strong>
+                  ₹{{ formatAmount(selectedInvoice.totalTaxAmount) }}
+                </strong>
+              </div>
             }
 
             <div class="receipt-total-row receipt-grand-total">
-
-              <span>
-                Total
-              </span>
-
+              <span>Total</span>
               <strong>
-
-                ₹{{ formatAmount(
-                  receiptOrder.totalAmount
-                ) }}
-
+                ₹{{ formatAmount(selectedInvoice.total) }}
               </strong>
-
             </div>
 
             <div class="receipt-total-row">
-
-              <span>
-                Paid
-              </span>
-
+              <span>Paid</span>
               <strong class="receipt-paid">
-
-                ₹{{ formatAmount(
-                  selectedInvoice.paidAmount
-                ) }}
-
+                ₹{{ formatAmount(selectedInvoice.paidAmount) }}
               </strong>
-
             </div>
 
             <div class="receipt-total-row">
-
-              <span>
-                Balance
-              </span>
-
+              <span>Balance</span>
               <strong
-                [class.receipt-balance-due]="
-                  selectedInvoice.dueAmount > 0
-                ">
-
-                ₹{{ formatAmount(
-                  selectedInvoice.dueAmount
-                ) }}
-
+                [class.receipt-balance-due]="selectedInvoice.dueAmount > 0">
+                ₹{{ formatAmount(selectedInvoice.dueAmount) }}
               </strong>
-
             </div>
-
           </div>
 
           <div class="receipt-divider"></div>
