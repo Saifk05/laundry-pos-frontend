@@ -1,0 +1,257 @@
+.terms-page {
+  min-height: 100%;
+  padding: 24px;
+  background: #f6f8f7;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.terms-card {
+  width: 100%;
+  max-width: 950px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.section-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-group textarea {
+  width: 100%;
+  min-height: 250px;
+  padding: 15px 16px;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-group textarea:hover {
+  border-color: #9ca3af;
+}
+
+.form-group textarea:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.form-group textarea:disabled {
+  cursor: not-allowed;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+.character-count {
+  display: flex;
+  justify-content: flex-end;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.preview-section {
+  margin-top: 28px;
+}
+
+.preview-section h3 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.receipt-preview {
+  padding: 18px;
+  background: #fafafa;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+}
+
+.receipt-preview strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.preview-text {
+  color: #4b5563;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.success-message {
+  margin-top: 18px;
+  padding: 11px 13px;
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.error-message {
+  margin-top: 18px;
+  padding: 11px 13px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.reset-button,
+.save-button {
+  min-width: 120px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.reset-button {
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+}
+
+.reset-button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.save-button {
+  color: #ffffff;
+  background: #16a34a;
+  border: 1px solid #16a34a;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.reset-button:active:not(:disabled),
+.save-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.reset-button:disabled,
+.save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 768px) {
+  .terms-page {
+    padding: 16px;
+  }
+
+  .terms-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+
+  .form-group textarea {
+    min-height: 220px;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .reset-button,
+  .save-button {
+    width: 100%;
+  }
+}

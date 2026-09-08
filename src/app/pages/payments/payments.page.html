@@ -1,0 +1,845 @@
+<div class="payments-page">
+
+  <!-- =========================================
+       PAGE TITLE
+  ========================================== -->
+
+  <div class="page-heading">
+
+    <div>
+
+      <h1>
+        Payments
+      </h1>
+
+      <p>
+        View payment collections by date and payment method
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       FILTER BAR
+  ========================================== -->
+
+  <section class="filter-bar">
+
+    <div class="date-range-group">
+
+      <label>
+        Date Range
+      </label>
+
+      <div class="date-and-actions">
+
+
+        <!-- DATE RANGE -->
+
+        <mat-form-field
+          appearance="outline"
+          class="compact-date-range">
+
+          <mat-date-range-input
+            [rangePicker]="picker">
+
+            <input
+              matStartDate
+              [(ngModel)]="rangeStart"
+              [max]="maxDate"
+              placeholder="From date">
+
+            <input
+              matEndDate
+              [(ngModel)]="rangeEnd"
+              [max]="maxDate"
+              placeholder="To date"
+              (dateChange)="onDateRangeChange()">
+
+          </mat-date-range-input>
+
+
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker">
+          </mat-datepicker-toggle>
+
+
+          <mat-date-range-picker
+            #picker>
+          </mat-date-range-picker>
+
+        </mat-form-field>
+
+
+        <!-- QUICK DATE ACTIONS -->
+
+        <div class="quick-date-actions">
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'TODAY'
+            "
+            [disabled]="loading"
+            (click)="setToday()">
+
+            Today
+
+          </button>
+
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'YESTERDAY'
+            "
+            [disabled]="loading"
+            (click)="setYesterday()">
+
+            Yesterday
+
+          </button>
+
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'THIS_WEEK'
+            "
+            [disabled]="loading"
+            (click)="setThisWeek()">
+
+            This Week
+
+          </button>
+
+
+          <button
+            type="button"
+            class="quick-date-button"
+            [class.active]="
+              activePreset === 'THIS_MONTH'
+            "
+            [disabled]="loading"
+            (click)="setThisMonth()">
+
+            This Month
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- REFRESH -->
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="refresh()">
+
+      @if (loading) {
+
+        Loading...
+
+      } @else {
+
+        ↻ Refresh
+
+      }
+
+    </button>
+
+  </section>
+
+
+  <!-- =========================================
+       SUMMARY
+  ========================================== -->
+
+  <section class="payment-summary">
+
+    <div class="summary-item">
+
+      <span>
+        Total Collection
+      </span>
+
+      <strong>
+        ₹{{ formatAmount(totalAmount) }}
+      </strong>
+
+    </div>
+
+
+    <div class="summary-item upi-summary">
+
+      <span>
+        UPI
+      </span>
+
+      <strong>
+        ₹{{ formatAmount(totalUpi) }}
+      </strong>
+
+    </div>
+
+
+    <div class="summary-item cash-summary">
+
+      <span>
+        Cash
+      </span>
+
+      <strong>
+        ₹{{ formatAmount(totalCash) }}
+      </strong>
+
+    </div>
+
+
+    @if (totalCard > 0) {
+
+      <div class="summary-item">
+
+        <span>
+          Card
+        </span>
+
+        <strong>
+          ₹{{ formatAmount(totalCard) }}
+        </strong>
+
+      </div>
+
+    }
+
+
+    @if (totalOther > 0) {
+
+      <div class="summary-item">
+
+        <span>
+          Other
+        </span>
+
+        <strong>
+          ₹{{ formatAmount(totalOther) }}
+        </strong>
+
+      </div>
+
+    }
+
+  </section>
+
+
+  <!-- =========================================
+       LOADING
+  ========================================== -->
+
+  @if (loading) {
+
+    <div class="payments-loading">
+
+      Loading payment report...
+
+    </div>
+
+  }
+
+
+  <!-- =========================================
+       TABLE
+  ========================================== -->
+
+  @if (!loading) {
+
+    <section class="payments-table">
+
+
+      <!-- HEADER -->
+
+      <div class="table-header">
+
+        <div></div>
+
+        <div>
+          Date
+        </div>
+
+        <div>
+          Total
+        </div>
+
+        <div>
+          UPI
+        </div>
+
+        <div>
+          Cash
+        </div>
+
+        <div>
+          Card
+        </div>
+
+        <div>
+          Other
+        </div>
+
+        <div>
+          Payments
+        </div>
+
+      </div>
+
+
+      <!-- DATA ROWS -->
+
+      @for (
+        payment of payments;
+        track payment.date
+      ) {
+
+        <div
+          class="payment-row"
+          (click)="toggleRow(payment)">
+
+
+          <!-- EXPAND -->
+
+          <div class="expand-icon">
+
+            @if (payment.expanded) {
+
+              ▲
+
+            } @else {
+
+              ▼
+
+            }
+
+          </div>
+
+
+          <!-- DATE -->
+
+          <div class="payment-date">
+
+            {{ payment.date | date:'dd/MM/yyyy' }}
+
+          </div>
+
+
+          <!-- TOTAL -->
+
+          <div class="payment-value total-value">
+
+            ₹{{ formatAmount(
+              payment.totalAmount
+            ) }}
+
+          </div>
+
+
+          <!-- UPI -->
+
+          <div class="payment-value">
+
+            ₹{{ formatAmount(
+              payment.upiAmount
+            ) }}
+
+          </div>
+
+
+          <!-- CASH -->
+
+          <div class="payment-value">
+
+            ₹{{ formatAmount(
+              payment.cashAmount
+            ) }}
+
+          </div>
+
+
+          <!-- CARD -->
+
+          <div class="payment-value">
+
+            ₹{{ formatAmount(
+              payment.cardAmount
+            ) }}
+
+          </div>
+
+
+          <!-- OTHER -->
+
+          <div class="payment-value">
+
+            ₹{{ formatAmount(
+              payment.otherAmount
+            ) }}
+
+          </div>
+
+
+          <!-- PAYMENT COUNT -->
+
+          <div class="payment-count">
+
+            {{ getPaymentCount(payment) }}
+
+          </div>
+
+        </div>
+
+
+        <!-- =========================================
+             EXPANDED DETAILS
+        ========================================== -->
+
+        @if (payment.expanded) {
+
+          <div class="payment-details">
+
+
+            <!-- =====================================
+                 CASH
+            ====================================== -->
+
+            @if (
+              payment.cashOrders.length > 0
+            ) {
+
+              <div class="payment-method-section">
+
+                <div class="method-header cash-header">
+
+                  <strong>
+                    Cash
+                  </strong>
+
+                  <strong>
+                    ₹{{ formatAmount(
+                      payment.cashAmount
+                    ) }}
+                  </strong>
+
+                </div>
+
+
+                <div class="order-payment-list">
+
+                  @for (
+                    order of payment.cashOrders;
+                    track order.paymentId
+                  ) {
+
+                    <div class="order-payment-row">
+
+
+                      <div class="order-payment-main">
+
+                        <strong class="order-number">
+
+                          {{ order.orderNumber }}
+
+                        </strong>
+
+                        <span class="customer-name">
+
+                          {{ order.customerName }}
+
+                        </span>
+
+                      </div>
+
+
+                      <div class="order-payment-mobile">
+
+                        <button
+                          type="button"
+                          (click)="
+                            $event.stopPropagation();
+                            callCustomer(order)
+                          ">
+
+                          {{ order.mobile }}
+
+                        </button>
+
+                      </div>
+
+
+                      <div class="order-payment-time">
+
+                        {{
+                          order.paidAt
+                            | date:
+                              'dd/MM/yyyy hh:mm a'
+                        }}
+
+                      </div>
+
+
+                      <div class="order-payment-amount">
+
+                        ₹{{ formatAmount(
+                          order.amount
+                        ) }}
+
+                      </div>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </div>
+
+            }
+
+
+            <!-- =====================================
+                 UPI
+            ====================================== -->
+
+            @if (
+              payment.upiOrders.length > 0
+            ) {
+
+              <div class="payment-method-section">
+
+                <div class="method-header upi-header">
+
+                  <strong>
+                    UPI
+                  </strong>
+
+                  <strong>
+                    ₹{{ formatAmount(
+                      payment.upiAmount
+                    ) }}
+                  </strong>
+
+                </div>
+
+
+                <div class="order-payment-list">
+
+                  @for (
+                    order of payment.upiOrders;
+                    track order.paymentId
+                  ) {
+
+                    <div class="order-payment-row">
+
+
+                      <div class="order-payment-main">
+
+                        <strong class="order-number">
+
+                          {{ order.orderNumber }}
+
+                        </strong>
+
+                        <span class="customer-name">
+
+                          {{ order.customerName }}
+
+                        </span>
+
+                      </div>
+
+
+                      <div class="order-payment-mobile">
+
+                        <button
+                          type="button"
+                          (click)="
+                            $event.stopPropagation();
+                            callCustomer(order)
+                          ">
+
+                          {{ order.mobile }}
+
+                        </button>
+
+                      </div>
+
+
+                      <div class="order-payment-time">
+
+                        {{
+                          order.paidAt
+                            | date:
+                              'dd/MM/yyyy hh:mm a'
+                        }}
+
+                      </div>
+
+
+                      <div class="order-payment-amount">
+
+                        ₹{{ formatAmount(
+                          order.amount
+                        ) }}
+
+                      </div>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </div>
+
+            }
+
+
+            <!-- =====================================
+                 CARD
+            ====================================== -->
+
+            @if (
+              payment.cardOrders.length > 0
+            ) {
+
+              <div class="payment-method-section">
+
+                <div class="method-header card-header">
+
+                  <strong>
+                    Card
+                  </strong>
+
+                  <strong>
+                    ₹{{ formatAmount(
+                      payment.cardAmount
+                    ) }}
+                  </strong>
+
+                </div>
+
+
+                <div class="order-payment-list">
+
+                  @for (
+                    order of payment.cardOrders;
+                    track order.paymentId
+                  ) {
+
+                    <div class="order-payment-row">
+
+
+                      <div class="order-payment-main">
+
+                        <strong class="order-number">
+
+                          {{ order.orderNumber }}
+
+                        </strong>
+
+                        <span class="customer-name">
+
+                          {{ order.customerName }}
+
+                        </span>
+
+                      </div>
+
+
+                      <div class="order-payment-mobile">
+
+                        <button
+                          type="button"
+                          (click)="
+                            $event.stopPropagation();
+                            callCustomer(order)
+                          ">
+
+                          {{ order.mobile }}
+
+                        </button>
+
+                      </div>
+
+
+                      <div class="order-payment-time">
+
+                        {{
+                          order.paidAt
+                            | date:
+                              'dd/MM/yyyy hh:mm a'
+                        }}
+
+                      </div>
+
+
+                      <div class="order-payment-amount">
+
+                        ₹{{ formatAmount(
+                          order.amount
+                        ) }}
+
+                      </div>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </div>
+
+            }
+
+
+            <!-- =====================================
+                 OTHER
+            ====================================== -->
+
+            @if (
+              payment.otherOrders.length > 0
+            ) {
+
+              <div class="payment-method-section">
+
+                <div class="method-header other-header">
+
+                  <strong>
+                    Other
+                  </strong>
+
+                  <strong>
+                    ₹{{ formatAmount(
+                      payment.otherAmount
+                    ) }}
+                  </strong>
+
+                </div>
+
+
+                <div class="order-payment-list">
+
+                  @for (
+                    order of payment.otherOrders;
+                    track order.paymentId
+                  ) {
+
+                    <div class="order-payment-row">
+
+
+                      <div class="order-payment-main">
+
+                        <strong class="order-number">
+
+                          {{ order.orderNumber }}
+
+                        </strong>
+
+                        <span class="customer-name">
+
+                          {{ order.customerName }}
+
+                        </span>
+
+                      </div>
+
+
+                      <div class="order-payment-mobile">
+
+                        <button
+                          type="button"
+                          (click)="
+                            $event.stopPropagation();
+                            callCustomer(order)
+                          ">
+
+                          {{ order.mobile }}
+
+                        </button>
+
+                      </div>
+
+
+                      <div class="order-payment-time">
+
+                        {{
+                          order.paidAt
+                            | date:
+                              'dd/MM/yyyy hh:mm a'
+                        }}
+
+                      </div>
+
+
+                      <div class="order-payment-amount">
+
+                        ₹{{ formatAmount(
+                          order.amount
+                        ) }}
+
+                      </div>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+      }
+
+
+      <!-- =========================================
+           EMPTY
+      ========================================== -->
+
+      @if (
+        payments.length === 0
+      ) {
+
+        <div class="payments-empty">
+
+          <h3>
+            No payment data found
+          </h3>
+
+          <p>
+            Try changing the selected date range.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+</div>

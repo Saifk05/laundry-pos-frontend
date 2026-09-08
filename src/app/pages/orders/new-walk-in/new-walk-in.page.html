@@ -1,0 +1,1181 @@
+<div class="walkin-page">
+
+  <section class="order-panel">
+
+@if (isRetagMode || isRescheduleMode) {
+
+  <div class="retag-header">
+
+    <div>
+
+      <h2>
+        {{
+          isRescheduleMode
+            ? 'Reschedule Order'
+            : 'Re-Tag Order'
+        }}
+      </h2>
+
+      <p>
+
+        {{
+          isRescheduleMode
+            ? 'Update delivery date and timeslot for'
+            : 'Update garment quantities for'
+        }}
+
+        <strong>
+          {{ retagOrderNumber }}
+        </strong>
+
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="retag-cancel-button"
+      (click)="cancelRetag()">
+
+      Back to Orders
+
+    </button>
+
+  </div>
+
+}
+
+    <div class="customer-section">
+
+      <div class="customer-fields">
+
+        <div class="customer-input">
+
+          <span class="input-icon">
+            ☎
+          </span>
+
+          <input
+            type="tel"
+            [(ngModel)]="customerPhone"
+            maxlength="10"
+            inputmode="numeric"
+            placeholder="Mobile"
+            [readonly]="isRetagMode || isRescheduleMode"
+            (blur)="!isRetagMode && !isRescheduleMode && checkCustomer()">
+
+        </div>
+
+        <div class="customer-input">
+
+          <span class="input-icon">
+            ●
+          </span>
+
+          <input
+            type="text"
+            [(ngModel)]="customerName"
+            placeholder="Name"
+            [readonly]="customerExists || isRetagMode || isRescheduleMode">
+
+        </div>
+
+      </div>
+
+      @if (checkingCustomer) {
+
+        <div class="customer-message">
+          Checking customer...
+        </div>
+
+      } @else if (customerMessage) {
+
+        <div
+          class="customer-message"
+          [class.existing]="customerExists">
+
+          {{ customerMessage }}
+
+        </div>
+
+      }
+
+    </div>
+
+    <div class="cart-section">
+
+      @if (loadingRetagOrder) {
+
+        <div class="empty-cart">
+          <div class="empty-title">
+            Loading existing order...
+          </div>
+        </div>
+
+      } @else if (orderItems.length === 0) {
+
+        <div class="empty-cart">
+
+          <div class="empty-cart-icon">
+            🛒
+          </div>
+
+          <div class="empty-title">
+            No Product Added
+          </div>
+
+        </div>
+
+      } @else {
+
+        <div class="cart-items">
+
+          @for (
+            item of orderItems;
+            track item.id
+          ) {
+
+            <article class="compact-cart-item">
+
+              <div class="compact-cart-main">
+
+                <div class="compact-cart-left">
+
+                  @if (!isRescheduleMode) {
+
+                    <div class="compact-cart-actions">
+
+                    <button
+                      type="button"
+                      class="compact-edit-button"
+                      title="Edit"
+                      (click)="editOrderItem(item)">
+
+                      ✎
+
+                    </button>
+
+                    <button
+                      type="button"
+                      class="compact-remove-button"
+                      title="Remove"
+                      (click)="removeItem(item)">
+
+                      ×
+
+                    </button>
+
+                  </div>
+
+                  }
+
+                  <div class="compact-cart-info">
+
+                    <div class="compact-cart-title">
+
+                      <strong>
+                        {{ item.productName }}
+                      </strong>
+
+                      @if (
+                        item.typeName &&
+                        item.typeName.toLowerCase() !== 'default'
+                      ) {
+
+                        <span>
+                          [{{ item.typeName }}]
+                        </span>
+
+                      }
+
+                    </div>
+
+                    <div class="compact-cart-services">
+                      <span>Services:</span>
+                      <strong>{{ item.serviceNames.join(', ') }}</strong>
+                    </div>
+
+                    @if (item.unit === 'KG') {
+                      <div class="compact-cart-services">
+                        <span>Total Garments:</span>
+                        <strong>{{ item.garmentCount }}</strong>
+                      </div>
+                    }
+
+                  </div>
+
+                </div>
+
+                <div class="compact-cart-total">
+
+                  <strong>
+                    {{ item.quantity }}
+                    ×
+                    ₹{{ item.unitPrice }}
+                    =
+                    ₹{{ item.total | number:'1.2-2' }}
+
+                  </strong>
+
+                  <span>
+                    {{
+                      item.unit === 'KG'
+                        ? '/ kg'
+                        : '/ pc'
+                    }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </div>
+
+    <div class="left-summary">
+
+      <div class="summary-line">
+
+        <span>
+          Gross Total:
+        </span>
+
+        <strong>
+          ₹{{ grossTotal | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+      <div class="summary-line">
+
+        <span>
+          Discount Amount:
+        </span>
+
+        <strong>
+          ₹{{ totalDiscount | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+      <div class="summary-line">
+
+        <span>
+
+          Express Amount:
+
+          @if (
+            expressDelivery &&
+            expressPercentage > 0
+          ) {
+
+            <small>
+              ({{ expressPercentage }}%)
+            </small>
+
+          }
+
+        </span>
+
+        <strong>
+          ₹{{ expressAmount }}
+        </strong>
+
+      </div>
+
+      <div class="summary-line">
+
+        <span>
+
+          Tax Amount:
+
+          @if (
+            taxIncluded &&
+            totalTaxPercentage > 0
+          ) {
+
+            <small>
+              ({{ totalTaxPercentage }}%)
+            </small>
+
+          }
+
+        </span>
+
+        <strong>
+          ₹{{ taxAmount | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+      @if (
+        taxIncluded &&
+        totalTaxPercentage > 0
+      ) {
+
+        <div class="summary-line tax-breakup">
+
+          <span>
+            CGST ({{ cgstPercentage }}%):
+          </span>
+
+          <strong>
+            ₹{{ cgstAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+        <div class="summary-line tax-breakup">
+
+          <span>
+            SGST ({{ sgstPercentage }}%):
+          </span>
+
+          <strong>
+            ₹{{ sgstAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+      }
+
+      <div class="summary-line">
+
+        <span>
+          Total Count:
+        </span>
+
+        <strong>
+          {{ totalPieces }}
+        </strong>
+
+      </div>
+
+      <div class="summary-line total">
+
+        <span>
+          Total Amount:
+        </span>
+
+        <strong>
+          ₹{{ grandTotal | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+    <div class="bottom-options">
+
+      <div class="delivery-options">
+
+        <div class="delivery-option-row">
+
+          <div class="delivery-option-icon">
+            📅
+          </div>
+
+          <div class="delivery-control">
+
+            <select
+              [(ngModel)]="deliveryDate"
+              aria-label="Delivery Date">
+
+              <option
+                value=""
+                disabled>
+                Delivery Date
+              </option>
+
+              @for (
+                date of deliveryDateOptions;
+                track date.value
+              ) {
+
+                <option [value]="date.value">
+                  {{ date.label }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="delivery-option-row">
+
+          <div class="delivery-option-icon">
+            ◷
+          </div>
+
+          <div class="delivery-control">
+
+            <select
+              [(ngModel)]="deliveryTime"
+              aria-label="Delivery Time">
+
+              <option
+                value=""
+                disabled>
+                Delivery Timeslot
+              </option>
+
+              @for (
+                slot of deliveryTimeSlots;
+                track slot
+              ) {
+
+                <option [value]="slot">
+                  {{ slot }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+        </div>
+
+        @if (!isRescheduleMode) {
+
+        <div class="delivery-option-row toggle-row">
+
+          <div class="delivery-option-icon"></div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="homeDelivery">
+
+            <span class="switch-slider"></span>
+
+          </label>
+
+          <span class="toggle-label">
+            Home Delivery
+          </span>
+
+        </div>
+
+        <div class="delivery-option-row express-row">
+
+          <div class="delivery-option-icon"></div>
+
+          <label class="switch">
+
+            <input
+              type="checkbox"
+              [(ngModel)]="expressDelivery"
+              (ngModelChange)="onExpressDeliveryChange()">
+
+            <span class="switch-slider"></span>
+
+          </label>
+
+          <span class="toggle-label">
+            Express Delivery
+          </span>
+
+          @if (expressDelivery) {
+
+            <select
+              class="express-select"
+              [(ngModel)]="selectedExpressChargeId"
+              (ngModelChange)="onExpressChargeSelected($event)">
+
+              <option
+                [ngValue]="null"
+                disabled>
+
+                Add Express
+
+              </option>
+
+              @for (
+                charge of expressCharges;
+                track charge.id
+              ) {
+
+                <option
+                  [ngValue]="charge.id">
+
+                  {{ charge.name }}
+                  -
+                  {{ charge.percentage }}%
+
+                </option>
+
+              }
+
+            </select>
+
+          }
+
+        </div>
+
+        @if (
+          expressDelivery &&
+          expressPercentage > 0
+        ) {
+
+          <div class="express-info">
+
+            <span>
+              Express charge
+              ({{ expressPercentage }}%)
+            </span>
+
+            <strong>
+              +₹{{ expressAmount }}
+            </strong>
+
+          </div>
+
+        }
+
+        }
+
+      </div>
+
+      @if (!isRescheduleMode) {
+
+      <div class="coupon-area">
+
+        <button
+          type="button"
+          class="coupon-trigger"
+          (click)="toggleCouponDropdown()">
+
+          @if (couponApplied) {
+
+            <span>
+              Coupon:
+              {{ couponCode }}
+            </span>
+
+            <strong>
+              -₹{{ couponDiscount }}
+            </strong>
+
+          } @else {
+
+            <span>
+              Select Coupon
+            </span>
+
+            <span>
+              ▾
+            </span>
+
+          }
+
+        </button>
+
+        @if (couponDropdownOpen) {
+
+          <div class="coupon-menu">
+
+            @for (
+              coupon of coupons;
+              track coupon.id
+            ) {
+
+            <button
+              type="button"
+              [disabled]="!coupon.active"
+              [class.disabled]="!coupon.active"
+              (click)="selectCoupon(coupon)">
+
+                <div>
+
+                  <strong>
+                    {{ coupon.code }}
+                  </strong>
+
+                  <small>
+
+                    @if (
+                      coupon.discountType === 'PERCENTAGE'
+                    ) {
+
+                      {{ coupon.discountValue }}% OFF
+
+                    } @else {
+
+                      ₹{{ coupon.discountValue }} OFF
+
+                    }
+
+                  </small>
+
+                  <small>
+                    Minimum order:
+                    ₹{{ coupon.minimumOrderAmount }}
+                  </small>
+
+                </div>
+
+                <span>
+
+                  {{
+                    coupon.active
+                      ? 'Apply'
+                      : 'Inactive'
+                  }}
+
+                </span>
+
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+        @if (couponApplied) {
+
+          <button
+            type="button"
+            class="remove-coupon"
+            (click)="removeCoupon()">
+
+            Remove Coupon
+
+          </button>
+
+        }
+
+      </div>
+
+      }
+
+      @if (errorMessage) {
+
+        <div class="error-text">
+          {{ errorMessage }}
+        </div>
+
+      }
+
+      @if (isRescheduleMode) {
+
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            loadingRetagOrder ||
+            !deliveryDate ||
+            !deliveryTime
+          "
+          (click)="createOrder()">
+
+          {{
+            creatingOrder
+              ? 'Rescheduling...'
+              : 'Update Schedule'
+          }}
+
+        </button>
+
+      } @else if (isRetagMode) {
+
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            loadingRetagOrder ||
+            orderItems.length === 0
+          "
+          (click)="createOrder()">
+
+          {{
+            creatingOrder
+              ? 'Updating Re-Tag...'
+              : 'Update Re-Tag'
+          }}
+
+        </button>
+
+      } @else {
+
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            !customerName.trim() ||
+            !customerPhone.trim() ||
+            !deliveryDate ||
+            !deliveryTime ||
+            orderItems.length === 0 ||
+            (
+              expressDelivery &&
+              !selectedExpressChargeId
+            )
+          "
+          (click)="createOrder()">
+
+          {{
+            creatingOrder
+              ? 'Creating Order...'
+              : 'Create Order'
+          }}
+
+        </button>
+
+      }
+
+    </div>
+
+  </section>
+
+  @if (!isRescheduleMode) {
+
+  <section class="products-panel">
+
+    <div class="product-search">
+
+      <span>
+        ⌕
+      </span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search products">
+
+    </div>
+
+    <div class="product-list">
+
+      @if (loading) {
+
+        <div class="no-products">
+          Loading products...
+        </div>
+
+      } @else if (
+        filteredProducts.length === 0
+      ) {
+
+        <div class="no-products">
+          No products found
+        </div>
+
+      } @else {
+
+        @for (
+          product of filteredProducts;
+          track product.id
+        ) {
+
+          <article class="product-card">
+
+            <div class="product-content">
+
+              <h3>
+                {{ product.name }}
+              </h3>
+
+              @if (product.types.length > 0) {
+
+                <div class="product-types">
+
+                  @for (
+                    type of product.types;
+                    track type.id
+                  ) {
+
+                    @if (
+                      type.name.toLowerCase() !== 'default'
+                    ) {
+
+                      <span>
+                        {{ type.name }}
+                      </span>
+
+                    }
+
+                  }
+
+                </div>
+
+              }
+
+              @if (
+                product.types.length > 0 &&
+                product.types[0].services.length > 0
+              ) {
+
+                <div class="product-services">
+
+                  @for (
+                    service of product.types[0].services;
+                    track service.id
+                  ) {
+
+                    <div class="product-service">
+
+                      <span>
+                        {{ service.name }}
+                      </span>
+
+                      <strong>
+
+                        ₹{{ service.price }}
+                        /
+                        {{
+                          product.unit === 'KG'
+                            ? 'kg'
+                            : 'pc'
+                        }}
+
+                      </strong>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              }
+
+            </div>
+
+            <div class="product-actions">
+
+            <div class="product-icon">
+              {{ product.icon || (product.unit === 'KG' ? '🧺' : '👕') }}
+            </div>
+              <button
+                type="button"
+                class="add-product-button"
+                (click)="openProduct(product)">
+
+                Add
+
+              </button>
+
+            </div>
+
+          </article>
+
+        }
+
+      }
+
+    </div>
+
+  </section>
+
+  }
+
+</div>
+
+@if (
+  productModalOpen &&
+  selectedProduct
+) {
+
+  <div
+    class="product-modal-overlay"
+    (click)="closeProductModal()">
+
+    <div
+      class="product-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="product-modal-header">
+
+        <button
+          type="button"
+          class="close-modal"
+          (click)="closeProductModal()">
+
+          ×
+
+        </button>
+
+        <h2>
+          {{ selectedProduct.name }}
+        </h2>
+
+      </div>
+
+      <div class="product-modal-body">
+
+        @if (
+          selectedProduct.types.length > 0 &&
+          !(
+            selectedProduct.types.length === 1 &&
+            selectedProduct.types[0].name.toLowerCase() === 'default'
+          )
+        ) {
+
+          <div class="modal-section">
+
+            <label class="modal-label">
+
+              Select
+              {{ selectedProduct.name }}
+              Type
+
+            </label>
+
+            <div class="selection-buttons">
+
+              @for (
+                type of selectedProduct.types;
+                track type.id
+              ) {
+
+                <button
+                  type="button"
+                  [class.selected]="
+                    selectedProductType?.id === type.id
+                  "
+                  (click)="selectProductType(type)">
+
+                  {{ type.name }}
+
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+        }
+
+        <div class="modal-section">
+
+          <label class="modal-label">
+
+            Select one or more services
+
+            <span class="required">
+              *
+            </span>
+
+          </label>
+
+          <div class="service-selection">
+
+            @for (
+              service of availableServices;
+              track service.id
+            ) {
+
+              <button
+                type="button"
+                [class.selected]="
+                  isServiceSelected(service.id)
+                "
+                (click)="toggleService(service.id)">
+
+                {{ service.name }}
+
+                [
+                ₹{{ service.price }}
+                /
+                {{
+                  selectedProduct.unit === 'KG'
+                    ? 'kg'
+                    : 'pc'
+                }}
+                ]
+
+              </button>
+
+            }
+
+          </div>
+
+        </div>
+
+        <div class="modal-section modal-quantity-section">
+
+          <label class="modal-label">
+            {{
+              selectedProduct.unit === 'KG'
+                ? 'Quantity / Weight'
+                : 'Quantity'
+            }}
+          </label>
+
+          <div class="modal-quantity">
+
+            <button
+              type="button"
+              (click)="decreaseModalQuantity()">
+              −
+            </button>
+
+            <input
+              type="number"
+              [(ngModel)]="modalQuantity"
+              [min]="selectedProduct.unit === 'KG' ? 0.1 : 1"
+              [max]="selectedProduct.unit === 'KG' ? 100 : 999"
+              [step]="selectedProduct.unit === 'KG' ? 0.1 : 1"
+              class="quantity-input"
+              (blur)="normalizeModalQuantity()">
+
+            <button
+              type="button"
+              [disabled]="isRescheduleMode"
+              (click)="increaseModalQuantity()">
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+@if (selectedProduct.unit === 'KG') {
+
+  <div class="modal-section modal-quantity-section">
+
+    <label class="modal-label">
+      Total Garments
+    </label>
+
+    <div class="modal-quantity">
+
+      <button
+        type="button"
+        (click)="decreaseGarmentCount()">
+        −
+      </button>
+
+      <input
+        type="number"
+        [(ngModel)]="modalGarmentCount"
+        min="1"
+        step="1"
+        inputmode="numeric"
+        class="quantity-input"
+        (blur)="normalizeGarmentCount()">
+
+      <button
+        type="button"
+        (click)="increaseGarmentCount()">
+        +
+      </button>
+
+    </div>
+
+  </div>
+
+}
+
+      </div>
+
+      <div class="product-modal-footer">
+
+        <button
+          type="button"
+          class="cancel-modal-button"
+          (click)="closeProductModal()">
+
+          Cancel
+
+        </button>
+
+        <button
+          type="button"
+          class="confirm-product-button"
+          [disabled]="
+            selectedServiceIds.length === 0 ||
+            !selectedProductType
+          "
+          (click)="addConfiguredProduct()">
+
+          {{
+            editingOrderItemId
+              ? 'Update Product'
+              : 'Add Product'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+@if (orderCreated) {
+
+  <div class="success-overlay">
+
+    <div class="success-modal compact-success-modal">
+
+      <div class="success-content">
+
+        <h2>
+          Order #{{ createdOrder?.orderNumber }}
+        </h2>
+
+        <p>
+          Order created successfully.
+        </p>
+
+        <span class="success-message">
+          Print the receipt and give one copy to the customer.
+        </span>
+
+      </div>
+
+      <div class="success-actions compact-success-actions">
+
+        <button
+          type="button"
+          class="success-close-button"
+          (click)="closeOrderModal()">
+
+          Close
+
+        </button>
+
+        <button
+          type="button"
+          class="success-print-button"
+          (click)="printReceipt()">
+
+          Print Receipt
+
+        </button>
+
+        <button
+          type="button"
+          class="success-print-button"
+          (click)="printTag()">
+
+          Print Tag
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

@@ -1,0 +1,145 @@
+<div class="terms-page">
+
+  <div class="page-header">
+    <div>
+
+      <h1>
+        Terms & Conditions
+      </h1>
+
+      <p>
+        Manage the terms and conditions that will appear on customer receipts.
+      </p>
+
+    </div>
+  </div>
+
+
+  <div class="terms-card">
+
+    <div class="section-header">
+
+      <div>
+
+        <h2>
+          Receipt Terms
+        </h2>
+
+        <p>
+          These terms will be printed at the bottom of receipts.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    @if (loading) {
+
+      <div class="loading-state">
+        Loading Terms & Conditions...
+      </div>
+
+    } @else {
+
+      <div class="form-group">
+
+        <label>
+          Terms & Conditions
+        </label>
+
+        <textarea
+          [(ngModel)]="termsAndConditions"
+          rows="12"
+          [disabled]="saving"
+          placeholder="Enter terms and conditions">
+        </textarea>
+
+        <div class="character-count">
+          {{ termsAndConditions.length }} characters
+        </div>
+
+      </div>
+
+
+      <div class="preview-section">
+
+        <h3>
+          Receipt Preview
+        </h3>
+
+        <div class="receipt-preview">
+
+          <strong>
+            Terms & Conditions
+          </strong>
+
+          <div class="preview-text">
+
+            {{
+              termsAndConditions ||
+              'No terms and conditions added.'
+            }}
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      @if (successMessage) {
+
+        <div class="success-message">
+          {{ successMessage }}
+        </div>
+
+      }
+
+
+      @if (errorMessage) {
+
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+
+      }
+
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="reset-button"
+          [disabled]="saving"
+          (click)="resetTerms()">
+
+          Reset
+
+        </button>
+
+
+        <button
+          type="button"
+          class="save-button"
+          [disabled]="
+            saving ||
+            !termsAndConditions.trim()
+          "
+          (click)="saveTerms()">
+
+          {{
+            saving
+              ? 'Saving...'
+              : 'Save Terms'
+          }}
+
+        </button>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

@@ -1,0 +1,1134 @@
+<div class="services-page">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Services
+      </h1>
+
+      <p>
+        Manage laundry products, types, services and pricing
+      </p>
+
+    </div>
+
+    <div class="header-actions">
+
+      @if (!arrangeMode) {
+
+        <button
+          type="button"
+          class="arrange-button"
+          [disabled]="
+            loading ||
+            bulkLoading ||
+            arrangementSaving ||
+            products.length === 0
+          "
+          (click)="startArrange()">
+
+          Arrange Products
+
+        </button>
+
+        <button
+          type="button"
+          class="bulk-button"
+          [disabled]="loading || bulkLoading"
+          (click)="openBulkUpload()">
+
+          Bulk Upload
+
+        </button>
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="loading || bulkLoading"
+          (click)="addProduct()">
+
+          + Add Product
+
+        </button>
+
+      } @else {
+
+        <button
+          type="button"
+          class="cancel-arrange-button"
+          [disabled]="arrangementSaving"
+          (click)="cancelArrange()">
+
+          Cancel
+
+        </button>
+
+        <button
+          type="button"
+          class="save-arrange-button"
+          [disabled]="arrangementSaving"
+          (click)="saveArrangement()">
+
+          @if (arrangementSaving) {
+
+            Saving...
+
+          } @else {
+
+            Save Arrangement
+
+          }
+
+        </button>
+
+      }
+
+    </div>
+
+  </div>
+
+
+  <section class="filters">
+
+    <div class="search-field">
+
+      <input
+        type="text"
+        [(ngModel)]="search"
+        [disabled]="arrangeMode"
+        [placeholder]="
+          arrangeMode
+            ? 'Search disabled while arranging'
+            : 'Search product'
+        ">
+
+    </div>
+
+
+    <div class="category-tabs">
+
+      <button
+        type="button"
+        class="category-button"
+        [class.active]="selectedUnit === 'ALL'"
+        [disabled]="arrangeMode"
+        (click)="selectUnit('ALL')">
+
+        All
+
+      </button>
+
+
+      <button
+        type="button"
+        class="category-button"
+        [class.active]="selectedUnit === 'PC'"
+        [disabled]="arrangeMode"
+        (click)="selectUnit('PC')">
+
+        Per Piece
+
+      </button>
+
+
+      <button
+        type="button"
+        class="category-button"
+        [class.active]="selectedUnit === 'KG'"
+        [disabled]="arrangeMode"
+        (click)="selectUnit('KG')">
+
+        Per KG
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  @if (arrangeMode) {
+
+    <div class="arrange-mode-banner">
+
+      <div class="arrange-mode-icon">
+        ↕
+      </div>
+
+      <div>
+
+        <strong>
+          Arrange Products
+        </strong>
+
+        <p>
+          Drag and drop the product cards into the order you want, then save the arrangement.
+        </p>
+
+      </div>
+
+    </div>
+
+  }
+@if (loading && products.length === 0) {
+
+    <div class="loading-state">
+
+      <p>
+        Loading products...
+      </p>
+
+    </div>
+
+  } @else {
+
+    @if (filteredProducts.length > 0) {
+
+      <section
+        class="product-grid"
+        [class.arrange-mode]="arrangeMode">
+
+        @for (
+          product of filteredProducts;
+          track product.id;
+          let productIndex = $index
+        ) {
+
+          <article
+            class="product-card"
+            [class.arrange-card]="arrangeMode"
+            [class.dragging]="
+              arrangeMode &&
+              draggedProductId === product.id
+            "
+            [attr.draggable]="
+              arrangeMode &&
+              !arrangementSaving
+                ? 'true'
+                : 'false'
+            "
+            (dragstart)="onProductDragStart($event, product)"
+            (dragover)="onProductDragOver($event)"
+            (drop)="onProductDrop($event, product)"
+            (dragend)="onProductDragEnd()">
+
+            @if (arrangeMode) {
+
+              <div class="arrange-card-header">
+
+                <div class="drag-handle">
+                  ☰
+                </div>
+
+                <span class="arrange-position">
+                  Position {{ productIndex + 1 }}
+                </span>
+
+              </div>
+
+            }
+
+
+            <div class="product-card-header">
+
+              <div class="product-identity">
+
+                <div class="product-icon">
+
+                  {{
+                    product.icon ||
+                    (
+                      product.unit === 'KG'
+                        ? '🧺'
+                        : '👕'
+                    )
+                  }}
+
+                </div>
+
+
+                <div>
+
+                  <h2>
+                    {{ product.name }}
+                  </h2>
+
+                  <p class="product-category">
+                    {{ getUnitLabel(product) }}
+                  </p>
+
+
+                  <span
+                    class="status-badge"
+                    [class.active]="product.active"
+                    [class.inactive]="!product.active">
+
+                    {{
+                      product.active
+                        ? 'Active'
+                        : 'Inactive'
+                    }}
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              @if (!arrangeMode) {
+
+                <button
+                  type="button"
+                  class="edit-product-button"
+                  [disabled]="loading"
+                  (click)="editProduct(product)">
+
+                  Edit
+
+                </button>
+
+              }
+
+            </div>
+
+
+            <div class="product-section">
+
+              <div class="section-heading">
+
+                <h3>
+                  Types & Pricing
+                </h3>
+
+                @if (!arrangeMode) {
+
+                  <button
+                    type="button"
+                    class="text-button"
+                    [disabled]="loading"
+                    (click)="manageServices(product)">
+
+                    Manage
+
+                  </button>
+
+                }
+
+              </div>
+
+
+              @if (product.types.length > 0) {
+
+                <div class="product-types-list">
+
+                  @for (
+                    type of product.types;
+                    track type.id;
+                    let typeIndex = $index
+                  ) {
+
+                    @if (
+                      typeIndex === 0 ||
+                      isProductExpanded(product.id)
+                    ) {
+
+                      @if (
+                        product.unit === 'KG' &&
+                        isDefaultType(type.name)
+                      ) {
+
+                        <div
+                          class="product-type-block default-type-block">
+
+                          <div class="service-list">
+
+                            @for (
+                              service of type.services;
+                              track service.id
+                            ) {
+
+                              <div class="service-row">
+
+                                <div class="service-info">
+
+                                  <span class="service-name">
+                                    {{ service.name }}
+                                  </span>
+
+                                </div>
+
+
+                                <strong class="service-price">
+
+                                  ₹{{ service.price }}
+
+                                  <small>
+                                    /kg
+                                  </small>
+
+                                </strong>
+
+                              </div>
+
+                            }
+
+                          </div>
+
+                        </div>
+
+                      } @else {
+
+                        <div class="product-type-block">
+
+                          <div class="product-type-header">
+
+                            <strong>
+                              {{ type.name }}
+                            </strong>
+
+                          </div>
+
+
+                          @if (type.services.length > 0) {
+
+                            <div class="service-list">
+
+                              @for (
+                                service of type.services;
+                                track service.id
+                              ) {
+
+                                <div class="service-row">
+
+                                  <div class="service-info">
+
+                                    <span class="service-name">
+                                      {{ service.name }}
+                                    </span>
+
+                                  </div>
+
+
+                                  <strong class="service-price">
+
+                                    ₹{{ service.price }}
+
+                                    <small>
+                                      /
+                                      {{
+                                        product.unit === 'KG'
+                                          ? 'kg'
+                                          : 'pc'
+                                      }}
+                                    </small>
+
+                                  </strong>
+
+                                </div>
+
+                              }
+
+                            </div>
+
+                          } @else {
+
+                            <p class="empty-text">
+                              No services configured
+                            </p>
+
+                          }
+
+                        </div>
+
+                      }
+
+                    }
+
+                  }
+
+                </div>
+
+
+                @if (
+                  product.types.length > 1 &&
+                  !arrangeMode
+                ) {
+
+                  <button
+                    type="button"
+                    class="view-more-button"
+                    (click)="toggleProductDetails(product.id)">
+
+                    {{
+                      isProductExpanded(product.id)
+                        ? 'View less'
+                        : 'View more'
+                    }}
+
+                    <span
+                      class="view-more-arrow"
+                      [class.expanded]="
+                        isProductExpanded(product.id)
+                      ">
+
+                      ↓
+
+                    </span>
+
+                  </button>
+
+                }
+
+              } @else {
+
+                <p class="empty-text">
+                  No product types configured
+                </p>
+
+              }
+
+            </div>
+
+          </article>
+
+        }
+
+      </section>
+
+    } @else {
+
+      <div class="empty-state">
+
+        <h3>
+          No products found
+        </h3>
+
+
+        @if (products.length === 0) {
+
+          <p>
+            Add your first laundry product and configure its pricing.
+          </p>
+
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="arrangeMode"
+            (click)="addProduct()">
+
+            + Add Product
+
+          </button>
+
+        } @else {
+
+          <p>
+            Try changing the search or pricing-unit filter.
+          </p>
+
+        }
+
+      </div>
+
+    }
+
+  }
+
+
+  @if (showProductForm) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeProductForm()">
+
+      <div
+        class="product-modal"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+
+              {{
+                editingProductId !== null
+                  ? 'Edit Product'
+                  : 'Add Product'
+              }}
+
+            </h2>
+
+            <p>
+
+              {{
+                editingProductId !== null
+                  ? 'Update product types, services and pricing'
+                  : 'Create a new laundry product'
+              }}
+
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close"
+            [disabled]="loading"
+            (click)="closeProductForm()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <div class="product-form">
+
+          <div class="form-group">
+
+            <label for="productName">
+
+              Product Name
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+            <input
+              id="productName"
+              type="text"
+              [(ngModel)]="productForm.name"
+              placeholder="Example: Shirt">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Product Icon
+            </label>
+
+            <div class="icon-picker">
+
+              @for (
+                icon of productIcons;
+                track icon
+              ) {
+
+                <button
+                  type="button"
+                  class="icon-option"
+                  [class.selected]="
+                    productForm.icon === icon
+                  "
+                  (click)="selectProductIcon(icon)">
+
+                  {{ icon }}
+
+                </button>
+
+              }
+
+            </div>
+
+            <div class="icon-custom-row">
+
+              <span class="icon-preview">
+                {{ productForm.icon || '👕' }}
+              </span>
+
+              <input
+                type="text"
+                [(ngModel)]="productForm.icon"
+                maxlength="10"
+                placeholder="Or paste an emoji">
+
+            </div>
+
+            <small class="helper-text">
+              Choose an icon or paste your own emoji.
+            </small>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="pricingUnit">
+
+              Pricing Unit
+
+              <span class="required">
+                *
+              </span>
+
+            </label>
+
+            <select
+              id="pricingUnit"
+              [(ngModel)]="productForm.unit">
+
+              <option value="PC">
+                Per Piece (PC)
+              </option>
+
+              <option value="KG">
+                Per Kilogram (KG)
+              </option>
+
+            </select>
+
+
+            <small class="helper-text">
+
+              {{
+                productForm.unit === 'KG'
+                  ? 'Prices will be charged per kilogram.'
+                  : 'Prices will be charged per piece.'
+              }}
+
+            </small>
+
+          </div>
+
+
+          <div class="types-editor">
+
+            <div class="services-editor-header">
+
+              <div>
+
+                <h3>
+                  Product Types & Pricing
+                </h3>
+
+                <p>
+                  Add product types and configure services with separate prices.
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                class="add-service-button"
+                [disabled]="loading"
+                (click)="addType()">
+
+                + Add Type
+
+              </button>
+
+            </div>
+
+
+            @for (
+              type of productForm.types;
+              track $index;
+              let typeIndex = $index
+            ) {
+
+              <div class="type-editor-card">
+
+                <div class="type-editor-header">
+
+                  <div class="form-group type-name-field">
+
+                    <label>
+                      Product Type
+                    </label>
+
+                    <input
+                      type="text"
+                      [(ngModel)]="type.name"
+                      [placeholder]="
+                        productForm.unit === 'KG'
+                          ? 'Example: Default'
+                          : 'Example: Kids, Cotton, Silk'
+                      ">
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    class="remove-type-button"
+                    [disabled]="
+                      loading ||
+                      productForm.types.length === 1
+                    "
+                    (click)="removeType(typeIndex)">
+
+                    Remove Type
+
+                  </button>
+
+                </div>
+
+
+                <div class="type-services-section">
+
+                  <div class="type-services-header">
+
+                    <div>
+
+                      <strong>
+                        Services & Pricing
+                      </strong>
+
+                      <p>
+                        Pricing for {{ type.name || 'this type' }}
+                      </p>
+
+                    </div>
+
+
+                    <button
+                      type="button"
+                      class="add-service-button"
+                      [disabled]="loading"
+                      (click)="addServiceRow(typeIndex)">
+
+                      + Add Service
+
+                    </button>
+
+                  </div>
+
+
+                  <div class="service-editor-list">
+
+                    @for (
+                      service of type.services;
+                      track $index;
+                      let serviceIndex = $index
+                    ) {
+
+                      <div class="service-editor-row">
+
+                        <div class="form-group">
+
+                          <label>
+                            Service Name
+                          </label>
+
+                          <input
+                            type="text"
+                            [(ngModel)]="service.name"
+                            placeholder="Example: Dry Clean">
+
+                        </div>
+
+
+                        <div class="form-group price-field">
+
+                          <label>
+
+                            Price
+
+                            <span class="price-unit-label">
+
+                              {{
+                                productForm.unit === 'KG'
+                                  ? '/ KG'
+                                  : '/ PC'
+                              }}
+
+                            </span>
+
+                          </label>
+
+
+                          <div class="price-input">
+
+                            <span>
+                              ₹
+                            </span>
+
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              [(ngModel)]="service.price"
+                              placeholder="0">
+
+                          </div>
+
+                        </div>
+
+
+                        <button
+                          type="button"
+                          class="remove-service-button"
+                          aria-label="Remove service"
+                          [disabled]="
+                            loading ||
+                            type.services.length === 1
+                          "
+                          (click)="
+                            removeServiceRow(
+                              typeIndex,
+                              serviceIndex
+                            )
+                          ">
+
+                          ×
+
+                        </button>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+
+          @if (productForm.unit === 'KG') {
+
+            <div class="info-note">
+
+              <strong>
+                Per KG Product
+              </strong>
+
+              <p>
+                For products such as Laundry By Weight,
+                use <strong>Default</strong> as the product type
+                and add services such as Wash & Fold,
+                Wash & Iron and Premium Laundry.
+              </p>
+
+            </div>
+
+          }
+<div class="modal-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              [disabled]="loading"
+              (click)="closeProductForm()">
+
+              Cancel
+
+            </button>
+
+
+            <button
+              type="button"
+              class="save-button"
+              [disabled]="
+                loading ||
+                !productForm.name.trim()
+              "
+              (click)="saveProduct()">
+
+              @if (loading) {
+
+                Saving...
+
+              } @else {
+
+                {{
+                  editingProductId !== null
+                    ? 'Update Product'
+                    : 'Save Product'
+                }}
+
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  @if (showBulkUpload) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeBulkUpload()">
+
+      <div
+        class="product-modal bulk-upload-modal"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+              Bulk Upload Products
+            </h2>
+
+            <p>
+              Upload your laundry price list PDF to create or update products automatically
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="close-button"
+            aria-label="Close"
+            [disabled]="bulkLoading"
+            (click)="closeBulkUpload()">
+
+            ×
+
+          </button>
+
+        </div>
+
+        <div class="product-form">
+
+          <div class="bulk-info-note">
+
+            <strong>
+              Upload Price List PDF
+            </strong>
+
+            <p>
+              The PDF will be read automatically and products, types, services and prices will be imported.
+            </p>
+
+          </div>
+
+          <div class="pdf-upload-section">
+
+            <input
+              #bulkPdfInput
+              type="file"
+              accept=".pdf,application/pdf"
+              class="pdf-file-input"
+              [disabled]="bulkLoading"
+              (change)="onBulkFileSelected($event)">
+
+            <button
+              type="button"
+              class="pdf-drop-zone"
+              [disabled]="bulkLoading"
+              (click)="bulkPdfInput.click()">
+
+              <span class="pdf-upload-icon">
+                📄
+              </span>
+
+              <strong>
+                Choose PDF File
+              </strong>
+
+              <span>
+                Select your laundry price list PDF
+              </span>
+
+              <small>
+                PDF only · Maximum 10 MB
+              </small>
+
+            </button>
+
+          </div>
+
+          @if (selectedBulkFile) {
+
+            <div class="selected-pdf-file">
+
+              <div class="selected-pdf-icon">
+                📄
+              </div>
+
+              <div class="selected-pdf-details">
+
+                <strong>
+                  {{ selectedBulkFile.name }}
+                </strong>
+
+                <span>
+                  {{ (selectedBulkFile.size / 1024 / 1024) | number:'1.2-2' }} MB
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="remove-pdf-button"
+                [disabled]="bulkLoading"
+                (click)="removeBulkFile()">
+
+                ×
+
+              </button>
+
+            </div>
+
+          }
+<div class="modal-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              [disabled]="bulkLoading"
+              (click)="closeBulkUpload()">
+
+              Cancel
+
+            </button>
+
+            <button
+              type="button"
+              class="save-button"
+              [disabled]="
+                bulkLoading ||
+                !selectedBulkFile
+              "
+              (click)="submitBulkUpload()">
+
+              @if (bulkLoading) {
+
+                Uploading...
+
+              } @else {
+
+                Upload Products
+
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

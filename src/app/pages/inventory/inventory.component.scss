@@ -1,0 +1,194 @@
+:host {
+  display: block;
+}
+
+.inventory-page {
+  min-height: calc(100vh - 80px);
+
+  padding: var(--app-space-xl);
+
+  background:
+    radial-gradient(
+      circle at 8% 8%,
+      rgba(18, 183, 214, 0.10) 0%,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 92% 5%,
+      rgba(255, 212, 59, 0.12) 0%,
+      transparent 28%
+    ),
+    var(--app-background-soft);
+}
+
+.page-header {
+  margin-bottom: var(--app-space-xl);
+
+  h1 {
+    margin: 0;
+
+    color: var(--app-text-primary);
+
+    font-family: var(--app-font-heading);
+
+    font-size: var(--app-font-size-2xl);
+    font-weight: 700;
+
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: var(--app-space-sm) 0 0;
+
+    color: var(--app-text-secondary);
+
+    font-size: var(--app-font-size-sm);
+  }
+}
+
+.cards-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: var(--app-space-lg);
+}
+
+.management-card {
+  width: 100%;
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+
+  gap: var(--app-space-lg);
+
+  padding: var(--app-space-lg);
+
+  border: 1px solid var(--app-border);
+
+  border-radius: var(--app-radius-lg);
+
+  background: rgba(255, 255, 255, 0.94);
+
+  color: var(--app-text-primary);
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow: var(--app-shadow-sm);
+
+  transition: var(--app-transition);
+
+  &:hover {
+    transform: translateY(-2px);
+
+    border-color: var(--app-primary);
+
+    box-shadow: var(--app-shadow-md);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-primary);
+    outline-offset: 3px;
+  }
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--app-radius-md);
+
+  background: var(--app-primary-light);
+
+  color: var(--app-primary-dark);
+
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.card-content {
+  flex: 1;
+
+  h2 {
+    margin: 0 0 var(--app-space-sm);
+
+    color: var(--app-text-primary);
+
+    font-family: var(--app-font-heading);
+
+    font-size: var(--app-font-size-lg);
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--app-text-secondary);
+
+    font-size: var(--app-font-size-sm);
+
+    line-height: 1.6;
+  }
+}
+
+.card-arrow {
+  flex-shrink: 0;
+
+  color: var(--app-text-muted);
+
+  font-size: 24px;
+
+  transition: var(--app-transition);
+}
+
+.management-card:hover .card-arrow {
+  color: var(--app-primary);
+
+  transform: translateX(3px);
+}
+
+@media (max-width: 1000px) {
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .inventory-page {
+    padding: var(--app-space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+
+  .inventory-page {
+    padding: var(--app-space-md);
+  }
+
+  .management-card {
+    min-height: 150px;
+
+    gap: var(--app-space-md);
+
+    padding: var(--app-space-md);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+
+    font-size: 22px;
+  }
+}

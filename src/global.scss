@@ -1,37 +1,454 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
-/* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
+:root {
+  --app-primary: #16a34a;
+  --app-primary-dark: #15803d;
+  --app-primary-light: #dcfce7;
 
-/* Basic CSS for apps built with Ionic */
-@import "@ionic/angular/css/normalize.css";
-@import "@ionic/angular/css/structure.css";
-@import "@ionic/angular/css/typography.css";
-@import "@ionic/angular/css/display.css";
+  --app-secondary: #22c55e;
+  --app-secondary-dark: #16a34a;
+  --app-secondary-light: #f0fdf4;
 
-/* Optional CSS utils that can be commented out */
-@import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/float-elements.css";
-@import "@ionic/angular/css/text-alignment.css";
-@import "@ionic/angular/css/text-transformation.css";
-@import "@ionic/angular/css/flex-utils.css";
+  --app-background: #ffffff;
+  --app-background-soft: #f7faf8;
+  --app-background-blue: #ecfdf3;
+  --app-background-yellow: #f0fdf4;
+  --app-background-dark: #111815;
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+  --app-surface: #ffffff;
+  --app-surface-soft: #f8faf9;
+  --app-surface-dark: #1b2420;
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+  --app-text-primary: #111814;
+  --app-text-secondary: #5f6c64;
+  --app-text-muted: #8a9690;
+  --app-text-light: #ffffff;
+
+  --app-border: #e3e9e5;
+  --app-border-dark: #2c3731;
+
+  --app-success: #16a34a;
+  --app-warning: #d99a00;
+  --app-danger: #dc4545;
+  --app-info: #168aad;
+
+  --app-font-body: 'Inter', sans-serif;
+  --app-font-heading: 'Manrope', sans-serif;
+
+  --app-font-size-xs: 12px;
+  --app-font-size-sm: 14px;
+  --app-font-size-md: 16px;
+  --app-font-size-lg: 18px;
+  --app-font-size-xl: 24px;
+  --app-font-size-2xl: 32px;
+  --app-font-size-3xl: 48px;
+  --app-font-size-4xl: 64px;
+
+  --app-radius-sm: 8px;
+  --app-radius-md: 12px;
+  --app-radius-lg: 18px;
+  --app-radius-xl: 26px;
+  --app-radius-round: 999px;
+
+  --app-space-xs: 4px;
+  --app-space-sm: 8px;
+  --app-space-md: 16px;
+  --app-space-lg: 24px;
+  --app-space-xl: 32px;
+  --app-space-2xl: 48px;
+  --app-space-3xl: 72px;
+  --app-space-4xl: 100px;
+
+  --app-shadow-sm:
+    0 2px 10px rgba(17, 24, 20, 0.05);
+
+  --app-shadow-md:
+    0 10px 30px rgba(17, 24, 20, 0.08);
+
+  --app-shadow-lg:
+    0 20px 60px rgba(17, 24, 20, 0.12);
+
+  --app-container-width: 1280px;
+  --app-page-padding: 48px;
+
+  --app-transition: 0.25s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+app-root,
+ion-app {
+  width: 100%;
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  background: var(--app-background);
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-body);
+}
+
+body {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--app-font-heading);
+  font-weight: 700;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: var(--app-font-body);
+}
+
+ion-content {
+  --background: var(--app-background);
+
+  font-family: var(--app-font-body);
+}
+
+ion-button {
+  --background: var(--app-primary);
+  --background-hover: var(--app-primary-dark);
+  --background-activated: var(--app-primary-dark);
+  --background-focused: var(--app-primary-dark);
+
+  --color: var(--app-text-light);
+
+  --border-radius: var(--app-radius-md);
+
+  --box-shadow: none;
+
+  font-family: var(--app-font-body);
+  font-weight: 600;
+
+  text-transform: none;
+}
+
+.app-container {
+  width: 100%;
+  max-width: var(--app-container-width);
+
+  margin: 0 auto;
+
+  padding-left: var(--app-page-padding);
+  padding-right: var(--app-page-padding);
+}
+
+.section-heading {
+  text-align: center;
+}
+
+.section-heading h2 {
+  margin: 0;
+
+  color: var(--app-text-primary);
+
+  font-family: var(--app-font-heading);
+
+  font-size: var(--app-font-size-2xl);
+  font-weight: 700;
+
+  letter-spacing: -0.03em;
+}
+
+.section-heading p {
+  margin: 8px 0 0;
+
+  color: var(--app-text-secondary);
+
+  font-size: var(--app-font-size-sm);
+}
+
+// ion-content::part(scroll) {
+//   scrollbar-width: none;
+//   -ms-overflow-style: none;
+// }
+
+// ion-content::part(scroll)::-webkit-scrollbar {
+//   display: none;
+
+//   width: 0;
+//   height: 0;
+// }
+
+
+
+@media (max-width: 992px) {
+  :root {
+    --app-page-padding: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --app-page-padding: 20px;
+
+    --app-font-size-3xl: 40px;
+    --app-font-size-4xl: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --app-page-padding: 16px;
+
+    --app-font-size-2xl: 28px;
+    --app-font-size-3xl: 34px;
+    --app-font-size-4xl: 40px;
+  }
+}
+
+.cdk-overlay-container {
+  position: fixed !important;
+  z-index: 10000 !important;
+}
+
+.cdk-overlay-pane {
+  z-index: 10000 !important;
+}
+
+.mat-datepicker-content {
+  background: #ffffff !important;
+  border: 1px solid #e2e8e4 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+
+  box-shadow:
+    0 12px 32px rgba(15, 23, 42, 0.16) !important;
+}
+
+.mat-datepicker-content .mat-calendar {
+  width: 300px !important;
+  height: 354px !important;
+  background: #ffffff !important;
+}
+
+.mat-datepicker-content .mat-calendar-header {
+  padding: 8px 8px 0 !important;
+}
+
+.mat-datepicker-content .mat-calendar-controls {
+  margin: 5% calc(4.7142857143% - 16px) !important;
+}
+
+.mat-datepicker-content .mat-calendar-period-button {
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+.mat-datepicker-content .mat-calendar-previous-button,
+.mat-datepicker-content .mat-calendar-next-button {
+  color: #1f2937 !important;
+}
+
+.mat-datepicker-content .mat-calendar-arrow {
+  fill: #1f2937 !important;
+}
+
+.mat-datepicker-content .mat-calendar-table-header th {
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-cell-content {
+  color: #1f2937 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-selected {
+  background-color: #16a34a !important;
+  color: #ffffff !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-today:not(
+  .mat-calendar-body-selected
+) {
+  border-color: #16a34a !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-in-range::before {
+  background: #dcfce7 !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-range-start::before {
+  left: 50% !important;
+}
+
+.mat-datepicker-content .mat-calendar-body-range-end::before {
+  right: 50% !important;
+}
+
+.mat-datepicker-content
+  .mat-calendar-body-cell:hover
+  .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+  background: #ecfdf5 !important;
+}
+
+
+
+ion-toast.app-notification-toast {
+  --width: 340px;
+  --max-width: 340px;
+  --min-height: 46px;
+  --border-radius: 10px;
+  --box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+  --start: auto;
+  --end: 18px;
+  font-family: var(--app-font-body);
+  z-index: 99999;
+  animation: toastEnter 0.28s ease-out;
+}
+
+ion-toast.app-notification-toast::part(container) {
+  min-height: 46px;
+  padding: 0 2px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+ion-toast.app-notification-toast::part(message) {
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+ion-toast.app-notification-toast::part(icon) {
+  width: 18px;
+  height: 18px;
+  margin-left: 9px;
+  font-size: 18px;
+  animation: toastIconPop 0.35s ease-out;
+}
+
+ion-toast.app-notification-toast::part(button) {
+  min-width: 30px;
+  padding-inline: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+ion-toast.app-notification-success {
+  --background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  --color: #166534;
+}
+
+ion-toast.app-notification-success::part(container) {
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #16a34a;
+}
+
+ion-toast.app-notification-success::part(icon),
+ion-toast.app-notification-success::part(button) {
+  color: #16a34a;
+}
+
+ion-toast.app-notification-error {
+  --background: linear-gradient(135deg, #fff1f2, #fef2f2);
+  --color: #991b1b;
+}
+
+ion-toast.app-notification-error::part(container) {
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+}
+
+ion-toast.app-notification-error::part(icon) {
+  color: #dc2626;
+}
+
+ion-toast.app-notification-error::part(button) {
+  color: #991b1b;
+}
+
+ion-toast.app-notification-warning {
+  --background: linear-gradient(135deg, #fffbeb, #fefce8);
+  --color: #92400e;
+}
+
+ion-toast.app-notification-warning::part(container) {
+  border: 1px solid #fde68a;
+  border-left: 4px solid #d97706;
+}
+
+ion-toast.app-notification-warning::part(icon),
+ion-toast.app-notification-warning::part(button) {
+  color: #d97706;
+}
+
+ion-toast.app-notification-info {
+  --background: linear-gradient(135deg, #eff6ff, #ecfeff);
+  --color: #0c4a6e;
+}
+
+ion-toast.app-notification-info::part(container) {
+  border: 1px solid #bae6fd;
+  border-left: 4px solid #0284c7;
+}
+
+ion-toast.app-notification-info::part(icon),
+ion-toast.app-notification-info::part(button) {
+  color: #0284c7;
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toastIconPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  70% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  ion-toast.app-notification-toast {
+    --width: calc(100% - 32px);
+    --max-width: calc(100% - 32px);
+    --start: 16px;
+    --end: 16px;
+  }
+}

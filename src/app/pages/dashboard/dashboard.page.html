@@ -1,0 +1,345 @@
+<div class="dashboard-page">
+
+  <div class="dashboard-toolbar">
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="loading"
+      (click)="loadDashboard()">
+      {{ loading ? 'Loading...' : '↻ Refresh' }}
+    </button>
+  </div>
+
+  <!-- @if (errorMessage) {
+    <div class="dashboard-error">
+      <span>{{ errorMessage }}</span>
+      <button
+        type="button"
+        (click)="errorMessage = ''">
+        ×
+      </button>
+    </div>
+  } -->
+
+  @if (loading) {
+    <div class="dashboard-loading">
+      Loading dashboard...
+    </div>
+  }
+
+  @if (!loading && deliveryDays.length === 0) {
+    <div class="dashboard-empty">
+      <h3>No active delivery orders</h3>
+      <p>Orders with delivery dates will appear here.</p>
+    </div>
+  }
+
+  @if (!loading && deliveryDays.length > 0) {
+
+    <div class="delivery-matrix-wrapper">
+
+      <div
+        class="delivery-matrix"
+        [style.--date-count]="deliveryDays.length">
+
+        <div class="matrix-label-column">
+
+          <div class="matrix-delivery-label">
+            Delivery Date
+          </div>
+
+          <div class="matrix-total-label">
+            Total
+            <span>[{{ totalOrders }}]</span>
+          </div>
+
+          <div class="matrix-processing-label">
+            Processing
+            <span>[{{ processingOrders }}]</span>
+          </div>
+
+          <div class="matrix-ready-label">
+            Ready
+            <span>[{{ readyOrders }}]</span>
+          </div>
+
+          <div class="matrix-order-label">
+            <span class="ready-check">✓</span>
+          </div>
+
+        </div>
+
+        @for (day of deliveryDays; track day.deliveryDate) {
+
+          <div class="matrix-date-column">
+
+            <div class="matrix-date-header">
+              {{ day.dayLabel }}
+            </div>
+
+            <div class="matrix-total-cell">
+              {{ day.totalOrders }}
+              -
+              {{ formatPieces(day.totalPieces) }} pc
+            </div>
+
+            <div class="matrix-processing-cell">
+              {{ day.processingOrders }}
+              -
+              {{ formatPieces(day.processingPieces) }} pc
+            </div>
+
+            <div class="matrix-ready-cell">
+              {{ day.readyOrders }}
+              -
+              {{ formatPieces(day.readyPieces) }} pc
+            </div>
+
+            <div class="matrix-orders">
+
+              @if (day.orders.length === 0) {
+                <div class="matrix-empty-row"></div>
+              }
+
+              @for (
+                order of day.orders;
+                track order.id;
+                let index = $index
+              ) {
+
+                <button
+                  type="button"
+                  class="matrix-order-row"
+                  [class.processing-row]="isProcessingOrder(order)"
+                  [class.ready-row]="isReadyOrder(order)"
+                  (click)="openCallPopup(order)">
+
+                  <span class="matrix-order-index">
+                    {{ index + 1 }}.
+                  </span>
+
+                  <span class="matrix-order-number">
+                    {{ order.orderNumber }}
+                  </span>
+
+                  <span class="matrix-divider">
+                    -
+                  </span>
+
+                  <span class="matrix-pieces">
+                    {{ formatPieces(order.totalPieces) }} pc
+                  </span>
+
+                  <span class="matrix-divider">
+                    -
+                  </span>
+
+                  <span class="matrix-amount">
+                    ₹{{ formatAmount(order.totalAmount) }}
+                  </span>
+
+                  <span class="matrix-divider">
+                    -
+                  </span>
+
+                  <span class="matrix-time">
+                    {{ order.deliveryTime || '-' }}
+                  </span>
+
+                  <span class="matrix-phone-icon">
+                    ☎
+                  </span>
+
+                  <span class="matrix-customer">
+                    {{ order.customerName }}
+                  </span>
+
+                  @if (isProcessingOrder(order)) {
+
+                    <span
+                      class="matrix-status-tick"
+                      role="button"
+                      tabindex="0"
+                      title="Mark Ready"
+                      (click)="openReadyConfirmation(order, $event)">
+
+                      ✓
+
+                    </span>
+
+                  }
+
+                  @if (isReadyOrder(order)) {
+
+                    <span class="matrix-ready-icon">
+                      ✓
+                    </span>
+
+                  }
+
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  }
+
+  @if (selectedOrder) {
+
+    <div
+      class="call-overlay"
+      (click)="closeCallPopup()">
+
+      <div
+        class="call-popup"
+        (click)="$event.stopPropagation()">
+
+        <div class="call-popup-header">
+
+          <div>
+            <h2>Customer Details</h2>
+            <p>{{ selectedOrder.orderNumber }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="popup-close"
+            (click)="closeCallPopup()">
+            ×
+          </button>
+
+        </div>
+
+        <div class="call-popup-body">
+
+          <div class="call-customer-avatar">
+            {{
+              selectedOrder.customerName
+                ? selectedOrder.customerName.charAt(0).toUpperCase()
+                : '?'
+            }}
+          </div>
+
+          <h3>
+            {{ selectedOrder.customerName }}
+          </h3>
+
+          <p class="call-mobile">
+            {{ selectedOrder.mobile }}
+          </p>
+
+          <div class="call-order-details">
+
+            <div>
+              <span>Pieces</span>
+              <strong>
+                {{ formatPieces(selectedOrder.totalPieces) }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Amount</span>
+              <strong>
+                ₹{{ formatAmount(selectedOrder.totalAmount) }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Delivery</span>
+              <strong>
+                {{ selectedOrder.deliveryTime || '-' }}
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="call-popup-footer">
+
+          <button
+            type="button"
+            class="cancel-call-button"
+            (click)="closeCallPopup()">
+            Close
+          </button>
+
+          <button
+            type="button"
+            class="call-now-button"
+            (click)="callNow()">
+            ☎ Call Customer
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+  @if (confirmReadyOrder) {
+
+    <div
+      class="confirm-overlay"
+      (click)="closeReadyConfirmation()">
+
+      <div
+        class="confirm-popup"
+        (click)="$event.stopPropagation()">
+
+        <h3>
+          Mark Order Ready?
+        </h3>
+
+        <p>
+          Order
+          <strong>{{ confirmReadyOrder.orderNumber }}</strong>
+          for
+          <strong>{{ confirmReadyOrder.customerName }}</strong>
+          will be marked as Ready.
+        </p>
+
+        <div class="confirm-actions">
+
+          <button
+            type="button"
+            class="confirm-cancel"
+            [disabled]="updatingOrderId === confirmReadyOrder.id"
+            (click)="closeReadyConfirmation()">
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="confirm-ready"
+            [disabled]="updatingOrderId === confirmReadyOrder.id"
+            (click)="confirmMarkReady()">
+
+            {{
+              updatingOrderId === confirmReadyOrder.id
+                ? 'Updating...'
+                : 'Yes, Mark Ready'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

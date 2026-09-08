@@ -1,0 +1,179 @@
+<div class="sidebar">
+
+  <div class="sidebar-profile">
+
+    <div class="profile-avatar">
+
+      @if (settings.logoUrl) {
+
+        <img
+          [src]="settings.logoUrl"
+          alt="Business Logo">
+
+      } @else {
+
+        <ion-icon name="person"></ion-icon>
+
+      }
+
+    </div>
+
+    <div class="profile-info">
+
+      <strong class="profile-name">
+        {{ settings.adminName || 'Admin' }}
+      </strong>
+
+      <span class="profile-code">
+        {{ settings.adminSubtitle || 'Laundry' }}
+      </span>
+
+      <div class="profile-rating">
+
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+        <ion-icon name="star"></ion-icon>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <nav class="sidebar-menu">
+
+
+    <!-- HOME -->
+
+    <a
+      routerLink="/app/dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="menu-item">
+
+      <ion-icon name="home-outline"></ion-icon>
+
+      <span>
+        Home
+      </span>
+
+    </a>
+
+
+    <!-- NEW WALK-IN -->
+
+    <a
+      routerLink="/app/new-walk-in"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="walk-outline"></ion-icon>
+
+      <span>
+        New Walk-in
+      </span>
+
+    </a>
+
+
+    <!-- B2C ORDER -->
+
+    <a
+      routerLink="/app/b2c-orders"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="cart-outline"></ion-icon>
+
+      <span>
+        B2C Order
+      </span>
+
+    </a>
+
+
+    <!-- INVENTORY -->
+
+    <a
+      routerLink="/app/inventory"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="cube-outline"></ion-icon>
+
+      <span>
+        Inventory
+      </span>
+
+    </a>
+
+
+    <!-- SETTLEMENT -->
+
+    <!-- <a
+      routerLink="/app/settlement"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="checkmark-done-outline"></ion-icon>
+
+      <span>
+        Settlement
+      </span>
+
+    </a> -->
+
+
+    <!-- BILL -->
+
+    <a
+      routerLink="/app/bill"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="receipt-outline"></ion-icon>
+
+      <span>
+        Bill
+      </span>
+
+    </a>
+
+
+    <!-- PAYMENT -->
+
+    <a
+      routerLink="/app/payments"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="card-outline"></ion-icon>
+
+      <span>
+        Payment
+      </span>
+
+    </a>
+
+
+    <!-- SALES REPORT -->
+
+    <a
+      routerLink="/app/sales-report"
+      routerLinkActive="active"
+      class="menu-item">
+
+      <ion-icon name="bar-chart-outline"></ion-icon>
+
+      <span>
+        Sales Report
+      </span>
+
+    </a>
+
+  </nav>
+
+</div>

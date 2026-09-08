@@ -1,0 +1,86 @@
+<div class="app-shell">
+
+  <app-sidebar></app-sidebar>
+
+  <div class="app-main">
+
+    <header class="app-header">
+
+      <div class="header-title">
+
+        <strong>
+          {{ settings.businessName || 'Venkateshwara Fabric Works' }}
+        </strong>
+
+        <span>
+          {{ settings.headerSubtitle || 'Operations' }}
+        </span>
+
+      </div>
+
+      <div class="header-actions">
+
+        <div class="zoom-controls">
+
+          <button
+            type="button"
+            class="header-action zoom-button"
+            title="Zoom Out"
+            [disabled]="zoomLevel <= minZoom"
+            (click)="zoomOut()">
+            −
+          </button>
+
+          <span class="zoom-value">
+            {{ zoomPercentage }}%
+          </span>
+
+          <button
+            type="button"
+            class="header-action zoom-button"
+            title="Zoom In"
+            [disabled]="zoomLevel >= maxZoom"
+            (click)="zoomIn()">
+            +
+          </button>
+
+          <button
+            type="button"
+            class="header-action zoom-reset"
+            title="Reset Zoom"
+            (click)="resetZoom()">
+            100%
+          </button>
+
+        </div>
+
+        <button
+          type="button"
+          class="header-action">
+          🚲
+        </button>
+
+        <button
+          type="button"
+          class="header-action refresh"
+          title="Reload Page"
+          (click)="reloadPage()">
+          ↻
+        </button>
+
+      </div>
+
+    </header>
+
+    <main
+      class="app-content"
+      [style.zoom]="zoomLevel"
+      [style.--app-zoom]="zoomLevel">
+
+      <router-outlet></router-outlet>
+
+    </main>
+
+  </div>
+
+</div>
