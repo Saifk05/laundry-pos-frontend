@@ -54,7 +54,16 @@ export class AppLayoutComponent
         'Laundry',
 
       logoUrl:
-        null
+        null,
+
+      cgstPercentage:
+        0,
+
+      sgstPercentage:
+        0,
+
+      taxIncluded:
+        false
     };
 
 
@@ -219,8 +228,10 @@ export class AppLayoutComponent
       );
   }
 
+
   reloadPage(): void {
-  window.location.reload();
-}
+
+    window.location.reload();
+  }
 
 }

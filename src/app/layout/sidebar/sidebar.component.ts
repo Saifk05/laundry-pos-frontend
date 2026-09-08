@@ -76,7 +76,16 @@ export class SidebarComponent
         'Laundry',
 
       logoUrl:
-        null
+        null,
+
+      cgstPercentage:
+        0,
+
+      sgstPercentage:
+        0,
+
+      taxIncluded:
+        false
     };
 
 

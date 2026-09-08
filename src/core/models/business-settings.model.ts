@@ -1,5 +1,4 @@
 export interface BusinessSettings {
-
   id: number;
 
   businessName: string;
@@ -14,6 +13,11 @@ export interface BusinessSettings {
 
   logoUrl: string | null;
 
+  cgstPercentage: number;
+
+  sgstPercentage: number;
+
+  taxIncluded: boolean;
 }
 
 export interface BusinessSettingsRequest {

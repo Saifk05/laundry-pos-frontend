@@ -12,6 +12,11 @@ import {
 } from '../models/walk-in.model';
 
 import {
+  TaxSetting,
+  TaxSettingRequest
+} from '../models/tax-setting.model';
+
+import {
   TermsConditionsRequest,
   TermsConditionsResponse
 } from '../models/terms-conditions.model';
@@ -673,6 +678,29 @@ updateTermsConditions(
     request
   );
 }
+
+  /* =========================================
+     TAX SETTINGS
+  ========================================= */
+
+  getTaxSettings():
+    Observable<TaxSetting> {
+
+    return this.http.get<TaxSetting>(
+      `${this.baseUrl}/tax-settings`
+    );
+  }
+
+
+  updateTaxSettings(
+    request: TaxSettingRequest
+  ): Observable<TaxSetting> {
+
+    return this.http.put<TaxSetting>(
+      `${this.baseUrl}/tax-settings`,
+      request
+    );
+  }
 
 
 }

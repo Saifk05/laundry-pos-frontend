@@ -293,6 +293,62 @@
       <div class="summary-line">
 
         <span>
+
+          Tax Amount:
+
+          @if (
+            taxIncluded &&
+            totalTaxPercentage > 0
+          ) {
+
+            <small>
+              ({{ totalTaxPercentage }}%)
+            </small>
+
+          }
+
+        </span>
+
+        <strong>
+          ₹{{ taxAmount | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+      @if (
+        taxIncluded &&
+        totalTaxPercentage > 0
+      ) {
+
+        <div class="summary-line tax-breakup">
+
+          <span>
+            CGST ({{ cgstPercentage }}%):
+          </span>
+
+          <strong>
+            ₹{{ cgstAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+        <div class="summary-line tax-breakup">
+
+          <span>
+            SGST ({{ sgstPercentage }}%):
+          </span>
+
+          <strong>
+            ₹{{ sgstAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+      }
+
+      <div class="summary-line">
+
+        <span>
           Total Count:
         </span>
 

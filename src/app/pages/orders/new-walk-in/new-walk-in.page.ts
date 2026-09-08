@@ -125,6 +125,12 @@ export class NewWalkInPage
   rescheduleOrderId: string | null = null;
   businessName = 'Venkateshwara Fabric Works';
 
+  cgstPercentage = 0;
+
+  sgstPercentage = 0;
+
+  taxIncluded = false;
+
   constructor(
     private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
@@ -141,12 +147,54 @@ export class NewWalkInPage
   }
   
   loadBusinessSettings(): void {
-  this.apiService .getBusinessSettings()
-    .subscribe({
-        next: ( response: any ) => {
-          this.businessName = response?.businessName ||
+
+    this.apiService
+      .getBusinessSettings()
+      .subscribe({
+
+        next: (
+          response
+        ) => {
+
+          this.businessName =
+            response?.businessName ||
             'Venkateshwara Fabric Works';
-        },  error: (  error: any ) => {}
+
+          this.cgstPercentage =
+            Number(
+              response?.cgstPercentage ?? 0
+            );
+
+          this.sgstPercentage =
+            Number(
+              response?.sgstPercentage ?? 0
+            );
+
+          this.taxIncluded =
+            Boolean(
+              response?.taxIncluded
+            );
+        },
+
+        error: (
+          error
+        ) => {
+
+          console.error(
+            'Unable to load business settings:',
+            error
+          );
+
+          this.cgstPercentage =
+            0;
+
+          this.sgstPercentage =
+            0;
+
+          this.taxIncluded =
+            false;
+        }
+
       });
   }
 
@@ -950,13 +998,20 @@ get totalPieces(): number {
 }
 
 
-  get grossTotal():    number {
+  get grossTotal():
+    number {
+
     return this.orderItems
-      .reduce((
+      .reduce(
+        (
           total: number,
-          item:  SelectedOrderItem
-        ) => total + item.total, 0 );
+          item: SelectedOrderItem
+        ) =>
+          total + item.total,
+        0
+      );
   }
+
 
   get expressAmount():
     number {
@@ -997,7 +1052,7 @@ get totalPieces(): number {
   }
 
 
-  get grandTotal():
+  get taxableAmount():
     number {
 
     const amount =
@@ -1007,6 +1062,88 @@ get totalPieces(): number {
 
     return Math.max(
       amount,
+      0
+    );
+  }
+
+
+  get totalTaxPercentage():
+    number {
+
+    if (
+      !this.taxIncluded
+    ) {
+
+      return 0;
+    }
+
+    return (
+      Number(
+        this.cgstPercentage || 0
+      ) +
+      Number(
+        this.sgstPercentage || 0
+      )
+    );
+  }
+
+
+  get cgstAmount():
+    number {
+
+    if (
+      !this.taxIncluded ||
+      this.taxableAmount <= 0
+    ) {
+
+      return 0;
+    }
+
+    return (
+      this.taxableAmount *
+      Number(
+        this.cgstPercentage || 0
+      )
+    ) / 100;
+  }
+
+
+  get sgstAmount():
+    number {
+
+    if (
+      !this.taxIncluded ||
+      this.taxableAmount <= 0
+    ) {
+
+      return 0;
+    }
+
+    return (
+      this.taxableAmount *
+      Number(
+        this.sgstPercentage || 0
+      )
+    ) / 100;
+  }
+
+
+  get taxAmount():
+    number {
+
+    return (
+      this.cgstAmount +
+      this.sgstAmount
+    );
+  }
+
+
+  get grandTotal():
+    number {
+
+    return Math.max(
+      this.taxableAmount +
+      this.taxAmount,
       0
     );
   }
@@ -1729,57 +1866,31 @@ const request: RetagOrderRequest = {
           <div class="terms-content">
             ${termsAndConditions
               .split('\n')
-              .filter(
-                line =>
-                  line.trim()
-              )
-              .map(
-                line =>
-                  `<div>${line}</div>`
-              )
+              .filter( line => line.trim())
+              .map( line =>`<div>${line}</div>`)
               .join('')}
           </div>
-
         </div>
       `
       : '';
 
-
-const itemsHtml =
-  order.items
-    .map(
-      item => `
+const itemsHtml = order.items
+    .map(item => `
         <tr>
           <td>
             ${item.productName}
             ${item.typeName ? ` (${item.typeName})` : ''}
-
             <br>
-
-            <small>
-              ${item.serviceName}
-            </small>
-
-            ${
-              item.unit === 'KG' && item.garmentCount
-                ? `
+            <small> ${item.serviceName} </small>
+            ${item.unit === 'KG' && item.garmentCount ? `
                   <br>
-                  <small>
-                    Garments: ${item.garmentCount}
-                  </small>
+                  <small> Garments: ${item.garmentCount} </small>
                 `
                 : ''
             }
           </td>
-
-          <td style="text-align:center;">
-            ${item.quantity}
-          </td>
-
-          <td style="text-align:right;">
-            ₹${Number(item.unitPrice).toFixed(2)}
-          </td>
-
+          <td style="text-align:center;">  ${item.quantity} </td>
+          <td style="text-align:right;"> ₹${Number(item.unitPrice).toFixed(2)} </td>
           <td style="text-align:right;">
             ₹${Number(item.lineTotal).toFixed(2)}
           </td>
@@ -1788,8 +1899,108 @@ const itemsHtml =
     )
     .join('');
 
-const printWindow =
-  window.open(
+const receiptSubtotal =
+  Number(
+    order.subtotal ?? 0
+  );
+
+const receiptDiscount =
+  Number(
+    order.discountAmount ?? 0
+  );
+
+const receiptExpress =
+  Number(
+    order.expressChargeAmount ?? 0
+  );
+
+const receiptTaxableAmount =
+  Math.max(
+    receiptSubtotal -
+    receiptDiscount +
+    receiptExpress,
+    0
+  );
+
+const receiptCgst =
+  this.taxIncluded
+    ? (
+        receiptTaxableAmount *
+        Number(
+          this.cgstPercentage || 0
+        )
+      ) / 100
+    : 0;
+
+const receiptSgst =
+  this.taxIncluded
+    ? (
+        receiptTaxableAmount *
+        Number(
+          this.sgstPercentage || 0
+        )
+      ) / 100
+    : 0;
+
+const receiptTax =
+  receiptCgst +
+  receiptSgst;
+
+const receiptTotal =
+  receiptTaxableAmount +
+  receiptTax;
+
+const receiptTotalTaxPercentage =
+  Number(
+    this.cgstPercentage || 0
+  ) +
+  Number(
+    this.sgstPercentage || 0
+  );
+
+const taxHtml =
+  this.taxIncluded &&
+  receiptTotalTaxPercentage > 0
+    ? `
+        <div class="total-row">
+
+          <span>
+            CGST (${this.cgstPercentage}%)
+          </span>
+
+          <strong>
+            +₹${receiptCgst.toFixed(2)}
+          </strong>
+
+        </div>
+
+        <div class="total-row">
+
+          <span>
+            SGST (${this.sgstPercentage}%)
+          </span>
+
+          <strong>
+            +₹${receiptSgst.toFixed(2)}
+          </strong>
+
+        </div>
+
+        <div class="total-row">
+
+          <span>
+            Tax (${receiptTotalTaxPercentage}%)
+          </span>
+
+          <strong>
+            +₹${receiptTax.toFixed(2)}
+          </strong>
+
+        </div>
+      `
+    : '';
+
+const printWindow = window.open(
     '',
     '_blank',
     `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
@@ -1798,7 +2009,7 @@ const printWindow =
   if (!printWindow) {
     return;
   }
-
+  
 printWindow.document.write(`
   <!DOCTYPE html>
   <html>
@@ -2087,10 +2298,12 @@ printWindow.document.write(`
           </span>
 
           <strong>
-            +₹${Number(order.expressChargeAmount).toFixed(2)}
+            +₹${receiptExpress.toFixed(2)}
           </strong>
 
         </div>
+
+        ${taxHtml}
 
         <div class="total-row grand-total">
 
@@ -2099,7 +2312,7 @@ printWindow.document.write(`
           </span>
 
           <strong>
-            ₹${Number(order.totalAmount).toFixed(2)}
+            ₹${receiptTotal.toFixed(2)}
           </strong>
 
         </div>
@@ -2141,22 +2354,17 @@ printTag(): void {
   }
 
   const order = this.createdOrder;
-
-  const deliveryDate =
-    order.deliveryDate
+  const deliveryDate =  order.deliveryDate
       ? new Date(order.deliveryDate + 'T00:00:00')
       : null;
 
-  const formattedDate =
-    deliveryDate
-      ? deliveryDate.toLocaleDateString(
+  const formattedDate = deliveryDate ? deliveryDate.toLocaleDateString(
           'en-GB',
           {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
-          }
-        )
+          })
       : '-';
 
   //sdsd    
@@ -2240,11 +2448,8 @@ const groupedOrderItems = this.orderItems.map(item => ({
     const tagCount = item.unit === 'KG'
       ? item.garmentCount
       : Math.max(1, Math.floor(Number(item.quantity)));
-
     const tagNumber = `T${totalItemCount}`;
-
-    const isShoes =
-      item.productName
+    const isShoes = item.productName
         .trim()
         .toLowerCase() === 'shoes';
 
@@ -2490,34 +2695,24 @@ printWindow.document.write(`
 }
 
   startNewOrder(): void {
-
-  if (
-    this.isRetagMode ||
-    this.isRescheduleMode
-  ) {
+  if ( this.isRetagMode || this.isRescheduleMode ) {
     this.router.navigate(
       ['/app/new-walk-in']
-    );
-
+    ); 
     return;
   }
 
   this.orderCreated = false;
-
   this.createdOrderNumber = '';
   this.createdOrder = null;
-
   this.customerName = '';
   this.customerPhone = '';
   this.customerId = null;
   this.customerExists = false;
   this.checkingCustomer = false;
   this.customerMessage = '';
-
   this.searchText = '';
-
   this.orderItems = [];
-
   this.productModalOpen = false;
   this.editingOrderItemId = null;
   this.selectedProduct = null;
@@ -2527,23 +2722,17 @@ printWindow.document.write(`
   this.productComment = '';
   this.modalQuantity = 1;
   this.modalGarmentCount = 1;
-
   this.homeDelivery = false;
-
   this.expressDelivery = false;
   this.selectedExpressChargeId = null;
   this.expressPercentage = 0;
-
   this.deliveryTime = '';
-
   this.discountAmount = 0;
-
   this.couponApplied = false;
   this.selectedCouponId = null;
   this.couponCode = '';
   this.couponDiscount = 0;
   this.couponDropdownOpen = false;
-
   this.errorMessage = '';
 
   this.generateDeliveryDates();
@@ -2615,5 +2804,4 @@ normalizeGarmentCount(): void {
   const value = Number(this.modalGarmentCount);
   this.modalGarmentCount = !value || value < 1 ? 1 : Math.floor(value);
 }
-
 }
