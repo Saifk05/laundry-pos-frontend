@@ -6,7 +6,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  NativeDateAdapter
+} from '@angular/material/core';
 
 import { ApiService } from '../../../core/services/api.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -18,9 +25,154 @@ import {
 } from '../../../core/models/payment-report.model';
 
 
-interface PaymentDayView extends PaymentReportDate {
+/* =========================================
+   DATE FORMAT
+   UI: DD/MM/YYYY
+========================================= */
+
+const PAYMENT_DATE_FORMATS = {
+  parse: {
+    dateInput: 'paymentInput'
+  },
+  display: {
+    dateInput: 'paymentInput',
+    monthYearLabel: 'paymentMonthYear',
+    dateA11yLabel: 'paymentA11y',
+    monthYearA11yLabel: 'paymentMonthYearA11y'
+  }
+};
+
+
+class PaymentDateAdapter extends NativeDateAdapter {
+
+  override parse(value: any): Date | null {
+
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    if (value instanceof Date) {
+      return this.isValid(value)
+        ? value
+        : null;
+    }
+
+    const text = String(value).trim();
+
+    const match =
+      text.match(
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+      );
+
+    if (!match) {
+      return null;
+    }
+
+    const day =
+      Number(match[1]);
+
+    const month =
+      Number(match[2]) - 1;
+
+    const year =
+      Number(match[3]);
+
+    const date =
+      new Date(
+        year,
+        month,
+        day
+      );
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
+  }
+
+
+  override format(
+    date: Date,
+    displayFormat: any
+  ): string {
+
+    if (!this.isValid(date)) {
+      throw Error(
+        'PaymentDateAdapter: invalid date'
+      );
+    }
+
+
+    if (displayFormat === 'paymentInput') {
+
+      const day =
+        String(
+          date.getDate()
+        ).padStart(2, '0');
+
+      const month =
+        String(
+          date.getMonth() + 1
+        ).padStart(2, '0');
+
+      const year =
+        date.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    }
+
+
+    if (displayFormat === 'paymentMonthYear') {
+
+      return new Intl.DateTimeFormat(
+        'en-GB',
+        {
+          month: 'short',
+          year: 'numeric'
+        }
+      ).format(date);
+    }
+
+
+    if (displayFormat === 'paymentMonthYearA11y') {
+
+      return new Intl.DateTimeFormat(
+        'en-GB',
+        {
+          month: 'long',
+          year: 'numeric'
+        }
+      ).format(date);
+    }
+
+
+    return new Intl.DateTimeFormat(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }
+    ).format(date);
+  }
+}
+
+
+/* =========================================
+   VIEW MODEL
+========================================= */
+
+interface PaymentDayView
+  extends PaymentReportDate {
+
   expanded?: boolean;
 }
+
 
 type DatePreset =
   | 'TODAY'
@@ -32,9 +184,16 @@ type DatePreset =
 
 @Component({
   selector: 'app-payments',
+
   standalone: true,
-  templateUrl: './payments.page.html',
-  styleUrls: ['./payments.page.scss'],
+
+  templateUrl:
+    './payments.page.html',
+
+  styleUrls: [
+    './payments.page.scss'
+  ],
+
   imports: [
     CommonModule,
     FormsModule,
@@ -42,41 +201,82 @@ type DatePreset =
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule
+  ],
+
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: PaymentDateAdapter
+    },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: PAYMENT_DATE_FORMATS
+    },
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'en-GB'
+    }
   ]
 })
-export class PaymentsPage implements OnInit {
+export class PaymentsPage
+  implements OnInit {
+
+
+  /* =========================================
+     DATE FILTER
+  ========================================= */
 
   startDate = '';
   endDate = '';
 
-  rangeStart: Date | null = null;
-  rangeEnd: Date | null = null;
+  rangeStart:
+    Date | null = null;
 
-  maxDate = new Date();
+  rangeEnd:
+    Date | null = null;
+
+  maxDate =
+    new Date();
 
   activePreset:
-  'TODAY' |
-  'YESTERDAY' |
-  'THIS_WEEK' |
-  'THIS_MONTH' |
-  'CUSTOM' =
-    'TODAY';
+    DatePreset =
+      'TODAY';
+
+
+  /* =========================================
+     PAGE STATE
+  ========================================= */
 
   loading = false;
+
   errorMessage = '';
 
-  report: PaymentReportResponse | null = null;
-  payments: PaymentDayView[] = [];
+  report:
+    PaymentReportResponse | null =
+      null;
+
+  payments:
+    PaymentDayView[] = [];
 
 
   constructor(
-    private readonly apiService: ApiService,
-    private readonly notificationService: NotificationService
+    private readonly apiService:
+      ApiService,
+
+    private readonly notificationService:
+      NotificationService
   ) {}
 
 
+  /* =========================================
+     INIT
+  ========================================= */
+
   ngOnInit(): void {
-    this.maxDate = this.getTodayDate();
+
+    this.maxDate =
+      this.getTodayDate();
+
     this.setToday();
   }
 
@@ -87,36 +287,55 @@ export class PaymentsPage implements OnInit {
 
   loadPaymentReport(): void {
 
-    if (!this.startDate || !this.endDate) {
+    if (
+      !this.startDate ||
+      !this.endDate
+    ) {
+
       this.showWarning(
         'Start date and end date are required'
       );
+
       return;
     }
 
-    if (this.startDate > this.endDate) {
+
+    if (
+      this.startDate >
+      this.endDate
+    ) {
+
       this.showWarning(
         'Start date cannot be after end date'
       );
+
       return;
     }
 
-    const today = this.formatLocalDate(
-      this.getTodayDate()
-    );
+
+    const today =
+      this.formatLocalDate(
+        this.getTodayDate()
+      );
+
 
     if (
       this.startDate > today ||
       this.endDate > today
     ) {
+
       this.showWarning(
         'Future dates cannot be selected'
       );
+
       return;
     }
 
+
     this.loading = true;
+
     this.errorMessage = '';
+
 
     this.apiService
       .getPaymentReport(
@@ -125,22 +344,34 @@ export class PaymentsPage implements OnInit {
       )
       .subscribe({
 
-        next: (response: PaymentReportResponse) => {
+        next: (
+          response:
+            PaymentReportResponse
+        ) => {
 
-          this.report = response;
+          this.report =
+            response;
 
           this.payments =
-            (response?.dates ?? []).map(
-              (item: PaymentReportDate) => ({
-                ...item,
-                expanded: false
-              })
-            );
+            (response?.dates ?? [])
+              .map(
+                (
+                  item:
+                    PaymentReportDate
+                ) => ({
+                  ...item,
+                  expanded: false
+                })
+              );
 
           this.loading = false;
         },
 
-        error: (error: HttpErrorResponse) => {
+
+        error: (
+          error:
+            HttpErrorResponse
+        ) => {
 
           console.error(
             'Payment report error',
@@ -148,7 +379,9 @@ export class PaymentsPage implements OnInit {
           );
 
           this.report = null;
+
           this.payments = [];
+
 
           const message =
             this.getErrorMessage(
@@ -156,11 +389,17 @@ export class PaymentsPage implements OnInit {
               'Unable to load payment report'
             );
 
-          this.errorMessage = message;
 
-          void this.notificationService.error(
-            message
-          );
+          this.errorMessage =
+            message;
+
+
+          void this
+            .notificationService
+            .error(
+              message
+            );
+
 
           this.loading = false;
         }
@@ -182,40 +421,52 @@ export class PaymentsPage implements OnInit {
       return;
     }
 
+
     const today =
       this.getTodayDate();
+
 
     if (
       this.rangeStart > today ||
       this.rangeEnd > today
     ) {
+
       this.showWarning(
         'Future dates cannot be selected'
       );
+
       return;
     }
+
 
     if (
       this.rangeStart >
       this.rangeEnd
     ) {
+
       this.showWarning(
         'Start date cannot be after end date'
       );
+
       return;
     }
 
-    this.activePreset = 'CUSTOM';
+
+    this.activePreset =
+      'CUSTOM';
+
 
     this.startDate =
       this.formatLocalDate(
         this.rangeStart
       );
 
+
     this.endDate =
       this.formatLocalDate(
         this.rangeEnd
       );
+
 
     this.errorMessage = '';
 
@@ -231,6 +482,7 @@ export class PaymentsPage implements OnInit {
 
     const today =
       this.getTodayDate();
+
 
     this.setDateRange(
       today,
@@ -249,9 +501,11 @@ export class PaymentsPage implements OnInit {
     const yesterday =
       this.getTodayDate();
 
+
     yesterday.setDate(
       yesterday.getDate() - 1
     );
+
 
     this.setDateRange(
       yesterday,
@@ -271,20 +525,26 @@ export class PaymentsPage implements OnInit {
     const today =
       this.getTodayDate();
 
+
     const day =
       today.getDay();
+
 
     const difference =
       day === 0
         ? -6
         : 1 - day;
 
+
     const monday =
       new Date(today);
 
+
     monday.setDate(
-      today.getDate() + difference
+      today.getDate() +
+      difference
     );
+
 
     this.setDateRange(
       monday,
@@ -304,12 +564,14 @@ export class PaymentsPage implements OnInit {
     const today =
       this.getTodayDate();
 
+
     const firstDay =
       new Date(
         today.getFullYear(),
         today.getMonth(),
         1
       );
+
 
     this.setDateRange(
       firstDay,
@@ -329,19 +591,29 @@ export class PaymentsPage implements OnInit {
     preset: DatePreset
   ): void {
 
-    this.activePreset = preset;
+    this.activePreset =
+      preset;
+
 
     this.rangeStart =
       new Date(start);
 
+
     this.rangeEnd =
       new Date(end);
 
+
     this.startDate =
-      this.formatLocalDate(start);
+      this.formatLocalDate(
+        start
+      );
+
 
     this.endDate =
-      this.formatLocalDate(end);
+      this.formatLocalDate(
+        end
+      );
+
 
     this.errorMessage = '';
 
@@ -358,6 +630,7 @@ export class PaymentsPage implements OnInit {
     const now =
       new Date();
 
+
     return new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -373,6 +646,7 @@ export class PaymentsPage implements OnInit {
     const year =
       date.getFullYear();
 
+
     const month =
       String(
         date.getMonth() + 1
@@ -381,6 +655,7 @@ export class PaymentsPage implements OnInit {
         '0'
       );
 
+
     const day =
       String(
         date.getDate()
@@ -388,6 +663,7 @@ export class PaymentsPage implements OnInit {
         2,
         '0'
       );
+
 
     return `${year}-${month}-${day}`;
   }
@@ -401,11 +677,15 @@ export class PaymentsPage implements OnInit {
     message: string
   ): void {
 
-    this.errorMessage = message;
+    this.errorMessage =
+      message;
 
-    void this.notificationService.warning(
-      message
-    );
+
+    void this
+      .notificationService
+      .warning(
+        message
+      );
   }
 
 
@@ -417,22 +697,30 @@ export class PaymentsPage implements OnInit {
     const backendMessage =
       error?.error?.message;
 
+
     if (
-      typeof backendMessage === 'string' &&
+      typeof backendMessage ===
+        'string' &&
       backendMessage.trim()
     ) {
+
       return backendMessage.trim();
     }
+
 
     const legacyMessage =
       error?.error?.error;
 
+
     if (
-      typeof legacyMessage === 'string' &&
+      typeof legacyMessage ===
+        'string' &&
       legacyMessage.trim()
     ) {
+
       return legacyMessage.trim();
     }
+
 
     return fallback;
   }
@@ -443,36 +731,46 @@ export class PaymentsPage implements OnInit {
   ========================================= */
 
   get totalAmount(): number {
+
     return Number(
-      this.report?.totalAmount ?? 0
+      this.report?.totalAmount ??
+      0
     );
   }
 
 
   get totalUpi(): number {
+
     return Number(
-      this.report?.upiAmount ?? 0
+      this.report?.upiAmount ??
+      0
     );
   }
 
 
   get totalCash(): number {
+
     return Number(
-      this.report?.cashAmount ?? 0
+      this.report?.cashAmount ??
+      0
     );
   }
 
 
   get totalCard(): number {
+
     return Number(
-      this.report?.cardAmount ?? 0
+      this.report?.cardAmount ??
+      0
     );
   }
 
 
   get totalOther(): number {
+
     return Number(
-      this.report?.otherAmount ?? 0
+      this.report?.otherAmount ??
+      0
     );
   }
 
@@ -495,7 +793,10 @@ export class PaymentsPage implements OnInit {
   ): boolean {
 
     return (
-      (payment.cashOrders?.length ?? 0) > 0
+      (
+        payment.cashOrders
+          ?.length ?? 0
+      ) > 0
     );
   }
 
@@ -505,7 +806,10 @@ export class PaymentsPage implements OnInit {
   ): boolean {
 
     return (
-      (payment.upiOrders?.length ?? 0) > 0
+      (
+        payment.upiOrders
+          ?.length ?? 0
+      ) > 0
     );
   }
 
@@ -515,7 +819,10 @@ export class PaymentsPage implements OnInit {
   ): boolean {
 
     return (
-      (payment.cardOrders?.length ?? 0) > 0
+      (
+        payment.cardOrders
+          ?.length ?? 0
+      ) > 0
     );
   }
 
@@ -525,7 +832,10 @@ export class PaymentsPage implements OnInit {
   ): boolean {
 
     return (
-      (payment.otherOrders?.length ?? 0) > 0
+      (
+        payment.otherOrders
+          ?.length ?? 0
+      ) > 0
     );
   }
 
@@ -535,10 +845,22 @@ export class PaymentsPage implements OnInit {
   ): number {
 
     return (
-      (payment.cashOrders?.length ?? 0) +
-      (payment.upiOrders?.length ?? 0) +
-      (payment.cardOrders?.length ?? 0) +
-      (payment.otherOrders?.length ?? 0)
+      (
+        payment.cashOrders
+          ?.length ?? 0
+      ) +
+      (
+        payment.upiOrders
+          ?.length ?? 0
+      ) +
+      (
+        payment.cardOrders
+          ?.length ?? 0
+      ) +
+      (
+        payment.otherOrders
+          ?.length ?? 0
+      )
     );
   }
 
@@ -558,7 +880,8 @@ export class PaymentsPage implements OnInit {
 
 
   getOrderDisplay(
-    order: PaymentReportOrder
+    order:
+      PaymentReportOrder
   ): string {
 
     return order.orderNumber;
@@ -570,17 +893,21 @@ export class PaymentsPage implements OnInit {
   ========================================= */
 
   callCustomer(
-    order: PaymentReportOrder
+    order:
+      PaymentReportOrder
   ): void {
 
     if (!order.mobile) {
 
-      void this.notificationService.warning(
-        'Customer mobile number is not available'
-      );
+      void this
+        .notificationService
+        .warning(
+          'Customer mobile number is not available'
+        );
 
       return;
     }
+
 
     window.location.href =
       `tel:${order.mobile}`;
@@ -592,6 +919,7 @@ export class PaymentsPage implements OnInit {
   ========================================= */
 
   refresh(): void {
+
     this.loadPaymentReport();
   }
 
