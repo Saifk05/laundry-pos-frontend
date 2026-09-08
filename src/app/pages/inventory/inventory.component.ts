@@ -61,4 +61,11 @@ export class InventoryComponent {
     );
   }
 
+  openTax(): void {
+
+    this.router.navigateByUrl(
+      '/app/inventory/tax'
+    );
+  }
+
 }

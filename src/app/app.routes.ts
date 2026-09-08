@@ -110,11 +110,19 @@ export const routes: Routes = [
           import('./pages/inventory/add-product/add-product.page')
             .then((m) => m.AddProductPage),
       },
+
+      {
+        path: 'inventory/tax',
+        loadComponent: () =>
+          import('./pages/inventory/tax/tax.component')
+            .then((m) => m.TaxComponent),
+      },
+
       {
         path: 'sales-report',
-        loadComponent: () => 
+        loadComponent: () =>
           import('./pages/sales-report/sales-report.page')
-            .then( m => m.SalesReportPage)
+            .then((m) => m.SalesReportPage),
       },
     ],
   },

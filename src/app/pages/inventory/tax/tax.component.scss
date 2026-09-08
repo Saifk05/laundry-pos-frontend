@@ -1,0 +1,566 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+button,
+input {
+  font: inherit;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.tax-page {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+
+  padding: 30px 32px 50px;
+
+  background: #ffffff;
+  color: #111827;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.page-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+
+.page-header h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #111111;
+}
+
+
+.page-header p {
+  margin: 6px 0 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  color: #68737d;
+}
+
+
+/* =====================================================
+   TAX CARD
+===================================================== */
+
+.tax-card {
+  width: 100%;
+  max-width: 760px;
+
+  overflow: hidden;
+
+  border: 1px solid #dfe6e9;
+  border-radius: 11px;
+
+  background: #ffffff;
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.tax-card-header {
+  padding: 20px 22px;
+
+  border-bottom: 1px solid #edf0f2;
+}
+
+
+.tax-card-header h2 {
+  margin: 0;
+
+  color: #20272c;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+
+.tax-card-header p {
+  margin: 5px 0 0;
+
+  color: #78838a;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.tax-form {
+  padding: 24px;
+}
+
+
+.form-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 16px;
+}
+
+
+.form-group {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-bottom: 18px;
+}
+
+
+.form-group label {
+  color: #323a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   NORMAL INPUT
+===================================================== */
+
+.form-group > input {
+  width: 100%;
+  height: 46px;
+
+  padding: 0 13px;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #252c31;
+
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.form-group > input::placeholder {
+  color: #a1a9ae;
+}
+
+
+.form-group > input:focus {
+  border-color: #16a34a;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 163, 74, 0.08);
+}
+
+
+/* =====================================================
+   PERCENTAGE INPUT
+===================================================== */
+
+.percentage-input {
+  width: 100%;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #d5dde1;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.percentage-input:focus-within {
+  border-color: #16a34a;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 163, 74, 0.08);
+}
+
+
+.percentage-input input {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+
+  padding: 0 13px;
+
+  border: none;
+  outline: none;
+
+  background: #ffffff;
+  color: #252c31;
+
+  font-size: 13px;
+}
+
+
+.percentage-input input::placeholder {
+  color: #a1a9ae;
+}
+
+
+.percentage-input span {
+  height: 100%;
+
+  min-width: 46px;
+
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-left: 1px solid #e1e6e8;
+
+  background: #f5f8f9;
+  color: #59636a;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   HELPER TEXT
+===================================================== */
+
+.helper-text {
+  color: #89939a;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+
+/* =====================================================
+   TAX SUMMARY
+===================================================== */
+
+.tax-summary {
+  min-height: 78px;
+
+  margin-top: 4px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 8px;
+
+  background: #fafcfc;
+}
+
+
+.summary-label {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #323a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.tax-summary p {
+  margin: 0;
+
+  color: #838d93;
+
+  font-size: 11px;
+}
+
+
+.tax-summary strong {
+  color: #16a34a;
+
+  font-size: 24px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.modal-actions {
+  margin-top: 24px;
+  padding-top: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  border-top: 1px solid #edf0f2;
+}
+
+
+.save-button {
+  min-width: 150px;
+  height: 43px;
+
+  padding: 0 18px;
+
+  border: 1px solid #16a34a;
+  border-radius: 7px;
+
+  background: #16a34a;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.save-button:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 750px) {
+
+  .tax-page {
+    padding: 22px 18px 40px;
+  }
+
+}
+
+
+@media (max-width: 520px) {
+
+  .tax-page {
+    padding: 18px 12px 30px;
+  }
+
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+
+  .tax-form {
+    padding: 18px;
+  }
+
+
+  .tax-card-header {
+    padding: 18px;
+  }
+
+
+  .form-row {
+    grid-template-columns: 1fr;
+
+    gap: 0;
+  }
+
+
+  .save-button {
+    width: 100%;
+  }
+
+}
+
+/* =====================================================
+   TAX TYPE
+===================================================== */
+
+.tax-type-setting {
+  min-height: 78px;
+
+  margin-top: 16px;
+  padding: 14px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 8px;
+
+  background: #fafcfc;
+}
+
+
+.tax-type-info strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #323a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.tax-type-info p {
+  margin: 0;
+
+  color: #838d93;
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+
+.tax-type-control {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+
+.tax-type-label {
+  color: #8a949a;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  transition: color 0.2s ease;
+}
+
+
+.tax-type-label.active {
+  color: #15803d;
+}
+
+
+/* =====================================================
+   TOGGLE
+===================================================== */
+
+.toggle-switch {
+  position: relative;
+
+  width: 42px;
+  height: 23px;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 20px;
+
+  background: #cbd2d6;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+
+.toggle-switch.enabled {
+  background: #16a34a;
+}
+
+
+.toggle-knob {
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 17px;
+  height: 17px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.18);
+
+  transition: transform 0.2s ease;
+}
+
+
+.toggle-switch.enabled .toggle-knob {
+  transform: translateX(19px);
+}
+
+
+@media (max-width: 520px) {
+
+  .tax-type-setting {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+}

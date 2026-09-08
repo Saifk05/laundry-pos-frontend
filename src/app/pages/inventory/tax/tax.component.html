@@ -1,0 +1,194 @@
+<div class="tax-page">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Tax Management</h1>
+
+      <p>
+        Configure GST number, CGST and SGST percentage for your business.
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="tax-card">
+
+    <div class="tax-card-header">
+
+      <div>
+        <h2>GST Configuration</h2>
+
+        <p>
+          These tax details will be used while calculating order totals and invoices.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="tax-form">
+
+      <div class="form-group">
+
+        <label for="gstNumber">
+          GST Number
+        </label>
+
+        <input
+          id="gstNumber"
+          type="text"
+          [(ngModel)]="gstNumber"
+          placeholder="Enter GST number"
+          maxlength="15"
+        />
+
+        <span class="helper-text">
+          Example: 29ABCDE1234F1Z5
+        </span>
+
+      </div>
+
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label for="cgst">
+            CGST Percentage
+          </label>
+
+          <div class="percentage-input">
+
+            <input
+              id="cgst"
+              type="number"
+              [(ngModel)]="cgstPercentage"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="0"
+            />
+
+            <span>%</span>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="sgst">
+            SGST Percentage
+          </label>
+
+          <div class="percentage-input">
+
+            <input
+              id="sgst"
+              type="number"
+              [(ngModel)]="sgstPercentage"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="0"
+            />
+
+            <span>%</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="tax-summary">
+
+        <div>
+
+          <span class="summary-label">
+            Total GST
+          </span>
+
+          <p>
+            CGST + SGST
+          </p>
+
+        </div>
+
+        <strong>
+          {{ totalGstPercentage }}%
+        </strong>
+
+      </div>
+
+
+      <div class="tax-type-setting">
+
+        <div class="tax-type-info">
+
+          <strong>
+            Tax Type
+          </strong>
+
+          <p *ngIf="isTaxInclusive">
+            Tax is already included in the service price.
+          </p>
+
+          <p *ngIf="!isTaxInclusive">
+            Tax will be added separately to the service price.
+          </p>
+
+        </div>
+
+
+        <div class="tax-type-control">
+
+          <span
+            class="tax-type-label"
+            [class.active]="!isTaxInclusive">
+            Exclusive
+          </span>
+
+          <button
+            type="button"
+            class="toggle-switch"
+            [class.enabled]="isTaxInclusive"
+            (click)="toggleTaxType()">
+
+            <span class="toggle-knob"></span>
+
+          </button>
+
+          <span
+            class="tax-type-label"
+            [class.active]="isTaxInclusive">
+            Inclusive
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="save-button"
+          (click)="saveTaxSettings()">
+
+          Save Tax Settings
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
