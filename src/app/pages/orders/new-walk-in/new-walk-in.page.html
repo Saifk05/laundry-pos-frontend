@@ -285,40 +285,45 @@
         </span>
 
         <strong>
-          ₹{{ expressAmount }}
-        </strong>
-
-      </div>
-
-      <div class="summary-line">
-
-        <span>
-
-          Tax Amount:
-
-          @if (
-            taxIncluded &&
-            totalTaxPercentage > 0
-          ) {
-
-            <small>
-              ({{ totalTaxPercentage }}%)
-            </small>
-
-          }
-
-        </span>
-
-        <strong>
-          ₹{{ taxAmount | number:'1.2-2' }}
+          ₹{{ expressAmount | number:'1.2-2' }}
         </strong>
 
       </div>
 
       @if (
-        taxIncluded &&
+        taxEnabled &&
         totalTaxPercentage > 0
       ) {
+
+        <div class="summary-line">
+
+          <span>
+
+            Tax Amount:
+
+            <small>
+              ({{ totalTaxPercentage }}%)
+            </small>
+
+          </span>
+
+          <strong>
+            ₹{{ taxAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+        <div class="summary-line tax-breakup">
+
+          <span>
+            Taxable Amount:
+          </span>
+
+          <strong>
+            ₹{{ taxableAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
 
         <div class="summary-line tax-breakup">
 
@@ -340,6 +345,20 @@
 
           <strong>
             ₹{{ sgstAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+      } @else {
+
+        <div class="summary-line">
+
+          <span>
+            Tax Amount:
+          </span>
+
+          <strong>
+            ₹0.00
           </strong>
 
         </div>

@@ -129,6 +129,8 @@ export class NewWalkInPage
 
   sgstPercentage = 0;
 
+  taxEnabled = false;
+
   taxIncluded = false;
 
   constructor(
@@ -170,6 +172,11 @@ export class NewWalkInPage
               response?.sgstPercentage ?? 0
             );
 
+          this.taxEnabled =
+            Boolean(
+              response?.taxEnabled
+            );
+
           this.taxIncluded =
             Boolean(
               response?.taxIncluded
@@ -190,6 +197,9 @@ export class NewWalkInPage
 
           this.sgstPercentage =
             0;
+
+          this.taxEnabled =
+            false;
 
           this.taxIncluded =
             false;
@@ -1052,16 +1062,13 @@ get totalPieces(): number {
   }
 
 
-  get taxableAmount():
+  get amountBeforeTax():
     number {
 
-    const amount =
+    return Math.max(
       this.grossTotal -
       this.totalDiscount +
-      this.expressAmount;
-
-    return Math.max(
-      amount,
+      this.expressAmount,
       0
     );
   }
@@ -1071,7 +1078,7 @@ get totalPieces(): number {
     number {
 
     if (
-      !this.taxIncluded
+      !this.taxEnabled
     ) {
 
       return 0;
@@ -1088,11 +1095,33 @@ get totalPieces(): number {
   }
 
 
+  get taxableAmount():
+    number {
+
+    if (
+      !this.taxEnabled ||
+      !this.taxIncluded ||
+      this.totalTaxPercentage <= 0
+    ) {
+
+      return this.amountBeforeTax;
+    }
+
+    return (
+      this.amountBeforeTax /
+      (
+        1 +
+        this.totalTaxPercentage / 100
+      )
+    );
+  }
+
+
   get cgstAmount():
     number {
 
     if (
-      !this.taxIncluded ||
+      !this.taxEnabled ||
       this.taxableAmount <= 0
     ) {
 
@@ -1112,7 +1141,7 @@ get totalPieces(): number {
     number {
 
     if (
-      !this.taxIncluded ||
+      !this.taxEnabled ||
       this.taxableAmount <= 0
     ) {
 
@@ -1131,6 +1160,13 @@ get totalPieces(): number {
   get taxAmount():
     number {
 
+    if (
+      !this.taxEnabled
+    ) {
+
+      return 0;
+    }
+
     return (
       this.cgstAmount +
       this.sgstAmount
@@ -1141,12 +1177,27 @@ get totalPieces(): number {
   get grandTotal():
     number {
 
+    if (
+      !this.taxEnabled
+    ) {
+
+      return this.amountBeforeTax;
+    }
+
+    if (
+      this.taxIncluded
+    ) {
+
+      return this.amountBeforeTax;
+    }
+
     return Math.max(
-      this.taxableAmount +
+      this.amountBeforeTax +
       this.taxAmount,
       0
     );
   }
+
 
 get minimumDeliveryDate(): string {
 
@@ -1912,7 +1963,7 @@ const receiptExpress =
     order.expressChargeAmount ?? 0
   );
 
-const receiptTaxableAmount =
+const receiptAmountBeforeTax =
   Math.max(
     receiptSubtotal -
     receiptDiscount +
@@ -1920,8 +1971,33 @@ const receiptTaxableAmount =
     0
   );
 
+const receiptTotalTaxPercentage =
+  this.taxEnabled
+    ? (
+        Number(
+          this.cgstPercentage || 0
+        ) +
+        Number(
+          this.sgstPercentage || 0
+        )
+      )
+    : 0;
+
+const receiptTaxableAmount =
+  this.taxEnabled &&
+  this.taxIncluded &&
+  receiptTotalTaxPercentage > 0
+    ? (
+        receiptAmountBeforeTax /
+        (
+          1 +
+          receiptTotalTaxPercentage / 100
+        )
+      )
+    : receiptAmountBeforeTax;
+
 const receiptCgst =
-  this.taxIncluded
+  this.taxEnabled
     ? (
         receiptTaxableAmount *
         Number(
@@ -1931,7 +2007,7 @@ const receiptCgst =
     : 0;
 
 const receiptSgst =
-  this.taxIncluded
+  this.taxEnabled
     ? (
         receiptTaxableAmount *
         Number(
@@ -1945,21 +2021,33 @@ const receiptTax =
   receiptSgst;
 
 const receiptTotal =
-  receiptTaxableAmount +
-  receiptTax;
+  !this.taxEnabled
+    ? receiptAmountBeforeTax
+    : this.taxIncluded
+      ? receiptAmountBeforeTax
+      : receiptAmountBeforeTax + receiptTax;
 
-const receiptTotalTaxPercentage =
-  Number(
-    this.cgstPercentage || 0
-  ) +
-  Number(
-    this.sgstPercentage || 0
-  );
+const taxModeLabel =
+  this.taxIncluded
+    ? 'Inclusive'
+    : 'Exclusive';
 
 const taxHtml =
-  this.taxIncluded &&
+  this.taxEnabled &&
   receiptTotalTaxPercentage > 0
     ? `
+        <div class="total-row">
+
+          <span>
+            Taxable Amount
+          </span>
+
+          <strong>
+            ₹${receiptTaxableAmount.toFixed(2)}
+          </strong>
+
+        </div>
+
         <div class="total-row">
 
           <span>
@@ -1967,7 +2055,7 @@ const taxHtml =
           </span>
 
           <strong>
-            +₹${receiptCgst.toFixed(2)}
+            ₹${receiptCgst.toFixed(2)}
           </strong>
 
         </div>
@@ -1979,7 +2067,7 @@ const taxHtml =
           </span>
 
           <strong>
-            +₹${receiptSgst.toFixed(2)}
+            ₹${receiptSgst.toFixed(2)}
           </strong>
 
         </div>
@@ -1987,11 +2075,11 @@ const taxHtml =
         <div class="total-row">
 
           <span>
-            Tax (${receiptTotalTaxPercentage}%)
+            Tax (${receiptTotalTaxPercentage}%) - ${taxModeLabel}
           </span>
 
           <strong>
-            +₹${receiptTax.toFixed(2)}
+            ₹${receiptTax.toFixed(2)}
           </strong>
 
         </div>
@@ -2413,7 +2501,6 @@ printTag(): void {
           })
       : '-';
 
-  //sdsd    
 const groupedOrderItems = this.orderItems.map(item => ({
   productName: item.productName,
   typeName: item.typeName ?? '',

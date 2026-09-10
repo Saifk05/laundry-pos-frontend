@@ -19,7 +19,6 @@ import {
   BusinessSettingsService
 } from '../../../core/services/business-settings.service';
 
-
 @Component({
   selector: 'app-app-layout',
   standalone: true,
@@ -62,10 +61,12 @@ export class AppLayoutComponent
       sgstPercentage:
         0,
 
+      taxEnabled:
+        false,
+
       taxIncluded:
         false
     };
-
 
   zoomLevel = 1;
 
@@ -75,12 +76,10 @@ export class AppLayoutComponent
 
   readonly zoomStep = 0.1;
 
-
   constructor(
     private readonly businessSettingsService:
       BusinessSettingsService
   ) {}
-
 
   ngOnInit(): void {
 
@@ -105,7 +104,6 @@ export class AppLayoutComponent
       );
   }
 
-
   get zoomPercentage():
     number {
 
@@ -113,7 +111,6 @@ export class AppLayoutComponent
       this.zoomLevel * 100
     );
   }
-
 
   zoomIn():
     void {
@@ -140,7 +137,6 @@ export class AppLayoutComponent
     this.saveZoom();
   }
 
-
   zoomOut():
     void {
 
@@ -166,7 +162,6 @@ export class AppLayoutComponent
     this.saveZoom();
   }
 
-
   resetZoom():
     void {
 
@@ -175,7 +170,6 @@ export class AppLayoutComponent
 
     this.saveZoom();
   }
-
 
   private saveZoom():
     void {
@@ -187,7 +181,6 @@ export class AppLayoutComponent
       )
     );
   }
-
 
   private loadZoom():
     void {
@@ -228,10 +221,8 @@ export class AppLayoutComponent
       );
   }
 
-
   reloadPage(): void {
 
     window.location.reload();
   }
-
 }

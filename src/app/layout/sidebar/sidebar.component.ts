@@ -40,7 +40,6 @@ import {
   BusinessSettingsService
 } from '../../../core/services/business-settings.service';
 
-
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -55,39 +54,40 @@ import {
 export class SidebarComponent
   implements OnInit {
 
-  settings:
-    BusinessSettings = {
+  settings: BusinessSettings = {
 
-      id: 0,
+    id: 0,
 
-      businessName:
-        '',
+    businessName:
+      '',
 
-      whatsappDisplayName:
-        '',
+    whatsappDisplayName:
+      '',
 
-      headerSubtitle:
-        '',
+    headerSubtitle:
+      '',
 
-      adminName:
-        'Admin',
+    adminName:
+      'Admin',
 
-      adminSubtitle:
-        'Laundry',
+    adminSubtitle:
+      'Laundry',
 
-      logoUrl:
-        null,
+    logoUrl:
+      null,
 
-      cgstPercentage:
-        0,
+    cgstPercentage:
+      0,
 
-      sgstPercentage:
-        0,
+    sgstPercentage:
+      0,
 
-      taxIncluded:
-        false
-    };
+    taxEnabled:
+      false,
 
+    taxIncluded:
+      false
+  };
 
   constructor(
     private readonly businessSettingsService:
@@ -110,7 +110,6 @@ export class SidebarComponent
       person
     });
   }
-
 
   ngOnInit(): void {
 

@@ -44,6 +44,8 @@ export class TaxComponent
 
   sgstPercentage: number = 0;
 
+  taxEnabled: boolean = false;
+
   isTaxInclusive: boolean = false;
 
   loading: boolean = false;
@@ -69,13 +71,54 @@ export class TaxComponent
   get totalGstPercentage(): number {
 
     return (
-      Number(this.cgstPercentage || 0) +
-      Number(this.sgstPercentage || 0)
+      Number(
+        this.cgstPercentage || 0
+      ) +
+      Number(
+        this.sgstPercentage || 0
+      )
     );
   }
 
 
+  get taxModeLabel(): string {
+
+    if (
+      !this.taxEnabled
+    ) {
+
+      return 'Tax Off';
+    }
+
+    return this.isTaxInclusive
+      ? 'Inclusive'
+      : 'Exclusive';
+  }
+
+
+  toggleTaxEnabled(): void {
+
+    this.taxEnabled =
+      !this.taxEnabled;
+
+    if (
+      !this.taxEnabled
+    ) {
+
+      this.isTaxInclusive =
+        false;
+    }
+  }
+
+
   toggleTaxType(): void {
+
+    if (
+      !this.taxEnabled
+    ) {
+
+      return;
+    }
 
     this.isTaxInclusive =
       !this.isTaxInclusive;
@@ -86,6 +129,7 @@ export class TaxComponent
 
     this.loading =
       true;
+
 
     this.apiService
       .getTaxSettings()
@@ -105,8 +149,21 @@ export class TaxComponent
           this.sgstPercentage =
             setting.sgstPercentage ?? 0;
 
+          this.taxEnabled =
+            setting.taxEnabled ?? false;
+
           this.isTaxInclusive =
             setting.taxIncluded ?? false;
+
+
+          if (
+            !this.taxEnabled
+          ) {
+
+            this.isTaxInclusive =
+              false;
+          }
+
 
           this.loading =
             false;
@@ -162,8 +219,13 @@ export class TaxComponent
             this.sgstPercentage || 0
           ),
 
+        taxEnabled:
+          this.taxEnabled,
+
         taxIncluded:
-          this.isTaxInclusive
+          this.taxEnabled
+            ? this.isTaxInclusive
+            : false
       };
 
 
@@ -191,8 +253,21 @@ export class TaxComponent
           this.sgstPercentage =
             setting.sgstPercentage ?? 0;
 
+          this.taxEnabled =
+            setting.taxEnabled ?? false;
+
           this.isTaxInclusive =
             setting.taxIncluded ?? false;
+
+
+          if (
+            !this.taxEnabled
+          ) {
+
+            this.isTaxInclusive =
+              false;
+          }
+
 
           this.saving =
             false;

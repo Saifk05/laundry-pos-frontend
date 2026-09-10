@@ -75,6 +75,20 @@
   font-size: 12px;
 }
 
+
+.summary-line.tax-breakup {
+  min-height: 26px;
+  padding-left: 14px;
+  color: #6d7477;
+  font-size: 13px;
+}
+
+.summary-line.tax-breakup strong {
+  color: #4d5457;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .customer-message.existing {
   color: #159b79;
   font-weight: 600;

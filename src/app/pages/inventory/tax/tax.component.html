@@ -6,7 +6,7 @@
       <h1>Tax Management</h1>
 
       <p>
-        Configure GST number, CGST and SGST percentage for your business.
+        Configure GST settings and choose how tax should be applied to orders.
       </p>
     </div>
 
@@ -21,7 +21,7 @@
         <h2>GST Configuration</h2>
 
         <p>
-          These tax details will be used while calculating order totals and invoices.
+          These tax settings will be used while calculating order totals and invoices.
         </p>
       </div>
 
@@ -30,143 +30,50 @@
 
     <div class="tax-form">
 
-      <div class="form-group">
 
-        <label for="gstNumber">
-          GST Number
-        </label>
+      <!-- TAX ENABLE / DISABLE -->
 
-        <input
-          id="gstNumber"
-          type="text"
-          [(ngModel)]="gstNumber"
-          placeholder="Enter GST number"
-          maxlength="15"
-        />
+      <div class="tax-enabled-setting">
 
-        <span class="helper-text">
-          Example: 29ABCDE1234F1Z5
-        </span>
-
-      </div>
-
-
-      <div class="form-row">
-
-        <div class="form-group">
-
-          <label for="cgst">
-            CGST Percentage
-          </label>
-
-          <div class="percentage-input">
-
-            <input
-              id="cgst"
-              type="number"
-              [(ngModel)]="cgstPercentage"
-              min="0"
-              max="100"
-              step="0.01"
-              placeholder="0"
-            />
-
-            <span>%</span>
-
-          </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label for="sgst">
-            SGST Percentage
-          </label>
-
-          <div class="percentage-input">
-
-            <input
-              id="sgst"
-              type="number"
-              [(ngModel)]="sgstPercentage"
-              min="0"
-              max="100"
-              step="0.01"
-              placeholder="0"
-            />
-
-            <span>%</span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="tax-summary">
-
-        <div>
-
-          <span class="summary-label">
-            Total GST
-          </span>
-
-          <p>
-            CGST + SGST
-          </p>
-
-        </div>
-
-        <strong>
-          {{ totalGstPercentage }}%
-        </strong>
-
-      </div>
-
-
-      <div class="tax-type-setting">
-
-        <div class="tax-type-info">
+        <div class="tax-enabled-info">
 
           <strong>
-            Tax Type
+            Enable Tax
           </strong>
 
-          <p *ngIf="isTaxInclusive">
-            Tax is already included in the service price.
+          <p *ngIf="taxEnabled">
+            GST calculation is enabled for orders.
           </p>
 
-          <p *ngIf="!isTaxInclusive">
-            Tax will be added separately to the service price.
+          <p *ngIf="!taxEnabled">
+            No tax will be applied to order totals.
           </p>
 
         </div>
 
 
-        <div class="tax-type-control">
+        <div class="tax-enabled-control">
 
           <span
-            class="tax-type-label"
-            [class.active]="!isTaxInclusive">
-            Exclusive
+            class="tax-status-label"
+            [class.active]="!taxEnabled">
+            Off
           </span>
 
           <button
             type="button"
             class="toggle-switch"
-            [class.enabled]="isTaxInclusive"
-            (click)="toggleTaxType()">
+            [class.enabled]="taxEnabled"
+            (click)="toggleTaxEnabled()">
 
             <span class="toggle-knob"></span>
 
           </button>
 
           <span
-            class="tax-type-label"
-            [class.active]="isTaxInclusive">
-            Inclusive
+            class="tax-status-label"
+            [class.active]="taxEnabled">
+            On
           </span>
 
         </div>
@@ -174,14 +81,201 @@
       </div>
 
 
+      <!-- GST DETAILS -->
+
+      <div
+        class="tax-details-section"
+        [class.disabled]="!taxEnabled">
+
+
+        <div class="form-group">
+
+          <label for="gstNumber">
+            GST Number
+          </label>
+
+          <input
+            id="gstNumber"
+            type="text"
+            [(ngModel)]="gstNumber"
+            placeholder="Enter GST number"
+            maxlength="15"
+            [disabled]="!taxEnabled"
+          />
+
+          <span class="helper-text">
+            Example: 29ABCDE1234F1Z5
+          </span>
+
+        </div>
+
+
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label for="cgst">
+              CGST Percentage
+            </label>
+
+            <div class="percentage-input">
+
+              <input
+                id="cgst"
+                type="number"
+                [(ngModel)]="cgstPercentage"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="0"
+                [disabled]="!taxEnabled"
+              />
+
+              <span>%</span>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="sgst">
+              SGST Percentage
+            </label>
+
+            <div class="percentage-input">
+
+              <input
+                id="sgst"
+                type="number"
+                [(ngModel)]="sgstPercentage"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="0"
+                [disabled]="!taxEnabled"
+              />
+
+              <span>%</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="tax-summary">
+
+          <div>
+
+            <span class="summary-label">
+              Total GST
+            </span>
+
+            <p>
+              CGST + SGST
+            </p>
+
+          </div>
+
+          <strong>
+            {{ taxEnabled ? totalGstPercentage : 0 }}%
+          </strong>
+
+        </div>
+
+
+        <!-- TAX TYPE -->
+
+        <div class="tax-type-setting">
+
+          <div class="tax-type-info">
+
+            <strong>
+              Tax Type
+            </strong>
+
+            <p *ngIf="!taxEnabled">
+              Enable tax first to select the tax type.
+            </p>
+
+            <p *ngIf="taxEnabled && isTaxInclusive">
+              Tax is already included in the service price.
+            </p>
+
+            <p *ngIf="taxEnabled && !isTaxInclusive">
+              Tax will be added separately to the service price.
+            </p>
+
+          </div>
+
+
+          <div
+            class="tax-type-control"
+            [class.disabled]="!taxEnabled">
+
+            <span
+              class="tax-type-label"
+              [class.active]="taxEnabled && !isTaxInclusive">
+
+              Exclusive
+
+            </span>
+
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.enabled]="isTaxInclusive"
+              [disabled]="!taxEnabled"
+              (click)="toggleTaxType()">
+
+              <span class="toggle-knob"></span>
+
+            </button>
+
+            <span
+              class="tax-type-label"
+              [class.active]="taxEnabled && isTaxInclusive">
+
+              Inclusive
+
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CURRENT MODE SUMMARY -->
+
+      <div class="current-mode-summary">
+
+        <span>
+          Current Tax Mode
+        </span>
+
+        <strong>
+          {{ taxModeLabel }}
+        </strong>
+
+      </div>
+
+
+      <!-- SAVE -->
+
       <div class="modal-actions">
 
         <button
           type="button"
           class="save-button"
+          [disabled]="saving || loading"
           (click)="saveTaxSettings()">
 
-          Save Tax Settings
+          {{ saving ? 'Saving...' : 'Save Tax Settings' }}
 
         </button>
 

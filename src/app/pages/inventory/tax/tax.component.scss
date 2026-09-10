@@ -4,17 +4,14 @@
   min-height: 100%;
 }
 
-
 * {
   box-sizing: border-box;
 }
-
 
 button,
 input {
   font: inherit;
 }
-
 
 /* =====================================================
    PAGE
@@ -29,7 +26,6 @@ input {
   background: #ffffff;
   color: #111827;
 }
-
 
 /* =====================================================
    PAGE HEADER
@@ -47,7 +43,6 @@ input {
   margin-bottom: 24px;
 }
 
-
 .page-header h1 {
   margin: 0;
 
@@ -58,16 +53,16 @@ input {
   color: #111111;
 }
 
-
 .page-header p {
-  margin: 6px 0 0;
+  margin: 7px 0 0;
+
+  max-width: 620px;
 
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
 
   color: #68737d;
 }
-
 
 /* =====================================================
    TAX CARD
@@ -75,16 +70,18 @@ input {
 
 .tax-card {
   width: 100%;
-  max-width: 760px;
+  max-width: 780px;
 
   overflow: hidden;
 
   border: 1px solid #dfe6e9;
-  border-radius: 11px;
+  border-radius: 12px;
 
   background: #ffffff;
-}
 
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.03);
+}
 
 /* =====================================================
    CARD HEADER
@@ -94,8 +91,9 @@ input {
   padding: 20px 22px;
 
   border-bottom: 1px solid #edf0f2;
-}
 
+  background: #ffffff;
+}
 
 .tax-card-header h2 {
   margin: 0;
@@ -106,7 +104,6 @@ input {
   font-weight: 700;
 }
 
-
 .tax-card-header p {
   margin: 5px 0 0;
 
@@ -116,7 +113,6 @@ input {
   line-height: 1.5;
 }
 
-
 /* =====================================================
    FORM
 ===================================================== */
@@ -124,7 +120,6 @@ input {
 .tax-form {
   padding: 24px;
 }
-
 
 .form-row {
   display: grid;
@@ -135,7 +130,6 @@ input {
 
   gap: 16px;
 }
-
 
 .form-group {
   min-width: 0;
@@ -148,14 +142,12 @@ input {
   margin-bottom: 18px;
 }
 
-
 .form-group label {
   color: #323a3f;
 
   font-size: 12px;
   font-weight: 600;
 }
-
 
 /* =====================================================
    NORMAL INPUT
@@ -168,7 +160,7 @@ input {
   padding: 0 13px;
 
   border: 1px solid #d5dde1;
-  border-radius: 7px;
+  border-radius: 8px;
 
   outline: none;
 
@@ -179,14 +171,13 @@ input {
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
-
 
 .form-group > input::placeholder {
   color: #a1a9ae;
 }
-
 
 .form-group > input:focus {
   border-color: #16a34a;
@@ -195,6 +186,14 @@ input {
     0 0 0 3px rgba(22, 163, 74, 0.08);
 }
 
+.form-group > input:disabled {
+  cursor: not-allowed;
+
+  background: #f6f8f9;
+  color: #a1a9ae;
+
+  border-color: #e5e9eb;
+}
 
 /* =====================================================
    PERCENTAGE INPUT
@@ -210,15 +209,15 @@ input {
   overflow: hidden;
 
   border: 1px solid #d5dde1;
-  border-radius: 7px;
+  border-radius: 8px;
 
   background: #ffffff;
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
-
 
 .percentage-input:focus-within {
   border-color: #16a34a;
@@ -226,7 +225,6 @@ input {
   box-shadow:
     0 0 0 3px rgba(22, 163, 74, 0.08);
 }
-
 
 .percentage-input input {
   width: 100%;
@@ -239,17 +237,15 @@ input {
   border: none;
   outline: none;
 
-  background: #ffffff;
+  background: transparent;
   color: #252c31;
 
   font-size: 13px;
 }
 
-
 .percentage-input input::placeholder {
   color: #a1a9ae;
 }
-
 
 .percentage-input span {
   height: 100%;
@@ -271,6 +267,15 @@ input {
   font-weight: 600;
 }
 
+.percentage-input:has(input:disabled) {
+  background: #f6f8f9;
+  border-color: #e5e9eb;
+}
+
+.percentage-input:has(input:disabled) span {
+  background: #eef1f2;
+  color: #a1a9ae;
+}
 
 /* =====================================================
    HELPER TEXT
@@ -283,6 +288,83 @@ input {
   line-height: 1.45;
 }
 
+/* =====================================================
+   ENABLE TAX
+===================================================== */
+
+.tax-enabled-setting {
+  min-height: 82px;
+
+  margin-bottom: 22px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border: 1px solid #dfe6e9;
+  border-radius: 9px;
+
+  background: #f8fbf9;
+}
+
+.tax-enabled-info strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #20272c;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tax-enabled-info p {
+  margin: 0;
+
+  color: #7c878d;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.tax-enabled-control {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+.tax-status-label {
+  color: #8b949a;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  transition: color 0.2s ease;
+}
+
+.tax-status-label.active {
+  color: #15803d;
+}
+
+/* =====================================================
+   TAX DETAILS STATE
+===================================================== */
+
+.tax-details-section {
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+
+.tax-details-section.disabled {
+  opacity: 0.58;
+}
 
 /* =====================================================
    TAX SUMMARY
@@ -301,11 +383,10 @@ input {
   gap: 20px;
 
   border: 1px solid #e0e6e9;
-  border-radius: 8px;
+  border-radius: 9px;
 
   background: #fafcfc;
 }
-
 
 .summary-label {
   display: block;
@@ -318,7 +399,6 @@ input {
   font-weight: 600;
 }
 
-
 .tax-summary p {
   margin: 0;
 
@@ -327,7 +407,6 @@ input {
   font-size: 11px;
 }
 
-
 .tax-summary strong {
   color: #16a34a;
 
@@ -335,6 +414,175 @@ input {
   font-weight: 700;
 }
 
+/* =====================================================
+   TAX TYPE
+===================================================== */
+
+.tax-type-setting {
+  min-height: 82px;
+
+  margin-top: 16px;
+  padding: 15px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 9px;
+
+  background: #fafcfc;
+}
+
+.tax-type-info strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #323a3f;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tax-type-info p {
+  margin: 0;
+
+  max-width: 430px;
+
+  color: #838d93;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.tax-type-control {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+
+  transition: opacity 0.2s ease;
+}
+
+.tax-type-control.disabled {
+  opacity: 0.45;
+}
+
+.tax-type-label {
+  color: #8a949a;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  transition: color 0.2s ease;
+}
+
+.tax-type-label.active {
+  color: #15803d;
+}
+
+/* =====================================================
+   TOGGLE
+===================================================== */
+
+.toggle-switch {
+  position: relative;
+
+  width: 44px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #cbd2d6;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.toggle-switch:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.toggle-switch.enabled {
+  background: #16a34a;
+}
+
+.toggle-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.toggle-knob {
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.18);
+
+  transition: transform 0.2s ease;
+}
+
+.toggle-switch.enabled .toggle-knob {
+  transform: translateX(20px);
+}
+
+/* =====================================================
+   CURRENT MODE
+===================================================== */
+
+.current-mode-summary {
+  min-height: 54px;
+
+  margin-top: 16px;
+  padding: 13px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  border-radius: 8px;
+
+  background: #f3f8f4;
+  border: 1px solid #dcebe0;
+}
+
+.current-mode-summary span {
+  color: #68737d;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.current-mode-summary strong {
+  color: #15803d;
+
+  font-size: 12px;
+  font-weight: 700;
+}
 
 /* =====================================================
    ACTIONS
@@ -353,15 +601,14 @@ input {
   border-top: 1px solid #edf0f2;
 }
 
-
 .save-button {
-  min-width: 150px;
+  min-width: 156px;
   height: 43px;
 
   padding: 0 18px;
 
   border: 1px solid #16a34a;
-  border-radius: 7px;
+  border-radius: 8px;
 
   background: #16a34a;
   color: #ffffff;
@@ -373,15 +620,20 @@ input {
 
   transition:
     background 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    opacity 0.2s ease;
 }
 
-
-.save-button:hover {
+.save-button:hover:not(:disabled) {
   background: #15803d;
   border-color: #15803d;
 }
 
+.save-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
 
 /* =====================================================
    RESPONSIVE
@@ -395,28 +647,23 @@ input {
 
 }
 
-
 @media (max-width: 520px) {
 
   .tax-page {
     padding: 18px 12px 30px;
   }
 
-
   .page-header h1 {
     font-size: 24px;
   }
-
 
   .tax-form {
     padding: 18px;
   }
 
-
   .tax-card-header {
     padding: 18px;
   }
-
 
   .form-row {
     grid-template-columns: 1fr;
@@ -424,143 +671,28 @@ input {
     gap: 0;
   }
 
-
-  .save-button {
-    width: 100%;
-  }
-
-}
-
-/* =====================================================
-   TAX TYPE
-===================================================== */
-
-.tax-type-setting {
-  min-height: 78px;
-
-  margin-top: 16px;
-  padding: 14px 16px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  border: 1px solid #e0e6e9;
-  border-radius: 8px;
-
-  background: #fafcfc;
-}
-
-
-.tax-type-info strong {
-  display: block;
-
-  margin-bottom: 4px;
-
-  color: #323a3f;
-
-  font-size: 12px;
-  font-weight: 600;
-}
-
-
-.tax-type-info p {
-  margin: 0;
-
-  color: #838d93;
-
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-
-.tax-type-control {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  flex-shrink: 0;
-}
-
-
-.tax-type-label {
-  color: #8a949a;
-
-  font-size: 11px;
-  font-weight: 600;
-
-  transition: color 0.2s ease;
-}
-
-
-.tax-type-label.active {
-  color: #15803d;
-}
-
-
-/* =====================================================
-   TOGGLE
-===================================================== */
-
-.toggle-switch {
-  position: relative;
-
-  width: 42px;
-  height: 23px;
-
-  flex-shrink: 0;
-
-  padding: 0;
-
-  border: none;
-  border-radius: 20px;
-
-  background: #cbd2d6;
-
-  cursor: pointer;
-
-  transition: background 0.2s ease;
-}
-
-
-.toggle-switch.enabled {
-  background: #16a34a;
-}
-
-
-.toggle-knob {
-  position: absolute;
-
-  top: 3px;
-  left: 3px;
-
-  width: 17px;
-  height: 17px;
-
-  border-radius: 50%;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.18);
-
-  transition: transform 0.2s ease;
-}
-
-
-.toggle-switch.enabled .toggle-knob {
-  transform: translateX(19px);
-}
-
-
-@media (max-width: 520px) {
-
+  .tax-enabled-setting,
   .tax-type-setting {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .tax-enabled-control,
+  .tax-type-control {
+    width: 100%;
+
+    justify-content: flex-end;
+  }
+
+  .current-mode-summary {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 4px;
+  }
+
+  .save-button {
+    width: 100%;
   }
 
 }
