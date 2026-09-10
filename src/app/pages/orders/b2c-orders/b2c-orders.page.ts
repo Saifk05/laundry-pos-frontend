@@ -638,7 +638,7 @@ Quantity: ${totalQuantity} ${quantityLabel}
 Kindly collect your order within 2 days.
 
 Thank you,
-${this.businessName}`;
+`;
 
         const whatsappUrl =
           `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
