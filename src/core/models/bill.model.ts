@@ -5,6 +5,11 @@ export type BillStatus =
   | 'CANCELLED';
 
 
+  export type GstFilter =
+  | 'ALL'
+  | 'WITH_GST'
+  | 'WITHOUT_GST';
+
 export interface Bill {
 
   orderId: string;

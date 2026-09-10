@@ -76,6 +76,7 @@ export interface B2COrderDetails {
   discountAmount: number;
   couponCode: string | null;
 
+
   expressDelivery: boolean;
   expressChargePercentage: number | null;
   expressChargeAmount: number;

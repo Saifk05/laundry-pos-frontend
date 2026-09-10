@@ -543,23 +543,27 @@ getB2COrders(
 getBills(
   fromDate?: string,
   toDate?: string,
+  withGst?: boolean,
   cursor?: string | null,
   limit = 10
 ): Observable<BillListResponse> {
 
-  const params = {
+  const params: any = {
     fromDate: fromDate ?? '',
     toDate: toDate ?? '',
     cursor: cursor ?? '',
     limit
   };
 
+  if (withGst !== undefined) {
+    params.withGst = withGst;
+  }
+
   return this.http.get<BillListResponse>(
     `${this.baseUrl}/bills`,
     { params }
   );
 }
-
 
 //   getBills():
 //   Observable<BillListResponse> {

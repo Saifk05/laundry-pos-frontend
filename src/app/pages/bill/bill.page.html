@@ -62,12 +62,14 @@
           <input
             matStartDate
             formControlName="start"
-            placeholder="Start date">
+            placeholder="Start date"
+            (dateChange)="onDateFilterChange()">
 
           <input
             matEndDate
             formControlName="end"
-            placeholder="End date">
+            placeholder="End date"
+            (dateChange)="onDateFilterChange()">
 
         </mat-date-range-input>
 
@@ -113,6 +115,34 @@
     <div class="filter-field">
 
       <label>
+        GST
+      </label>
+
+      <select
+        [(ngModel)]="gstFilter"
+        (change)="onGstFilterChange()">
+
+        @for (
+          option of gstFilterOptions;
+          track option.value
+        ) {
+
+          <option
+            [value]="option.value">
+
+            {{ option.label }}
+
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+    <div class="filter-field">
+
+      <label>
         Sort By
       </label>
 
@@ -136,16 +166,6 @@
       </select>
 
     </div>
-
-    <button
-      type="button"
-      class="load-button"
-      [disabled]="loading"
-      (click)="searchBills()">
-
-      Search
-
-    </button>
 
     <button
       type="button"

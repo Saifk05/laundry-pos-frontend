@@ -123,7 +123,7 @@ export class NewWalkInPage
   loadingRetagOrder = false;
   isRescheduleMode = false;
   rescheduleOrderId: string | null = null;
-  businessName = 'Venkateshwara Fabric Works';
+  businessName = ' Fabric Works';
 
   cgstPercentage = 0;
 
@@ -160,7 +160,7 @@ export class NewWalkInPage
 
           this.businessName =
             response?.businessName ||
-            'Venkateshwara Fabric Works';
+            'Fabric Works';
 
           this.cgstPercentage =
             Number(
@@ -172,15 +172,8 @@ export class NewWalkInPage
               response?.sgstPercentage ?? 0
             );
 
-          this.taxEnabled =
-            Boolean(
-              response?.taxEnabled
-            );
-
-          this.taxIncluded =
-            Boolean(
-              response?.taxIncluded
-            );
+          this.taxEnabled = Boolean( response?.taxEnabled );
+          this.taxIncluded = Boolean( response?.taxIncluded );
         },
 
         error: (
@@ -2445,16 +2438,40 @@ openWhatsApp(): void {
     order.customer.phone
   );
 
-const message = `Dear ${order.customer.name},
+  const totalQuantity =
+    order.items?.reduce(
+      (total: number, item: any) => {
+
+        if (item.unit === 'KG') {
+          return total + Number(item.garmentCount ?? 0);
+        }
+
+        if (item.unit === 'PC') {
+          return total + Number(item.quantity ?? 0);
+        }
+
+        return total;
+      },
+      0
+    ) ?? 0;
+
+  const quantityLabel =
+    totalQuantity === 1
+      ? 'Pc'
+      : 'Pcs';
+
+  const message = `Dear ${order.customer.name},
 
 We have received your laundry for order ${order.orderNumber}.
 
 Total Amount: ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+Quantity: ${totalQuantity} ${quantityLabel}
+
+We will inform you if there are any updates to your order after store inspection.
 
 We'll notify you once your laundry is ready for collection.
 
-Thank you,
-${this.businessName}`;
+Thank you, `;
 
   const whatsappUrl =
     `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;

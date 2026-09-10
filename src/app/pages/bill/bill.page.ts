@@ -312,6 +312,27 @@ export class BillPage
   invoiceStatus =
     'ALL';
 
+  gstFilter:
+    'ALL' |
+    'WITH_GST' |
+    'WITHOUT_GST' =
+      'ALL';
+
+  readonly gstFilterOptions = [
+    {
+      label: 'All',
+      value: 'ALL'
+    },
+    {
+      label: 'With GST',
+      value: 'WITH_GST'
+    },
+    {
+      label: 'Without GST',
+      value: 'WITHOUT_GST'
+    }
+  ];
+
   sortBy =
     'Created Date Desc';
 
@@ -386,6 +407,7 @@ export class BillPage
       .getBills(
         this.fromDate || undefined,
         this.toDate || undefined,
+        this.withGstFilter,
         cursor,
         this.pageLimit
       )
@@ -435,6 +457,26 @@ export class BillPage
         }
 
       });
+  }
+
+  get withGstFilter():
+    boolean | undefined {
+
+    if (
+      this.gstFilter ===
+      'WITH_GST'
+    ) {
+      return true;
+    }
+
+    if (
+      this.gstFilter ===
+      'WITHOUT_GST'
+    ) {
+      return false;
+    }
+
+    return undefined;
   }
 
   get filteredInvoices():
@@ -833,6 +875,26 @@ export class BillPage
     this.searchBills();
   }
 
+  onDateFilterChange(): void {
+
+    const start =
+      this.range.controls.start.value;
+
+    const end =
+      this.range.controls.end.value;
+
+    if (!start || !end) {
+      return;
+    }
+
+    this.searchBills();
+  }
+
+  onGstFilterChange(): void {
+    this.resetPagination();
+    this.loadInvoices();
+  }
+
   clearFilters(): void {
 
     this.orderIdSearch =
@@ -859,6 +921,9 @@ export class BillPage
       '';
 
     this.invoiceStatus =
+      'ALL';
+
+    this.gstFilter =
       'ALL';
 
     this.sortBy =

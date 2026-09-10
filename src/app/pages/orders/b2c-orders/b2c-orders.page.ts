@@ -273,27 +273,30 @@ export class B2cOrdersPage implements OnInit {
       });
   }
 
-  private toViewOrder(order: B2COrder): B2cOrderView {
-    return {
-      id: order.id,
-      orderNumber: order.orderNumber,
-      status: order.status,
-      customerName: order.customerName,
-      mobile: order.mobile,
-      storageLabel: order.storageLabel ?? '-',
-      pickupDate: order.pickupDate ?? '-',
-      pickupSlot: order.pickupTime ?? '-',
-      deliveryDate: order.deliveryDate ?? '-',
-      deliverySlot: order.deliveryTime ?? '-',
-      amount: Number(order.totalAmount ?? 0),
-      homeDelivery: order.homeDelivery,
-      expressDelivery: order.expressDelivery,
-      settled: order.settled,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-      moreOpen: false
-    };
-  }
+private toViewOrder(
+  order: B2COrder
+): B2cOrderView {
+
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    status: order.status,
+    customerName: order.customerName,
+    mobile: order.mobile,
+    storageLabel: order.storageLabel ?? '-',
+    pickupDate: order.pickupDate ?? '-',
+    pickupSlot: order.pickupTime ?? '-',
+    deliveryDate: order.deliveryDate ?? '-',
+    deliverySlot: order.deliveryTime ?? '-',
+    amount: Number(order.totalAmount ?? 0),
+    homeDelivery: order.homeDelivery,
+    expressDelivery: order.expressDelivery,
+    settled: order.settled,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    moreOpen: false
+  };
+}
 
   get filteredOrders(): B2cOrderView[] {
     return this.orders.filter((order: B2cOrderView) => {
@@ -576,41 +579,88 @@ export class B2cOrdersPage implements OnInit {
       }});
   }
 
-  private openReadyWhatsApp(
-    order: B2cOrderView
-  ): void {
+private openReadyWhatsApp(
+  order: B2cOrderView
+): void {
 
-    const phone =
-      this.formatWhatsAppPhone(
-        order.mobile
-      );
-
-    if (!phone) {
-      this.errorMessage =
-        'Customer WhatsApp number is invalid';
-
-      return;
-    }
-
-    const message = `Dear ${order.customerName},
-
-    Your laundry order ${order.orderNumber} is ready for collection.
-
-    Total Amount: ₹${order.amount.toFixed(2)}
-
-    Kindly collect your order within 2 days.
-
-    Thank you,
-    ${this.businessName}`;
-
-    const whatsappUrl =
-      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-
-    window.open(
-      whatsappUrl,
-      '_blank'
+  const phone =
+    this.formatWhatsAppPhone(
+      order.mobile
     );
+
+  if (!phone) {
+    this.errorMessage =
+      'Customer WhatsApp number is invalid';
+
+    return;
   }
+
+  this.apiService
+    .getB2COrderById(order.id)
+    .subscribe({
+
+      next: (details: any) => {
+
+        const totalQuantity =
+          details.items?.reduce(
+            (total: number, item: any) => {
+
+              if (item.unit === 'KG') {
+                return total +
+                  Number(
+                    item.garmentCount ?? 0
+                  );
+              }
+
+              if (item.unit === 'PC') {
+                return total +
+                  Number(
+                    item.quantity ?? 0
+                  );
+              }
+
+              return total;
+            },
+            0
+          ) ?? 0;
+
+        const quantityLabel = totalQuantity === 1
+            ? 'Pc'
+            : 'Pcs';
+
+        const message = `Dear ${order.customerName},
+
+Your laundry order ${order.orderNumber} is ready for collection.
+
+Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
+Quantity: ${totalQuantity} ${quantityLabel}
+
+Kindly collect your order within 2 days.
+
+Thank you,
+${this.businessName}`;
+
+        const whatsappUrl =
+          `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+        window.open(
+          whatsappUrl,
+          '_blank'
+        );
+      },
+
+      error: (error: any) => {
+
+        console.error(
+          'Unable to load order details',
+          error
+        );
+
+        this.errorMessage =
+          'Unable to load order details';
+      }
+    });
+}
 
   private formatWhatsAppPhone(
     phone: string
