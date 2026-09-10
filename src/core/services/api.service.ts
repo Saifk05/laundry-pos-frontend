@@ -565,13 +565,6 @@ getBills(
   );
 }
 
-//   getBills():
-//   Observable<BillListResponse> {
-
-//   return this.http.get<BillListResponse>(
-//     `${this.baseUrl}/bills`
-//   );
-// }
 
 downloadBillReceipt(
   orderId: string

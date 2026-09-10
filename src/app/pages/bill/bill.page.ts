@@ -311,26 +311,12 @@ export class BillPage
 
   invoiceStatus =
     'ALL';
-
-  gstFilter:
-    'ALL' |
-    'WITH_GST' |
-    'WITHOUT_GST' =
-      'ALL';
+  gstFilter: 'ALL' | 'WITH_GST' | 'WITHOUT_GST' = 'ALL';
 
   readonly gstFilterOptions = [
-    {
-      label: 'All',
-      value: 'ALL'
-    },
-    {
-      label: 'With GST',
-      value: 'WITH_GST'
-    },
-    {
-      label: 'Without GST',
-      value: 'WITHOUT_GST'
-    }
+    { label: 'All', value: 'ALL' },
+    { label: 'With GST', value: 'WITH_GST' },
+    { label: 'Without GST', value: 'WITHOUT_GST' }
   ];
 
   sortBy =
@@ -459,23 +445,9 @@ export class BillPage
       });
   }
 
-  get withGstFilter():
-    boolean | undefined {
-
-    if (
-      this.gstFilter ===
-      'WITH_GST'
-    ) {
-      return true;
-    }
-
-    if (
-      this.gstFilter ===
-      'WITHOUT_GST'
-    ) {
-      return false;
-    }
-
+  get withGstFilter(): boolean | undefined {
+    if (this.gstFilter === 'WITH_GST') return true;
+    if (this.gstFilter === 'WITHOUT_GST') return false;
     return undefined;
   }
 
@@ -923,8 +895,7 @@ export class BillPage
     this.invoiceStatus =
       'ALL';
 
-    this.gstFilter =
-      'ALL';
+    this.gstFilter = 'ALL';
 
     this.sortBy =
       'Created Date Desc';
@@ -1340,11 +1311,9 @@ export class BillPage
 
   get settlementBalanceAmount():
     number {
-
     if (
       this.settlementOrder
     ) {
-
       return Number(
         this.settlementOrder
           .balanceAmount ?? 0
@@ -1358,62 +1327,31 @@ export class BillPage
   }
 
   addPayment(): void {
-
-    if (
-      !this.settlementInvoice
-    ) {
-
+    if (!this.settlementInvoice ) {
       return;
     }
 
-    const amount =
-      Number(
-        this.paymentAmount
-      );
-
-    const balance =
-      this.settlementBalanceAmount;
-
-    if (
-      !amount ||
-      amount <= 0
-    ) {
-
-      this.paymentError =
-        'Enter a valid payment amount';
-
+    const amount = Number(this.paymentAmount);
+    const balance = this.settlementBalanceAmount;
+    if ( !amount || amount <= 0 ) {
+      this.paymentError = 'Enter a valid payment amount';
       return;
     }
 
-    if (
-      amount > balance
-    ) {
-
-      this.paymentError =
-        'Payment amount cannot be greater than balance';
-
+    if ( amount > balance ) {
+      this.paymentError = 'Payment amount cannot be greater than balance';
       return;
     }
 
-    const request:
-      PaymentRequest = {
-
+    const request: PaymentRequest = {
         amount,
-
-        paymentMethod:
-          this.paymentMethod,
-
-        referenceNumber:
-          this.referenceNumber
+        paymentMethod: this.paymentMethod,
+        referenceNumber: this.referenceNumber
             .trim() || null
       };
 
-    this.paymentSubmitting =
-      true;
-
-    this.paymentError =
-      '';
-
+    this.paymentSubmitting = true;
+    this.paymentError ='';
     this.apiService
       .addSettlementPayment(
         this.settlementInvoice
@@ -1423,12 +1361,8 @@ export class BillPage
       .subscribe({
 
         next: () => {
-
-          this.paymentSubmitting =
-            false;
-
+          this.paymentSubmitting = false;
           this.closeSettlement();
-
           this.loadInvoices();
         },
 

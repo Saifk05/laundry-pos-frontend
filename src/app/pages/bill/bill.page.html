@@ -112,32 +112,20 @@
 
     </div>
 
-    <div class="filter-field">
-
-      <label>
-        GST
-      </label>
-
+    <div class="filter-field gst-filter-field">
+      <label>GST</label>
       <select
         [(ngModel)]="gstFilter"
         (change)="onGstFilterChange()">
-
         @for (
           option of gstFilterOptions;
           track option.value
         ) {
-
-          <option
-            [value]="option.value">
-
+          <option [value]="option.value">
             {{ option.label }}
-
           </option>
-
         }
-
       </select>
-
     </div>
 
     <div class="filter-field">
