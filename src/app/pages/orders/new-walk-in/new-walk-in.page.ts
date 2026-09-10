@@ -1359,10 +1359,8 @@ private formatLocalDate(
   toggleCouponDropdown():
     void {
 
-    this.couponDropdownOpen =
-      !this.couponDropdownOpen;
+    this.couponDropdownOpen = !this.couponDropdownOpen;
   }
-
 
   selectCoupon(
     coupon:
@@ -2346,6 +2344,54 @@ printWindow.document.write(`
 `);
 
   printWindow.document.close();
+}
+
+openWhatsApp(): void {
+  if (!this.createdOrder) {
+    return;
+  }
+
+  const order = this.createdOrder;
+
+  const phone = this.formatWhatsAppPhone(
+    order.customer.phone
+  );
+
+const message = `Dear ${order.customer.name},
+
+We have received your laundry for order ${order.orderNumber}.
+
+Total Amount: ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+
+We'll notify you once your laundry is ready for collection.
+
+Thank you,
+${this.businessName}`;
+
+  const whatsappUrl =
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+  window.open(
+    whatsappUrl,
+    '_blank'
+  );
+}
+
+private formatWhatsAppPhone(
+  phone: string
+): string {
+
+  const digits =
+    phone.replace(
+      /\D/g,
+      ''
+    );
+
+  if (digits.length === 10) {
+    return `91${digits}`;
+  }
+
+  return digits;
 }
 
 printTag(): void {

@@ -534,12 +534,36 @@ export class B2cOrdersPage implements OnInit {
         this.updateLocalOrder(storageResponse);
         this.apiService.markB2COrderReady(orderId).subscribe({
           next: (readyResponse: B2COrder) => {
+            const readyOrder: B2cOrderView = {
+              id: readyResponse.id,
+              orderNumber: readyResponse.orderNumber,
+              status: readyResponse.status,
+              customerName: readyResponse.customerName,
+              mobile: readyResponse.mobile,
+              storageLabel: readyResponse.storageLabel ?? '-',
+              pickupDate: readyResponse.pickupDate ?? '-',
+              pickupSlot: readyResponse.pickupTime ?? '-',
+              deliveryDate: readyResponse.deliveryDate ?? '-',
+              deliverySlot: readyResponse.deliveryTime ?? '-',
+              amount: Number(readyResponse.totalAmount ?? 0),
+              homeDelivery: readyResponse.homeDelivery,
+              expressDelivery: readyResponse.expressDelivery,
+              settled: readyResponse.settled,
+              createdAt: readyResponse.createdAt,
+              updatedAt: readyResponse.updatedAt,
+              moreOpen: false
+            };
+
             this.updateLocalOrder(readyResponse);
             this.actionLoading = false;
             this.readyStorageModalOpen = false;
             this.selectedReadyOrder = null;
             this.readyStorageLabel = '';
             this.readyStorageError = '';
+
+            this.openReadyWhatsApp(
+              readyOrder
+            );
           },
           error: (error: any) => {
             this.actionLoading = false;
@@ -550,6 +574,70 @@ export class B2cOrdersPage implements OnInit {
         this.actionLoading = false;
         this.readyStorageError = error?.error?.message || error?.error?.error || 'Unable to update storage label';
       }});
+  }
+
+  private openReadyWhatsApp(
+    order: B2cOrderView
+  ): void {
+
+    const phone =
+      this.formatWhatsAppPhone(
+        order.mobile
+      );
+
+    if (!phone) {
+      this.errorMessage =
+        'Customer WhatsApp number is invalid';
+
+      return;
+    }
+
+    const message = `Dear ${order.customerName},
+
+    Your laundry order ${order.orderNumber} is ready for collection.
+
+    Total Amount: ₹${order.amount.toFixed(2)}
+
+    Kindly collect your order within 2 days.
+
+    Thank you,
+    ${this.businessName}`;
+
+    const whatsappUrl =
+      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+    window.open(
+      whatsappUrl,
+      '_blank'
+    );
+  }
+
+  private formatWhatsAppPhone(
+    phone: string
+  ): string {
+
+    if (!phone) {
+      return '';
+    }
+
+    let digits =
+      phone.replace(
+        /\D/g,
+        ''
+      );
+
+    if (digits.length === 10) {
+      digits = `91${digits}`;
+    }
+
+    if (
+      digits.length !== 12 ||
+      !digits.startsWith('91')
+    ) {
+      return '';
+    }
+
+    return digits;
   }
 
   markDelivered(order: B2cOrderView): void {

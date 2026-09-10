@@ -5,7 +5,6 @@ export type B2COrderStatus =
   | 'DELIVERED'
   | 'CANCELLED';
 
-
 export interface B2COrder {
   id: string;
   orderNumber: string;
@@ -25,7 +24,6 @@ export interface B2COrder {
   updatedAt: string;
 }
 
-
 export interface B2COrderListResponse {
   message: string;
   totalOrders: number;
@@ -34,17 +32,14 @@ export interface B2COrderListResponse {
   hasMore: boolean;
 }
 
-
 export interface OrderStatusRequest {
   status: B2COrderStatus;
 }
-
 
 export interface RescheduleOrderRequest {
   deliveryDate: string;
   deliveryTime: string;
 }
-
 
 export interface B2COrderCustomer {
   id: string;
@@ -52,11 +47,9 @@ export interface B2COrderCustomer {
   phone: string;
 }
 
-
 export type PricingUnit =
   | 'PC'
   | 'KG';
-
 
 export interface B2COrderItem {
   id: string;
@@ -73,7 +66,6 @@ export interface B2COrderItem {
   lineTotal: number;
 }
 
-
 export interface B2COrderDetails {
   id: string;
   orderNumber: string;
@@ -88,10 +80,17 @@ export interface B2COrderDetails {
   expressChargePercentage: number | null;
   expressChargeAmount: number;
 
-  totalAmount: number;
+  cgstPercentage: number;
+  sgstPercentage: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  taxAmount: number;
+  taxIncluded: boolean;
 
+  totalAmount: number;
   paidAmount: number;
   balanceAmount: number;
+
   paymentStatus:
     | 'PENDING'
     | 'PARTIALLY_PAID'
@@ -99,23 +98,18 @@ export interface B2COrderDetails {
 
   pickupDate: string | null;
   pickupTime: string | null;
-
   deliveryDate: string | null;
   deliveryTime: string | null;
 
   storageLabel: string | null;
-
   homeDelivery: boolean;
   settled: boolean;
-
   status: B2COrderStatus;
 
   createdAt: string;
   updatedAt: string;
-
   message: string;
 }
-
 
 export interface RetagOrderItemRequest {
   productId: string;
@@ -124,7 +118,6 @@ export interface RetagOrderItemRequest {
   quantity: number;
   garmentCount: number | null;
 }
-
 
 export interface RetagOrderRequest {
   items: RetagOrderItemRequest[];
