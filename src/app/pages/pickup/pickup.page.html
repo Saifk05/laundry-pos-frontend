@@ -1,0 +1,248 @@
+<ion-content [fullscreen]="true">
+  <div class="pickup-page">
+
+    <div class="page-header">
+      <div>
+        <h1>Pickup</h1>
+        <p>Manage today's pickups, customer details and locations</p>
+      </div>
+
+      <button class="primary-btn" (click)="addDummyPickup()">
+        + Add Pickup
+      </button>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-card">
+      <input
+        type="text"
+        placeholder="Search by name, address or mobile..."
+        [(ngModel)]="searchText"
+        (input)="applyFilters()"
+      >
+
+      <input
+        type="date"
+        [(ngModel)]="selectedDate"
+        (change)="applyFilters()"
+      >
+
+      <select
+        [(ngModel)]="selectedTimeSlot"
+        (change)="applyFilters()"
+      >
+        <option value="">All Time Slots</option>
+
+        @for (slot of timeSlots; track slot) {
+          <option [value]="slot">{{ slot }}</option>
+        }
+      </select>
+
+      <select
+        [(ngModel)]="selectedStatus"
+        (change)="applyFilters()"
+      >
+        <option value="">All Status</option>
+        <option value="Scheduled">Scheduled</option>
+        <option value="Assigned">Assigned</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+
+      <button class="search-btn" (click)="applyFilters()">Search</button>
+
+      <button class="clear-btn" (click)="clearFilters()">Clear</button>
+    </div>
+
+    <!-- GOOGLE MAP URL -->
+    <div class="map-link-card">
+      <div class="map-link-title">
+        Google Maps Location
+      </div>
+
+      <div class="map-link-row">
+        <input
+          type="text"
+          [(ngModel)]="googleMapLink"
+          placeholder="Paste Google Maps link here..."
+        >
+
+        <button class="search-btn" (click)="loadGoogleMapLink()">
+          Load Map
+        </button>
+      </div>
+
+      @if (mapMessage) {
+        <small>{{ mapMessage }}</small>
+      }
+    </div>
+
+    <!-- MAIN -->
+    <div class="content-grid">
+
+      <!-- TABLE -->
+      <div class="table-card">
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Address</th>
+                <th>Pickup Time</th>
+                <th>Delivery Time</th>
+                <th>Time Slot</th>
+                <th>Status</th>
+                <th>Map</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (pickup of filteredPickups; track pickup.id; let i = $index) {
+                <tr
+                  [class.selected-row]="selectedPickup?.id === pickup.id"
+                  (click)="selectPickup(pickup)"
+                >
+                  <td>{{ i + 1 }}</td>
+
+                  <td>
+                    <div class="customer">
+                      <strong>{{ pickup.fullName }}</strong>
+                      <span>{{ pickup.mobile }}</span>
+                    </div>
+                  </td>
+
+                  <td class="address-cell">
+                    {{ pickup.address }}
+                  </td>
+
+                  <td>{{ pickup.pickupTime }}</td>
+
+                  <td>{{ pickup.deliveryTime }}</td>
+
+                  <td>
+                    <span class="slot">
+                      {{ pickup.timeSlot }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span
+                      class="status"
+                      [ngClass]="getStatusClass(pickup.status)"
+                    >
+                      {{ pickup.status }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <button
+                      class="map-btn"
+                      (click)="selectPickup(pickup); $event.stopPropagation()"
+                      title="View location"
+                    >
+                      📍
+                    </button>
+                  </td>
+                </tr>
+              }
+
+              @if (!filteredPickups.length) {
+                <tr>
+                  <td colspan="8" class="empty">
+                    No pickups found
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- MAP -->
+      <div class="map-card">
+
+        <div class="map-header">
+          <div>
+            <strong>Pickup Location</strong>
+
+            @if (selectedPickup) {
+              <span>{{ selectedPickup.fullName }}</span>
+            }
+          </div>
+        </div>
+
+        <iframe
+          [src]="mapUrl"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          loading="lazy"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+
+        @if (selectedPickup) {
+          <div class="map-info">
+            <strong>{{ selectedPickup.fullName }}</strong>
+
+            <span>
+              {{ selectedPickup.mobile }}
+            </span>
+
+            <p>
+              {{ selectedPickup.address }}
+            </p>
+
+            <div>
+              <b>Pickup:</b>
+              {{ selectedPickup.pickupTime }}
+            </div>
+
+            <div>
+              <b>Delivery:</b>
+              {{ selectedPickup.deliveryTime }}
+            </div>
+
+            <div>
+              <b>Slot:</b>
+              {{ selectedPickup.timeSlot }}
+            </div>
+          </div>
+        }
+
+      </div>
+
+    </div>
+
+    <!-- QUICK SLOT FILTER -->
+    <div class="quick-filter-card">
+
+      <strong>Quick Time Slot Filters</strong>
+
+      <div class="quick-slots">
+
+        <button
+          [class.active]="selectedTimeSlot === ''"
+          (click)="setTimeSlot('')">
+          All
+        </button>
+
+        @for (slot of timeSlots; track slot) {
+          <button
+            [class.active]="selectedTimeSlot === slot"
+            (click)="setTimeSlot(slot)">
+            {{ slot }}
+          </button>
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>

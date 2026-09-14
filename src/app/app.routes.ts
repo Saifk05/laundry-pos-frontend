@@ -35,20 +35,6 @@ export const routes: Routes = [
       },
 
       {
-        path: 'payments',
-        loadComponent: () =>
-          import('./pages/payments/payments.page')
-            .then((m) => m.PaymentsPage),
-      },
-
-      {
-        path: 'settlement',
-        loadComponent: () =>
-          import('./pages/settlement/settlement.page')
-            .then((m) => m.SettlementPage),
-      },
-
-      {
         path: 'b2c-orders',
         loadComponent: () =>
           import('./pages/orders/b2c-orders/b2c-orders.page')
@@ -56,10 +42,10 @@ export const routes: Routes = [
       },
 
       {
-        path: 'bill',
+        path: 'pickup',
         loadComponent: () =>
-          import('./pages/bill/bill.page')
-            .then((m) => m.BillPage),
+          import('./pages/pickup/pickup.page')
+            .then((m) => m.PickupPage),
       },
 
       {
@@ -116,6 +102,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/inventory/tax/tax.component')
             .then((m) => m.TaxComponent),
+      },
+
+      {
+        path: 'bill',
+        loadComponent: () =>
+          import('./pages/bill/bill.page')
+            .then((m) => m.BillPage),
+      },
+
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./pages/payments/payments.page')
+            .then((m) => m.PaymentsPage),
+      },
+
+      {
+        path: 'settlement',
+        loadComponent: () =>
+          import('./pages/settlement/settlement.page')
+            .then((m) => m.SettlementPage),
       },
 
       {
