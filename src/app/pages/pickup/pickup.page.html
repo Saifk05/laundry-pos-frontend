@@ -3,97 +3,313 @@
 
     <div class="page-header">
       <div>
-        <h1>Pickup</h1>
-        <p>Manage today's pickups, customer details and locations</p>
+        <h1>Pickup / Delivery</h1>
+        <p>Manage pickups, deliveries, customer details and locations</p>
       </div>
 
-      <button class="primary-btn" (click)="addDummyPickup()">
-        + Add Pickup
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="toggleAddForm()">
+        + Add Pickup / Delivery
       </button>
     </div>
 
-    <!-- FILTERS -->
+    @if (showAddForm) {
+      <div class="add-pickup-card">
+
+        <div class="add-form-header">
+          <div>
+            <h2>Add Pickup / Delivery</h2>
+            <p>Enter customer, schedule and location details</p>
+          </div>
+
+          <button
+            type="button"
+            class="close-btn"
+            (click)="cancelAddPickup()">
+            ✕
+          </button>
+        </div>
+
+        <div class="add-form-grid">
+
+          <div class="form-field">
+            <label>Customer Name *</label>
+            <input
+              type="text"
+              [(ngModel)]="newPickup.customerName"
+              placeholder="Enter customer name">
+          </div>
+
+          <div class="form-field">
+            <label>Phone Number *</label>
+            <input
+              type="tel"
+              maxlength="10"
+              inputmode="numeric"
+              [(ngModel)]="newPickup.phoneNumber"
+              placeholder="Enter 10 digit mobile number">
+          </div>
+
+          <div class="form-field">
+            <label>Type *</label>
+            <select [(ngModel)]="newPickup.type">
+              <option value="PICKUP">Pickup</option>
+              <option value="DELIVERY">Delivery</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Scheduled Date *</label>
+            <input
+              type="date"
+              [(ngModel)]="newPickup.scheduledDate">
+          </div>
+
+          <div class="form-field">
+            <label>Time Slot *</label>
+            <select [(ngModel)]="newPickup.timeSlot">
+              <option value="">Select Time Slot</option>
+
+              @for (slot of timeSlots; track slot) {
+                <option [value]="slot">
+                  {{ slot }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field address-field location-search-field">
+            <label>Customer Address *</label>
+
+            <div class="address-search-wrapper">
+              <input
+                type="text"
+                [(ngModel)]="newPickup.address"
+                (input)="searchAddress()"
+                placeholder="Search customer address..."
+                autocomplete="off">
+
+              @if (searchingLocation) {
+                <div class="location-loading">
+                  Searching locations...
+                </div>
+              }
+
+              @if (!searchingLocation && locationSuggestions.length > 0) {
+                <div class="location-suggestions">
+
+                  @for (location of locationSuggestions; track $index) {
+                    <button
+                      type="button"
+                      class="location-suggestion"
+                      (click)="selectLocation(location)">
+
+                      <span class="suggestion-icon">
+                        📍
+                      </span>
+
+                      <span class="suggestion-content">
+                        <strong>
+                          {{ location.name || 'Location' }}
+                        </strong>
+
+                        <span>
+                          {{ location.formattedAddress }}
+                        </span>
+                      </span>
+
+                    </button>
+                  }
+
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-field map-link-field">
+            <label>Google Maps Location</label>
+
+            <div class="location-input-row">
+              <input
+                type="text"
+                [(ngModel)]="newPickupGoogleMapLink"
+                placeholder="Paste Google Maps link...">
+
+              <button
+                type="button"
+                class="location-btn"
+                (click)="resolveNewPickupLocation()">
+                Get Location
+              </button>
+            </div>
+
+            @if (newPickupLocationMessage) {
+              <small>
+                {{ newPickupLocationMessage }}
+              </small>
+            }
+          </div>
+
+          @if (
+            newPickup.latitude !== null &&
+            newPickup.longitude !== null
+          ) {
+            <div class="coordinates">
+              <strong>
+                📍 Location detected
+              </strong>
+
+              <span>
+                {{ newPickup.latitude }},
+                {{ newPickup.longitude }}
+              </span>
+            </div>
+          }
+
+        </div>
+
+        @if (formError) {
+          <div class="form-error">
+            {{ formError }}
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="clear-btn"
+            (click)="cancelAddPickup()">
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="savingPickup"
+            (click)="savePickup()">
+
+            @if (savingPickup) {
+              Saving...
+            } @else {
+              Save Pickup / Delivery
+            }
+
+          </button>
+        </div>
+
+      </div>
+    }
+
     <div class="filter-card">
+
       <input
         type="text"
-        placeholder="Search by name, address or mobile..."
         [(ngModel)]="searchText"
         (input)="applyFilters()"
-      >
+        placeholder="Search by name, address or mobile...">
 
       <input
         type="date"
         [(ngModel)]="selectedDate"
-        (change)="applyFilters()"
-      >
+        (change)="applyFilters()">
+
+      <select
+        [(ngModel)]="selectedType"
+        (change)="changeType()">
+
+        <option value="ALL">All Types</option>
+        <option value="PICKUP">Pickup</option>
+        <option value="DELIVERY">Delivery</option>
+      </select>
 
       <select
         [(ngModel)]="selectedTimeSlot"
-        (change)="applyFilters()"
-      >
-        <option value="">All Time Slots</option>
+        (change)="applyFilters()">
+
+        <option value="">
+          All Time Slots
+        </option>
 
         @for (slot of timeSlots; track slot) {
-          <option [value]="slot">{{ slot }}</option>
+          <option [value]="slot">
+            {{ slot }}
+          </option>
         }
       </select>
 
       <select
         [(ngModel)]="selectedStatus"
-        (change)="applyFilters()"
-      >
+        (change)="applyFilters()">
+
         <option value="">All Status</option>
-        <option value="Scheduled">Scheduled</option>
-        <option value="Assigned">Assigned</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Pending">Pending</option>
-        <option value="Completed">Completed</option>
-        <option value="Cancelled">Cancelled</option>
+        <option value="PENDING">Pending</option>
+        <option value="PICKED_UP">Picked Up</option>
+        <option value="DELIVERED">Delivered</option>
       </select>
 
-      <button class="search-btn" (click)="applyFilters()">Search</button>
+      <button
+        type="button"
+        class="search-btn"
+        (click)="applyFilters()">
+        Search
+      </button>
 
-      <button class="clear-btn" (click)="clearFilters()">Clear</button>
+      <button
+        type="button"
+        class="clear-btn"
+        (click)="clearFilters()">
+        Clear
+      </button>
+
     </div>
 
-    <!-- GOOGLE MAP URL -->
-    <div class="map-link-card">
-      <div class="map-link-title">
-        Google Maps Location
+    <div class="location-summary">
+
+      <div class="summary-item">
+        <span class="summary-marker pickup"></span>
+
+        <div>
+          <strong>{{ pickupCount }}</strong>
+          <span>Pickups</span>
+        </div>
       </div>
 
-      <div class="map-link-row">
-        <input
-          type="text"
-          [(ngModel)]="googleMapLink"
-          placeholder="Paste Google Maps link here..."
-        >
+      <div class="summary-item">
+        <span class="summary-marker delivery"></span>
 
-        <button class="search-btn" (click)="loadGoogleMapLink()">
-          Load Map
-        </button>
+        <div>
+          <strong>{{ deliveryCount }}</strong>
+          <span>Deliveries</span>
+        </div>
       </div>
 
-      @if (mapMessage) {
-        <small>{{ mapMessage }}</small>
-      }
+      <div class="summary-item">
+        <span class="summary-marker mapped"></span>
+
+        <div>
+          <strong>{{ mappedCount }}</strong>
+          <span>Mapped Locations</span>
+        </div>
+      </div>
+
     </div>
 
-    <!-- MAIN -->
     <div class="content-grid">
 
-      <!-- TABLE -->
       <div class="table-card">
-
         <div class="table-scroll">
+
           <table>
+
             <thead>
               <tr>
                 <th>#</th>
-                <th>Full Name</th>
+                <th>Customer</th>
                 <th>Address</th>
-                <th>Pickup Time</th>
-                <th>Delivery Time</th>
+                <th>Type</th>
+                <th>Date</th>
                 <th>Time Slot</th>
                 <th>Status</th>
                 <th>Map</th>
@@ -101,17 +317,30 @@
             </thead>
 
             <tbody>
-              @for (pickup of filteredPickups; track pickup.id; let i = $index) {
+
+              @for (
+                pickup of filteredPickups;
+                track pickup.id;
+                let i = $index
+              ) {
+
                 <tr
                   [class.selected-row]="selectedPickup?.id === pickup.id"
-                  (click)="selectPickup(pickup)"
-                >
-                  <td>{{ i + 1 }}</td>
+                  (click)="selectPickup(pickup)">
+
+                  <td>
+                    {{ i + 1 }}
+                  </td>
 
                   <td>
                     <div class="customer">
-                      <strong>{{ pickup.fullName }}</strong>
-                      <span>{{ pickup.mobile }}</span>
+                      <strong>
+                        {{ pickup.customerName }}
+                      </strong>
+
+                      <span>
+                        {{ pickup.phoneNumber }}
+                      </span>
                     </div>
                   </td>
 
@@ -119,9 +348,18 @@
                     {{ pickup.address }}
                   </td>
 
-                  <td>{{ pickup.pickupTime }}</td>
+                  <td>
+                    <span
+                      class="slot"
+                      [class.pickup-type]="pickup.type === 'PICKUP'"
+                      [class.delivery-type]="pickup.type === 'DELIVERY'">
+                      {{ pickup.type }}
+                    </span>
+                  </td>
 
-                  <td>{{ pickup.deliveryTime }}</td>
+                  <td>
+                    {{ pickup.scheduledDate }}
+                  </td>
 
                   <td>
                     <span class="slot">
@@ -130,114 +368,240 @@
                   </td>
 
                   <td>
-                    <span
-                      class="status"
-                      [ngClass]="getStatusClass(pickup.status)"
-                    >
-                      {{ pickup.status }}
-                    </span>
+                    <select
+                      [ngModel]="pickup.status"
+                      (ngModelChange)="updateStatus(pickup, $event)"
+                      (click)="$event.stopPropagation()"
+                      class="status-select"
+                      [ngClass]="getStatusClass(pickup.status)">
+
+                      <option value="PENDING">
+                        Pending
+                      </option>
+
+                      <option value="PICKED_UP">
+                        Picked Up
+                      </option>
+
+                      <option value="DELIVERED">
+                        Delivered
+                      </option>
+
+                    </select>
                   </td>
 
                   <td>
                     <button
+                      type="button"
                       class="map-btn"
-                      (click)="selectPickup(pickup); $event.stopPropagation()"
-                      title="View location"
-                    >
+                      title="View on map"
+                      [disabled]="
+                        pickup.latitude === null ||
+                        pickup.longitude === null
+                      "
+                      (click)="
+                        selectPickup(pickup);
+                        $event.stopPropagation()
+                      ">
                       📍
                     </button>
                   </td>
+
                 </tr>
               }
 
-              @if (!filteredPickups.length) {
+              @if (!filteredPickups.length && !loading) {
                 <tr>
-                  <td colspan="8" class="empty">
-                    No pickups found
+                  <td
+                    colspan="8"
+                    class="empty">
+                    No pickup / delivery records found
                   </td>
                 </tr>
               }
-            </tbody>
-          </table>
-        </div>
 
+              @if (loading) {
+                <tr>
+                  <td
+                    colspan="8"
+                    class="empty">
+                    Loading...
+                  </td>
+                </tr>
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
       </div>
 
-      <!-- MAP -->
       <div class="map-card">
 
         <div class="map-header">
-          <div>
-            <strong>Pickup Location</strong>
 
-            @if (selectedPickup) {
-              <span>{{ selectedPickup.fullName }}</span>
-            }
+          <div class="map-title">
+            <div>
+              <strong>
+                Customer Locations
+              </strong>
+
+              <span>
+                {{ mappedCount }} locations on map
+              </span>
+            </div>
           </div>
+
+          <div class="map-header-actions">
+
+            <div class="map-legend">
+              <span>
+                <i class="legend-dot pickup"></i>
+                Pickup
+              </span>
+
+              <span>
+                <i class="legend-dot delivery"></i>
+                Delivery
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="fit-map-btn"
+              (click)="resetMapView()">
+              View All
+            </button>
+
+          </div>
+
         </div>
 
-        <iframe
-          [src]="mapUrl"
-          width="100%"
-          height="100%"
-          style="border:0;"
-          loading="lazy"
-          allowfullscreen
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
+        <div class="map-container">
 
-        @if (selectedPickup) {
-          <div class="map-info">
-            <strong>{{ selectedPickup.fullName }}</strong>
-
-            <span>
-              {{ selectedPickup.mobile }}
-            </span>
-
-            <p>
-              {{ selectedPickup.address }}
-            </p>
-
-            <div>
-              <b>Pickup:</b>
-              {{ selectedPickup.pickupTime }}
-            </div>
-
-            <div>
-              <b>Delivery:</b>
-              {{ selectedPickup.deliveryTime }}
-            </div>
-
-            <div>
-              <b>Slot:</b>
-              {{ selectedPickup.timeSlot }}
-            </div>
+          <div
+            id="pickupOlaMap"
+            class="ola-map">
           </div>
-        }
+
+          @if (mapLoading) {
+            <div class="map-loading">
+
+              <div class="map-spinner"></div>
+
+              <strong>
+                Loading Ola Maps
+              </strong>
+
+              <span>
+                Preparing customer locations...
+              </span>
+
+            </div>
+          }
+
+          @if (mapError) {
+            <div class="map-error-state">
+
+              <span>!</span>
+
+              <strong>
+                Map unavailable
+              </strong>
+
+              <p>
+                {{ mapError }}
+              </p>
+
+            </div>
+          }
+
+          @if (
+            !mapLoading &&
+            !mapError &&
+            mappedCount === 0
+          ) {
+            <div class="no-map-records">
+
+              <span>📍</span>
+
+              <strong>
+                No mapped customers
+              </strong>
+
+              <p>
+                Customer locations with coordinates
+                will appear here.
+              </p>
+
+            </div>
+          }
+
+        </div>
+
+        <div class="map-footer">
+
+          <div class="map-help">
+            Hover a pin to view customer details
+          </div>
+
+          @if (selectedPickup) {
+
+            <div class="selected-map-customer">
+
+              <span
+                class="selected-dot"
+                [class.pickup]="selectedPickup.type === 'PICKUP'"
+                [class.delivery]="selectedPickup.type === 'DELIVERY'">
+              </span>
+
+              <div>
+                <strong>
+                  {{ selectedPickup.customerName }}
+                </strong>
+
+                <span>
+                  {{ selectedPickup.type }}
+                  ·
+                  {{ selectedPickup.timeSlot }}
+                </span>
+              </div>
+
+            </div>
+
+          }
+
+        </div>
 
       </div>
 
     </div>
 
-    <!-- QUICK SLOT FILTER -->
     <div class="quick-filter-card">
 
-      <strong>Quick Time Slot Filters</strong>
+      <strong>
+        Quick Time Slot Filters
+      </strong>
 
       <div class="quick-slots">
 
         <button
+          type="button"
           [class.active]="selectedTimeSlot === ''"
           (click)="setTimeSlot('')">
           All
         </button>
 
         @for (slot of timeSlots; track slot) {
+
           <button
+            type="button"
             [class.active]="selectedTimeSlot === slot"
             (click)="setTimeSlot(slot)">
             {{ slot }}
           </button>
+
         }
 
       </div>

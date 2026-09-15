@@ -35,6 +35,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'schedule-service',
+        loadComponent: () =>
+          import('./pages/schedule-service/schedule-service.page')
+            .then((m) => m.ScheduleServicePage),
+      },
+
+      {
         path: 'b2c-orders',
         loadComponent: () =>
           import('./pages/orders/b2c-orders/b2c-orders.page')

@@ -11,6 +11,14 @@ import {
   OrderResponse
 } from '../models/walk-in.model';
 
+
+import {
+  PickupDelivery,
+  PickupDeliveryRequest,
+  PickupDeliveryStatus,
+  MapLocationResponse
+} from '../models/pickup-delivery.model';
+
 import {
   TaxSetting,
   TaxSettingRequest
@@ -699,5 +707,103 @@ updateTermsConditions(
     );
   }
 
+    /* =========================================
+     PICKUP / DELIVERY
+  ========================================= */
+
+  createPickupDelivery(
+    request: PickupDeliveryRequest
+  ): Observable<PickupDelivery> {
+
+    return this.http.post<PickupDelivery>(
+      `${this.baseUrl}/v1/pickup-deliveries`,
+      request
+    );
+  }
+
+
+  getPickupDeliveries(
+    filter: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL'
+  ): Observable<PickupDelivery[]> {
+
+    return this.http.get<PickupDelivery[]>(
+      `${this.baseUrl}/v1/pickup-deliveries`,
+      {
+        params: { filter }
+      }
+    );
+  }
+
+
+  updatePickupDeliveryStatus(
+    id: string,
+    status: PickupDeliveryStatus
+  ): Observable<PickupDelivery> {
+
+    return this.http.patch<PickupDelivery>(
+      `${this.baseUrl}/v1/pickup-deliveries/${id}/status`,
+      { status }
+    );
+  }
+
+
+  /* =========================================
+     MAPS
+  ========================================= */
+
+  autocompleteLocation(
+    query: string
+  ): Observable<MapLocationResponse[]> {
+
+    return this.http.get<MapLocationResponse[]>(
+      `${this.baseUrl}/v1/maps/autocomplete`,
+      {
+        params: { q: query }
+      }
+    );
+  }
+
+
+  geocodeAddress(
+    address: string
+  ): Observable<any> {
+
+    return this.http.get<any>(
+      `${this.baseUrl}/v1/maps/geocode`,
+      {
+        params: { address }
+      }
+    );
+  }
+
+
+  reverseGeocode(
+    latitude: number,
+    longitude: number
+  ): Observable<any> {
+
+    return this.http.get<any>(
+      `${this.baseUrl}/v1/maps/reverse-geocode`,
+      {
+        params: {
+          lat: latitude,
+          lng: longitude
+        }
+      }
+    );
+  }
+
+
+  resolveGoogleMapsLink(
+    url: string
+  ): Observable<MapLocationResponse> {
+
+    return this.http.get<MapLocationResponse>(
+      `${this.baseUrl}/v1/maps/resolve-link`,
+      {
+        params: { url }
+      }
+    );
+  }
 
 }
