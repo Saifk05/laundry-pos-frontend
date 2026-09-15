@@ -1,9 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit
-} from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent } from '@ionic/angular/standalone';
@@ -12,26 +7,22 @@ import { OlaMaps } from 'olamaps-web-sdk';
 import { ApiService } from '../../../core/services/api.service';
 import {
   PickupDelivery,
-  PickupDeliveryRequest,
-  PickupDeliveryStatus,
-  MapLocationResponse
+  PickupDeliveryStatus
 } from '../../../core/models/pickup-delivery.model';
-
 import { environment } from '../../../environments/environment';
+
+type PickupViewTab = 'MAP' | 'ORDERS';
 
 @Component({
   selector: 'app-pickup',
   templateUrl: './pickup.page.html',
   styleUrls: ['./pickup.page.scss'],
   standalone: true,
-  imports: [
-    IonContent,
-    CommonModule,
-    FormsModule
-  ]
+  imports: [IonContent, CommonModule, FormsModule]
 })
-export class PickupPage
-  implements OnInit, AfterViewInit, OnDestroy {
+export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
+
+  activeTab: PickupViewTab = 'MAP';
 
   searchText = '';
   selectedDate = '';
@@ -40,25 +31,13 @@ export class PickupPage
   selectedType: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL';
 
   loading = false;
-  savingPickup = false;
-  showAddForm = false;
-  searchingLocation = false;
-
   mapLoading = true;
   mapError = '';
-
-  formError = '';
-  newPickupGoogleMapLink = '';
-  newPickupLocationMessage = '';
 
   pickups: PickupDelivery[] = [];
   filteredPickups: PickupDelivery[] = [];
   selectedPickup: PickupDelivery | null = null;
-
-  locationSuggestions: MapLocationResponse[] = [];
-
-  newPickup: PickupDeliveryRequest =
-    this.createEmptyPickup();
+  statusMenuPickup: PickupDelivery | null = null;
 
   timeSlots = [
     '09:00 AM - 10:00 AM',
@@ -76,24 +55,13 @@ export class PickupPage
   });
 
   private map: any = null;
-
   private markers: any[] = [];
   private popups: any[] = [];
-
-  private markerByPickupId =
-    new Map<string, any>();
-
-  private popupByPickupId =
-    new Map<string, any>();
-
-  private locationSearchTimer:
-    ReturnType<typeof setTimeout> | null = null;
-
+  private markerByPickupId = new Map<string, any>();
+  private popupByPickupId = new Map<string, any>();
   private mapReady = false;
 
-  constructor(
-    private readonly apiService: ApiService
-  ) {}
+  constructor(private readonly apiService: ApiService) {}
 
   ngOnInit(): void {
     this.loadPickupDeliveries();
@@ -101,15 +69,13 @@ export class PickupPage
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.initializeMap();
+      if (this.activeTab === 'MAP') {
+        this.initializeMap();
+      }
     }, 200);
   }
 
   ngOnDestroy(): void {
-    if (this.locationSearchTimer) {
-      clearTimeout(this.locationSearchTimer);
-    }
-
     this.clearMarkers();
 
     if (this.map?.remove) {
@@ -120,22 +86,49 @@ export class PickupPage
     this.mapReady = false;
   }
 
+setActiveTab(tab: PickupViewTab): void {
+  if (this.activeTab === tab) return;
+
+  this.activeTab = tab;
+  this.statusMenuPickup = null;
+
+  if (tab !== 'MAP') return;
+
+  setTimeout(() => {
+    if (!this.mapReady || !this.map) {
+      this.initializeMap();
+      return;
+    }
+
+    this.map.resize?.();
+
+    requestAnimationFrame(() => {
+      this.map.resize?.();
+      this.map.triggerRepaint?.();
+    });
+
+    setTimeout(() => {
+      this.map.resize?.();
+      this.map.triggerRepaint?.();
+    }, 250);
+  }, 100);
+}
+
   private async initializeMap(): Promise<void> {
+    if (this.mapReady && this.map) {
+      this.map.resize?.();
+      this.refreshMapMarkers();
+      return;
+    }
+
     try {
       this.mapLoading = true;
       this.mapError = '';
 
       this.map = await this.olaMaps.init({
-        style:
-          'https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json',
-
+        style: 'https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json',
         container: 'pickupOlaMap',
-
-        center: [
-          77.5946,
-          12.9716
-        ],
-
+        center: [77.5946, 12.9716],
         zoom: 11
       });
 
@@ -148,8 +141,7 @@ export class PickupPage
             this.olaMaps.addNavigationControls(),
             'top-right'
           );
-        } catch {
-        }
+        } catch {}
       }
 
       this.refreshMapMarkers();
@@ -159,10 +151,7 @@ export class PickupPage
       }, 300);
 
     } catch (error) {
-      console.error(
-        'Failed to initialize Ola Maps',
-        error
-      );
+      console.error('Failed to initialize Ola Maps', error);
 
       this.mapLoading = false;
       this.mapError =
@@ -178,14 +167,14 @@ export class PickupPage
       .subscribe({
         next: response => {
           this.pickups = response ?? [];
-
           this.applyFilters(false);
-
           this.loading = false;
 
-          setTimeout(() => {
-            this.refreshMapMarkers();
-          }, 100);
+          if (this.activeTab === 'MAP') {
+            setTimeout(() => {
+              this.refreshMapMarkers();
+            }, 100);
+          }
         },
 
         error: error => {
@@ -197,7 +186,6 @@ export class PickupPage
           this.pickups = [];
           this.filteredPickups = [];
           this.selectedPickup = null;
-
           this.loading = false;
 
           this.refreshMapMarkers();
@@ -205,437 +193,47 @@ export class PickupPage
       });
   }
 
-  toggleAddForm(): void {
-    this.showAddForm = !this.showAddForm;
+  applyFilters(refreshMap = true): void {
+    const search = this.searchText.trim().toLowerCase();
 
-    if (this.showAddForm) {
-      this.resetAddForm();
-    }
+    this.filteredPickups = this.pickups.filter(pickup => {
 
-    setTimeout(() => {
-      this.map?.resize?.();
-    }, 250);
-  }
+      const matchesSearch =
+        !search ||
+        pickup.customerName.toLowerCase().includes(search) ||
+        pickup.phoneNumber.includes(search) ||
+        pickup.address.toLowerCase().includes(search);
 
-  cancelAddPickup(): void {
-    this.showAddForm = false;
-    this.resetAddForm();
+      const matchesDate =
+        !this.selectedDate ||
+        pickup.scheduledDate === this.selectedDate;
 
-    setTimeout(() => {
-      this.map?.resize?.();
-    }, 250);
-  }
+      const matchesSlot =
+        !this.selectedTimeSlot ||
+        pickup.timeSlot === this.selectedTimeSlot;
 
-  private createEmptyPickup():
-    PickupDeliveryRequest {
+      const matchesStatus =
+        !this.selectedStatus ||
+        pickup.status === this.selectedStatus;
 
-    return {
-      customerName: '',
-      phoneNumber: '',
-      address: '',
-      latitude: null,
-      longitude: null,
-      type: 'PICKUP',
-      scheduledDate: this.getToday(),
-      timeSlot: ''
-    };
-  }
-
-  private resetAddForm(): void {
-    this.newPickup =
-      this.createEmptyPickup();
-
-    this.newPickupGoogleMapLink = '';
-    this.newPickupLocationMessage = '';
-
-    this.locationSuggestions = [];
-    this.searchingLocation = false;
-
-    this.formError = '';
-    this.savingPickup = false;
-
-    if (this.locationSearchTimer) {
-      clearTimeout(
-        this.locationSearchTimer
+      return (
+        matchesSearch &&
+        matchesDate &&
+        matchesSlot &&
+        matchesStatus
       );
-
-      this.locationSearchTimer = null;
-    }
-  }
-
-  private getToday(): string {
-    const date = new Date();
-
-    const year =
-      date.getFullYear();
-
-    const month =
-      String(
-        date.getMonth() + 1
-      ).padStart(2, '0');
-
-    const day =
-      String(
-        date.getDate()
-      ).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  }
-
-  searchAddress(): void {
-    const query =
-      this.newPickup.address.trim();
-
-    this.newPickup.latitude = null;
-    this.newPickup.longitude = null;
-
-    if (this.locationSearchTimer) {
-      clearTimeout(
-        this.locationSearchTimer
-      );
-    }
-
-    if (query.length < 3) {
-      this.locationSuggestions = [];
-      this.searchingLocation = false;
-      return;
-    }
-
-    this.searchingLocation = true;
-
-    this.locationSearchTimer =
-      setTimeout(() => {
-
-        this.apiService
-          .autocompleteLocation(query)
-          .subscribe({
-            next: response => {
-              this.locationSuggestions =
-                response ?? [];
-
-              this.searchingLocation =
-                false;
-            },
-
-            error: error => {
-              console.error(
-                'Address autocomplete failed',
-                error
-              );
-
-              this.locationSuggestions = [];
-              this.searchingLocation = false;
-            }
-          });
-
-      }, 400);
-  }
-
-  selectLocation(
-    location: MapLocationResponse
-  ): void {
-
-    const parts = [
-      location.name,
-      location.formattedAddress
-    ].filter(
-      value =>
-        value &&
-        value.trim()
-    );
-
-    this.newPickup.address =
-      parts.join(', ') ||
-      this.newPickup.address;
-
-    this.newPickup.latitude =
-      location.latitude;
-
-    this.newPickup.longitude =
-      location.longitude;
-
-    this.locationSuggestions = [];
-    this.searchingLocation = false;
-
-    if (
-      location.latitude !== null &&
-      location.longitude !== null
-    ) {
-      this.previewLocation(
-        location.latitude,
-        location.longitude
-      );
-    }
-  }
-
-  resolveNewPickupLocation(): void {
-    const link =
-      this.newPickupGoogleMapLink.trim();
-
-    if (!link) {
-      this.newPickupLocationMessage =
-        'Paste a Google Maps link first.';
-
-      return;
-    }
-
-    this.newPickupLocationMessage =
-      'Getting location...';
-
-    this.apiService
-      .resolveGoogleMapsLink(link)
-      .subscribe({
-        next: response => {
-
-          if (
-            response.latitude === null ||
-            response.longitude === null
-          ) {
-            this.newPickupLocationMessage =
-              'Location coordinates not found.';
-
-            return;
-          }
-
-          this.newPickup.latitude =
-            response.latitude;
-
-          this.newPickup.longitude =
-            response.longitude;
-
-          if (response.formattedAddress) {
-            this.newPickup.address =
-              response.formattedAddress;
-          }
-
-          this.locationSuggestions = [];
-
-          this.previewLocation(
-            response.latitude,
-            response.longitude
-          );
-
-          this.newPickupLocationMessage =
-            'Location added successfully.';
-        },
-
-        error: error => {
-          console.error(
-            'Failed to resolve Google Maps location',
-            error
-          );
-
-          this.newPickupLocationMessage =
-            'Unable to read this Google Maps link.';
-        }
-      });
-  }
-
-  private previewLocation(
-    latitude: number,
-    longitude: number
-  ): void {
-
-    if (!this.mapReady || !this.map) {
-      return;
-    }
-
-    this.map.flyTo?.({
-      center: [
-        longitude,
-        latitude
-      ],
-      zoom: 16,
-      essential: true
     });
-  }
-
-  savePickup(): void {
-    this.formError = '';
-
-    const customerName =
-      this.newPickup.customerName.trim();
-
-    const phoneNumber =
-      this.newPickup.phoneNumber.trim();
-
-    const address =
-      this.newPickup.address.trim();
-
-    if (!customerName) {
-      this.formError =
-        'Customer name is required.';
-      return;
-    }
-
-    if (
-      !/^\d{10}$/.test(phoneNumber)
-    ) {
-      this.formError =
-        'Enter a valid 10 digit mobile number.';
-      return;
-    }
-
-    if (!address) {
-      this.formError =
-        'Customer address is required.';
-      return;
-    }
-
-    if (!this.newPickup.scheduledDate) {
-      this.formError =
-        'Scheduled date is required.';
-      return;
-    }
-
-    if (!this.newPickup.timeSlot) {
-      this.formError =
-        'Time slot is required.';
-      return;
-    }
-
-    if (
-      this.newPickup.latitude === null ||
-      this.newPickup.longitude === null
-    ) {
-      this.formError =
-        'Please select or detect the customer location.';
-      return;
-    }
-
-    const request:
-      PickupDeliveryRequest = {
-
-      ...this.newPickup,
-
-      customerName,
-      phoneNumber,
-      address
-    };
-
-    this.savingPickup = true;
-
-    this.apiService
-      .createPickupDelivery(request)
-      .subscribe({
-        next: created => {
-
-          this.savingPickup = false;
-          this.showAddForm = false;
-
-          this.resetAddForm();
-
-          this.selectedType = 'ALL';
-
-          this.apiService
-            .getPickupDeliveries('ALL')
-            .subscribe({
-              next: response => {
-
-                this.pickups =
-                  response ?? [];
-
-                this.applyFilters(false);
-
-                this.refreshMapMarkers();
-
-                const saved =
-                  this.pickups.find(
-                    pickup =>
-                      pickup.id ===
-                      created.id
-                  );
-
-                if (saved) {
-                  setTimeout(() => {
-                    this.selectPickup(saved);
-                  }, 150);
-                }
-              },
-
-              error: error => {
-                console.error(
-                  'Failed to refresh records',
-                  error
-                );
-
-                this.loadPickupDeliveries();
-              }
-            });
-        },
-
-        error: error => {
-          console.error(
-            'Failed to save pickup/delivery',
-            error
-          );
-
-          this.savingPickup = false;
-
-          this.formError =
-            'Unable to save pickup/delivery.';
-        }
-      });
-  }
-
-  applyFilters(
-    refreshMap = true
-  ): void {
-
-    const search =
-      this.searchText
-        .trim()
-        .toLowerCase();
-
-    this.filteredPickups =
-      this.pickups.filter(pickup => {
-
-        const matchesSearch =
-          !search ||
-          pickup.customerName
-            .toLowerCase()
-            .includes(search) ||
-          pickup.phoneNumber
-            .includes(search) ||
-          pickup.address
-            .toLowerCase()
-            .includes(search);
-
-        const matchesDate =
-          !this.selectedDate ||
-          pickup.scheduledDate ===
-            this.selectedDate;
-
-        const matchesSlot =
-          !this.selectedTimeSlot ||
-          pickup.timeSlot ===
-            this.selectedTimeSlot;
-
-        const matchesStatus =
-          !this.selectedStatus ||
-          pickup.status ===
-            this.selectedStatus;
-
-        return (
-          matchesSearch &&
-          matchesDate &&
-          matchesSlot &&
-          matchesStatus
-        );
-      });
 
     if (
       this.selectedPickup &&
       !this.filteredPickups.some(
-        pickup =>
-          pickup.id ===
-          this.selectedPickup?.id
+        pickup => pickup.id === this.selectedPickup?.id
       )
     ) {
       this.selectedPickup = null;
     }
 
-    if (refreshMap) {
+    if (refreshMap && this.activeTab === 'MAP') {
       this.refreshMapMarkers();
     }
   }
@@ -645,34 +243,69 @@ export class PickupPage
     this.selectedDate = '';
     this.selectedTimeSlot = '';
     this.selectedStatus = '';
+    this.selectedType = 'ALL';
+    this.statusMenuPickup = null;
 
-    this.applyFilters();
-  }
-
-  setTimeSlot(slot: string): void {
-    this.selectedTimeSlot = slot;
-
-    this.applyFilters();
-  }
-
-  changeType(): void {
     this.loadPickupDeliveries();
   }
 
-  selectPickup(
-    pickup: PickupDelivery
-  ): void {
+  changeType(): void {
+    this.statusMenuPickup = null;
+    this.selectedStatus = '';
+    this.loadPickupDeliveries();
+  }
 
+  openStatusMenu(pickup: PickupDelivery): void {
+    if (this.statusMenuPickup?.id === pickup.id) {
+      this.statusMenuPickup = null;
+      return;
+    }
+
+    this.statusMenuPickup = pickup;
+  }
+
+  closeStatusMenu(): void {
+    this.statusMenuPickup = null;
+  }
+
+  selectStatus(
+    pickup: PickupDelivery,
+    status: PickupDeliveryStatus
+  ): void {
+    this.statusMenuPickup = null;
+    this.updateStatus(pickup, status);
+  }
+
+  getStatusLabel(status: PickupDeliveryStatus): string {
+    const labels: Record<PickupDeliveryStatus, string> = {
+      PENDING: 'Pending',
+      ASSIGNED_FOR_PICKUP: 'Assigned for Pickup',
+      OUT_FOR_PICKUP: 'Out for Pickup',
+      PICKED_UP: 'Picked Up',
+      RECEIVED_AT_STORE: 'Received at Store',
+      ASSIGNED_FOR_DELIVERY: 'Assigned for Delivery',
+      OUT_FOR_DELIVERY: 'Out for Delivery',
+      DELIVERED: 'Delivered'
+    };
+
+    return labels[status];
+  }
+
+  getStatusClass(status: PickupDeliveryStatus): string {
+    return status
+      .toLowerCase()
+      .replace(/_/g, '-');
+  }
+
+  selectPickup(pickup: PickupDelivery): void {
     this.selectedPickup = pickup;
 
     if (
       pickup.latitude === null ||
-      pickup.longitude === null
+      pickup.longitude === null ||
+      !this.mapReady ||
+      !this.map
     ) {
-      return;
-    }
-
-    if (!this.mapReady || !this.map) {
       return;
     }
 
@@ -688,9 +321,12 @@ export class PickupPage
     });
 
     const popup =
-      this.popupByPickupId.get(
-        pickup.id
-      );
+      this.popupByPickupId.get(pickup.id);
+
+    popup?.setLngLat?.([
+      pickup.longitude,
+      pickup.latitude
+    ]);
 
     popup?.addTo?.(this.map);
 
@@ -699,18 +335,13 @@ export class PickupPage
 
   resetMapView(): void {
     this.selectedPickup = null;
-
     this.closeAllPopups();
-
     this.updateMarkerSelection();
-
     this.fitAllMarkers();
   }
 
   private refreshMapMarkers(): void {
-    if (!this.mapReady || !this.map) {
-      return;
-    }
+    if (!this.mapReady || !this.map) return;
 
     this.clearMarkers();
 
@@ -721,15 +352,14 @@ export class PickupPage
           pickup.longitude !== null
       );
 
-    if (!records.length) {
-      return;
-    }
+    if (!records.length) return;
 
     for (const pickup of records) {
       this.addCustomerMarker(pickup);
     }
 
     setTimeout(() => {
+      this.map?.resize?.();
       this.fitAllMarkers();
     }, 50);
   }
@@ -751,30 +381,25 @@ export class PickupPage
     const popupElement =
       this.createPopupElement(pickup);
 
-    const popup =
-      this.olaMaps
-        .addPopup({
-          offset: [0, -28],
-          closeButton: false,
-          closeOnClick: false,
-          className:
-            'laundry-map-popup'
-        })
-        .setDOMContent(
-          popupElement
-        );
+    const popup = this.olaMaps
+      .addPopup({
+        offset: [0, -28],
+        closeButton: false,
+        closeOnClick: false,
+        className: 'laundry-map-popup'
+      })
+      .setDOMContent(popupElement);
 
-    const marker =
-      this.olaMaps
-        .addMarker({
-          element,
-          anchor: 'bottom'
-        })
-        .setLngLat([
-          pickup.longitude,
-          pickup.latitude
-        ])
-        .addTo(this.map);
+    const marker = this.olaMaps
+      .addMarker({
+        element,
+        anchor: 'bottom'
+      })
+      .setLngLat([
+        pickup.longitude,
+        pickup.latitude
+      ])
+      .addTo(this.map);
 
     element.addEventListener(
       'mouseenter',
@@ -875,11 +500,7 @@ export class PickupPage
     marker.innerHTML = `
       <span class="pin-head">
         <span class="pin-icon">
-          ${
-            pickup.type === 'PICKUP'
-              ? '↑'
-              : '↓'
-          }
+          ${pickup.type === 'PICKUP' ? '↑' : '↓'}
         </span>
       </span>
       <span class="pin-point"></span>
@@ -904,11 +525,16 @@ export class PickupPage
         : 'Delivery';
 
     const status =
-      pickup.status
-        .replace(/_/g, ' ');
+      this.getStatusLabel(pickup.status);
+
+    const typeClass =
+      pickup.type === 'PICKUP'
+        ? 'pickup'
+        : 'delivery';
 
     container.innerHTML = `
       <div class="popup-customer-header">
+
         <div class="popup-avatar">
           ${this.escapeHtml(
             pickup.customerName
@@ -931,19 +557,14 @@ export class PickupPage
           </span>
         </div>
 
-        <span class="popup-type ${
-          pickup.type === 'PICKUP'
-            ? 'pickup'
-            : 'delivery'
-        }">
+        <span class="popup-type ${typeClass}">
           ${typeLabel}
         </span>
+
       </div>
 
       <div class="popup-address">
-        <span class="popup-location-icon">
-          ●
-        </span>
+        <span class="popup-location-icon">●</span>
 
         <span>
           ${this.escapeHtml(
@@ -953,6 +574,7 @@ export class PickupPage
       </div>
 
       <div class="popup-meta">
+
         <div>
           <span>Date</span>
           <strong>
@@ -970,9 +592,11 @@ export class PickupPage
             )}
           </strong>
         </div>
+
       </div>
 
       <div class="popup-status-row">
+
         <span>Status</span>
 
         <strong class="popup-status ${this.getStatusClass(
@@ -980,6 +604,7 @@ export class PickupPage
         )}">
           ${this.escapeHtml(status)}
         </strong>
+
       </div>
     `;
 
@@ -988,9 +613,7 @@ export class PickupPage
 
   private updateMarkerSelection(): void {
     document
-      .querySelectorAll(
-        '.customer-map-pin'
-      )
+      .querySelectorAll('.customer-map-pin')
       .forEach(element => {
 
         const marker =
@@ -1025,9 +648,7 @@ export class PickupPage
   }
 
   private fitAllMarkers(): void {
-    if (!this.mapReady || !this.map) {
-      return;
-    }
+    if (!this.mapReady || !this.map) return;
 
     const records =
       this.filteredPickups.filter(
@@ -1036,11 +657,10 @@ export class PickupPage
           pickup.longitude !== null
       );
 
-    if (!records.length) {
-      return;
-    }
+    if (!records.length) return;
 
     if (records.length === 1) {
+
       const pickup = records[0];
 
       this.map.flyTo?.({
@@ -1061,23 +681,14 @@ export class PickupPage
     let maxLat = -Infinity;
 
     for (const pickup of records) {
-      const lng =
-        pickup.longitude!;
 
-      const lat =
-        pickup.latitude!;
+      const lng = pickup.longitude!;
+      const lat = pickup.latitude!;
 
-      minLng =
-        Math.min(minLng, lng);
-
-      maxLng =
-        Math.max(maxLng, lng);
-
-      minLat =
-        Math.min(minLat, lat);
-
-      maxLat =
-        Math.max(maxLat, lat);
+      minLng = Math.min(minLng, lng);
+      maxLng = Math.max(maxLng, lng);
+      minLat = Math.min(minLat, lat);
+      maxLat = Math.max(maxLat, lat);
     }
 
     this.map.fitBounds?.(
@@ -1098,9 +709,7 @@ export class PickupPage
     status: PickupDeliveryStatus
   ): void {
 
-    if (pickup.status === status) {
-      return;
-    }
+    if (pickup.status === status) return;
 
     this.apiService
       .updatePickupDeliveryStatus(
@@ -1108,25 +717,23 @@ export class PickupPage
         status
       )
       .subscribe({
+
         next: updated => {
 
           const index =
             this.pickups.findIndex(
-              item =>
-                item.id === updated.id
+              item => item.id === updated.id
             );
 
           if (index !== -1) {
-            this.pickups[index] =
-              updated;
+            this.pickups[index] = updated;
           }
 
           if (
             this.selectedPickup?.id ===
             updated.id
           ) {
-            this.selectedPickup =
-              updated;
+            this.selectedPickup = updated;
           }
 
           this.applyFilters();
@@ -1139,15 +746,6 @@ export class PickupPage
           );
         }
       });
-  }
-
-  getStatusClass(
-    status: string
-  ): string {
-
-    return status
-      .toLowerCase()
-      .replace(/_/g, '-');
   }
 
   get pickupCount(): number {
@@ -1172,15 +770,11 @@ export class PickupPage
     ).length;
   }
 
-  private escapeHtml(
-    value: string
-  ): string {
-
+  private escapeHtml(value: string): string {
     const div =
       document.createElement('div');
 
-    div.textContent =
-      value ?? '';
+    div.textContent = value ?? '';
 
     return div.innerHTML;
   }
