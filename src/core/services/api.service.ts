@@ -120,6 +120,20 @@ export class ApiService {
   }
 
 
+  createCustomer(
+    request: {
+      name: string;
+      phone: string;
+    }
+  ): Observable<CustomerResponse> {
+
+    return this.http.post<CustomerResponse>(
+      `${this.baseUrl}/customers`,
+      request
+    );
+  }
+
+
   /* =========================================
      COUPONS
   ========================================= */

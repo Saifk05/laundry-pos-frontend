@@ -1,13 +1,532 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>schedule-service</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">schedule-service</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+  <div class="schedule-page">
+
+    <div class="page-header">
+      <div>
+        <h1>Schedule Service</h1>
+        <p>Schedule a customer pickup or delivery.</p>
+      </div>
+
+      <div class="service-toggle">
+        <button
+          type="button"
+          [class.active]="serviceType === 'PICKUP'"
+          (click)="selectServiceType('PICKUP')"
+        >
+          <ion-icon name="bicycle-outline"></ion-icon>
+          Pickup
+        </button>
+
+        <button
+          type="button"
+          [class.active]="serviceType === 'DELIVERY'"
+          (click)="selectServiceType('DELIVERY')"
+        >
+          <ion-icon name="car-outline"></ion-icon>
+          Delivery
+        </button>
+      </div>
+    </div>
+
+
+    @if (successMessage) {
+      <div class="alert success-alert">
+        <ion-icon name="checkmark-circle"></ion-icon>
+        {{ successMessage }}
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="alert error-alert">
+        {{ errorMessage }}
+      </div>
+    }
+
+
+    <div class="page-grid">
+
+      <div class="form-column">
+
+        <!-- CUSTOMER -->
+
+        <section class="form-card">
+
+          <div class="card-title">
+            <span class="step">1</span>
+
+            <div>
+              <h2>Customer Details</h2>
+              <p>Search customer using mobile number</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+
+            <label>
+              Mobile Number <span>*</span>
+            </label>
+
+            <div class="phone-row">
+
+              <div class="input-box">
+                <ion-icon name="call-outline"></ion-icon>
+
+                <input
+                  type="tel"
+                  inputmode="numeric"
+                  maxlength="10"
+                  placeholder="Enter 10-digit mobile number"
+                  [(ngModel)]="phoneNumber"
+                  (input)="onPhoneInput()"
+                  (keyup.enter)="checkCustomer()"
+                >
+              </div>
+
+              <button
+                type="button"
+                class="primary small"
+                [disabled]="phoneNumber.length !== 10 || checkingCustomer"
+                (click)="checkCustomer()"
+              >
+                @if (checkingCustomer) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="search-outline"></ion-icon>
+                  Check
+                }
+              </button>
+
+            </div>
+
+
+            @if (customerChecked && customerExists) {
+              <div class="found-message">
+                <ion-icon name="checkmark-circle"></ion-icon>
+
+                <div>
+                  <strong>Customer found</strong>
+                  <span>{{ customerName }} · {{ phoneNumber }}</span>
+                </div>
+              </div>
+            }
+
+
+            @if (customerChecked) {
+              <div class="field customer-name">
+
+                <label>
+                  Customer Name <span>*</span>
+                </label>
+
+                <div class="input-box">
+                  <ion-icon name="person-outline"></ion-icon>
+
+                  <input
+                    type="text"
+                    placeholder="Enter customer name"
+                    [(ngModel)]="customerName"
+                    [readonly]="customerExists"
+                  >
+                </div>
+
+                @if (!customerExists) {
+                  <small>
+                    New customer will be created automatically.
+                  </small>
+                }
+
+              </div>
+            }
+
+          </div>
+
+        </section>
+
+
+        <!-- LOCATION -->
+
+        <section
+          class="form-card"
+          [class.disabled]="!customerChecked"
+        >
+
+          <div class="card-title">
+            <span class="step">2</span>
+
+            <div>
+              <h2>
+                {{ serviceType === 'PICKUP'
+                  ? 'Pickup Location'
+                  : 'Delivery Location' }}
+              </h2>
+
+              <p>
+                {{ serviceType === 'PICKUP'
+                  ? 'Where should we collect the laundry?'
+                  : 'Where should we deliver the laundry?' }}
+              </p>
+            </div>
+          </div>
+
+
+          <div class="card-body">
+
+            <div class="field location-field">
+
+              <label>
+                {{ serviceType === 'PICKUP'
+                  ? 'Pickup Address'
+                  : 'Delivery Address' }}
+                <span>*</span>
+              </label>
+
+              <div class="input-box">
+                <ion-icon name="location-outline"></ion-icon>
+
+                <input
+                  type="text"
+                  placeholder="Search area, street or landmark"
+                  [(ngModel)]="address"
+                  [disabled]="!customerChecked"
+                  (input)="searchAddress()"
+                >
+
+                @if (searchingLocation) {
+                  <ion-spinner
+                    class="input-spinner"
+                    name="crescent"
+                  ></ion-spinner>
+                }
+              </div>
+
+
+              @if (locationSuggestions.length > 0) {
+
+                <div class="suggestions">
+
+                  @for (
+                    location of locationSuggestions;
+                    track location.placeId
+                  ) {
+
+                    <button
+                      type="button"
+                      class="suggestion"
+                      (click)="selectLocation(location)"
+                    >
+
+                      <ion-icon name="location-outline"></ion-icon>
+
+                      <div>
+                        <strong>
+                          {{ location.name || 'Location' }}
+                        </strong>
+
+                        <span>
+                          {{ location.formattedAddress }}
+                        </span>
+                      </div>
+
+                    </button>
+
+                  }
+
+                </div>
+
+              }
+
+            </div>
+
+
+            <div class="divider">
+              <span>OR</span>
+            </div>
+
+
+            <div class="field">
+
+              <label>Google Maps Link</label>
+
+              <div class="map-row">
+
+                <div class="input-box">
+                  <ion-icon name="map-outline"></ion-icon>
+
+                  <input
+                    type="text"
+                    placeholder="Paste Google Maps link"
+                    [(ngModel)]="googleMapsLink"
+                    [disabled]="!customerChecked"
+                  >
+                </div>
+
+                <button
+                  type="button"
+                  class="secondary"
+                  [disabled]="
+                    !customerChecked ||
+                    !googleMapsLink.trim() ||
+                    resolvingLink
+                  "
+                  (click)="resolveGoogleMapsLink()"
+                >
+                  @if (resolvingLink) {
+                    <ion-spinner name="crescent"></ion-spinner>
+                  } @else {
+                    Use Location
+                  }
+                </button>
+
+              </div>
+
+            </div>
+
+
+            @if (latitude !== null && longitude !== null) {
+
+              <div class="found-message">
+                <ion-icon name="checkmark-circle"></ion-icon>
+
+                <div>
+                  <strong>Location selected</strong>
+                  <span>{{ address }}</span>
+                </div>
+              </div>
+
+            }
+
+          </div>
+
+        </section>
+
+
+        <!-- SCHEDULE -->
+
+        <section
+          class="form-card"
+          [class.disabled]="!customerChecked"
+        >
+
+          <div class="card-title">
+            <span class="step">3</span>
+
+            <div>
+              <h2>
+                {{ serviceType === 'PICKUP'
+                  ? 'Pickup Schedule'
+                  : 'Delivery Schedule' }}
+              </h2>
+
+              <p>Select date and preferred time slot</p>
+            </div>
+          </div>
+
+
+          <div class="card-body schedule-row">
+
+            <div class="field">
+
+              <label>
+                {{ serviceType === 'PICKUP'
+                  ? 'Pickup Date'
+                  : 'Delivery Date' }}
+                <span>*</span>
+              </label>
+
+              <div class="input-box">
+                <ion-icon name="calendar-outline"></ion-icon>
+
+                <input
+                  type="date"
+                  [(ngModel)]="scheduledDate"
+                  [min]="scheduledDate"
+                  [disabled]="!customerChecked"
+                >
+              </div>
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                {{ serviceType === 'PICKUP'
+                  ? 'Pickup Time'
+                  : 'Delivery Time' }}
+                <span>*</span>
+              </label>
+
+              <div class="input-box">
+                <ion-icon name="time-outline"></ion-icon>
+
+                <select
+                  [(ngModel)]="timeSlot"
+                  [disabled]="!customerChecked"
+                >
+
+                  <option value="">
+                    Select time slot
+                  </option>
+
+                  @for (slot of timeSlots; track slot) {
+                    <option [value]="slot">
+                      {{ slot }}
+                    </option>
+                  }
+
+                </select>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+
+      <!-- SUMMARY -->
+
+<aside class="summary">
+
+  <div class="summary-header">
+    <h2>Summary</h2>
+
+    <span class="type-badge">
+      {{ serviceType }}
+    </span>
+  </div>
+
+  <div class="summary-content">
+
+    <div class="summary-row">
+
+      <div class="summary-icon">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
+
+      <div class="summary-details">
+        <span class="summary-label">
+          Customer
+        </span>
+
+        <strong class="summary-value">
+          {{ customerName || 'Not selected' }}
+        </strong>
+
+        @if (phoneNumber) {
+          <small class="summary-secondary">
+            {{ phoneNumber }}
+          </small>
+        }
+      </div>
+
+    </div>
+
+
+    <div class="summary-row">
+
+      <div class="summary-icon">
+        <ion-icon name="location-outline"></ion-icon>
+      </div>
+
+      <div class="summary-details">
+
+        <span class="summary-label">
+          {{ serviceType === 'PICKUP'
+            ? 'Pickup Location'
+            : 'Delivery Location' }}
+        </span>
+
+        <strong class="summary-value">
+          {{ address || 'Not selected' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-row">
+
+      <div class="summary-icon">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </div>
+
+      <div class="summary-details">
+
+        <span class="summary-label">
+          {{ serviceType === 'PICKUP'
+            ? 'Pickup Date'
+            : 'Delivery Date' }}
+        </span>
+
+        <strong class="summary-value">
+          {{ scheduledDate || 'Not selected' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="summary-row">
+
+      <div class="summary-icon">
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+
+      <div class="summary-details">
+
+        <span class="summary-label">
+          Time Slot
+        </span>
+
+        <strong class="summary-value">
+          {{ timeSlot || 'Not selected' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="summary-footer">
+
+    <button
+      type="button"
+      class="primary schedule-action"
+      [disabled]="submitting"
+      (click)="scheduleService()"
+    >
+
+      @if (submitting) {
+
+        <ion-spinner name="crescent"></ion-spinner>
+        Scheduling...
+
+      } @else {
+
+        <ion-icon name="calendar-outline"></ion-icon>
+
+        {{ serviceType === 'PICKUP'
+          ? 'Schedule Pickup'
+          : 'Schedule Delivery' }}
+
+      }
+
+    </button>
+
+  </div>
+
+</aside>
+
+    </div>
+
+  </div>
+
 </ion-content>

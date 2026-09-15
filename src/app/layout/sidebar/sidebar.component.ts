@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
+
 import {
   homeOutline,
   walkOutline,
+  calendarOutline,
   bicycleOutline,
   cartOutline,
   receiptOutline,
@@ -23,7 +25,11 @@ import { BusinessSettingsService } from '../../../core/services/business-setting
   standalone: true,
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [RouterLink, RouterLinkActive, IonIcon]
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    IonIcon
+  ]
 })
 export class SidebarComponent implements OnInit {
 
@@ -47,6 +53,7 @@ export class SidebarComponent implements OnInit {
     addIcons({
       homeOutline,
       walkOutline,
+      calendarOutline,
       bicycleOutline,
       cartOutline,
       receiptOutline,
@@ -60,7 +67,9 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.businessSettingsService.settings$.subscribe(settings => {
-      if (settings) this.settings = settings;
+      if (settings) {
+        this.settings = settings;
+      }
     });
 
     this.businessSettingsService.loadSettings();
