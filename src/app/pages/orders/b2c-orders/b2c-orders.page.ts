@@ -233,18 +233,17 @@ export class B2cOrdersPage implements OnInit {
 
 ngOnInit(): void {
   this.loadOrders();
-  this.loadBusinessSettings();
   this.loadCustomFeatures();
 }
 
-loadBusinessSettings(): void {
-  this.apiService.getBusinessSettings().subscribe({
-    next: (res: any) => {
-      this.businessName = res?.businessName || 'Venkateshwara Fabric Works';
-    },
-    error: err => console.error('Business settings error:', err)
-  });
-}
+// loadBusinessSettings(): void {
+//   this.apiService.getBusinessSettings().subscribe({
+//     next: (res: any) => {
+//       this.businessName = res?.businessName || 'Venkateshwara Fabric Works';
+//     },
+//     error: err => console.error('Business settings error:', err)
+//   });
+// }
 
 loadCustomFeatures(): void {
   this.apiService.getCustomFeatures().subscribe({
@@ -924,18 +923,10 @@ Thank you,
 
   retagOrder(order: B2cOrderView): void {
   this.closeAllMoreMenus();
-
-  console.log('RETAG CLICKED');
-  console.log('secureRetagEnabled:', this.secureRetagEnabled);
-  console.log('retagPinConfigured:', this.retagPinConfigured);
-
   this.selectedRetagOrder = order;
   this.retagPin = '';
   this.retagPinError = '';
   this.retagPinModalOpen = true;
-
-  console.log('selectedRetagOrder:', this.selectedRetagOrder);
-  console.log('retagPinModalOpen:', this.retagPinModalOpen);
 }
 
   closeRetagPinModal(): void {

@@ -1832,15 +1832,9 @@ Thank you,
   );
 }
 
-closeOrderModal(): void {
-  this.startNewOrder();
-}
+closeOrderModal(): void {  this.startNewOrder();}
 
-
-
-
-  printReceipt(): void {
-
+printReceipt(): void {
   if (!this.createdOrder) {
     return;
   }
@@ -1848,145 +1842,188 @@ closeOrderModal(): void {
   const order = this.createdOrder;
 
   const termsAndConditions =
-    localStorage.getItem(
-      'receiptTermsAndConditions'
-    ) ?? '';
+    localStorage.getItem('receiptTermsAndConditions') ?? '';
 
-  const termsHtml =
-    termsAndConditions.trim()
+  const termsHtml = termsAndConditions.trim()
+    ? `
+      <div class="divider"></div>
+
+      <div class="terms">
+
+        <div class="terms-title">
+          Terms & Conditions
+        </div>
+
+        <div class="terms-content">
+          ${termsAndConditions
+            .split('\n')
+            .filter(line => line.trim())
+            .map(line => `<div>${line}</div>`)
+            .join('')}
+        </div>
+
+      </div>
+    `
+    : '';
+
+  const itemsHtml = order.items
+    .map(item => `
+      <tr>
+
+        <td>
+
+          ${item.productName}
+
+          ${
+            item.typeName &&
+            item.typeName.toLowerCase() !== 'default'
+              ? ` (${item.typeName})`
+              : ''
+          }
+
+          <br>
+
+          <small>
+            ${item.serviceName}
+          </small>
+
+          ${
+            item.unit === 'KG' && item.garmentCount
+              ? `
+                <br>
+                <small>
+                  Garments: ${item.garmentCount}
+                </small>
+              `
+              : ''
+          }
+
+        </td>
+
+        <td style="text-align:center;">
+          ${item.quantity}
+        </td>
+
+        <td style="text-align:right;">
+          ₹${Number(item.unitPrice).toFixed(2)}
+        </td>
+
+        <td style="text-align:right;">
+          ₹${Number(item.lineTotal).toFixed(2)}
+        </td>
+
+      </tr>
+    `)
+    .join('');
+
+  const receiptSubtotal =
+    Number(order.subtotal ?? 0);
+
+  const receiptDiscount =
+    Number(order.discountAmount ?? 0);
+
+  const receiptExpress =
+    Number(order.expressChargeAmount ?? 0);
+
+  const receiptAmountBeforeTax =
+    Math.max(
+      receiptSubtotal -
+      receiptDiscount +
+      receiptExpress,
+      0
+    );
+
+  const receiptTotalTaxPercentage =
+    this.taxEnabled
+      ? (
+          Number(this.cgstPercentage || 0) +
+          Number(this.sgstPercentage || 0)
+        )
+      : 0;
+
+  const receiptTaxableAmount =
+    this.taxEnabled &&
+    this.taxIncluded &&
+    receiptTotalTaxPercentage > 0
+      ? (
+          receiptAmountBeforeTax /
+          (
+            1 +
+            receiptTotalTaxPercentage / 100
+          )
+        )
+      : receiptAmountBeforeTax;
+
+  const receiptCgst =
+    this.taxEnabled
+      ? (
+          receiptTaxableAmount *
+          Number(this.cgstPercentage || 0)
+        ) / 100
+      : 0;
+
+  const receiptSgst =
+    this.taxEnabled
+      ? (
+          receiptTaxableAmount *
+          Number(this.sgstPercentage || 0)
+        ) / 100
+      : 0;
+
+  const receiptTax =
+    receiptCgst +
+    receiptSgst;
+
+  const receiptTotal =
+    !this.taxEnabled
+      ? receiptAmountBeforeTax
+      : this.taxIncluded
+        ? receiptAmountBeforeTax
+        : receiptAmountBeforeTax + receiptTax;
+
+  const taxModeLabel =
+    this.taxIncluded
+      ? 'Inclusive'
+      : 'Exclusive';
+
+  const discountHtml =
+    receiptDiscount > 0
       ? `
-        <div class="divider"></div>
+        <div class="total-row">
 
-        <div class="terms">
+          <span>
+            Discount
+          </span>
 
-          <div class="terms-title">
-            Terms & Conditions
-          </div>
+          <strong>
+            -₹${receiptDiscount.toFixed(2)}
+          </strong>
 
-          <div class="terms-content">
-            ${termsAndConditions
-              .split('\n')
-              .filter( line => line.trim())
-              .map( line =>`<div>${line}</div>`)
-              .join('')}
-          </div>
         </div>
       `
       : '';
 
-const itemsHtml = order.items
-    .map(item => `
-        <tr>
-          <td>
-            ${item.productName}
-            ${item.typeName ? ` (${item.typeName})` : ''}
-            <br>
-            <small> ${item.serviceName} </small>
-            ${item.unit === 'KG' && item.garmentCount ? `
-                  <br>
-                  <small> Garments: ${item.garmentCount} </small>
-                `
-                : ''
-            }
-          </td>
-          <td style="text-align:center;">  ${item.quantity} </td>
-          <td style="text-align:right;"> ₹${Number(item.unitPrice).toFixed(2)} </td>
-          <td style="text-align:right;">
-            ₹${Number(item.lineTotal).toFixed(2)}
-          </td>
-        </tr>
+  const expressHtml =
+    receiptExpress > 0
+      ? `
+        <div class="total-row">
+
+          <span>
+            Express Charge
+          </span>
+
+          <strong>
+            +₹${receiptExpress.toFixed(2)}
+          </strong>
+
+        </div>
       `
-    )
-    .join('');
+      : '';
 
-const receiptSubtotal =
-  Number(
-    order.subtotal ?? 0
-  );
-
-const receiptDiscount =
-  Number(
-    order.discountAmount ?? 0
-  );
-
-const receiptExpress =
-  Number(
-    order.expressChargeAmount ?? 0
-  );
-
-const receiptAmountBeforeTax =
-  Math.max(
-    receiptSubtotal -
-    receiptDiscount +
-    receiptExpress,
-    0
-  );
-
-const receiptTotalTaxPercentage =
-  this.taxEnabled
-    ? (
-        Number(
-          this.cgstPercentage || 0
-        ) +
-        Number(
-          this.sgstPercentage || 0
-        )
-      )
-    : 0;
-
-const receiptTaxableAmount =
-  this.taxEnabled &&
-  this.taxIncluded &&
-  receiptTotalTaxPercentage > 0
-    ? (
-        receiptAmountBeforeTax /
-        (
-          1 +
-          receiptTotalTaxPercentage / 100
-        )
-      )
-    : receiptAmountBeforeTax;
-
-const receiptCgst =
-  this.taxEnabled
-    ? (
-        receiptTaxableAmount *
-        Number(
-          this.cgstPercentage || 0
-        )
-      ) / 100
-    : 0;
-
-const receiptSgst =
-  this.taxEnabled
-    ? (
-        receiptTaxableAmount *
-        Number(
-          this.sgstPercentage || 0
-        )
-      ) / 100
-    : 0;
-
-const receiptTax =
-  receiptCgst +
-  receiptSgst;
-
-const receiptTotal =
-  !this.taxEnabled
-    ? receiptAmountBeforeTax
-    : this.taxIncluded
-      ? receiptAmountBeforeTax
-      : receiptAmountBeforeTax + receiptTax;
-
-const taxModeLabel =
-  this.taxIncluded
-    ? 'Inclusive'
-    : 'Exclusive';
-
-const taxHtml =
-  this.taxEnabled &&
-  receiptTotalTaxPercentage > 0
-    ? `
+  const taxHtml =
+    this.taxEnabled &&
+    receiptTotalTaxPercentage > 0
+      ? `
         <div class="total-row">
 
           <span>
@@ -2035,9 +2072,9 @@ const taxHtml =
 
         </div>
       `
-    : '';
+      : '';
 
-const printWindow = window.open(
+  const printWindow = window.open(
     '',
     '_blank',
     `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
@@ -2046,344 +2083,325 @@ const printWindow = window.open(
   if (!printWindow) {
     return;
   }
-  
-printWindow.document.write(`
-  <!DOCTYPE html>
-  <html>
 
-    <head>
+  printWindow.document.write(`
+    <!DOCTYPE html>
 
-      <title>
-        Receipt
-      </title>
+    <html>
 
-      <style>
+      <head>
 
-        * {
-          box-sizing: border-box;
-        }
+        <title>
+          Receipt
+        </title>
 
-        body {
-          margin: 0;
-          padding: 12px;
-          font-family: Arial, sans-serif;
-          color: #111;
-          background: #fff;
-        }
+        <style>
 
-        .receipt {
-          width: 80mm;
-          margin: 0 auto;
-          font-size: 12px;
-        }
-
-        .center {
-          text-align: center;
-        }
-
-        .shop-name {
-          font-size: 18px;
-          font-weight: 700;
-        }
-
-        .muted {
-          color: #555;
-          font-size: 11px;
-        }
-
-        .divider {
-          margin: 8px 0;
-          border-top: 1px dashed #000;
-        }
-
-        .info-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          margin: 3px 0;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 8px;
-        }
-
-        th,
-        td {
-          padding: 5px 2px;
-          vertical-align: top;
-          border-bottom: 1px dashed #bbb;
-        }
-
-        th {
-          text-align: left;
-          font-size: 11px;
-        }
-
-        td {
-          font-size: 11px;
-        }
-
-        .total-row {
-          display: flex;
-          justify-content: space-between;
-          margin: 4px 0;
-        }
-
-        .grand-total {
-          margin-top: 8px;
-          padding-top: 8px;
-          border-top: 1px solid #000;
-          font-size: 15px;
-          font-weight: 700;
-        }
-
-        .terms {
-          margin-top: 6px;
-          font-size: 8px;
-          line-height: 1.4;
-        }
-
-        .terms-title {
-          margin-bottom: 4px;
-          font-size: 9px;
-          font-weight: 700;
-          text-align: left;
-        }
-
-        .terms-content {
-          text-align: left;
-          color: #333;
-        }
-
-        .terms-content div {
-          margin-bottom: 2px;
-        }
-
-        .footer {
-          margin-top: 14px;
-          text-align: center;
-          font-size: 11px;
-        }
-
-        @media print {
-
-          @page {
-            size: 80mm auto;
-            margin: 0;
+          * {
+            box-sizing: border-box;
           }
 
           body {
-            padding: 4mm;
+            margin: 0;
+            padding: 12px;
+            font-family: Arial, sans-serif;
+            color: #111;
+            background: #fff;
           }
 
-        }
+          .receipt {
+            width: 80mm;
+            margin: 0 auto;
+            font-size: 12px;
+          }
 
-      </style>
+          .center {
+            text-align: center;
+          }
 
-    </head>
+          .shop-name {
+            font-size: 18px;
+            font-weight: 700;
+          }
 
-    <body>
+          .muted {
+            color: #555;
+            font-size: 11px;
+          }
 
-      <div class="receipt">
+          .divider {
+            margin: 8px 0;
+            border-top: 1px dashed #000;
+          }
 
-        <div class="center">
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 3px 0;
+          }
 
-          <div class="shop-name">
-            ${this.businessName}
-          </div>
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+          }
 
-          <div class="muted">
-            Laundry Service Receipt
-          </div>
+          th,
+          td {
+            padding: 5px 2px;
+            vertical-align: top;
+            border-bottom: 1px dashed #bbb;
+          }
 
-        </div>
+          th {
+            text-align: left;
+            font-size: 11px;
+          }
 
-        <div class="divider"></div>
+          td {
+            font-size: 11px;
+          }
 
-        <div class="info-row">
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+          }
 
-          <span>
-            Order
-          </span>
+          .grand-total {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #000;
+            font-size: 15px;
+            font-weight: 700;
+          }
 
-          <strong>
-            #${order.orderNumber}
-          </strong>
+          .terms {
+            margin-top: 6px;
+            font-size: 8px;
+            line-height: 1.4;
+          }
 
-        </div>
+          .terms-title {
+            margin-bottom: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+          }
 
-        <div class="info-row">
+          .terms-content {
+            text-align: left;
+            color: #333;
+          }
 
-          <span>
-            Customer
-          </span>
+          .terms-content div {
+            margin-bottom: 2px;
+          }
 
-          <strong>
-            ${order.customer.name}
-          </strong>
+          .footer {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 11px;
+          }
 
-        </div>
+          @media print {
 
-        <div class="info-row">
-
-          <span>
-            Mobile
-          </span>
-
-          <strong>
-            ${order.customer.phone}
-          </strong>
-
-        </div>
-
-        <div class="info-row">
-
-          <span>
-            Created At
-          </span>
-
-          <strong>
-            ${new Date(order.createdAt).toLocaleDateString('en-GB')}
-          </strong>
-
-        </div>
-
-        <div class="info-row">
-
-          <span>
-            Delivered Date 
-          </span>
-
-          <strong>
-            ${
-              order.deliveryDate
-                ? new Date(
-                    order.deliveryDate + 'T00:00:00'
-                  ).toLocaleDateString('en-GB')
-                : '-'
+            @page {
+              size: 80mm auto;
+              margin: 0;
             }
-          </strong>
+
+            body {
+              padding: 4mm;
+            }
+
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="receipt">
+
+          <div class="center">
+
+            <div class="shop-name">
+              ${this.businessName}
+            </div>
+
+            <div class="muted">
+              Laundry Service Receipt
+            </div>
+
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="info-row">
+
+            <span>
+              Order
+            </span>
+
+            <strong>
+              #${order.orderNumber}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Customer
+            </span>
+
+            <strong>
+              ${order.customer.name}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Mobile
+            </span>
+
+            <strong>
+              ${order.customer.phone}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Created At
+            </span>
+
+            <strong>
+              ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Delivered Date
+            </span>
+
+            <strong>
+              ${
+                order.deliveryDate
+                  ? new Date(
+                      order.deliveryDate + 'T00:00:00'
+                    ).toLocaleDateString('en-GB')
+                  : '-'
+              }
+            </strong>
+
+          </div>
+
+          <div class="divider"></div>
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Item
+                </th>
+
+                <th style="text-align:center;">
+                  Qty
+                </th>
+
+                <th style="text-align:right;">
+                  Rate
+                </th>
+
+                <th style="text-align:right;">
+                  Total
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+
+          </table>
+
+          <div class="divider"></div>
+
+          <div class="total-row">
+
+            <span>
+              Subtotal
+            </span>
+
+            <strong>
+              ₹${receiptSubtotal.toFixed(2)}
+            </strong>
+
+          </div>
+
+          ${discountHtml}
+
+          ${expressHtml}
+
+          ${taxHtml}
+
+          <div class="total-row grand-total">
+
+            <span>
+              Total
+            </span>
+
+            <strong>
+              ₹${receiptTotal.toFixed(2)}
+            </strong>
+
+          </div>
+
+          ${termsHtml}
+
+          <div class="footer">
+
+            Thank you!
+
+            <br>
+
+            Please keep this receipt until collection.
+
+          </div>
 
         </div>
 
-        <div class="divider"></div>
+        <script>
 
-        <table>
+          window.onload = function () {
+            window.print();
+          };
 
-          <thead>
+        </script>
 
-            <tr>
+      </body>
 
-              <th>
-                Item
-              </th>
-
-              <th style="text-align:center;">
-                Qty
-              </th>
-
-              <th style="text-align:right;">
-                Rate
-              </th>
-
-              <th style="text-align:right;">
-                Total
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-
-        </table>
-
-        <div class="divider"></div>
-
-        <div class="total-row">
-
-          <span>
-            Subtotal
-          </span>
-
-          <strong>
-            ₹${Number(order.subtotal).toFixed(2)}
-          </strong>
-
-        </div>
-
-        <div class="total-row">
-
-          <span>
-            Discount
-          </span>
-
-          <strong>
-            -₹${Number(order.discountAmount).toFixed(2)}
-          </strong>
-
-        </div>
-
-        <div class="total-row">
-
-          <span>
-            Express Charge
-          </span>
-
-          <strong>
-            +₹${receiptExpress.toFixed(2)}
-          </strong>
-
-        </div>
-
-        ${taxHtml}
-
-        <div class="total-row grand-total">
-
-          <span>
-            Total
-          </span>
-
-          <strong>
-            ₹${receiptTotal.toFixed(2)}
-          </strong>
-
-        </div>
-
-        ${termsHtml}
-
-        <div class="footer">
-
-          Thank you!
-
-          <br>
-
-          Please keep this receipt
-          until collection.
-
-        </div>
-
-      </div>
-
-      <script>
-
-        window.onload = function () {
-          window.print();
-        };
-
-      </script>
-
-    </body>
-
-  </html>
-`);
+    </html>
+  `);
 
   printWindow.document.close();
 }
+
 
 openWhatsApp(): void {
   if (!this.createdOrder) {
@@ -2391,13 +2409,11 @@ openWhatsApp(): void {
   }
 
   const order = this.createdOrder;
-
   const phone = this.formatWhatsAppPhone(
     order.customer.phone
   );
 
-  const totalQuantity =
-    order.items?.reduce(
+  const totalQuantity = order.items?.reduce(
       (total: number, item: any) => {
 
         if (item.unit === 'KG') {
