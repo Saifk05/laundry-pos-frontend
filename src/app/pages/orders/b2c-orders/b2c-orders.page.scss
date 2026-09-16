@@ -2288,3 +2288,206 @@
   }
 }
 
+/* SECURE RETAG - KEEP AT END OF FILE */
+
+.retag-pin-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 20px !important;
+
+  background: rgba(15, 23, 42, 0.52) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: auto !important;
+}
+
+.retag-pin-modal {
+  position: relative !important;
+  z-index: 2147483647 !important;
+
+  width: min(440px, 100%) !important;
+  max-width: 440px !important;
+  max-height: calc(100vh - 40px) !important;
+
+  margin: auto !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.22),
+    0 8px 20px rgba(0, 0, 0, 0.08) !important;
+
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: hidden !important;
+}
+
+.retag-pin-modal .modal-header {
+  min-height: auto !important;
+  padding: 20px 22px !important;
+}
+
+.retag-pin-modal .modal-header h2 {
+  font-size: 20px !important;
+}
+
+.retag-pin-modal .modal-header p {
+  margin-top: 4px !important;
+  font-size: 12px !important;
+}
+
+.retag-pin-modal .modal-close {
+  width: 36px !important;
+  height: 36px !important;
+  flex: 0 0 36px !important;
+  font-size: 22px !important;
+}
+
+.retag-pin-modal .modal-body {
+  padding: 22px !important;
+}
+
+.retag-lock-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+  background: #dcfce7;
+
+  font-size: 24px;
+}
+
+.retag-intro {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.retag-intro h3 {
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.retag-intro p {
+  max-width: 330px;
+  margin: 0 auto;
+
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.retag-pin-modal .payment-order-info {
+  margin-bottom: 18px;
+  gap: 10px;
+}
+
+.retag-pin-modal .payment-order-info > div {
+  min-height: 62px;
+  padding: 11px 12px;
+  border-radius: 9px;
+}
+
+.retag-pin-modal .payment-order-info span {
+  font-size: 10px;
+}
+
+.retag-pin-modal .payment-order-info strong {
+  font-size: 13px;
+}
+
+.retag-pin-modal .form-group {
+  margin-top: 0;
+}
+
+.retag-pin-input {
+  width: 100% !important;
+  height: 50px !important;
+
+  box-sizing: border-box !important;
+
+  padding: 0 14px !important;
+
+  border: 1.5px solid #d1d5db !important;
+  border-radius: 9px !important;
+
+  outline: none !important;
+
+  background: #fff !important;
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+
+  font-size: 18px !important;
+  font-weight: 700 !important;
+
+  letter-spacing: 5px !important;
+}
+
+.retag-pin-input:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1) !important;
+}
+
+.retag-pin-input::placeholder {
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
+
+  font-size: 12px !important;
+  font-weight: 400 !important;
+
+  letter-spacing: 0 !important;
+}
+
+.retag-pin-modal .modal-footer {
+  min-height: auto !important;
+  padding: 14px 22px !important;
+}
+
+.retag-pin-modal .cancel-button,
+.retag-pin-modal .confirm-button {
+  height: 44px !important;
+  font-size: 12px !important;
+}
+
+@media (max-width: 520px) {
+  .retag-pin-overlay {
+    padding: 12px !important;
+  }
+
+  .retag-pin-modal {
+    width: 100% !important;
+    min-height: auto !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 16px !important;
+  }
+
+  .retag-pin-modal .modal-body {
+    padding: 18px !important;
+  }
+
+  .retag-pin-modal .payment-order-info {
+    grid-template-columns: 1fr !important;
+  }
+}

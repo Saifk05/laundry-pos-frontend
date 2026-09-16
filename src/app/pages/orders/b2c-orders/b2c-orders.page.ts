@@ -215,27 +215,56 @@ export class B2cOrdersPage implements OnInit {
   selectedCallOrder: B2cOrderView | null = null;
   numberCopied = false;
   businessName = 'Venkateshwara Fabric Works';
+  secureRetagEnabled = false;
+  retagPinConfigured = false;
+  retagWhatsappEnabled = false;
+
+  retagPinModalOpen = false;
+  retagPin = '';
+  retagPinError = '';
+  retagPinLoading = false;
+
+  selectedRetagOrder: B2cOrderView | null = null;
 
   constructor(
     private readonly apiService: ApiService,
     private readonly router: Router
   ) {}
 
-  ngOnInit(): void {
-    this.loadOrders();
-    this.loadBusinessSettings();
-  }
+ngOnInit(): void {
+  this.loadOrders();
+  this.loadBusinessSettings();
+  this.loadCustomFeatures();
+}
 
-  loadBusinessSettings(): void {
-    this.apiService.getBusinessSettings().subscribe({
-      next: (response: any) => {
-        this.businessName = response?.businessName || 'Venkateshwara Fabric Works';
-      },
-      error: (error: any) => {
-        console.error('Settings load error', error);
-      }
-    });
-  }
+loadBusinessSettings(): void {
+  this.apiService.getBusinessSettings().subscribe({
+    next: (res: any) => {
+      this.businessName = res?.businessName || 'Venkateshwara Fabric Works';
+    },
+    error: err => console.error('Business settings error:', err)
+  });
+}
+
+loadCustomFeatures(): void {
+  this.apiService.getCustomFeatures().subscribe({
+    next: (res: any) => {
+      this.secureRetagEnabled = res?.secureRetagEnabled ?? false;
+      this.retagPinConfigured = res?.retagPinConfigured ?? false;
+      this.retagWhatsappEnabled = res?.retagWhatsappEnabled ?? false;
+
+      console.log('CUSTOM FEATURES:', res);
+      console.log('SECURE RETAG:', this.secureRetagEnabled);
+      console.log('PIN CONFIGURED:', this.retagPinConfigured);
+    },
+    error: err => {
+      console.error('Custom features load error:', err);
+      this.secureRetagEnabled = false;
+      this.retagPinConfigured = false;
+      this.retagWhatsappEnabled = false;
+    }
+  });
+}
 
   loadOrders(cursor: string | null = null): void {
     this.loading = true;
@@ -894,13 +923,78 @@ Thank you,
   }
 
   retagOrder(order: B2cOrderView): void {
-    this.closeAllMoreMenus();
+  this.closeAllMoreMenus();
 
-    this.router.navigate(['/app/new-walk-in'], {
-      queryParams: {
-        mode: 'retag',
-        orderId: order.id
+  console.log('RETAG CLICKED');
+  console.log('secureRetagEnabled:', this.secureRetagEnabled);
+  console.log('retagPinConfigured:', this.retagPinConfigured);
+
+  this.selectedRetagOrder = order;
+  this.retagPin = '';
+  this.retagPinError = '';
+  this.retagPinModalOpen = true;
+
+  console.log('selectedRetagOrder:', this.selectedRetagOrder);
+  console.log('retagPinModalOpen:', this.retagPinModalOpen);
+}
+
+  closeRetagPinModal(): void {
+    if (this.retagPinLoading) return;
+    this.retagPinModalOpen = false;
+    this.selectedRetagOrder = null;
+    this.retagPin = '';
+    this.retagPinError = '';
+  }
+
+  onRetagPinInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, '').slice(0, 6);
+    input.value = value;
+    this.retagPin = value;
+    this.retagPinError = '';
+  }
+
+  verifyRetagPin(): void {
+    if (!this.selectedRetagOrder) return;
+    if (!/^\d{6}$/.test(this.retagPin)) {
+      this.retagPinError = 'Enter your 6-digit Retag PIN.';
+      return;
+    }
+
+    this.retagPinLoading = true;
+    this.retagPinError = '';
+
+    this.apiService.verifyRetagPin({ pin: this.retagPin }).subscribe({
+      next: (response: any) => {
+        this.retagPinLoading = false;
+        const verified = response === true || response?.verified === true || response?.valid === true;
+        if (!verified) {
+          this.retagPinError = 'Incorrect Retag PIN.';
+          this.retagPin = '';
+          return;
+        }
+
+        const order = this.selectedRetagOrder;
+        this.retagPinModalOpen = false;
+        this.selectedRetagOrder = null;
+        this.retagPin = '';
+        this.retagPinError = '';
+        if (order) this.openRetag(order);
+      },
+      error: (error: any) => {
+        this.retagPinLoading = false;
+        this.retagPin = '';
+        this.retagPinError =
+          error?.status === 400 || error?.status === 401 || error?.status === 403
+            ? 'Incorrect Retag PIN.'
+            : error?.error?.message || error?.error?.error || 'Unable to verify Retag PIN.';
       }
+    });
+  }
+
+  private openRetag(order: B2cOrderView): void {
+    this.router.navigate(['/app/new-walk-in'], {
+      queryParams: { mode: 'retag', orderId: order.id }
     });
   }
 

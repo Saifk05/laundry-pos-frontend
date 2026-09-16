@@ -367,3 +367,22 @@
     gap: 5px;
   }
 }
+
+
+.pin-input {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #16a34a;
+  font-family: Arial, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 600;
+  letter-spacing: 5px;
+}
+
+.pin-input::placeholder {
+  color: #9ca3af;
+  -webkit-text-fill-color: #9ca3af;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+}

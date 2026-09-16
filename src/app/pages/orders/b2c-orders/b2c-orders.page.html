@@ -812,40 +812,23 @@
   </div>
 }
 
-@if (
-  callModalOpen &&
-  selectedCallOrder
-) {
-  <div
-    class="modal-overlay"
-    (click)="closeCallModal()">
-
-    <div
-      class="payment-modal call-customer-modal"
-      (click)="$event.stopPropagation()">
-
+@if (callModalOpen && selectedCallOrder) {
+  <div class="modal-overlay" (click)="closeCallModal()">
+    <div class="payment-modal call-customer-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div>
           <h2>Customer Contact</h2>
           <p>{{ selectedCallOrder.orderNumber }}</p>
         </div>
-
-        <button
-          type="button"
-          class="modal-close"
-          (click)="closeCallModal()">
-          ×
-        </button>
+        <button type="button" class="modal-close" (click)="closeCallModal()">×</button>
       </div>
 
       <div class="modal-body">
-
         <div class="payment-order-info">
           <div>
             <span>Customer</span>
             <strong>{{ selectedCallOrder.customerName }}</strong>
           </div>
-
           <div>
             <span>Mobile</span>
             <strong>{{ selectedCallOrder.mobile }}</strong>
@@ -858,8 +841,80 @@
         </div>
 
         @if (numberCopied) {
-          <div class="number-copied">
-            ✓ Number copied
+          <div class="number-copied">✓ Number copied</div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="cancel-button" (click)="closeCallModal()">Close</button>
+        <button type="button" class="confirm-button" (click)="copyCustomerNumber()">
+          {{ numberCopied ? 'Copied' : 'Copy Number' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (retagPinModalOpen && selectedRetagOrder) {
+  <div class="modal-overlay retag-pin-overlay">
+    <div class="payment-modal retag-pin-modal">
+
+      <div class="modal-header">
+        <div>
+          <h2>Secure Retag</h2>
+          <p>{{ selectedRetagOrder.orderNumber }}</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          [disabled]="retagPinLoading"
+          (click)="closeRetagPinModal()">
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="retag-lock-icon">🔐</div>
+
+        <div class="retag-intro">
+          <h3>Enter Retag PIN</h3>
+          <p>Enter your 6-digit security PIN to continue retagging this order.</p>
+        </div>
+
+        <div class="payment-order-info">
+          <div>
+            <span>Order</span>
+            <strong>{{ selectedRetagOrder.orderNumber }}</strong>
+          </div>
+
+          <div>
+            <span>Customer</span>
+            <strong>{{ selectedRetagOrder.customerName }}</strong>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="retagPin">Retag PIN</label>
+
+          <input
+            id="retagPin"
+            class="retag-pin-input"
+            type="text"
+            inputmode="numeric"
+            maxlength="6"
+            autocomplete="off"
+            placeholder="Enter 6-digit PIN"
+            [value]="retagPin"
+            [disabled]="retagPinLoading"
+            (input)="onRetagPinInput($event)"
+            (keyup.enter)="verifyRetagPin()">
+        </div>
+
+        @if (retagPinError) {
+          <div class="payment-error">
+            {{ retagPinError }}
           </div>
         }
 
@@ -869,17 +924,20 @@
         <button
           type="button"
           class="cancel-button"
-          (click)="closeCallModal()">
-          Close
+          [disabled]="retagPinLoading"
+          (click)="closeRetagPinModal()">
+          Cancel
         </button>
 
         <button
           type="button"
           class="confirm-button"
-          (click)="copyCustomerNumber()">
-          {{ numberCopied ? 'Copied' : 'Copy Number' }}
+          [disabled]="retagPinLoading || retagPin.length !== 6"
+          (click)="verifyRetagPin()">
+          {{ retagPinLoading ? 'Verifying...' : 'Verify & Retag' }}
         </button>
       </div>
+
     </div>
   </div>
 }

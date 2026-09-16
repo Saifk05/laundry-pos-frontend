@@ -17,8 +17,13 @@ import {
   star
 } from 'ionicons/icons';
 
-import { BusinessSettings } from '../../../core/models/business-settings.model';
-import { BusinessSettingsService } from '../../../core/services/business-settings.service';
+import {
+  BusinessSettings
+} from '../../../core/models/business-settings.model';
+
+import {
+  BusinessSettingsService
+} from '../../../core/services/business-settings.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -44,11 +49,18 @@ export class SidebarComponent implements OnInit {
     cgstPercentage: 0,
     sgstPercentage: 0,
     taxEnabled: false,
-    taxIncluded: false
+    taxIncluded: false,
+
+    customFeatures: {
+      secureRetagEnabled: false,
+      retagPinConfigured: false,
+      retagWhatsappEnabled: false
+    }
   };
 
   constructor(
-    private readonly businessSettingsService: BusinessSettingsService
+    private readonly businessSettingsService:
+      BusinessSettingsService
   ) {
     addIcons({
       homeOutline,
@@ -66,12 +78,18 @@ export class SidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.businessSettingsService.settings$.subscribe(settings => {
-      if (settings) {
-        this.settings = settings;
-      }
-    });
 
-    this.businessSettingsService.loadSettings();
+    this.businessSettingsService
+      .settings$
+      .subscribe(settings => {
+
+        if (settings) {
+          this.settings = settings;
+        }
+
+      });
+
+    this.businessSettingsService
+      .loadSettings();
   }
 }

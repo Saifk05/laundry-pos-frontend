@@ -29,44 +29,48 @@ import {
     SidebarComponent
   ]
 })
-export class AppLayoutComponent
-  implements OnInit {
+export class AppLayoutComponent implements OnInit {
 
-  settings:
-    BusinessSettings = {
+  settings: BusinessSettings = {
 
-      id: 0,
+    id: 0,
 
-      businessName:
-        'Venkateshwara Fabric Works',
+    businessName:
+      'Venkateshwara Fabric Works',
 
-      whatsappDisplayName:
-        'Fabric Luxury Shine',
+    whatsappDisplayName:
+      'Fabric Luxury Shine',
 
-      headerSubtitle:
-        'Operations',
+    headerSubtitle:
+      'Operations',
 
-      adminName:
-        'Admin',
+    adminName:
+      'Admin',
 
-      adminSubtitle:
-        'Laundry',
+    adminSubtitle:
+      'Laundry',
 
-      logoUrl:
-        null,
+    logoUrl:
+      null,
 
-      cgstPercentage:
-        0,
+    cgstPercentage:
+      0,
 
-      sgstPercentage:
-        0,
+    sgstPercentage:
+      0,
 
-      taxEnabled:
-        false,
+    taxEnabled:
+      false,
 
-      taxIncluded:
-        false
-    };
+    taxIncluded:
+      false,
+
+    customFeatures: {
+      secureRetagEnabled: false,
+      retagPinConfigured: false,
+      retagWhatsappEnabled: false
+    }
+  };
 
   zoomLevel = 1;
 

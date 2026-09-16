@@ -11,6 +11,16 @@ import {
   OrderResponse
 } from '../models/walk-in.model';
 
+import {
+  CustomFeatureSettings,
+  RetagSecurityRequest,
+  SetRetagPinRequest,
+  VerifyRetagPinRequest,
+  VerifyRetagPinResponse,
+  ChangeRetagPinRequest,
+  ResetRetagPinRequest,
+  RetagWhatsappRequest
+} from '../models/custom-feature.model';
 
 import {
   PickupDelivery,
@@ -819,5 +829,73 @@ updateTermsConditions(
       }
     );
   }
+
+  getCustomFeatures():
+  Observable<CustomFeatureSettings> {
+
+  return this.http.get<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features`
+  );
+}
+
+updateRetagSecurity(
+  request: RetagSecurityRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-security`,
+    request
+  );
+}
+
+setRetagPin(
+  request: SetRetagPinRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.post<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-pin`,
+    request
+  );
+}
+
+verifyRetagPin(
+  request: VerifyRetagPinRequest
+): Observable<VerifyRetagPinResponse> {
+
+  return this.http.post<VerifyRetagPinResponse>(
+    `${this.baseUrl}/custom-features/retag-pin/verify`,
+    request
+  );
+}
+
+changeRetagPin(
+  request: ChangeRetagPinRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-pin/change`,
+    request
+  );
+}
+
+resetRetagPin(
+  request: ResetRetagPinRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-pin/reset`,
+    request
+  );
+}
+
+updateRetagWhatsapp(
+  request: RetagWhatsappRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-whatsapp`,
+    request
+  );
+}
 
 }
