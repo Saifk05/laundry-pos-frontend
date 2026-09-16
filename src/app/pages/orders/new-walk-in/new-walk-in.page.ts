@@ -124,14 +124,11 @@ export class NewWalkInPage
   isRescheduleMode = false;
   rescheduleOrderId: string | null = null;
   businessName = ' Fabric Works';
-
   cgstPercentage = 0;
-
   sgstPercentage = 0;
-
   taxEnabled = false;
-
   taxIncluded = false;
+  retagWhatsappEnabled = false;
 
   constructor(
     private readonly apiService: ApiService,
@@ -149,58 +146,25 @@ export class NewWalkInPage
   }
   
   loadBusinessSettings(): void {
-
-    this.apiService
-      .getBusinessSettings()
-      .subscribe({
-
-        next: (
-          response
-        ) => {
-
-          this.businessName =
-            response?.businessName ||
-            'Fabric Works';
-
-          this.cgstPercentage =
-            Number(
-              response?.cgstPercentage ?? 0
-            );
-
-          this.sgstPercentage =
-            Number(
-              response?.sgstPercentage ?? 0
-            );
-
-          this.taxEnabled = Boolean( response?.taxEnabled );
-          this.taxIncluded = Boolean( response?.taxIncluded );
-        },
-
-        error: (
-          error
-        ) => {
-
-          console.error(
-            'Unable to load business settings:',
-            error
-          );
-
-          this.cgstPercentage =
-            0;
-
-          this.sgstPercentage =
-            0;
-
-          this.taxEnabled =
-            false;
-
-          this.taxIncluded =
-            false;
-        }
-
-      });
+    this.apiService.getBusinessSettings().subscribe({
+      next: response => {
+        this.businessName = response?.businessName || 'Fabric Works';
+        this.cgstPercentage = Number(response?.cgstPercentage ?? 0);
+        this.sgstPercentage = Number(response?.sgstPercentage ?? 0);
+        this.taxEnabled = Boolean(response?.taxEnabled);
+        this.taxIncluded = Boolean(response?.taxIncluded);
+        this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
+      },
+      error: error => {
+        console.error('Unable to load business settings:', error);
+        this.cgstPercentage = 0;
+        this.sgstPercentage = 0;
+        this.taxEnabled = false;
+        this.taxIncluded = false;
+        this.retagWhatsappEnabled = false;
+      }
+    });
   }
-
   loadWalkInSetup(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -1787,99 +1751,93 @@ const request:
   }
 
 
-  private updateRetagOrder():
-    void {
+private updateRetagOrder(): void {
+  if (!this.retagOrderId) {
+    this.errorMessage = 'Re-tag order id is missing';
+    return;
+  }
 
-    if (
-      !this.retagOrderId
-    ) {
+  if (this.orderItems.length === 0) {
+    this.errorMessage = 'At least one item must remain in the order';
+    return;
+  }
 
-      this.errorMessage =
-        'Re-tag order id is missing';
+  const items: RetagOrderRequest['items'] = [];
 
-      return;
-    }
-
-    if (
-      this.orderItems.length === 0
-    ) {
-
-      this.errorMessage =
-        'At least one item must remain in the order';
-
-      return;
-    }
-
-    const items:
-      RetagOrderRequest['items'] =
-      [];
-
-    for (
-      const item
-      of this.orderItems
-    ) {
-
-      for (
-        const service
-        of item.services
-      ) {
-
-        items.push({
-
-          productId:
-            item.productId,
-
-          typeId:
-            item.typeId,
-
-          serviceId:
-            service.id,
-
-          quantity:
-            item.quantity,
-
-          garmentCount:
-            item.unit === 'KG'
-              ? item.garmentCount
-              : null
-
-        });
-      }
-    }
-
-const request: RetagOrderRequest = {
-  items: items,
-  couponId: this.selectedCouponId
-};
-
-    this.creatingOrder = true;
-    this.errorMessage = '';
-    this.apiService.retagB2COrder(
-        this.retagOrderId,
-        request
-      )
-      .subscribe({next: (  response: B2COrderDetails ) => {
-          this.creatingOrder = false;
-          this.createdOrderNumber = response.orderNumber;
-          this.router.navigate(
-            ['/app/b2c-orders']
-          );
-        },
-
-        error: ( error: any ) => {
-          this.creatingOrder = false;
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to update re-tag order';
-        }
+  for (const item of this.orderItems) {
+    for (const service of item.services) {
+      items.push({
+        productId: item.productId,
+        typeId: item.typeId,
+        serviceId: service.id,
+        quantity: item.quantity,
+        garmentCount: item.unit === 'KG' ? item.garmentCount : null
       });
+    }
   }
 
+  const request: RetagOrderRequest = {
+    items,
+    couponId: this.selectedCouponId
+  };
 
-  closeOrderModal(): void {
-    this.startNewOrder();
+  this.creatingOrder = true;
+  this.errorMessage = '';
+
+  this.apiService.retagB2COrder(this.retagOrderId, request).subscribe({
+    next: (response: B2COrderDetails) => {
+      this.creatingOrder = false;
+      this.createdOrderNumber = response.orderNumber;
+
+      if (this.retagWhatsappEnabled) {
+        this.openRetagWhatsApp(response);
+      }
+
+      this.router.navigate(['/app/b2c-orders']);
+    },
+      error: (error: any) => {
+        this.creatingOrder = false;
+        this.errorMessage =
+          error?.error?.message ||
+          error?.error?.error ||
+          'Unable to update re-tag order';
+      }
+    });
   }
+
+  private openRetagWhatsApp(order: B2COrderDetails): void {
+  const phone = this.formatWhatsAppPhone(order.customer?.phone || this.customerPhone);
+
+  if (!phone) {
+    console.warn('Customer WhatsApp number is unavailable');
+    return;
+  }
+
+  const customerName = order.customer?.name || this.customerName || 'Customer';
+  const orderNumber = order.orderNumber || this.retagOrderNumber;
+  const totalAmount = Number(order.totalAmount ?? 0).toFixed(2);
+
+  const message = `Dear ${customerName},
+
+Your invoice for Order ${orderNumber} has been updated after store inspection.
+
+Updated Total Amount: ₹${totalAmount}
+
+Thank you,
+`;
+
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+    '_blank'
+  );
+}
+
+closeOrderModal(): void {
+  this.startNewOrder();
+}
+
+
+
 
   printReceipt(): void {
 
@@ -2954,4 +2912,7 @@ normalizeGarmentCount(): void {
   const value = Number(this.modalGarmentCount);
   this.modalGarmentCount = !value || value < 1 ? 1 : Math.floor(value);
 }
+
+
+
 }
