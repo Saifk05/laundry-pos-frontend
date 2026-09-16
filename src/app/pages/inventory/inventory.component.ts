@@ -1,11 +1,5 @@
-import {
-  Component
-} from '@angular/core';
-
-import {
-  Router
-} from '@angular/router';
-
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inventory',
@@ -15,57 +9,33 @@ import {
 })
 export class InventoryComponent {
 
-
-  constructor(
-    private readonly router:
-      Router
-  ) {}
-
+  constructor(private readonly router: Router) {}
 
   openServices(): void {
-
-    this.router.navigateByUrl(
-      '/app/inventory/services'
-    );
+    this.router.navigateByUrl('/app/inventory/services');
   }
-
 
   openCoupons(): void {
-
-    this.router.navigateByUrl(
-      '/app/inventory/coupons'
-    );
+    this.router.navigateByUrl('/app/inventory/coupons');
   }
-
 
   openExtraCharges(): void {
-
-    this.router.navigateByUrl(
-      '/app/inventory/extra-charges'
-    );
+    this.router.navigateByUrl('/app/inventory/extra-charges');
   }
-
 
   openAdminPanel(): void {
-
-    this.router.navigateByUrl(
-      '/app/inventory/admin-panel'
-    );
+    this.router.navigateByUrl('/app/inventory/admin-panel');
   }
 
-
   openTermsConditions(): void {
-
-    this.router.navigateByUrl(
-      '/app/inventory/terms-conditions'
-    );
+    this.router.navigateByUrl('/app/inventory/terms-conditions');
   }
 
   openTax(): void {
-
-    this.router.navigateByUrl(
-      '/app/inventory/tax'
-    );
+    this.router.navigateByUrl('/app/inventory/tax');
   }
 
+  openCustomFeatures(): void {
+    this.router.navigateByUrl('/app/inventory/custom-features');
+  }
 }

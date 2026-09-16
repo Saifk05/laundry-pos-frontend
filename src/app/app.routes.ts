@@ -112,6 +112,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'inventory/custom-features',
+        loadComponent: () =>
+          import('./pages/inventory/custom-features/custom-features.page')
+            .then((m) => m.CustomFeaturesPage),
+      },
+
+      {
         path: 'bill',
         loadComponent: () =>
           import('./pages/bill/bill.page')
