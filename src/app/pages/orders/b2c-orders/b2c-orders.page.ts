@@ -232,38 +232,27 @@ export class B2cOrdersPage implements OnInit {
   ) {}
 
 ngOnInit(): void {
+  this.loadBusinessSettings();
   this.loadOrders();
-  this.loadCustomFeatures();
 }
 
-// loadBusinessSettings(): void {
-//   this.apiService.getBusinessSettings().subscribe({
-//     next: (res: any) => {
-//       this.businessName = res?.businessName || 'Venkateshwara Fabric Works';
-//     },
-//     error: err => console.error('Business settings error:', err)
-//   });
-// }
-
-loadCustomFeatures(): void {
-  this.apiService.getCustomFeatures().subscribe({
-    next: (res: any) => {
-      this.secureRetagEnabled = res?.secureRetagEnabled ?? false;
-      this.retagPinConfigured = res?.retagPinConfigured ?? false;
-      this.retagWhatsappEnabled = res?.retagWhatsappEnabled ?? false;
-
-      console.log('CUSTOM FEATURES:', res);
-      console.log('SECURE RETAG:', this.secureRetagEnabled);
-      console.log('PIN CONFIGURED:', this.retagPinConfigured);
+private loadBusinessSettings(): void {
+  this.apiService.getBusinessSettings().subscribe({
+    next: (response: any) => {
+      this.businessName = response?.businessName || 'Venkateshwara Fabric Works';
+      this.secureRetagEnabled = Boolean(response?.customFeatures?.secureRetagEnabled);
+      this.retagPinConfigured = Boolean(response?.customFeatures?.retagPinConfigured);
+      this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
     },
-    error: err => {
-      console.error('Custom features load error:', err);
+    error: (error: any) => {
+      console.error('Unable to load business settings:', error);
       this.secureRetagEnabled = false;
       this.retagPinConfigured = false;
       this.retagWhatsappEnabled = false;
     }
   });
 }
+
 
   loadOrders(cursor: string | null = null): void {
     this.loading = true;
@@ -922,12 +911,18 @@ Thank you,
   }
 
   retagOrder(order: B2cOrderView): void {
-  this.closeAllMoreMenus();
-  this.selectedRetagOrder = order;
-  this.retagPin = '';
-  this.retagPinError = '';
-  this.retagPinModalOpen = true;
-}
+    this.closeAllMoreMenus();
+    this.errorMessage = '';
+    if (!this.secureRetagEnabled) { this.openRetag(order); return; }
+    if (!this.retagPinConfigured) {
+      this.errorMessage = 'Secure Retag is enabled, but Retag PIN is not configured.';
+      return;
+    }
+    this.selectedRetagOrder = order;
+    this.retagPin = '';
+    this.retagPinError = '';
+    this.retagPinModalOpen = true;
+  }
 
   closeRetagPinModal(): void {
     if (this.retagPinLoading) return;
@@ -951,20 +946,13 @@ Thank you,
       this.retagPinError = 'Enter your 6-digit Retag PIN.';
       return;
     }
-
     this.retagPinLoading = true;
     this.retagPinError = '';
-
     this.apiService.verifyRetagPin({ pin: this.retagPin }).subscribe({
       next: (response: any) => {
         this.retagPinLoading = false;
         const verified = response === true || response?.verified === true || response?.valid === true;
-        if (!verified) {
-          this.retagPinError = 'Incorrect Retag PIN.';
-          this.retagPin = '';
-          return;
-        }
-
+        if (!verified) { this.retagPinError = 'Incorrect Retag PIN.'; this.retagPin = ''; return; }
         const order = this.selectedRetagOrder;
         this.retagPinModalOpen = false;
         this.selectedRetagOrder = null;
@@ -975,18 +963,15 @@ Thank you,
       error: (error: any) => {
         this.retagPinLoading = false;
         this.retagPin = '';
-        this.retagPinError =
-          error?.status === 400 || error?.status === 401 || error?.status === 403
-            ? 'Incorrect Retag PIN.'
-            : error?.error?.message || error?.error?.error || 'Unable to verify Retag PIN.';
+        this.retagPinError = error?.status === 400 || error?.status === 401 || error?.status === 403
+          ? 'Incorrect Retag PIN.'
+          : error?.error?.message || error?.error?.error || 'Unable to verify Retag PIN.';
       }
     });
   }
 
   private openRetag(order: B2cOrderView): void {
-    this.router.navigate(['/app/new-walk-in'], {
-      queryParams: { mode: 'retag', orderId: order.id }
-    });
+    this.router.navigate(['/app/new-walk-in'], { queryParams: { mode: 'retag', orderId: order.id } });
   }
 
   callCustomer(order: B2cOrderView): void {
@@ -1343,22 +1328,18 @@ private printReceipt(order: B2COrderDetails): void {
           Number(order.taxAmount ?? 0) > 0
             ? `
               <div class="divider"></div>
-
               <div class="row tax-row">
                 <span>
                   CGST (${Number(order.cgstPercentage ?? 0).toFixed(2)}%)
                 </span>
-
                 <strong>
                   ₹${Number(order.cgstAmount ?? 0).toFixed(2)}
                 </strong>
               </div>
-
               <div class="row tax-row">
                 <span>
                   SGST (${Number(order.sgstPercentage ?? 0).toFixed(2)}%)
                 </span>
-
                 <strong>
                   ₹${Number(order.sgstAmount ?? 0).toFixed(2)}
                 </strong>
@@ -1503,9 +1484,7 @@ private printQrTags(order: B2COrderDetails ): void {
     };
 
     if ( serviceCodeMap[ normalized]) {
-      return serviceCodeMap[
-        normalized
-      ];
+      return serviceCodeMap[ normalized ];
     }
 
     return serviceName
@@ -1514,69 +1493,35 @@ private printQrTags(order: B2COrderDetails ): void {
         word =>
           word.trim()
       )
-      .map(
-        word =>
-          word
+      .map( word => word
             .charAt(0)
             .toUpperCase()
-      )
-      .join('');
+      ) .join('');
   };
 
   let tagsHtml = '';
 
-  for (
-    const item
-    of groupedOrderItems
-  ) {
-
-    const typeName =
-      item.typeName &&
-      item.typeName
-        .toLowerCase() !==
-        'default'
+  for ( const item of groupedOrderItems ) {
+    const typeName = item.typeName && item.typeName
+        .toLowerCase() !== 'default'
         ? item.typeName
         : '';
 
-    const productDisplay =
-      typeName
+    const productDisplay = typeName
         ? `${item.productName} (${typeName})`
         : item.productName;
 
-    const serviceCode =
-      item.serviceNames
-        .map(
-          serviceName =>
-            getServiceCode(
-              serviceName
-            )
-        )
-        .join(
-          '<span class="service-divider">|</span>'
-        );
+    const serviceCode = item.serviceNames
+        .map( serviceName => getServiceCode( serviceName ))
+        .join('<span class="service-divider">|</span>');
 
-    const tagCount =
-      item.unit === 'KG'
-        ? Math.max(
-            1,
-            Number(
-              item.garmentCount ?? 1
-            )
-          )
-        : Math.max(
-            1,
-            Math.floor(
-              Number(
-                item.quantity ?? 1
-              )
-            )
-          );
+    const tagCount = item.unit === 'KG'
+        ? Math.max( 1, Number( item.garmentCount ?? 1 ))
+        : Math.max( 1, Math.floor( Number( item.quantity ?? 1 )));
 
-    const isShoes =
-      item.productName
+    const isShoes = item.productName
         .trim()
-        .toLowerCase() ===
-      'shoes';
+        .toLowerCase() === 'shoes';
 
     if (isShoes) {
 
@@ -1922,14 +1867,9 @@ private printQrTags(order: B2COrderDetails ): void {
   printWindow.document.close();
   printWindow.focus();
 }
-
-
   private updateLocalOrder(response: B2COrder): void {
     this.orders = this.orders.map((order: B2cOrderView) => {
-      if (order.id !== response.id) {
-        return order;
-      }
-
+      if (order.id !== response.id) { return order; }
       return {
         ...order,
         orderNumber: response.orderNumber,
