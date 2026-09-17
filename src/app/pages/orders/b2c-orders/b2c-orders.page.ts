@@ -214,7 +214,7 @@ export class B2cOrdersPage implements OnInit {
   callModalOpen = false;
   selectedCallOrder: B2cOrderView | null = null;
   numberCopied = false;
-  businessName = 'Venkateshwara Fabric Works';
+  businessName = 'Fabric Works';
   secureRetagEnabled = false;
   retagPinConfigured = false;
   retagWhatsappEnabled = false;
@@ -239,7 +239,7 @@ ngOnInit(): void {
 private loadBusinessSettings(): void {
   this.apiService.getBusinessSettings().subscribe({
     next: (response: any) => {
-      this.businessName = response?.businessName || 'Venkateshwara Fabric Works';
+      this.businessName = response?.businessName || 'Fabric Works';
       this.secureRetagEnabled = Boolean(response?.customFeatures?.secureRetagEnabled);
       this.retagPinConfigured = Boolean(response?.customFeatures?.retagPinConfigured);
       this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
