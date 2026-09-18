@@ -8,11 +8,20 @@
       </div>
 
       <div class="view-toggle">
-        <button type="button" [class.active]="activeTab === 'MAP'" (click)="setActiveTab('MAP')">
-          <span class="tab-icon">⌖</span> Map
+        <button
+          type="button"
+          [class.active]="activeTab === 'MAP'"
+          (click)="setActiveTab('MAP')">
+          <span class="tab-icon">⌖</span>
+          Map
         </button>
-        <button type="button" [class.active]="activeTab === 'ORDERS'" (click)="setActiveTab('ORDERS')">
-          <span class="tab-icon">▤</span> Orders
+
+        <button
+          type="button"
+          [class.active]="activeTab === 'ORDERS'"
+          (click)="setActiveTab('ORDERS')">
+          <span class="tab-icon">▤</span>
+          Orders
         </button>
       </div>
     </div>
@@ -21,8 +30,10 @@
 
       <div class="filter-group search-group">
         <label>Search</label>
+
         <div class="search-field">
           <span class="field-icon">⌕</span>
+
           <input
             type="text"
             [(ngModel)]="searchText"
@@ -31,82 +42,120 @@
         </div>
       </div>
 
-      <!-- <div class="filter-group date-group">
-        <label>Date Range</label>
+      <div class="filter-group date-group">
+        <label>Date</label>
 
-        <mat-form-field appearance="outline" class="date-range-filter">
-          <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
-            <input
-              matStartDate
-              formControlName="start"
-              placeholder="From">
+        <mat-form-field
+          appearance="outline"
+          class="date-filter">
 
-            <input
-              matEndDate
-              formControlName="end"
-              placeholder="To"
-              (dateChange)="applyFilters()">
-          </mat-date-range-input>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            [formControl]="selectedDate"
+            (dateChange)="applyFilters()"
+            placeholder="DD/MM/YYYY">
 
-          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker></mat-date-range-picker>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker">
+          </mat-datepicker-toggle>
+
+          <mat-datepicker #picker>
+          </mat-datepicker>
+
         </mat-form-field>
-      </div> -->
-      
-      
-<div class="filter-group date-group">
-  <label>Date</label>
+      </div>
 
-  <mat-form-field appearance="outline" class="date-filter">
-    <input
-      matInput
-      [matDatepicker]="picker"
-      [formControl]="selectedDate"
-      (dateChange)="applyFilters()"
-      placeholder="DD/MM/YYYY">
-
-    <mat-datepicker-toggle
-      matIconSuffix
-      [for]="picker">
-    </mat-datepicker-toggle>
-
-    <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field>
-</div>
       <div class="filter-group">
         <label>Type</label>
-        <select [(ngModel)]="selectedType" (change)="changeType()">
-          <option value="ALL">All Types</option>
-          <option value="PICKUP">Pickup</option>
-          <option value="DELIVERY">Delivery</option>
+
+        <select
+          [(ngModel)]="selectedType"
+          (change)="changeType()">
+
+          <option value="ALL">
+            All Types
+          </option>
+
+          <option value="PICKUP">
+            Pickup
+          </option>
+
+          <option value="DELIVERY">
+            Delivery
+          </option>
+
         </select>
       </div>
 
       <div class="filter-group">
         <label>Time Slot</label>
-        <select [(ngModel)]="selectedTimeSlot" (change)="applyFilters()">
-          <option value="">All Time Slots</option>
+
+        <select
+          [(ngModel)]="selectedTimeSlot"
+          (change)="applyFilters()">
+
+          <option value="">
+            All Time Slots
+          </option>
+
           @for (slot of timeSlots; track slot) {
-            <option [value]="slot">{{ slot }}</option>
+            <option [value]="slot">
+              {{ slot }}
+            </option>
           }
+
         </select>
       </div>
 
       <div class="filter-group">
         <label>Status</label>
-        <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
-          <option value="">All Status</option>
-          <option value="PENDING">Pending</option>
-          <option value="PICKED_UP">Picked Up</option>
-          <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-          <option value="DELIVERED">Delivered</option>
-          <option value="COMPLETED">Completed</option>
+
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()">
+
+          <option value="">
+            All Status
+          </option>
+
+          <option value="PENDING">
+            Pending
+          </option>
+
+          <option value="PICKED_UP">
+            Picked Up
+          </option>
+
+          <option value="OUT_FOR_DELIVERY">
+            Out for Delivery
+          </option>
+
+          <option value="DELIVERED">
+            Delivered
+          </option>
+
+          <option value="COMPLETED">
+            Completed
+          </option>
+
+          <option value="CANCELLED">
+            Cancelled
+          </option>
+
         </select>
       </div>
 
       <div class="filter-group clear-group">
         <label>&nbsp;</label>
-        <button type="button" class="clear-filter-btn" (click)="clearFilters()">Clear</button>
+
+        <button
+          type="button"
+          class="clear-filter-btn"
+          (click)="clearFilters()">
+          Clear
+        </button>
       </div>
 
     </div>
@@ -115,6 +164,7 @@
 
       <div class="summary-item">
         <span class="summary-marker pickup"></span>
+
         <div>
           <strong>{{ pickupCount }}</strong>
           <span>Pickups</span>
@@ -123,6 +173,7 @@
 
       <div class="summary-item">
         <span class="summary-marker delivery"></span>
+
         <div>
           <strong>{{ deliveryCount }}</strong>
           <span>Deliveries</span>
@@ -131,6 +182,7 @@
 
       <div class="summary-item">
         <span class="summary-marker mapped"></span>
+
         <div>
           <strong>{{ mappedCount }}</strong>
           <span>Mapped Locations</span>
@@ -139,6 +191,7 @@
 
       <div class="summary-item">
         <span class="summary-marker total"></span>
+
         <div>
           <strong>{{ filteredPickups.length }}</strong>
           <span>Total</span>
@@ -147,63 +200,111 @@
 
     </div>
 
-    <div class="map-tab-wrapper" [class.tab-hidden]="activeTab !== 'MAP'">
+    <div
+      class="map-tab-wrapper"
+      [class.tab-hidden]="activeTab !== 'MAP'">
 
       <div class="map-card">
 
         <div class="map-header">
+
           <div class="map-title">
             <strong>Customer Locations</strong>
-            <span>{{ mappedCount }} locations on map</span>
+            <span>
+              {{ mappedCount }} locations on map
+            </span>
           </div>
 
           <div class="map-header-actions">
+
             <div class="map-legend">
-              <span><i class="legend-dot pickup"></i>Pickup</span>
-              <span><i class="legend-dot delivery"></i>Delivery</span>
+              <span>
+                <i class="legend-dot pickup"></i>
+                Pickup
+              </span>
+
+              <span>
+                <i class="legend-dot delivery"></i>
+                Delivery
+              </span>
             </div>
 
-            <button type="button" class="fit-map-btn" (click)="resetMapView()">
+            <button
+              type="button"
+              class="fit-map-btn"
+              (click)="resetMapView()">
               View All
             </button>
+
           </div>
+
         </div>
 
         <div class="map-container">
 
-          <div id="pickupOlaMap" class="ola-map"></div>
+          <div
+            id="pickupOlaMap"
+            class="ola-map">
+          </div>
 
           @if (mapLoading) {
             <div class="map-loading">
               <div class="map-spinner"></div>
-              <strong>Loading map</strong>
-              <span>Preparing customer locations...</span>
+
+              <strong>
+                Loading map
+              </strong>
+
+              <span>
+                Preparing customer locations...
+              </span>
             </div>
           }
 
           @if (mapError) {
             <div class="map-error-state">
-              <span class="error-icon">!</span>
-              <strong>Map unavailable</strong>
-              <p>{{ mapError }}</p>
+              <span class="error-icon">
+                !
+              </span>
+
+              <strong>
+                Map unavailable
+              </strong>
+
+              <p>
+                {{ mapError }}
+              </p>
             </div>
           }
 
           @if (!mapLoading && !mapError && mappedCount === 0) {
             <div class="no-map-records">
-              <span class="empty-location-icon">📍</span>
-              <strong>No mapped customers</strong>
-              <p>Customer locations with coordinates will appear here.</p>
+              <span class="empty-location-icon">
+                📍
+              </span>
+
+              <strong>
+                No mapped customers
+              </strong>
+
+              <p>
+                Customer locations with coordinates will appear here.
+              </p>
             </div>
           }
 
         </div>
 
         <div class="map-footer">
-          <span class="map-help">Hover a pin to view customer details</span>
+
+          <span class="map-help">
+            Hover a pin to view customer details
+          </span>
 
           @if (selectedPickup) {
+
             <div class="selected-map-customer">
+
               <span
                 class="selected-dot"
                 [class.pickup]="selectedPickup.type === 'PICKUP'"
@@ -211,11 +312,18 @@
               </span>
 
               <div>
-                <strong>{{ selectedPickup.customerName }}</strong>
-                <span>{{ selectedPickup.type }} · {{ selectedPickup.timeSlot }}</span>
+                <strong>
+                  {{ selectedPickup.customerName }}
+                </strong>
+
+                <span>
+                  {{ selectedPickup.type }} · {{ selectedPickup.timeSlot }}
+                </span>
               </div>
+
             </div>
           }
+
         </div>
 
       </div>
@@ -227,14 +335,20 @@
 
         <div class="orders-header">
           <div>
-            <h2>Pickup / Delivery Orders</h2>
-            <p>{{ filteredPickups.length }} records on this page</p>
+            <h2>
+              Pickup / Delivery Orders
+            </h2>
+
+            <p>
+              {{ filteredPickups.length }} records on this page
+            </p>
           </div>
         </div>
 
         <div class="table-scroll">
 
           <table>
+
             <thead>
               <tr>
                 <th>#</th>
@@ -250,17 +364,28 @@
 
             <tbody>
 
-              @for (pickup of filteredPickups; track pickup.id; let i = $index) {
+              @for (
+                pickup of filteredPickups;
+                track pickup.id;
+                let i = $index
+              ) {
 
                 <tr>
-                  <td>{{ ((currentPage - 1) * pageSize) + i + 1 }}</td>
 
                   <td>
-                    <strong class="customer-name">{{ pickup.customerName }}</strong>
+                    {{ ((currentPage - 1) * pageSize) + i + 1 }}
                   </td>
 
                   <td>
-                    <span class="phone-number">{{ pickup.phoneNumber }}</span>
+                    <strong class="customer-name">
+                      {{ pickup.customerName }}
+                    </strong>
+                  </td>
+
+                  <td>
+                    <span class="phone-number">
+                      {{ pickup.phoneNumber }}
+                    </span>
                   </td>
 
                   <td>
@@ -268,21 +393,31 @@
                       class="type-badge"
                       [class.pickup-type]="pickup.type === 'PICKUP'"
                       [class.delivery-type]="pickup.type === 'DELIVERY'">
+
                       {{ pickup.type }}
+
                     </span>
                   </td>
 
                   <td>
-                    <strong class="schedule-date">{{ pickup.scheduledDate }}</strong>
+                    <strong class="schedule-date">
+                      {{ pickup.scheduledDate }}
+                    </strong>
                   </td>
 
                   <td>
-                    <span class="time-slot">{{ pickup.timeSlot }}</span>
+                    <span class="time-slot">
+                      {{ pickup.timeSlot }}
+                    </span>
                   </td>
 
                   <td>
-                    <span class="status-badge" [ngClass]="getStatusClass(pickup.status)">
+                    <span
+                      class="status-badge"
+                      [ngClass]="getStatusClass(pickup.status)">
+
                       {{ getStatusLabel(pickup.status) }}
+
                     </span>
                   </td>
 
@@ -308,18 +443,33 @@
 
                     } @else {
 
-                      <span class="status-badge completed">Completed</span>
+                      <span
+                        class="status-badge"
+                        [ngClass]="getStatusClass(pickup.status)">
+
+                        {{ getStatusLabel(pickup.status) }}
+
+                      </span>
 
                     }
 
-                    @if (statusMenuPickup?.id === pickup.id && getNextStatus(pickup)) {
+                    @if (
+                      statusMenuPickup?.id === pickup.id &&
+                      getNextStatus(pickup)
+                    ) {
 
                       <div class="status-menu">
 
                         <div class="status-menu-header">
+
                           <div>
-                            <strong>Update Status</strong>
-                            <span>{{ pickup.customerName }}</span>
+                            <strong>
+                              Update Status
+                            </strong>
+
+                            <span>
+                              {{ pickup.customerName }}
+                            </span>
                           </div>
 
                           <button
@@ -328,9 +478,12 @@
                             (click)="closeStatusMenu()">
                             ×
                           </button>
+
                         </div>
 
-                        <button type="button" (click)="advanceStatus(pickup)">
+                        <button
+                          type="button"
+                          (click)="advanceStatus(pickup)">
 
                           <span
                             class="status-option-dot"
@@ -338,56 +491,124 @@
                           </span>
 
                           <div>
-                            <strong>{{ getNextStatusLabel(pickup) }}</strong>
 
-                            @if (pickup.type === 'PICKUP' && getNextStatus(pickup) === 'PICKED_UP') {
-                              <span>Laundry collected from customer</span>
+                            <strong>
+                              {{ getNextStatusLabel(pickup) }}
+                            </strong>
+
+                            @if (
+                              pickup.type === 'PICKUP' &&
+                              getNextStatus(pickup) === 'PICKED_UP'
+                            ) {
+                              <span>
+                                Laundry collected from customer
+                              </span>
                             }
 
-                            @if (pickup.type === 'PICKUP' && getNextStatus(pickup) === 'COMPLETED') {
-                              <span>Laundry reached the store</span>
+                            @if (
+                              pickup.type === 'PICKUP' &&
+                              getNextStatus(pickup) === 'COMPLETED'
+                            ) {
+                              <span>
+                                Laundry reached the store
+                              </span>
                             }
 
-                            @if (pickup.type === 'DELIVERY' && getNextStatus(pickup) === 'OUT_FOR_DELIVERY') {
-                              <span>Laundry left the store</span>
+                            @if (
+                              pickup.type === 'DELIVERY' &&
+                              getNextStatus(pickup) === 'OUT_FOR_DELIVERY'
+                            ) {
+                              <span>
+                                Laundry left the store
+                              </span>
                             }
 
-                            @if (pickup.type === 'DELIVERY' && getNextStatus(pickup) === 'DELIVERED') {
-                              <span>Laundry reached the customer</span>
+                            @if (
+                              pickup.type === 'DELIVERY' &&
+                              getNextStatus(pickup) === 'DELIVERED'
+                            ) {
+                              <span>
+                                Laundry reached the customer
+                              </span>
                             }
 
-                            @if (pickup.type === 'DELIVERY' && getNextStatus(pickup) === 'COMPLETED') {
-                              <span>Complete delivery service</span>
+                            @if (
+                              pickup.type === 'DELIVERY' &&
+                              getNextStatus(pickup) === 'COMPLETED'
+                            ) {
+                              <span>
+                                Complete delivery service
+                              </span>
                             }
+
                           </div>
 
                         </button>
+
+                        @if (canCancelPickup(pickup)) {
+
+                          <button
+                            type="button"
+                            class="cancel-status-option"
+                            (click)="cancelPickup(pickup)">
+
+                            <span
+                              class="status-option-dot cancelled">
+                            </span>
+
+                            <div>
+                              <strong>
+                                Cancel Pickup
+                              </strong>
+
+                              <span>
+                                Cancel this scheduled pickup
+                              </span>
+                            </div>
+
+                          </button>
+
+                        }
 
                       </div>
                     }
 
                   </td>
+
                 </tr>
 
               }
 
               @if (!filteredPickups.length && !loading) {
+
                 <tr>
-                  <td colspan="8" class="empty">
-                    <strong>No records found</strong>
+                  <td
+                    colspan="8"
+                    class="empty">
+
+                    <strong>
+                      No records found
+                    </strong>
+
                   </td>
                 </tr>
+
               }
 
               @if (loading) {
+
                 <tr>
-                  <td colspan="8" class="empty">
+                  <td
+                    colspan="8"
+                    class="empty">
                     Loading...
                   </td>
                 </tr>
+
               }
 
             </tbody>
+
           </table>
 
         </div>
@@ -395,17 +616,37 @@
         <div class="table-pagination">
 
           <div class="rows-per-page">
-            <label>Rows per page</label>
+
+            <label>
+              Rows per page
+            </label>
 
             <select
               [(ngModel)]="pageSize"
               (change)="changePageSize()">
-              <option [ngValue]="5">5</option>
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="25">25</option>
-              <option [ngValue]="50">50</option>
-              <option [ngValue]="100">100</option>
+
+              <option [ngValue]="5">
+                5
+              </option>
+
+              <option [ngValue]="10">
+                10
+              </option>
+
+              <option [ngValue]="25">
+                25
+              </option>
+
+              <option [ngValue]="50">
+                50
+              </option>
+
+              <option [ngValue]="100">
+                100
+              </option>
+
             </select>
+
           </div>
 
           <div class="pagination-actions">

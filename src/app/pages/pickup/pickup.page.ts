@@ -16,7 +16,10 @@ import {
 } from '@angular/material/core';
 import { OlaMaps } from 'olamaps-web-sdk';
 import { ApiService } from 'src/core/services/api.service';
-import { PickupDelivery, PickupDeliveryStatus } from 'src/core/models/pickup-delivery.model';
+import {
+  PickupDelivery,
+  PickupDeliveryStatus
+} from 'src/core/models/pickup-delivery.model';
 import { environment } from 'src/environments/environment';
 
 type PickupViewTab = 'MAP' | 'ORDERS';
@@ -26,7 +29,6 @@ interface MapCluster {
   latitude: number;
   longitude: number;
 }
-
 
 class DdMmYyyyDateAdapter extends NativeDateAdapter {
   override format(date: Date): string {
@@ -143,7 +145,10 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     '06:00 PM - 07:00 PM'
   ];
 
-  private readonly olaMaps = new OlaMaps({ apiKey: environment.olaMapsApiKey });
+  private readonly olaMaps = new OlaMaps({
+    apiKey: environment.olaMapsApiKey
+  });
+
   private map: any = null;
   private mapReady = false;
   private markers: any[] = [];
@@ -158,26 +163,37 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.selectedDate.setValue(new Date(), { emitEvent: false });
+    this.selectedDate.setValue(new Date(), {
+      emitEvent: false
+    });
+
     this.loadPickupDeliveries();
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if (this.activeTab === 'MAP') this.initializeMap();
+      if (this.activeTab === 'MAP') {
+        this.initializeMap();
+      }
     }, 200);
   }
 
   ngOnDestroy(): void {
-    if (this.renderTimer) clearTimeout(this.renderTimer);
+    if (this.renderTimer) {
+      clearTimeout(this.renderTimer);
+    }
+
     this.clearMarkers();
+
     this.map?.remove?.();
+
     this.map = null;
     this.mapReady = false;
   }
 
   setActiveTab(tab: PickupViewTab): void {
     if (this.activeTab === tab) return;
+
     this.activeTab = tab;
     this.statusMenuPickup = null;
 
@@ -216,7 +232,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       this.mapError = '';
 
       this.map = await this.olaMaps.init({
-        style: 'https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json',
+        style:
+          'https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json',
         container: 'pickupOlaMap',
         center: [77.5946, 12.9716],
         zoom: 11
@@ -226,7 +243,10 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       this.mapLoading = false;
 
       try {
-        this.map.addControl?.(this.olaMaps.addNavigationControls(), 'top-right');
+        this.map.addControl?.(
+          this.olaMaps.addNavigationControls(),
+          'top-right'
+        );
       } catch {}
 
       this.registerMapEvents();
@@ -248,18 +268,31 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     this.zoomListenerRegistered = true;
 
     this.map.on?.('zoomend', () => {
-      if (this.renderTimer) clearTimeout(this.renderTimer);
-      this.renderTimer = setTimeout(() => this.renderMarkers(), 50);
+      if (this.renderTimer) {
+        clearTimeout(this.renderTimer);
+      }
+
+      this.renderTimer = setTimeout(
+        () => this.renderMarkers(),
+        50
+      );
     });
   }
 
-  loadPickupDeliveries(cursor: string | null = null, page = 1): void {
+  loadPickupDeliveries(
+    cursor: string | null = null,
+    page = 1
+  ): void {
     if (this.loading) return;
 
     this.loading = true;
 
     this.apiService
-      .getPickupDeliveries(this.selectedType, cursor, this.pageSize)
+      .getPickupDeliveries(
+        this.selectedType,
+        cursor,
+        this.pageSize
+      )
       .subscribe({
         next: response => {
           this.pickups = response.items ?? [];
@@ -268,6 +301,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
           this.currentPage = page;
 
           this.applyFilters(false);
+
           this.loading = false;
 
           if (this.activeTab === 'MAP') {
@@ -278,33 +312,60 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
           }
         },
         error: error => {
-          console.error('Unable to load pickup/delivery records:', error);
+          console.error(
+            'Unable to load pickup/delivery records:',
+            error
+          );
+
           this.pickups = [];
           this.filteredPickups = [];
           this.selectedPickup = null;
           this.nextCursor = null;
           this.hasMore = false;
           this.loading = false;
+
           this.renderMarkers();
         }
       });
   }
 
   nextPage(): void {
-    if (this.loading || !this.hasMore || !this.nextCursor) return;
+    if (
+      this.loading ||
+      !this.hasMore ||
+      !this.nextCursor
+    ) {
+      return;
+    }
 
     const page = this.currentPage + 1;
-    this.cursorHistory[page - 1] = this.nextCursor;
-    this.loadPickupDeliveries(this.nextCursor, page);
+
+    this.cursorHistory[page - 1] =
+      this.nextCursor;
+
+    this.loadPickupDeliveries(
+      this.nextCursor,
+      page
+    );
   }
 
   previousPage(): void {
-    if (this.loading || this.currentPage <= 1) return;
+    if (
+      this.loading ||
+      this.currentPage <= 1
+    ) {
+      return;
+    }
 
     const page = this.currentPage - 1;
-    const cursor = this.cursorHistory[page - 1] ?? null;
 
-    this.loadPickupDeliveries(cursor, page);
+    const cursor =
+      this.cursorHistory[page - 1] ?? null;
+
+    this.loadPickupDeliveries(
+      cursor,
+      page
+    );
   }
 
   changePageSize(): void {
@@ -320,55 +381,104 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilters(refreshMap = true): void {
-    const search = this.searchText.trim().toLowerCase();
-    const selectedDate = this.selectedDate.value;
+    const search =
+      this.searchText.trim().toLowerCase();
 
-    this.filteredPickups = this.pickups.filter(pickup => {
-      const matchesSearch =
-        !search ||
-        pickup.customerName.toLowerCase().includes(search) ||
-        pickup.phoneNumber.includes(search) ||
-        pickup.address.toLowerCase().includes(search);
+    const selectedDate =
+      this.selectedDate.value;
 
-      const pickupDate = this.parseLocalDate(pickup.scheduledDate);
+    this.filteredPickups =
+      this.pickups.filter(pickup => {
+        const matchesSearch =
+          !search ||
+          pickup.customerName
+            .toLowerCase()
+            .includes(search) ||
+          pickup.phoneNumber.includes(search) ||
+          pickup.address
+            .toLowerCase()
+            .includes(search);
 
-      const matchesDate =
-        !selectedDate ||
-        (
-          pickupDate.getFullYear() === selectedDate.getFullYear() &&
-          pickupDate.getMonth() === selectedDate.getMonth() &&
-          pickupDate.getDate() === selectedDate.getDate()
+        const pickupDate =
+          this.parseLocalDate(
+            pickup.scheduledDate
+          );
+
+        const matchesDate =
+          !selectedDate ||
+          (
+            pickupDate.getFullYear() ===
+              selectedDate.getFullYear() &&
+            pickupDate.getMonth() ===
+              selectedDate.getMonth() &&
+            pickupDate.getDate() ===
+              selectedDate.getDate()
+          );
+
+        const matchesSlot =
+          !this.selectedTimeSlot ||
+          pickup.timeSlot ===
+            this.selectedTimeSlot;
+
+        const matchesStatus =
+          !this.selectedStatus ||
+          pickup.status ===
+            this.selectedStatus;
+
+        return (
+          matchesSearch &&
+          matchesDate &&
+          matchesSlot &&
+          matchesStatus
         );
-
-      const matchesSlot =
-        !this.selectedTimeSlot ||
-        pickup.timeSlot === this.selectedTimeSlot;
-
-      const matchesStatus =
-        !this.selectedStatus ||
-        pickup.status === this.selectedStatus;
-
-      return matchesSearch && matchesDate && matchesSlot && matchesStatus;
-    });
+      });
 
     if (
       this.selectedPickup &&
-      !this.filteredPickups.some(item => item.id === this.selectedPickup?.id)
+      !this.filteredPickups.some(
+        item =>
+          item.id ===
+          this.selectedPickup?.id
+      )
     ) {
       this.selectedPickup = null;
     }
 
-    if (refreshMap && this.activeTab === 'MAP') this.renderMarkers();
+    if (
+      refreshMap &&
+      this.activeTab === 'MAP'
+    ) {
+      this.renderMarkers();
+    }
   }
 
-  private parseLocalDate(value: string): Date {
-    const [year, month, day] = value.split('-').map(Number);
-    return new Date(year, month - 1, day, 0, 0, 0, 0);
+  private parseLocalDate(
+    value: string
+  ): Date {
+    const [year, month, day] =
+      value.split('-').map(Number);
+
+    return new Date(
+      year,
+      month - 1,
+      day,
+      0,
+      0,
+      0,
+      0
+    );
   }
 
   clearFilters(): void {
     this.searchText = '';
-    this.selectedDate.setValue(new Date(), { emitEvent: false });
+
+    this.selectedDate.setValue(
+      new Date(),
+      {
+        emitEvent: false
+      }
+    );
+
     this.selectedTimeSlot = '';
     this.selectedStatus = '';
     this.selectedType = 'ALL';
@@ -376,7 +486,11 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     this.selectedPickup = null;
 
     this.resetPagination();
-    this.loadPickupDeliveries(null, 1);
+
+    this.loadPickupDeliveries(
+      null,
+      1
+    );
   }
 
   changeType(): void {
@@ -385,157 +499,351 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     this.selectedPickup = null;
 
     this.resetPagination();
-    this.loadPickupDeliveries(null, 1);
+
+    this.loadPickupDeliveries(
+      null,
+      1
+    );
   }
 
-  openStatusMenu(pickup: PickupDelivery): void {
+  openStatusMenu(
+    pickup: PickupDelivery
+  ): void {
     this.statusMenuPickup =
-      this.statusMenuPickup?.id === pickup.id ? null : pickup;
+      this.statusMenuPickup?.id === pickup.id
+        ? null
+        : pickup;
   }
 
   closeStatusMenu(): void {
     this.statusMenuPickup = null;
   }
 
-  selectStatus(pickup: PickupDelivery, status: PickupDeliveryStatus): void {
+  selectStatus(
+    pickup: PickupDelivery,
+    status: PickupDeliveryStatus
+  ): void {
     this.statusMenuPickup = null;
-    this.updateStatus(pickup, status);
+
+    this.updateStatus(
+      pickup,
+      status
+    );
   }
 
-  getStatusLabel(status: PickupDeliveryStatus): string {
-    const labels: Record<PickupDeliveryStatus, string> = {
-      PENDING: 'Pending',
-      PICKED_UP: 'Picked Up',
-      OUT_FOR_DELIVERY: 'Out for Delivery',
-      DELIVERED: 'Delivered',
-      COMPLETED: 'Completed'
-    };
+  getStatusLabel(
+    status: PickupDeliveryStatus
+  ): string {
+    const labels:
+      Record<
+        PickupDeliveryStatus,
+        string
+      > = {
+        PENDING: 'Pending',
+        PICKED_UP: 'Picked Up',
+        OUT_FOR_DELIVERY:
+          'Out for Delivery',
+        DELIVERED: 'Delivered',
+        COMPLETED: 'Completed',
+        CANCELLED: 'Cancelled'
+      };
 
     return labels[status];
   }
 
-  getStatusClass(status: PickupDeliveryStatus): string {
-    return status.toLowerCase().replace(/_/g, '-');
+  getStatusClass(
+    status: PickupDeliveryStatus
+  ): string {
+    return status
+      .toLowerCase()
+      .replace(/_/g, '-');
   }
 
-  getNextStatus(pickup: PickupDelivery): PickupDeliveryStatus | null {
+  getNextStatus(
+    pickup: PickupDelivery
+  ): PickupDeliveryStatus | null {
     if (pickup.type === 'PICKUP') {
-      if (pickup.status === 'PENDING') return 'PICKED_UP';
-      if (pickup.status === 'PICKED_UP') return 'COMPLETED';
+      if (
+        pickup.status === 'PENDING'
+      ) {
+        return 'PICKED_UP';
+      }
+
+      if (
+        pickup.status === 'PICKED_UP'
+      ) {
+        return 'COMPLETED';
+      }
+
       return null;
     }
 
-    if (pickup.status === 'PENDING') return 'OUT_FOR_DELIVERY';
-    if (pickup.status === 'OUT_FOR_DELIVERY') return 'DELIVERED';
-    if (pickup.status === 'DELIVERED') return 'COMPLETED';
+    if (
+      pickup.status === 'PENDING'
+    ) {
+      return 'OUT_FOR_DELIVERY';
+    }
+
+    if (
+      pickup.status ===
+      'OUT_FOR_DELIVERY'
+    ) {
+      return 'DELIVERED';
+    }
+
+    if (
+      pickup.status === 'DELIVERED'
+    ) {
+      return 'COMPLETED';
+    }
 
     return null;
   }
 
-  getNextStatusLabel(pickup: PickupDelivery): string {
-    const status = this.getNextStatus(pickup);
+  getNextStatusLabel(
+    pickup: PickupDelivery
+  ): string {
+    const status =
+      this.getNextStatus(pickup);
 
     if (!status) return '';
 
     if (pickup.type === 'PICKUP') {
-      if (status === 'PICKED_UP') return 'Mark Picked Up';
-      if (status === 'COMPLETED') return 'Mark Completed';
+      if (
+        status === 'PICKED_UP'
+      ) {
+        return 'Mark Picked Up';
+      }
+
+      if (
+        status === 'COMPLETED'
+      ) {
+        return 'Mark Completed';
+      }
     }
 
-    if (status === 'OUT_FOR_DELIVERY') return 'Mark Out for Delivery';
-    if (status === 'DELIVERED') return 'Mark Delivered';
-    if (status === 'COMPLETED') return 'Mark Completed';
+    if (
+      status === 'OUT_FOR_DELIVERY'
+    ) {
+      return 'Mark Out for Delivery';
+    }
+
+    if (
+      status === 'DELIVERED'
+    ) {
+      return 'Mark Delivered';
+    }
+
+    if (
+      status === 'COMPLETED'
+    ) {
+      return 'Mark Completed';
+    }
 
     return this.getStatusLabel(status);
   }
 
-  advanceStatus(pickup: PickupDelivery): void {
-    const status = this.getNextStatus(pickup);
-    if (status) this.updateStatus(pickup, status);
+  canCancelPickup(
+    pickup: PickupDelivery
+  ): boolean {
+    return (
+      pickup.type === 'PICKUP' &&
+      pickup.status === 'PENDING'
+    );
   }
 
-  canCreateOrder(pickup: PickupDelivery): boolean {
-    return pickup.type === 'PICKUP' && pickup.status === 'COMPLETED';
+  cancelPickup(
+    pickup: PickupDelivery
+  ): void {
+    if (
+      !this.canCancelPickup(pickup)
+    ) {
+      return;
+    }
+
+    this.selectStatus(
+      pickup,
+      'CANCELLED'
+    );
   }
 
-  createOrder(pickup: PickupDelivery): void {
-    if (!this.canCreateOrder(pickup)) return;
+  advanceStatus(
+    pickup: PickupDelivery
+  ): void {
+    const status =
+      this.getNextStatus(pickup);
 
-    this.router.navigate(['/app/new-walk-in'], {
-      queryParams: { pickupId: pickup.id }
-    });
+    if (status) {
+      this.updateStatus(
+        pickup,
+        status
+      );
+    }
+  }
+
+  canCreateOrder(
+    pickup: PickupDelivery
+  ): boolean {
+    return (
+      pickup.type === 'PICKUP' &&
+      pickup.status === 'COMPLETED'
+    );
+  }
+
+  createOrder(
+    pickup: PickupDelivery
+  ): void {
+    if (
+      !this.canCreateOrder(pickup)
+    ) {
+      return;
+    }
+
+    this.router.navigate(
+      ['/app/new-walk-in'],
+      {
+        queryParams: {
+          pickupId: pickup.id
+        }
+      }
+    );
   }
 
   private getMappedRecords(): PickupDelivery[] {
-    return this.filteredPickups.filter(pickup => {
-      if (pickup.latitude === null || pickup.longitude === null) return false;
+    return this.filteredPickups.filter(
+      pickup => {
+        if (
+          pickup.latitude === null ||
+          pickup.longitude === null
+        ) {
+          return false;
+        }
 
-      const lat = Number(pickup.latitude);
-      const lng = Number(pickup.longitude);
+        const lat =
+          Number(pickup.latitude);
 
-      return (
-        Number.isFinite(lat) &&
-        Number.isFinite(lng) &&
-        lat >= -90 &&
-        lat <= 90 &&
-        lng >= -180 &&
-        lng <= 180
-      );
-    });
+        const lng =
+          Number(pickup.longitude);
+
+        return (
+          Number.isFinite(lat) &&
+          Number.isFinite(lng) &&
+          lat >= -90 &&
+          lat <= 90 &&
+          lng >= -180 &&
+          lng <= 180
+        );
+      }
+    );
   }
 
   private renderMarkers(): void {
-    if (!this.mapReady || !this.map) return;
+    if (
+      !this.mapReady ||
+      !this.map
+    ) {
+      return;
+    }
 
     this.clearMarkers();
 
-    const records = this.getMappedRecords();
+    const records =
+      this.getMappedRecords();
+
     if (!records.length) return;
 
-    const zoom = Number(this.map.getZoom?.() ?? 11);
-    const clusters = this.createClusters(records, zoom);
+    const zoom =
+      Number(
+        this.map.getZoom?.() ?? 11
+      );
 
-    for (const cluster of clusters) {
-      if (cluster.pickups.length === 1) {
-        this.addCustomerMarker(cluster.pickups[0]);
+    const clusters =
+      this.createClusters(
+        records,
+        zoom
+      );
+
+    for (
+      const cluster of clusters
+    ) {
+      if (
+        cluster.pickups.length === 1
+      ) {
+        this.addCustomerMarker(
+          cluster.pickups[0]
+        );
       } else {
-        this.addClusterMarker(cluster);
+        this.addClusterMarker(
+          cluster
+        );
       }
     }
 
     this.updateMarkerSelection();
   }
 
-  private createClusters(records: PickupDelivery[], zoom: number): MapCluster[] {
+  private createClusters(
+    records: PickupDelivery[],
+    zoom: number
+  ): MapCluster[] {
     if (zoom >= 14) {
-      return records.map(pickup => ({
-        pickups: [pickup],
-        latitude: Number(pickup.latitude),
-        longitude: Number(pickup.longitude)
-      }));
+      return records.map(
+        pickup => ({
+          pickups: [pickup],
+          latitude:
+            Number(
+              pickup.latitude
+            ),
+          longitude:
+            Number(
+              pickup.longitude
+            )
+        })
+      );
     }
 
-    const clusters: MapCluster[] = [];
-    const threshold = this.getClusterThreshold(zoom);
+    const clusters:
+      MapCluster[] = [];
 
-    for (const pickup of records) {
-      const lat = Number(pickup.latitude);
-      const lng = Number(pickup.longitude);
+    const threshold =
+      this.getClusterThreshold(
+        zoom
+      );
 
-      let nearest: MapCluster | null = null;
-      let nearestDistance = Infinity;
+    for (
+      const pickup of records
+    ) {
+      const lat =
+        Number(pickup.latitude);
 
-      for (const cluster of clusters) {
-        const distance = this.distance(
-          lat,
-          lng,
-          cluster.latitude,
-          cluster.longitude
-        );
+      const lng =
+        Number(pickup.longitude);
 
-        if (distance <= threshold && distance < nearestDistance) {
+      let nearest:
+        MapCluster | null = null;
+
+      let nearestDistance =
+        Infinity;
+
+      for (
+        const cluster of clusters
+      ) {
+        const distance =
+          this.distance(
+            lat,
+            lng,
+            cluster.latitude,
+            cluster.longitude
+          );
+
+        if (
+          distance <= threshold &&
+          distance <
+            nearestDistance
+        ) {
           nearest = cluster;
-          nearestDistance = distance;
+          nearestDistance =
+            distance;
         }
       }
 
@@ -549,25 +857,39 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
         continue;
       }
 
-      nearest.pickups.push(pickup);
+      nearest.pickups.push(
+        pickup
+      );
 
       nearest.latitude =
         nearest.pickups.reduce(
-          (sum, item) => sum + Number(item.latitude),
+          (sum, item) =>
+            sum +
+            Number(
+              item.latitude
+            ),
           0
-        ) / nearest.pickups.length;
+        ) /
+        nearest.pickups.length;
 
       nearest.longitude =
         nearest.pickups.reduce(
-          (sum, item) => sum + Number(item.longitude),
+          (sum, item) =>
+            sum +
+            Number(
+              item.longitude
+            ),
           0
-        ) / nearest.pickups.length;
+        ) /
+        nearest.pickups.length;
     }
 
     return clusters;
   }
 
-  private getClusterThreshold(zoom: number): number {
+  private getClusterThreshold(
+    zoom: number
+  ): number {
     if (zoom <= 4) return 900;
     if (zoom <= 5) return 600;
     if (zoom <= 6) return 350;
@@ -589,156 +911,264 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     lng2: number
   ): number {
     const r = 6371;
-    const dLat = this.toRadians(lat2 - lat1);
-    const dLng = this.toRadians(lng2 - lng1);
+
+    const dLat =
+      this.toRadians(
+        lat2 - lat1
+      );
+
+    const dLng =
+      this.toRadians(
+        lng2 - lng1
+      );
 
     const a =
       Math.sin(dLat / 2) ** 2 +
-      Math.cos(this.toRadians(lat1)) *
-      Math.cos(this.toRadians(lat2)) *
-      Math.sin(dLng / 2) ** 2;
+      Math.cos(
+        this.toRadians(lat1)
+      ) *
+        Math.cos(
+          this.toRadians(lat2)
+        ) *
+        Math.sin(
+          dLng / 2
+        ) ** 2;
 
-    return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (
+      r *
+      2 *
+      Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1 - a)
+      )
+    );
   }
 
-  private toRadians(value: number): number {
-    return value * (Math.PI / 180);
+  private toRadians(
+    value: number
+  ): number {
+    return (
+      value *
+      (Math.PI / 180)
+    );
   }
 
-  private addClusterMarker(cluster: MapCluster): void {
-    if (cluster.pickups.length === 1) {
-      this.addCustomerMarker(cluster.pickups[0]);
+  private addClusterMarker(
+    cluster: MapCluster
+  ): void {
+    if (
+      cluster.pickups.length === 1
+    ) {
+      this.addCustomerMarker(
+        cluster.pickups[0]
+      );
+
       return;
     }
 
-    const element = document.createElement('button');
+    const element =
+      document.createElement(
+        'button'
+      );
 
     element.type = 'button';
-    element.className = 'customer-cluster-marker';
+
+    element.className =
+      'customer-cluster-marker';
+
     element.setAttribute(
       'aria-label',
       `${cluster.pickups.length} locations`
     );
 
-    element.innerHTML = `<span>${cluster.pickups.length}</span>`;
+    element.innerHTML =
+      `<span>${cluster.pickups.length}</span>`;
 
-    Object.assign(element.style, {
-      width: '46px',
-      height: '46px',
-      borderRadius: '50%',
-      border: '4px solid #ffffff',
-      background: '#2563eb',
-      color: '#ffffff',
-      fontWeight: '800',
-      fontSize: '15px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      boxShadow: '0 3px 10px rgba(0,0,0,.25)'
-    });
+    Object.assign(
+      element.style,
+      {
+        width: '46px',
+        height: '46px',
+        borderRadius: '50%',
+        border:
+          '4px solid #ffffff',
+        background: '#2563eb',
+        color: '#ffffff',
+        fontWeight: '800',
+        fontSize: '15px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent:
+          'center',
+        boxShadow:
+          '0 3px 10px rgba(0,0,0,.25)'
+      }
+    );
 
-    const marker = this.olaMaps
-      .addMarker({
-        element,
-        anchor: 'center'
-      })
-      .setLngLat([
-        cluster.longitude,
-        cluster.latitude
-      ])
-      .addTo(this.map);
-
-    element.addEventListener('click', event => {
-      event.stopPropagation();
-
-      const currentZoom =
-        Number(this.map.getZoom?.() ?? 10);
-
-      this.map.flyTo?.({
-        center: [
+    const marker =
+      this.olaMaps
+        .addMarker({
+          element,
+          anchor: 'center'
+        })
+        .setLngLat([
           cluster.longitude,
           cluster.latitude
-        ],
-        zoom: Math.min(currentZoom + 2, 16),
-        essential: true
-      });
-    });
+        ])
+        .addTo(this.map);
+
+    element.addEventListener(
+      'click',
+      event => {
+        event.stopPropagation();
+
+        const currentZoom =
+          Number(
+            this.map.getZoom?.() ??
+              10
+          );
+
+        this.map.flyTo?.({
+          center: [
+            cluster.longitude,
+            cluster.latitude
+          ],
+          zoom: Math.min(
+            currentZoom + 2,
+            16
+          ),
+          essential: true
+        });
+      }
+    );
 
     this.markers.push(marker);
   }
 
-  private addCustomerMarker(pickup: PickupDelivery): void {
+  private addCustomerMarker(
+    pickup: PickupDelivery
+  ): void {
     if (
       pickup.latitude === null ||
       pickup.longitude === null
-    ) return;
+    ) {
+      return;
+    }
 
-    const lat = Number(pickup.latitude);
-    const lng = Number(pickup.longitude);
-    const element = this.createMarkerElement(pickup);
+    const lat =
+      Number(pickup.latitude);
 
-    const popup = this.olaMaps
-      .addPopup({
-        offset: [0, -28],
-        closeButton: false,
-        closeOnClick: false,
-        className: 'laundry-map-popup'
-      })
-      .setDOMContent(
-        this.createPopupElement(pickup)
+    const lng =
+      Number(pickup.longitude);
+
+    const element =
+      this.createMarkerElement(
+        pickup
       );
 
-    const marker = this.olaMaps
-      .addMarker({
-        element,
-        anchor: 'bottom'
-      })
-      .setLngLat([lng, lat])
-      .addTo(this.map);
+    const popup =
+      this.olaMaps
+        .addPopup({
+          offset: [0, -28],
+          closeButton: false,
+          closeOnClick: false,
+          className:
+            'laundry-map-popup'
+        })
+        .setDOMContent(
+          this.createPopupElement(
+            pickup
+          )
+        );
 
-    element.addEventListener('mouseenter', () => {
-      this.closeAllPopups();
-
-      popup
-        .setLngLat([lng, lat])
+    const marker =
+      this.olaMaps
+        .addMarker({
+          element,
+          anchor: 'bottom'
+        })
+        .setLngLat([
+          lng,
+          lat
+        ])
         .addTo(this.map);
-    });
 
-    element.addEventListener('mouseleave', () => {
-      if (this.selectedPickup?.id !== pickup.id) {
-        popup.remove?.();
+    element.addEventListener(
+      'mouseenter',
+      () => {
+        this.closeAllPopups();
+
+        popup
+          .setLngLat([
+            lng,
+            lat
+          ])
+          .addTo(this.map);
       }
-    });
+    );
 
-    element.addEventListener('click', event => {
-      event.stopPropagation();
+    element.addEventListener(
+      'mouseleave',
+      () => {
+        if (
+          this.selectedPickup?.id !==
+          pickup.id
+        ) {
+          popup.remove?.();
+        }
+      }
+    );
 
-      this.selectedPickup = pickup;
-      this.closeAllPopups();
+    element.addEventListener(
+      'click',
+      event => {
+        event.stopPropagation();
 
-      popup
-        .setLngLat([lng, lat])
-        .addTo(this.map);
+        this.selectedPickup =
+          pickup;
 
-      this.map.flyTo?.({
-        center: [lng, lat],
-        zoom: 16.5,
-        essential: true
-      });
+        this.closeAllPopups();
 
-      this.updateMarkerSelection();
-    });
+        popup
+          .setLngLat([
+            lng,
+            lat
+          ])
+          .addTo(this.map);
+
+        this.map.flyTo?.({
+          center: [
+            lng,
+            lat
+          ],
+          zoom: 16.5,
+          essential: true
+        });
+
+        this.updateMarkerSelection();
+      }
+    );
 
     this.markers.push(marker);
     this.popups.push(popup);
-    this.popupByPickupId.set(pickup.id, popup);
+
+    this.popupByPickupId.set(
+      pickup.id,
+      popup
+    );
   }
 
-  private createMarkerElement(pickup: PickupDelivery): HTMLElement {
-    const marker = document.createElement('button');
+  private createMarkerElement(
+    pickup: PickupDelivery
+  ): HTMLElement {
+    const marker =
+      document.createElement(
+        'button'
+      );
 
     marker.type = 'button';
+
     marker.className =
       `customer-map-pin ${
         pickup.type === 'PICKUP'
@@ -746,7 +1176,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
           : 'delivery-pin'
       }`;
 
-    marker.dataset['pickupId'] = pickup.id;
+    marker.dataset['pickupId'] =
+      pickup.id;
 
     marker.setAttribute(
       'aria-label',
@@ -756,7 +1187,12 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     marker.innerHTML = `
       <span class="pin-head">
         <span class="pin-icon">
-          ${pickup.type === 'PICKUP' ? '↑' : '↓'}
+          ${
+            pickup.type ===
+            'PICKUP'
+              ? '↑'
+              : '↓'
+          }
         </span>
       </span>
       <span class="pin-point"></span>
@@ -765,8 +1201,13 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     return marker;
   }
 
-  private createPopupElement(pickup: PickupDelivery): HTMLElement {
-    const container = document.createElement('div');
+  private createPopupElement(
+    pickup: PickupDelivery
+  ): HTMLElement {
+    const container =
+      document.createElement(
+        'div'
+      );
 
     const typeLabel =
       pickup.type === 'PICKUP'
@@ -779,7 +1220,9 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
         : 'delivery';
 
     const status =
-      this.getStatusLabel(pickup.status);
+      this.getStatusLabel(
+        pickup.status
+      );
 
     container.className =
       'customer-map-popup-content';
@@ -788,16 +1231,22 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       <div class="popup-customer-header">
         <div class="popup-avatar">
           ${this.escapeHtml(
-            pickup.customerName.charAt(0).toUpperCase()
+            pickup.customerName
+              .charAt(0)
+              .toUpperCase()
           )}
         </div>
 
         <div class="popup-customer-name">
           <strong>
-            ${this.escapeHtml(pickup.customerName)}
+            ${this.escapeHtml(
+              pickup.customerName
+            )}
           </strong>
           <span>
-            ${this.escapeHtml(pickup.phoneNumber)}
+            ${this.escapeHtml(
+              pickup.phoneNumber
+            )}
           </span>
         </div>
 
@@ -809,7 +1258,9 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       <div class="popup-address">
         <span class="popup-location-icon">●</span>
         <span>
-          ${this.escapeHtml(pickup.address)}
+          ${this.escapeHtml(
+            pickup.address
+          )}
         </span>
       </div>
 
@@ -817,22 +1268,30 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
         <div>
           <span>Date</span>
           <strong>
-            ${this.escapeHtml(pickup.scheduledDate)}
+            ${this.escapeHtml(
+              pickup.scheduledDate
+            )}
           </strong>
         </div>
 
         <div>
           <span>Time</span>
           <strong>
-            ${this.escapeHtml(pickup.timeSlot)}
+            ${this.escapeHtml(
+              pickup.timeSlot
+            )}
           </strong>
         </div>
       </div>
 
       <div class="popup-status-row">
         <span>Status</span>
-        <strong class="popup-status ${this.getStatusClass(pickup.status)}">
-          ${this.escapeHtml(status)}
+        <strong class="popup-status ${this.getStatusClass(
+          pickup.status
+        )}">
+          ${this.escapeHtml(
+            status
+          )}
         </strong>
       </div>
     `;
@@ -840,7 +1299,9 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     return container;
   }
 
-  selectPickup(pickup: PickupDelivery): void {
+  selectPickup(
+    pickup: PickupDelivery
+  ): void {
     this.selectedPickup = pickup;
 
     if (
@@ -848,14 +1309,20 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       pickup.longitude === null ||
       !this.mapReady ||
       !this.map
-    ) return;
+    ) {
+      return;
+    }
 
     this.closeAllPopups();
 
     this.map.flyTo?.({
       center: [
-        Number(pickup.longitude),
-        Number(pickup.latitude)
+        Number(
+          pickup.longitude
+        ),
+        Number(
+          pickup.latitude
+        )
       ],
       zoom: 16.5,
       essential: true
@@ -866,14 +1333,22 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
       setTimeout(() => {
         const popup =
-          this.popupByPickupId.get(pickup.id);
+          this.popupByPickupId.get(
+            pickup.id
+          );
 
         popup
           ?.setLngLat?.([
-            Number(pickup.longitude),
-            Number(pickup.latitude)
+            Number(
+              pickup.longitude
+            ),
+            Number(
+              pickup.latitude
+            )
           ])
-          ?.addTo?.(this.map);
+          ?.addTo?.(
+            this.map
+          );
 
         this.updateMarkerSelection();
       }, 100);
@@ -882,26 +1357,35 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
   resetMapView(): void {
     this.selectedPickup = null;
+
     this.closeAllPopups();
+
     this.fitAllMarkers();
   }
 
   private updateMarkerSelection(): void {
     document
-      .querySelectorAll('.customer-map-pin')
+      .querySelectorAll(
+        '.customer-map-pin'
+      )
       .forEach(element => {
-        const marker = element as HTMLElement;
+        const marker =
+          element as HTMLElement;
 
         marker.classList.toggle(
           'selected',
-          marker.dataset['pickupId'] ===
+          marker.dataset[
+            'pickupId'
+          ] ===
             this.selectedPickup?.id
         );
       });
   }
 
   private closeAllPopups(): void {
-    for (const popup of this.popups) {
+    for (
+      const popup of this.popups
+    ) {
       popup?.remove?.();
     }
   }
@@ -909,29 +1393,45 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   private clearMarkers(): void {
     this.closeAllPopups();
 
-    for (const marker of this.markers) {
+    for (
+      const marker of this.markers
+    ) {
       marker?.remove?.();
     }
 
     this.markers = [];
     this.popups = [];
+
     this.popupByPickupId.clear();
   }
 
   private fitAllMarkers(): void {
-    if (!this.mapReady || !this.map) return;
+    if (
+      !this.mapReady ||
+      !this.map
+    ) {
+      return;
+    }
 
-    const records = this.getMappedRecords();
+    const records =
+      this.getMappedRecords();
 
     if (!records.length) return;
 
-    if (records.length === 1) {
-      const pickup = records[0];
+    if (
+      records.length === 1
+    ) {
+      const pickup =
+        records[0];
 
       this.map.flyTo?.({
         center: [
-          Number(pickup.longitude),
-          Number(pickup.latitude)
+          Number(
+            pickup.longitude
+          ),
+          Number(
+            pickup.latitude
+          )
         ],
         zoom: 15,
         essential: true
@@ -945,20 +1445,54 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     let minLat = Infinity;
     let maxLat = -Infinity;
 
-    for (const pickup of records) {
-      const lng = Number(pickup.longitude);
-      const lat = Number(pickup.latitude);
+    for (
+      const pickup of records
+    ) {
+      const lng =
+        Number(
+          pickup.longitude
+        );
 
-      minLng = Math.min(minLng, lng);
-      maxLng = Math.max(maxLng, lng);
-      minLat = Math.min(minLat, lat);
-      maxLat = Math.max(maxLat, lat);
+      const lat =
+        Number(
+          pickup.latitude
+        );
+
+      minLng =
+        Math.min(
+          minLng,
+          lng
+        );
+
+      maxLng =
+        Math.max(
+          maxLng,
+          lng
+        );
+
+      minLat =
+        Math.min(
+          minLat,
+          lat
+        );
+
+      maxLat =
+        Math.max(
+          maxLat,
+          lat
+        );
     }
 
     this.map.fitBounds?.(
       [
-        [minLng, minLat],
-        [maxLng, maxLat]
+        [
+          minLng,
+          minLat
+        ],
+        [
+          maxLng,
+          maxLat
+        ]
       ],
       {
         padding: 70,
@@ -972,7 +1506,11 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     pickup: PickupDelivery,
     status: PickupDeliveryStatus
   ): void {
-    if (pickup.status === status) return;
+    if (
+      pickup.status === status
+    ) {
+      return;
+    }
 
     this.apiService
       .updatePickupDeliveryStatus(
@@ -983,45 +1521,77 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
         next: updated => {
           const index =
             this.pickups.findIndex(
-              item => item.id === updated.id
+              item =>
+                item.id ===
+                updated.id
             );
 
           if (index !== -1) {
-            this.pickups[index] = updated;
+            this.pickups[index] =
+              updated;
           }
 
           if (
             this.selectedPickup?.id ===
             updated.id
           ) {
-            this.selectedPickup = updated;
+            this.selectedPickup =
+              updated;
           }
 
-          this.statusMenuPickup = null;
+          this.statusMenuPickup =
+            null;
+
           this.applyFilters();
+        },
+        error: error => {
+          console.error(
+            'Unable to update pickup/delivery status:',
+            error
+          );
+
+          this.statusMenuPickup =
+            null;
         }
       });
   }
 
   get pickupCount(): number {
     return this.filteredPickups
-      .filter(item => item.type === 'PICKUP')
+      .filter(
+        item =>
+          item.type ===
+          'PICKUP'
+      )
       .length;
   }
 
   get deliveryCount(): number {
     return this.filteredPickups
-      .filter(item => item.type === 'DELIVERY')
+      .filter(
+        item =>
+          item.type ===
+          'DELIVERY'
+      )
       .length;
   }
 
   get mappedCount(): number {
-    return this.getMappedRecords().length;
+    return this.getMappedRecords()
+      .length;
   }
 
-  private escapeHtml(value: string): string {
-    const div = document.createElement('div');
-    div.textContent = value ?? '';
+  private escapeHtml(
+    value: string
+  ): string {
+    const div =
+      document.createElement(
+        'div'
+      );
+
+    div.textContent =
+      value ?? '';
+
     return div.innerHTML;
   }
 }

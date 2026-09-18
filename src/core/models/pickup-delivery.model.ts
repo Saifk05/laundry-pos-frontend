@@ -5,7 +5,8 @@ export type PickupDeliveryStatus =
   | 'PICKED_UP'
   | 'OUT_FOR_DELIVERY'
   | 'DELIVERED'
-  | 'COMPLETED';
+  | 'COMPLETED'
+  | 'CANCELLED';
 
 export interface PickupDelivery {
   id: string;
