@@ -1,20 +1,6 @@
-/* =========================================================
-   GLOBAL APP THEME
-   Light Mode : White + Professional Green
-   Dark Mode  : Black + Neon Green
-========================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
-/* =========================================================
-   LIGHT THEME - DEFAULT
-========================================================= */
-
 :root {
-
-  /* =========================
-     BRAND COLORS
-  ========================= */
-
   --app-primary: #16a34a;
   --app-primary-hover: #15803d;
   --app-primary-dark: #15803d;
@@ -25,71 +11,31 @@
   --app-secondary-dark: #16a34a;
   --app-secondary-light: #f0fdf4;
 
-
-  /* =========================
-     BACKGROUNDS
-  ========================= */
-
   --app-background: #ffffff;
   --app-background-soft: #f7faf8;
-
   --app-background-blue: #ecfdf3;
   --app-background-yellow: #f0fdf4;
 
-
-  /* =========================
-     SURFACES
-  ========================= */
-
   --app-surface: #ffffff;
   --app-surface-soft: #f8faf9;
-
   --app-card-background: #ffffff;
-
   --app-input-background: #ffffff;
-
   --app-sidebar-background: #ffffff;
-
   --app-header-background: #ffffff;
-
   --app-hover-background: #f4faf6;
-
   --app-selected-background: #ecfdf3;
 
-
-  /* =========================
-     TEXT
-  ========================= */
-
   --app-text-primary: #111814;
-
   --app-text-secondary: #5f6c64;
-
   --app-text-muted: #8a9690;
-
   --app-text-disabled: #aeb8b2;
-
   --app-text-light: #ffffff;
-
   --app-text-on-primary: #ffffff;
 
-
-  /* =========================
-     BORDERS
-  ========================= */
-
   --app-border: #e3e9e5;
-
   --app-border-soft: #edf2ef;
-
   --app-border-strong: #cfd8d3;
-
   --app-input-border: #dce4df;
-
-
-  /* =========================
-     STATUS COLORS
-  ========================= */
 
   --app-success: #16a34a;
   --app-success-soft: #dcfce7;
@@ -102,11 +48,6 @@
 
   --app-info: #0284c7;
   --app-info-soft: #e0f2fe;
-
-
-  /* =========================
-     TYPOGRAPHY
-  ========================= */
 
   --app-font-body:
     'Inter',
@@ -126,98 +67,44 @@
     'Segoe UI',
     sans-serif;
 
-
-  /* FONT SIZES */
-
   --app-font-size-xs: 12px;
-
   --app-font-size-sm: 13px;
-
   --app-font-size-md: 14px;
-
   --app-font-size-lg: 16px;
-
   --app-font-size-xl: 20px;
-
   --app-font-size-2xl: 26px;
-
   --app-font-size-3xl: 36px;
-
   --app-font-size-4xl: 48px;
 
-
-  /* FONT WEIGHTS */
-
   --app-font-weight-regular: 400;
-
   --app-font-weight-medium: 500;
-
   --app-font-weight-semibold: 600;
-
   --app-font-weight-bold: 700;
-
   --app-font-weight-extra-bold: 800;
 
-
-  /* LINE HEIGHT */
-
   --app-line-height-tight: 1.2;
-
   --app-line-height-normal: 1.5;
-
   --app-line-height-relaxed: 1.65;
 
-
-  /* LETTER SPACING */
-
   --app-letter-spacing-tight: -0.02em;
-
   --app-letter-spacing-normal: 0;
 
-
-  /* =========================
-     BORDER RADIUS
-  ========================= */
-
   --app-radius-xs: 6px;
-
   --app-radius-sm: 8px;
-
   --app-radius-md: 12px;
-
   --app-radius-lg: 16px;
-
   --app-radius-xl: 20px;
-
   --app-radius-2xl: 26px;
-
   --app-radius-round: 999px;
 
-
-  /* =========================
-     SPACING
-  ========================= */
-
   --app-space-xs: 4px;
-
   --app-space-sm: 8px;
-
   --app-space-md: 16px;
-
   --app-space-lg: 24px;
-
   --app-space-xl: 32px;
-
   --app-space-2xl: 48px;
-
   --app-space-3xl: 72px;
-
   --app-space-4xl: 100px;
-
-
-  /* =========================
-     SHADOWS
-  ========================= */
 
   --app-shadow-xs:
     0 1px 3px rgba(17, 24, 20, 0.05);
@@ -231,39 +118,16 @@
   --app-shadow-lg:
     0 20px 60px rgba(17, 24, 20, 0.12);
 
-
-  /* =========================
-     LAYOUT
-  ========================= */
-
   --app-container-width: 1280px;
-
   --app-page-padding: 48px;
 
-
-  /* =========================
-     TRANSITIONS
-  ========================= */
-
   --app-transition-fast: 0.15s ease;
-
   --app-transition: 0.25s ease;
-
   --app-transition-slow: 0.35s ease;
-
-
-  /* =========================
-     NATIVE COLOR SCHEME
-  ========================= */
 
   color-scheme: light;
 }
 
-
-/* =========================================================
-   DARK THEME
-   Black + Neon Green
-========================================================= */
 html.dark {
   --app-primary: #ffd600;
   --app-primary-hover: #ffe033;
@@ -285,7 +149,6 @@ html.dark {
   --app-surface-soft: #181818;
 
   --app-card-background: #121212;
-
   --app-input-background: #0b0b0b;
 
   --app-sidebar-background: #090909;
@@ -298,15 +161,12 @@ html.dark {
   --app-text-secondary: #b7b5ac;
   --app-text-muted: #85837b;
   --app-text-disabled: #5f5e59;
-
   --app-text-light: #ffffff;
-
   --app-text-on-primary: #090900;
 
   --app-border: #2b2a24;
   --app-border-soft: #20201d;
   --app-border-strong: #3b3930;
-
   --app-input-border: #34332c;
 
   --app-success: #22c55e;
@@ -334,4 +194,497 @@ html.dark {
     0 24px 65px rgba(0, 0, 0, 0.55);
 
   color-scheme: dark;
+}
+
+.laundry-map-popup .maplibregl-popup-content,
+.laundry-map-popup .mapboxgl-popup-content {
+  width: 295px !important;
+  min-width: 295px !important;
+  max-width: 295px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  border-radius: 9px !important;
+}
+
+.laundry-map-popup .customer-map-popup-content {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.laundry-map-popup .popup-action-section {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  gap: 7px !important;
+  margin-top: 9px !important;
+  padding-top: 9px !important;
+  border-top: 1px solid var(--app-border-soft) !important;
+  box-sizing: border-box !important;
+}
+
+.laundry-map-popup .popup-status-action,
+.laundry-map-popup .popup-create-order-action,
+.laundry-map-popup .popup-cancel-action {
+  display: inline-flex !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  font-family: var(--app-font-body) !important;
+  font-size: 8px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  transition:
+    filter 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease !important;
+}
+
+.laundry-map-popup .popup-status-action,
+.laundry-map-popup .popup-create-order-action {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  background: var(--app-primary) !important;
+  color: #ffffff !important;
+}
+
+.laundry-map-popup .popup-cancel-action {
+  flex: 0 0 70px !important;
+  width: 70px !important;
+  background: var(--app-danger) !important;
+  color: #ffffff !important;
+}
+
+.laundry-map-popup .popup-status-action:hover:not(:disabled),
+.laundry-map-popup .popup-create-order-action:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+.laundry-map-popup .popup-cancel-action:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.laundry-map-popup .popup-status-action:active:not(:disabled),
+.laundry-map-popup .popup-create-order-action:active:not(:disabled),
+.laundry-map-popup .popup-cancel-action:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.laundry-map-popup .popup-status-action:disabled,
+.laundry-map-popup .popup-create-order-action:disabled,
+.laundry-map-popup .popup-cancel-action:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+html.dark .laundry-map-popup .popup-status-action,
+html.dark .laundry-map-popup .popup-create-order-action {
+  color: var(--app-text-on-primary) !important;
+}
+
+
+.mat-datepicker-content {
+  width: 370px !important;
+  max-width: calc(100vw - 24px) !important;
+  padding: 0 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text-primary) !important;
+  box-shadow: var(--app-shadow-lg) !important;
+  font-family: var(--app-font-body) !important;
+}
+
+.mat-calendar {
+  width: 370px !important;
+  max-width: 100% !important;
+  height: auto !important;
+  padding: 18px 20px 20px !important;
+  box-sizing: border-box !important;
+  background: var(--app-surface) !important;
+  font-family: var(--app-font-body) !important;
+}
+
+.mat-calendar-header {
+  padding: 0 0 14px !important;
+}
+
+.mat-calendar-controls {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+}
+
+.mat-calendar-period-button {
+  height: 40px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--app-text-primary) !important;
+  font-family: var(--app-font-body) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+.mat-calendar-spacer {
+  flex: 1 1 auto !important;
+}
+
+.mat-calendar-previous-button,
+.mat-calendar-next-button {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 8px !important;
+  color: var(--app-text-primary) !important;
+}
+
+.mat-calendar-arrow {
+  fill: var(--app-text-primary) !important;
+}
+
+.mat-calendar-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+
+.mat-calendar-table-header {
+  color: var(--app-text-secondary) !important;
+}
+
+.mat-calendar-table-header th {
+  width: 14.285714% !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--app-text-secondary) !important;
+  font-family: var(--app-font-body) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 40px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.mat-calendar-table-header-divider {
+  display: none !important;
+}
+
+.mat-calendar-body-label {
+  height: 32px !important;
+  padding: 8px 0 4px !important;
+  color: var(--app-text-primary) !important;
+  font-family: var(--app-font-body) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.mat-calendar-body-cell {
+  width: 14.285714% !important;
+  height: 46px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  font-family: var(--app-font-body) !important;
+  text-align: center !important;
+}
+
+.mat-calendar-body-cell-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  display: flex !important;
+  width: 38px !important;
+  height: 38px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  color: var(--app-text-primary) !important;
+  font-family: var(--app-font-body) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 38px !important;
+  white-space: nowrap !important;
+}
+
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled)
+.mat-calendar-body-cell-content:hover {
+  background: var(--app-hover-background) !important;
+}
+
+.mat-calendar-body-selected {
+  border-color: var(--app-primary) !important;
+  background: var(--app-primary) !important;
+  color: var(--app-text-on-primary) !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: 1px solid var(--app-primary) !important;
+}
+
+.mat-calendar-body-disabled
+.mat-calendar-body-cell-content {
+  color: var(--app-text-disabled) !important;
+}
+
+.mat-calendar-body-in-range::before {
+  background: var(--app-primary-soft) !important;
+}
+
+.mat-calendar-body-range-start::before,
+.mat-calendar-body-range-end::before {
+  background: var(--app-primary-soft) !important;
+}
+
+.mat-calendar-body-range-start
+.mat-calendar-body-cell-content,
+.mat-calendar-body-range-end
+.mat-calendar-body-cell-content {
+  background: var(--app-primary) !important;
+  color: var(--app-text-on-primary) !important;
+}
+
+html.dark .mat-datepicker-content,
+html.dark .mat-calendar {
+  background: var(--app-surface) !important;
+}
+
+@media (max-width: 480px) {
+  .mat-datepicker-content {
+    width: 320px !important;
+  }
+
+  .mat-calendar {
+    width: 320px !important;
+    padding: 14px 14px 16px !important;
+  }
+
+  .mat-calendar-body-cell {
+    height: 42px !important;
+  }
+
+  .mat-calendar-body-cell-content {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 13px !important;
+    line-height: 34px !important;
+  }
+}
+
+.mat-calendar-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.mat-calendar-body tr {
+  height: 46px !important;
+}
+
+.mat-calendar-body td {
+  position: relative !important;
+  width: 14.285714% !important;
+  height: 46px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+.mat-calendar-body-cell {
+  position: relative !important;
+  width: 100% !important;
+  height: 46px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.mat-calendar-body-cell-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 38px !important;
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+  line-height: 38px !important;
+}
+
+.mat-calendar-body-cell::before,
+.mat-calendar-body-cell::after,
+.mat-calendar-body-preview-start::before,
+.mat-calendar-body-preview-end::before,
+.mat-calendar-body-in-preview::before {
+  display: none !important;
+  content: none !important;
+}
+
+.mat-calendar-body-in-range::before {
+  top: 4px !important;
+  bottom: 4px !important;
+  height: auto !important;
+  border: 0 !important;
+  background: var(--app-primary-soft) !important;
+}
+
+.mat-calendar-body-range-start::before {
+  left: 50% !important;
+  border-radius: 20px 0 0 20px !important;
+}
+
+.mat-calendar-body-range-end::before {
+  right: 50% !important;
+  border-radius: 0 20px 20px 0 !important;
+}
+
+.mat-calendar-body-range-start.mat-calendar-body-range-end::before {
+  left: 50% !important;
+  right: 50% !important;
+  background: transparent !important;
+}
+
+.mat-calendar-body-selected {
+  background: var(--app-primary) !important;
+  color: var(--app-text-on-primary) !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: 1px solid var(--app-primary) !important;
+}
+
+.mat-calendar-table-header th {
+  width: 14.285714% !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.mat-calendar-body-in-range::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  top: 4px !important;
+  bottom: 4px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: auto !important;
+  background: var(--app-primary-light) !important;
+  border: 0 !important;
+  z-index: 0 !important;
+}
+
+.mat-calendar-body-range-start::before {
+  left: 50% !important;
+  border-radius: 20px 0 0 20px !important;
+}
+
+.mat-calendar-body-range-end::before {
+  right: 50% !important;
+  border-radius: 0 20px 20px 0 !important;
+}
+
+.mat-calendar-body-range-start.mat-calendar-body-range-end::before {
+  left: 50% !important;
+  right: 50% !important;
+  background: transparent !important;
+}
+
+.mat-calendar-body-cell-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  z-index: 2 !important;
+  display: flex !important;
+  width: 38px !important;
+  height: 38px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+}
+
+.mat-calendar-body-range-start .mat-calendar-body-cell-content,
+.mat-calendar-body-range-end .mat-calendar-body-cell-content,
+.mat-calendar-body-selected {
+  background: var(--app-primary) !important;
+  color: var(--app-text-on-primary) !important;
+}
+
+.mat-calendar-body-in-range:not(.mat-calendar-body-range-start):not(.mat-calendar-body-range-end)
+.mat-calendar-body-cell-content {
+  background: transparent !important;
+  color: var(--app-text-primary) !important;
+}
+
+html.dark .mat-calendar-body-in-range::before {
+  background: var(--app-primary-light) !important;
+}
+
+.mat-calendar-body-in-range:not(.mat-calendar-body-disabled)
+.mat-calendar-body-cell:hover
+.mat-calendar-body-cell-content {
+  background: transparent !important;
+  color: var(--app-text-primary) !important;
+}
+
+.mat-calendar-body-in-range
+.mat-calendar-body-cell-content:hover {
+  background: transparent !important;
+  color: var(--app-text-primary) !important;
+}
+
+.mat-calendar-body-range-start
+.mat-calendar-body-cell-content,
+.mat-calendar-body-range-end
+.mat-calendar-body-cell-content {
+  background: var(--app-primary) !important;
+  color: var(--app-text-on-primary) !important;
+}
+
+.mat-calendar-body-range-start
+.mat-calendar-body-cell-content:hover,
+.mat-calendar-body-range-end
+.mat-calendar-body-cell-content:hover {
+  background: var(--app-primary) !important;
+  color: var(--app-text-on-primary) !important;
+}
+
+.mat-calendar-body-in-range::before {
+  background: var(--app-primary-light) !important;
+}
+
+.mat-calendar-body-cell:hover
+.mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+  background: var(--app-hover-background);
+}
+
+.mat-calendar-body-in-range:hover::before {
+  background: var(--app-primary-light) !important;
 }

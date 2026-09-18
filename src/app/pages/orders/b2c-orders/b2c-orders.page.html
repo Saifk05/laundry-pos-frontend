@@ -177,6 +177,7 @@
           <tr>
             <td class="actions-cell">
               <div class="actions-list">
+
                 @if (order.status === 'TAGGED') {
                   <button
                     type="button"
@@ -185,23 +186,9 @@
                     (click)="processAtStore(order)">
                     Process At Store
                   </button>
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="callCustomer(order)">
-                    ☎ Call
-                  </button>
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="retagOrder(order)">
-                    ↻ Re-Tag
-                  </button>
                 }
-                @if (
-                  order.status ===
-                    'PROCESSING_AT_STORE'
-                ) {
+
+                @if (order.status === 'PROCESSING_AT_STORE') {
                   <button
                     type="button"
                     class="action-button primary-action"
@@ -209,19 +196,8 @@
                     (click)="markReady(order)">
                     Mark Ready
                   </button>
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="callCustomer(order)">
-                    ☎ Call
-                  </button>
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="retagOrder(order)">
-                    ↻ Re-Tag
-                  </button>
                 }
+
                 @if (order.status === 'READY_ORDER') {
                   <button
                     type="button"
@@ -230,12 +206,24 @@
                     (click)="markDelivered(order)">
                     Mark Delivered
                   </button>
+                }
+
+                @if (
+                  order.status !== 'DELIVERED' &&
+                  order.status !== 'CANCELLED'
+                ) {
                   <button
                     type="button"
                     class="action-button primary-action"
-                    (click)="callCustomer(order)">
-                    ☎ Call
+                    (click)="reschedule(order)">
+                    ↻ Reschedule
                   </button>
+                }
+
+                @if (
+                  order.status !== 'DELIVERED' &&
+                  order.status !== 'CANCELLED'
+                ) {
                   <button
                     type="button"
                     class="action-button primary-action"
@@ -243,69 +231,32 @@
                     ↻ Re-Tag
                   </button>
                 }
-                <button
-                  type="button"
-                  class="action-button primary-action"
-                  (click)="viewOrder(order)">
-                  View
-                </button>
-                @if (order.status === 'DELIVERED') {
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="billReceipt(order)">
-                    Bill Receipt
-                  </button>
-                }
-                @if (order.status === 'CANCELLED') {
-                  <button
-                    type="button"
-                    class="action-button primary-action"
-                    (click)="viewOrder(order)">
-                    View
-                  </button>
-                }
+
                 <div class="more-wrapper">
+
                   <button
                     type="button"
                     class="more-button"
                     (click)="toggleMore(order)">
                     ⋮ More
                   </button>
+
                   @if (order.moreOpen) {
                     <div class="more-menu">
-                      @if (
-                        order.status !== 'DELIVERED' &&
-                        order.status !== 'CANCELLED'
-                      ) {
-                        <button
-                          type="button"
-                          (click)="reschedule(order)">
-                          ↻ Reschedule
-                        </button>
-                      }
+
                       <button
                         type="button"
                         (click)="billReceipt(order)">
                         ▣ Bill Receipt
                       </button>
+
                       <button
                         type="button"
                         [disabled]="actionLoading"
                         (click)="reprintQr(order)">
                         ▣ Re-print QR
                       </button>
-                      @if (
-                        order.status === 'TAGGED' ||
-                        order.status === 'PROCESSING_AT_STORE' ||
-                        order.status === 'READY_ORDER'
-                      ) {
-                        <button
-                          type="button"
-                          (click)="retagOrder(order)">
-                          ↻ Re-Tag
-                        </button>
-                      }
+
                       @if (
                         !order.settled &&
                         order.status !== 'CANCELLED'
@@ -317,6 +268,7 @@
                           Settle Order
                         </button>
                       }
+
                       @if (
                         order.status !== 'DELIVERED' &&
                         order.status !== 'CANCELLED'
@@ -329,15 +281,12 @@
                           Cancel Order
                         </button>
                       }
-                      <button
-                        type="button"
-                        class="view-order-action"
-                        (click)="viewOrder(order)">
-                        View Order
-                      </button>
+
                     </div>
                   }
+
                 </div>
+
               </div>
             </td>
             <td>

@@ -747,18 +747,27 @@ updateTermsConditions(
 
   getPickupDeliveries(
     filter: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL',
+    date?: string | null,
+    status?: PickupDeliveryStatus | null,
+    timeSlot?: string | null,
+    search?: string | null,
     cursor: string | null = null,
     limit = 10
   ): Observable<PickupDeliveryPageResponse> {
+    const params: any = {
+      filter,
+      cursor: cursor ?? '',
+      limit
+    };
+
+    if (date) params.date = date;
+    if (status) params.status = status;
+    if (timeSlot?.trim()) params.timeSlot = timeSlot.trim();
+    if (search?.trim()) params.search = search.trim();
+
     return this.http.get<PickupDeliveryPageResponse>(
       `${this.baseUrl}/v1/pickup-deliveries`,
-      {
-        params: {
-          filter,
-          cursor: cursor ?? '',
-          limit
-        }
-      }
+      { params }
     );
   }
 

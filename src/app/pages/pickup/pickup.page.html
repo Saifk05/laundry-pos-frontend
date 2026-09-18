@@ -37,7 +37,7 @@
           <input
             type="text"
             [(ngModel)]="searchText"
-            (input)="applyFilters()"
+            (input)="filterChanged()"
             placeholder="Customer, mobile or address">
         </div>
       </div>
@@ -53,7 +53,7 @@
             matInput
             [matDatepicker]="picker"
             [formControl]="selectedDate"
-            (dateChange)="applyFilters()"
+            (dateChange)="filterChanged()"
             placeholder="DD/MM/YYYY">
 
           <mat-datepicker-toggle
@@ -140,9 +140,11 @@
             Completed
           </option>
 
-          <option value="CANCELLED">
-            Cancelled
-          </option>
+          @if (activeTab === 'ORDERS') {
+            <option value="CANCELLED">
+              Cancelled
+            </option>
+          }
 
         </select>
       </div>
@@ -422,157 +424,36 @@
                   </td>
 
                   <td class="action-cell">
+                    <div class="order-action-buttons">
 
-                    @if (canCreateOrder(pickup)) {
-
-                      <button
-                        type="button"
-                        class="update-btn"
-                        (click)="createOrder(pickup)">
-                        Create Order
-                      </button>
-
-                    } @else if (getNextStatus(pickup)) {
-
-                      <button
-                        type="button"
-                        class="update-btn"
-                        (click)="openStatusMenu(pickup)">
-                        Update
-                      </button>
-
-                    } @else {
-
-                      <span
-                        class="status-badge"
-                        [ngClass]="getStatusClass(pickup.status)">
-
-                        {{ getStatusLabel(pickup.status) }}
-
-                      </span>
-
-                    }
-
-                    @if (
-                      statusMenuPickup?.id === pickup.id &&
-                      getNextStatus(pickup)
-                    ) {
-
-                      <div class="status-menu">
-
-                        <div class="status-menu-header">
-
-                          <div>
-                            <strong>
-                              Update Status
-                            </strong>
-
-                            <span>
-                              {{ pickup.customerName }}
-                            </span>
-                          </div>
-
-                          <button
-                            type="button"
-                            class="status-menu-close"
-                            (click)="closeStatusMenu()">
-                            ×
-                          </button>
-
-                        </div>
-
+                      @if (canCreateOrder(pickup)) {
                         <button
                           type="button"
-                          (click)="advanceStatus(pickup)">
-
-                          <span
-                            class="status-option-dot"
-                            [ngClass]="getStatusClass(getNextStatus(pickup)!)">
-                          </span>
-
-                          <div>
-
-                            <strong>
-                              {{ getNextStatusLabel(pickup) }}
-                            </strong>
-
-                            @if (
-                              pickup.type === 'PICKUP' &&
-                              getNextStatus(pickup) === 'PICKED_UP'
-                            ) {
-                              <span>
-                                Laundry collected from customer
-                              </span>
-                            }
-
-                            @if (
-                              pickup.type === 'PICKUP' &&
-                              getNextStatus(pickup) === 'COMPLETED'
-                            ) {
-                              <span>
-                                Laundry reached the store
-                              </span>
-                            }
-
-                            @if (
-                              pickup.type === 'DELIVERY' &&
-                              getNextStatus(pickup) === 'OUT_FOR_DELIVERY'
-                            ) {
-                              <span>
-                                Laundry left the store
-                              </span>
-                            }
-
-                            @if (
-                              pickup.type === 'DELIVERY' &&
-                              getNextStatus(pickup) === 'DELIVERED'
-                            ) {
-                              <span>
-                                Laundry reached the customer
-                              </span>
-                            }
-
-                            @if (
-                              pickup.type === 'DELIVERY' &&
-                              getNextStatus(pickup) === 'COMPLETED'
-                            ) {
-                              <span>
-                                Complete delivery service
-                              </span>
-                            }
-
-                          </div>
-
+                          class="order-action-btn primary"
+                          (click)="createOrder(pickup)">
+                          CREATE ORDER
                         </button>
+                      }
 
-                        @if (canCancelPickup(pickup)) {
+                      @if (getNextStatus(pickup)) {
+                        <button
+                          type="button"
+                          class="order-action-btn primary"
+                          (click)="advanceStatus(pickup)">
+                          {{ getNextStatusButtonLabel(pickup) }}
+                        </button>
+                      }
 
-                          <button
-                            type="button"
-                            class="cancel-status-option"
-                            (click)="cancelPickup(pickup)">
+                      @if (canCancelPickup(pickup)) {
+                        <button
+                          type="button"
+                          class="order-action-btn danger"
+                          (click)="cancelPickup(pickup)">
+                          CANCEL
+                        </button>
+                      }
 
-                            <span
-                              class="status-option-dot cancelled">
-                            </span>
-
-                            <div>
-                              <strong>
-                                Cancel Pickup
-                              </strong>
-
-                              <span>
-                                Cancel this scheduled pickup
-                              </span>
-                            </div>
-
-                          </button>
-
-                        }
-
-                      </div>
-                    }
-
+                    </div>
                   </td>
 
                 </tr>

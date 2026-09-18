@@ -91,8 +91,6 @@
   box-sizing: border-box;
 }
 
-
-
 .page-header {
   margin-bottom: 14px;
   display: flex;
@@ -143,8 +141,6 @@
   cursor: not-allowed;
 }
 
-
-
 .status-section {
   margin-bottom: 14px;
 }
@@ -180,8 +176,6 @@
   background: var(--app-primary);
   color: var(--app-text-light);
 }
-
-
 
 .filter-section {
   margin-bottom: 14px;
@@ -305,10 +299,6 @@
   flex: 0 0 auto;
 }
 
-
-
-
-
 .orders-table-wrapper::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -373,7 +363,6 @@
   border-bottom: none;
 }
 
-
 .orders-table th:nth-child(1),
 .orders-table td:nth-child(1) {
   min-width: 390px;
@@ -433,7 +422,6 @@
 .orders-table td:nth-child(13) {
   min-width: 90px;
 }
-
 
 .actions-column,
 .actions-cell {
@@ -1309,10 +1297,6 @@
   }
 }
 
-
-
-
-
 @media (max-width: 1200px) {
   .b2c-page {
     padding: 14px;
@@ -1362,9 +1346,6 @@
     box-shadow: none;
   }
 }
-
-
-
 
 .actions-cell {
   position: sticky !important;
@@ -1471,8 +1452,6 @@
   font-weight: 800;
 }
 
-
-
 .actions-cell:has(.more-menu) {
   z-index: 5000 !important;
 }
@@ -1556,8 +1535,6 @@
   background: var(--app-primary-hover);
 }
 
-
-
 .date-range-field {
   width: 280px;
   min-width: 260px;
@@ -1631,8 +1608,6 @@
   display: none;
 }
 
-
-
 .pagination-section {
   flex: 0 0 auto;
   margin-top: 12px;
@@ -1676,8 +1651,6 @@
   font-size: 11px;
   font-weight: 800;
 }
-
-
 
 @media (max-width: 1100px) {
   .date-range-field {
@@ -1768,9 +1741,6 @@
   }
 }
 
-
-
-
 :host {
   display: block;
   width: 100%;
@@ -1814,10 +1784,6 @@
   background: var(--app-text-secondary);
 }
 
-/* =========================================================
-   FINAL B2C ORDERS TABLE + MORE MENU
-   Compact table; dropdown overlays below without resizing it.
-========================================================= */
 .b2c-page{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;}
 
 .orders-table-wrapper{
@@ -1872,7 +1838,6 @@
   display:flex;align-items:center;justify-content:space-between;gap:10px;
 }
 
-/* Keep dropdown visible above pagination/page content. */
 .result-info,.pagination-section{overflow:visible!important;}
 
 @media(max-width:768px){
@@ -1880,10 +1845,6 @@
   .actions-column,.actions-cell{position:sticky!important;left:0!important;}
 }
 
-/* =========================================================
-   FINAL FILTER BAR FIX
-   Desktop: Order No. | Customer Name | Mobile | Date Range | Search | Clear
-========================================================= */
 @media (min-width: 1101px) {
   .filter-section {
     display: grid !important;
@@ -2001,4 +1962,172 @@
   }
 }
 
+.orders-table-wrapper {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  position: relative !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-surface);
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-text-muted) var(--app-surface-soft);
+}
 
+.orders-table-wrapper::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.orders-table-wrapper::-webkit-scrollbar-track {
+  background: var(--app-surface-soft);
+  border-radius: 999px;
+}
+
+.orders-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--app-text-muted);
+  border: 2px solid var(--app-surface-soft);
+  border-radius: 999px;
+}
+
+.orders-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--app-text-secondary);
+}
+
+.orders-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+}
+
+.orders-table th,
+.orders-table td {
+  white-space: nowrap;
+}
+
+.actions-column,
+.actions-cell {
+  position: sticky !important;
+  left: 0 !important;
+  width: 370px !important;
+  min-width: 370px !important;
+  max-width: 370px !important;
+  overflow: visible !important;
+  background: var(--app-surface) !important;
+  box-shadow: 8px 0 14px -14px rgba(20, 35, 27, 0.55);
+}
+
+.actions-column {
+  z-index: 60 !important;
+  background: var(--app-surface-soft) !important;
+}
+
+.actions-cell {
+  z-index: 50 !important;
+}
+
+.actions-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  overflow: visible !important;
+}
+
+.action-button {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 8px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.more-wrapper {
+  position: relative !important;
+  display: inline-flex;
+  flex: 0 0 auto;
+  overflow: visible !important;
+}
+
+.more-button {
+  height: 28px;
+  min-width: 58px;
+  padding: 0 8px;
+  font-size: 9px;
+}
+
+.more-menu {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 180px !important;
+  height: auto !important;
+  padding: 6px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100000 !important;
+  overflow: visible !important;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow-md);
+}
+
+.more-menu button {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--app-text-primary);
+  font-family: var(--app-font-body);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.more-menu button:hover:not(:disabled) {
+  background: var(--app-hover-background);
+  color: var(--app-primary);
+}
+
+.more-menu .danger-action {
+  color: var(--app-danger);
+}
+
+.actions-cell:has(.more-menu) {
+  z-index: 99998 !important;
+}
+
+.more-wrapper:has(.more-menu) {
+  z-index: 99999 !important;
+}
+
+@media (max-width: 768px) {
+  .orders-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .actions-column,
+  .actions-cell {
+    position: sticky !important;
+    left: 0 !important;
+  }
+}

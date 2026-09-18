@@ -38,6 +38,10 @@ export interface PickupDeliveryPageResponse {
   items: PickupDelivery[];
   nextCursor: string | null;
   hasMore: boolean;
+  total: number;
+  pickupCount: number;
+  deliveryCount: number;
+  mappedCount: number;
 }
 
 export interface MapLocation {
