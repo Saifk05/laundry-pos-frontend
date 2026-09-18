@@ -158,6 +158,7 @@ export class NewWalkInPage
     }
 
     this.pickupId = pickupId;
+    this.homeDelivery = true;
 
     this.apiService.getPickupDeliveryById(pickupId).subscribe({
       next: pickup => {
