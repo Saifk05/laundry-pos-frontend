@@ -1,66 +1,229 @@
+/* =========================================================
+   GLOBAL APP THEME
+   Light Mode : White + Professional Green
+   Dark Mode  : Black + Neon Green
+========================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
+/* =========================================================
+   LIGHT THEME - DEFAULT
+========================================================= */
+
 :root {
+
+  /* =========================
+     BRAND COLORS
+  ========================= */
+
   --app-primary: #16a34a;
+  --app-primary-hover: #15803d;
   --app-primary-dark: #15803d;
   --app-primary-light: #dcfce7;
+  --app-primary-soft: #f0fdf4;
 
   --app-secondary: #22c55e;
   --app-secondary-dark: #16a34a;
   --app-secondary-light: #f0fdf4;
 
+
+  /* =========================
+     BACKGROUNDS
+  ========================= */
+
   --app-background: #ffffff;
   --app-background-soft: #f7faf8;
+
   --app-background-blue: #ecfdf3;
   --app-background-yellow: #f0fdf4;
-  --app-background-dark: #111815;
+
+
+  /* =========================
+     SURFACES
+  ========================= */
 
   --app-surface: #ffffff;
   --app-surface-soft: #f8faf9;
-  --app-surface-dark: #1b2420;
+
+  --app-card-background: #ffffff;
+
+  --app-input-background: #ffffff;
+
+  --app-sidebar-background: #ffffff;
+
+  --app-header-background: #ffffff;
+
+  --app-hover-background: #f4faf6;
+
+  --app-selected-background: #ecfdf3;
+
+
+  /* =========================
+     TEXT
+  ========================= */
 
   --app-text-primary: #111814;
+
   --app-text-secondary: #5f6c64;
+
   --app-text-muted: #8a9690;
+
+  --app-text-disabled: #aeb8b2;
+
   --app-text-light: #ffffff;
 
+  --app-text-on-primary: #ffffff;
+
+
+  /* =========================
+     BORDERS
+  ========================= */
+
   --app-border: #e3e9e5;
-  --app-border-dark: #2c3731;
+
+  --app-border-soft: #edf2ef;
+
+  --app-border-strong: #cfd8d3;
+
+  --app-input-border: #dce4df;
+
+
+  /* =========================
+     STATUS COLORS
+  ========================= */
 
   --app-success: #16a34a;
-  --app-warning: #d99a00;
-  --app-danger: #dc4545;
-  --app-info: #168aad;
+  --app-success-soft: #dcfce7;
 
-  --app-font-body: 'Inter', sans-serif;
-  --app-font-heading: 'Manrope', sans-serif;
+  --app-warning: #d97706;
+  --app-warning-soft: #fef3c7;
+
+  --app-danger: #dc2626;
+  --app-danger-soft: #fee2e2;
+
+  --app-info: #0284c7;
+  --app-info-soft: #e0f2fe;
+
+
+  /* =========================
+     TYPOGRAPHY
+  ========================= */
+
+  --app-font-body:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  --app-font-heading:
+    'Manrope',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
+
+  /* FONT SIZES */
 
   --app-font-size-xs: 12px;
-  --app-font-size-sm: 14px;
-  --app-font-size-md: 16px;
-  --app-font-size-lg: 18px;
-  --app-font-size-xl: 24px;
-  --app-font-size-2xl: 32px;
-  --app-font-size-3xl: 48px;
-  --app-font-size-4xl: 64px;
+
+  --app-font-size-sm: 13px;
+
+  --app-font-size-md: 14px;
+
+  --app-font-size-lg: 16px;
+
+  --app-font-size-xl: 20px;
+
+  --app-font-size-2xl: 26px;
+
+  --app-font-size-3xl: 36px;
+
+  --app-font-size-4xl: 48px;
+
+
+  /* FONT WEIGHTS */
+
+  --app-font-weight-regular: 400;
+
+  --app-font-weight-medium: 500;
+
+  --app-font-weight-semibold: 600;
+
+  --app-font-weight-bold: 700;
+
+  --app-font-weight-extra-bold: 800;
+
+
+  /* LINE HEIGHT */
+
+  --app-line-height-tight: 1.2;
+
+  --app-line-height-normal: 1.5;
+
+  --app-line-height-relaxed: 1.65;
+
+
+  /* LETTER SPACING */
+
+  --app-letter-spacing-tight: -0.02em;
+
+  --app-letter-spacing-normal: 0;
+
+
+  /* =========================
+     BORDER RADIUS
+  ========================= */
+
+  --app-radius-xs: 6px;
 
   --app-radius-sm: 8px;
+
   --app-radius-md: 12px;
-  --app-radius-lg: 18px;
-  --app-radius-xl: 26px;
+
+  --app-radius-lg: 16px;
+
+  --app-radius-xl: 20px;
+
+  --app-radius-2xl: 26px;
+
   --app-radius-round: 999px;
 
+
+  /* =========================
+     SPACING
+  ========================= */
+
   --app-space-xs: 4px;
+
   --app-space-sm: 8px;
+
   --app-space-md: 16px;
+
   --app-space-lg: 24px;
+
   --app-space-xl: 32px;
+
   --app-space-2xl: 48px;
+
   --app-space-3xl: 72px;
+
   --app-space-4xl: 100px;
 
+
+  /* =========================
+     SHADOWS
+  ========================= */
+
+  --app-shadow-xs:
+    0 1px 3px rgba(17, 24, 20, 0.05);
+
   --app-shadow-sm:
-    0 2px 10px rgba(17, 24, 20, 0.05);
+    0 2px 10px rgba(17, 24, 20, 0.06);
 
   --app-shadow-md:
     0 10px 30px rgba(17, 24, 20, 0.08);
@@ -68,387 +231,176 @@
   --app-shadow-lg:
     0 20px 60px rgba(17, 24, 20, 0.12);
 
+
+  /* =========================
+     LAYOUT
+  ========================= */
+
   --app-container-width: 1280px;
+
   --app-page-padding: 48px;
 
+
+  /* =========================
+     TRANSITIONS
+  ========================= */
+
+  --app-transition-fast: 0.15s ease;
+
   --app-transition: 0.25s ease;
-}
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-html,
-body,
-app-root,
-ion-app {
-  width: 100%;
-  height: 100%;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-
-  background: var(--app-background);
-  color: var(--app-text-primary);
-
-  font-family: var(--app-font-body);
-}
-
-body {
-  min-height: 100vh;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--app-font-heading);
-  font-weight: 700;
-}
-
-button,
-input,
-textarea,
-select {
-  font-family: var(--app-font-body);
-}
-
-ion-content {
-  --background: var(--app-background);
-
-  font-family: var(--app-font-body);
-}
-
-ion-button {
-  --background: var(--app-primary);
-  --background-hover: var(--app-primary-dark);
-  --background-activated: var(--app-primary-dark);
-  --background-focused: var(--app-primary-dark);
-
-  --color: var(--app-text-light);
-
-  --border-radius: var(--app-radius-md);
-
-  --box-shadow: none;
-
-  font-family: var(--app-font-body);
-  font-weight: 600;
-
-  text-transform: none;
-}
-
-.app-container {
-  width: 100%;
-  max-width: var(--app-container-width);
-
-  margin: 0 auto;
-
-  padding-left: var(--app-page-padding);
-  padding-right: var(--app-page-padding);
-}
-
-.section-heading {
-  text-align: center;
-}
-
-.section-heading h2 {
-  margin: 0;
-
-  color: var(--app-text-primary);
-
-  font-family: var(--app-font-heading);
-
-  font-size: var(--app-font-size-2xl);
-  font-weight: 700;
-
-  letter-spacing: -0.03em;
-}
-
-.section-heading p {
-  margin: 8px 0 0;
-
-  color: var(--app-text-secondary);
-
-  font-size: var(--app-font-size-sm);
-}
-
-// ion-content::part(scroll) {
-//   scrollbar-width: none;
-//   -ms-overflow-style: none;
-// }
-
-// ion-content::part(scroll)::-webkit-scrollbar {
-//   display: none;
-
-//   width: 0;
-//   height: 0;
-// }
+  --app-transition-slow: 0.35s ease;
 
 
+  /* =========================
+     NATIVE COLOR SCHEME
+  ========================= */
 
-@media (max-width: 992px) {
-  :root {
-    --app-page-padding: 28px;
-  }
-}
-
-@media (max-width: 768px) {
-  :root {
-    --app-page-padding: 20px;
-
-    --app-font-size-3xl: 40px;
-    --app-font-size-4xl: 48px;
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --app-page-padding: 16px;
-
-    --app-font-size-2xl: 28px;
-    --app-font-size-3xl: 34px;
-    --app-font-size-4xl: 40px;
-  }
-}
-
-.cdk-overlay-container {
-  position: fixed !important;
-  z-index: 10000 !important;
-}
-
-.cdk-overlay-pane {
-  z-index: 10000 !important;
-}
-
-.mat-datepicker-content {
-  background: #ffffff !important;
-  border: 1px solid #e2e8e4 !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-
-  box-shadow:
-    0 12px 32px rgba(15, 23, 42, 0.16) !important;
-}
-
-.mat-datepicker-content .mat-calendar {
-  width: 300px !important;
-  height: 354px !important;
-  background: #ffffff !important;
-}
-
-.mat-datepicker-content .mat-calendar-header {
-  padding: 8px 8px 0 !important;
-}
-
-.mat-datepicker-content .mat-calendar-controls {
-  margin: 5% calc(4.7142857143% - 16px) !important;
-}
-
-.mat-datepicker-content .mat-calendar-period-button {
-  color: #1f2937 !important;
-  font-weight: 700 !important;
-}
-
-.mat-datepicker-content .mat-calendar-previous-button,
-.mat-datepicker-content .mat-calendar-next-button {
-  color: #1f2937 !important;
-}
-
-.mat-datepicker-content .mat-calendar-arrow {
-  fill: #1f2937 !important;
-}
-
-.mat-datepicker-content .mat-calendar-table-header th {
-  color: #64748b !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-}
-
-.mat-datepicker-content .mat-calendar-body-cell-content {
-  color: #1f2937 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-}
-
-.mat-datepicker-content .mat-calendar-body-selected {
-  background-color: #16a34a !important;
-  color: #ffffff !important;
-}
-
-.mat-datepicker-content .mat-calendar-body-today:not(
-  .mat-calendar-body-selected
-) {
-  border-color: #16a34a !important;
-}
-
-.mat-datepicker-content .mat-calendar-body-in-range::before {
-  background: #dcfce7 !important;
-}
-
-.mat-datepicker-content .mat-calendar-body-range-start::before {
-  left: 50% !important;
-}
-
-.mat-datepicker-content .mat-calendar-body-range-end::before {
-  right: 50% !important;
-}
-
-.mat-datepicker-content
-  .mat-calendar-body-cell:hover
-  .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
-  background: #ecfdf5 !important;
+  color-scheme: light;
 }
 
 
+/* =========================================================
+   DARK THEME
+   Black + Neon Green
+========================================================= */
 
-ion-toast.app-notification-toast {
-  --width: 340px;
-  --max-width: 340px;
-  --min-height: 46px;
-  --border-radius: 10px;
-  --box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
-  --start: auto;
-  --end: 18px;
-  font-family: var(--app-font-body);
-  z-index: 99999;
-  animation: toastEnter 0.28s ease-out;
-}
+html.dark {
 
-ion-toast.app-notification-toast::part(container) {
-  min-height: 46px;
-  padding: 0 2px;
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-}
+  /* =========================
+     BRAND COLORS
+  ========================= */
 
-ion-toast.app-notification-toast::part(message) {
-  padding: 9px 10px;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0.01em;
-}
+  --app-primary: #00e676;
 
-ion-toast.app-notification-toast::part(icon) {
-  width: 18px;
-  height: 18px;
-  margin-left: 9px;
-  font-size: 18px;
-  animation: toastIconPop 0.35s ease-out;
-}
+  --app-primary-hover: #00ff85;
 
-ion-toast.app-notification-toast::part(button) {
-  min-width: 30px;
-  padding-inline: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.8;
-}
+  --app-primary-dark: #00c853;
 
-ion-toast.app-notification-success {
-  --background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
-  --color: #166534;
-}
+  --app-primary-light: #123d29;
 
-ion-toast.app-notification-success::part(container) {
-  border: 1px solid #bbf7d0;
-  border-left: 4px solid #16a34a;
-}
+  --app-primary-soft: #0d2519;
 
-ion-toast.app-notification-success::part(icon),
-ion-toast.app-notification-success::part(button) {
-  color: #16a34a;
-}
 
-ion-toast.app-notification-error {
-  --background: linear-gradient(135deg, #fff1f2, #fef2f2);
-  --color: #991b1b;
-}
+  --app-secondary: #00e676;
 
-ion-toast.app-notification-error::part(container) {
-  border: 1px solid #fecaca;
-  border-left: 4px solid #dc2626;
-}
+  --app-secondary-dark: #00c853;
 
-ion-toast.app-notification-error::part(icon) {
-  color: #dc2626;
-}
+  --app-secondary-light: #102c20;
 
-ion-toast.app-notification-error::part(button) {
-  color: #991b1b;
-}
 
-ion-toast.app-notification-warning {
-  --background: linear-gradient(135deg, #fffbeb, #fefce8);
-  --color: #92400e;
-}
+  /* =========================
+     BACKGROUNDS
+  ========================= */
 
-ion-toast.app-notification-warning::part(container) {
-  border: 1px solid #fde68a;
-  border-left: 4px solid #d97706;
-}
+  --app-background: #080b0a;
 
-ion-toast.app-notification-warning::part(icon),
-ion-toast.app-notification-warning::part(button) {
-  color: #d97706;
-}
+  --app-background-soft: #0d1210;
 
-ion-toast.app-notification-info {
-  --background: linear-gradient(135deg, #eff6ff, #ecfeff);
-  --color: #0c4a6e;
-}
+  --app-background-blue: #0b1711;
 
-ion-toast.app-notification-info::part(container) {
-  border: 1px solid #bae6fd;
-  border-left: 4px solid #0284c7;
-}
+  --app-background-yellow: #0c1812;
 
-ion-toast.app-notification-info::part(icon),
-ion-toast.app-notification-info::part(button) {
-  color: #0284c7;
-}
 
-@keyframes toastEnter {
-  from {
-    opacity: 0;
-  }
+  /* =========================
+     SURFACES
+  ========================= */
 
-  to {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
+  --app-surface: #111916;
 
-@keyframes toastIconPop {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
+  --app-surface-soft: #161f1c;
 
-  70% {
-    transform: scale(1.12);
-  }
+  --app-card-background: #111916;
 
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
+  --app-input-background: #0d1512;
 
-@media (max-width: 768px) {
-  ion-toast.app-notification-toast {
-    --width: calc(100% - 32px);
-    --max-width: calc(100% - 32px);
-    --start: 16px;
-    --end: 16px;
-  }
+  --app-sidebar-background: #090d0b;
+
+  --app-header-background: #090d0b;
+
+  --app-hover-background: #17211d;
+
+  --app-selected-background: #10291d;
+
+
+  /* =========================
+     TEXT
+  ========================= */
+
+  --app-text-primary: #f5f7f6;
+
+  --app-text-secondary: #aab6b0;
+
+  --app-text-muted: #77827d;
+
+  --app-text-disabled: #56615c;
+
+  --app-text-light: #ffffff;
+
+  /*
+   * Neon green is bright enough that black text gives
+   * better contrast than white on primary buttons.
+   */
+  --app-text-on-primary: #041009;
+
+
+  /* =========================
+     BORDERS
+  ========================= */
+
+  --app-border: #26302c;
+
+  --app-border-soft: #1c2521;
+
+  --app-border-strong: #35423c;
+
+  --app-input-border: #2a3630;
+
+
+  /* =========================
+     STATUS COLORS
+  ========================= */
+
+  --app-success: #00e676;
+
+  --app-success-soft: #103522;
+
+
+  --app-warning: #fbbf24;
+
+  --app-warning-soft: #382b0c;
+
+
+  --app-danger: #f87171;
+
+  --app-danger-soft: #3a1717;
+
+
+  --app-info: #38bdf8;
+
+  --app-info-soft: #102c3b;
+
+
+  /* =========================
+     SHADOWS
+  ========================= */
+
+  --app-shadow-xs:
+    0 1px 3px rgba(0, 0, 0, 0.2);
+
+  --app-shadow-sm:
+    0 2px 10px rgba(0, 0, 0, 0.25);
+
+  --app-shadow-md:
+    0 10px 30px rgba(0, 0, 0, 0.35);
+
+  --app-shadow-lg:
+    0 20px 60px rgba(0, 0, 0, 0.5);
+
+
+  /* =========================
+     NATIVE COLOR SCHEME
+  ========================= */
+
+  color-scheme: dark;
 }

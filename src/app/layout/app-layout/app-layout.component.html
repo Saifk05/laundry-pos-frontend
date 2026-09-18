@@ -56,7 +56,10 @@
 
         <button
           type="button"
-          class="header-action">
+          class="header-action theme-toggle"
+          [class.dark-active]="isDarkMode"
+          [title]="isDarkMode ? 'Switch to Light Theme' : 'Switch to Neon Theme'"
+          (click)="toggleTheme()">
           🚲
         </button>
 
