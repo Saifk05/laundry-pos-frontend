@@ -54,7 +54,6 @@ import {
   PaymentRequest
 } from '../../../core/models/settlement.model';
 
-
 const BILL_DATE_FORMATS = {
   parse: {
     dateInput: 'DD/MM/YYYY'
@@ -159,7 +158,6 @@ class BillDateAdapter extends NativeDateAdapter {
   }
 }
 
-
 @Component({
   selector: 'app-bill',
   standalone: true,
@@ -223,8 +221,9 @@ export class BillPage
     B2COrderDetails | null =
       null;
 
-  receiptTermsAndConditions =
-    '';
+  receiptTermsAndConditions = '';
+  businessName = '';
+  headerSubtitle = '';
 
   settlementOpen =
     false;
@@ -312,6 +311,13 @@ export class BillPage
 
   invoiceStatus =
     'ALL';
+  gstFilter: 'ALL' | 'WITH_GST' | 'WITHOUT_GST' = 'ALL';
+
+  readonly gstFilterOptions = [
+    { label: 'All', value: 'ALL' },
+    { label: 'With GST', value: 'WITH_GST' },
+    { label: 'Without GST', value: 'WITHOUT_GST' }
+  ];
 
   sortBy =
     'Created Date Desc';
@@ -358,13 +364,19 @@ export class BillPage
   }
 
   ngOnInit(): void {
-
-    this.receiptTermsAndConditions =
-      localStorage.getItem(
-        'receiptTermsAndConditions'
-      ) ?? '';
-
+    this.receiptTermsAndConditions = localStorage.getItem('receiptTermsAndConditions') ?? '';
     this.loadInvoices();
+    this.loadBusinessSettings();
+  }
+
+  loadBusinessSettings(): void {
+    this.apiService.getBusinessSettings().subscribe({
+      next: (res: any) => {
+        this.businessName = res?.businessName ?? '';
+        this.headerSubtitle = res?.headerSubtitle ?? '';
+      },
+      error: (err: any) => console.error('Settings load error', err)
+    });
   }
 
   loadInvoices(
@@ -381,6 +393,7 @@ export class BillPage
       .getBills(
         this.fromDate || undefined,
         this.toDate || undefined,
+        this.withGstFilter,
         cursor,
         this.pageLimit
       )
@@ -430,6 +443,12 @@ export class BillPage
         }
 
       });
+  }
+
+  get withGstFilter(): boolean | undefined {
+    if (this.gstFilter === 'WITH_GST') return true;
+    if (this.gstFilter === 'WITHOUT_GST') return false;
+    return undefined;
   }
 
   get filteredInvoices():
@@ -572,7 +591,6 @@ export class BillPage
     return result;
   }
 
-
   get totalPaid():
     number {
 
@@ -590,7 +608,6 @@ export class BillPage
       0
     );
   }
-
 
   get totalDue():
     number {
@@ -610,7 +627,6 @@ export class BillPage
     );
   }
 
-
   get totalAmount():
     number {
 
@@ -628,7 +644,6 @@ export class BillPage
       0
     );
   }
-
 
   get totalTaxableAmount():
     number {
@@ -648,7 +663,6 @@ export class BillPage
     );
   }
 
-
   get totalCgstAmount():
     number {
 
@@ -666,7 +680,6 @@ export class BillPage
       0
     );
   }
-
 
   get totalSgstAmount():
     number {
@@ -686,7 +699,6 @@ export class BillPage
     );
   }
 
-
   get totalTaxAmount():
     number {
 
@@ -704,7 +716,6 @@ export class BillPage
       0
     );
   }
-
 
   get totalExpress():
     number {
@@ -724,7 +735,6 @@ export class BillPage
     );
   }
 
-
   get totalDiscount():
     number {
 
@@ -743,7 +753,6 @@ export class BillPage
     );
   }
 
-
   get grossTotal():
     number {
 
@@ -761,7 +770,6 @@ export class BillPage
       0
     );
   }
-
 
   getStatusLabel(
     status:
@@ -839,6 +847,26 @@ export class BillPage
     this.searchBills();
   }
 
+  onDateFilterChange(): void {
+
+    const start =
+      this.range.controls.start.value;
+
+    const end =
+      this.range.controls.end.value;
+
+    if (!start || !end) {
+      return;
+    }
+
+    this.searchBills();
+  }
+
+  onGstFilterChange(): void {
+    this.resetPagination();
+    this.loadInvoices();
+  }
+
   clearFilters(): void {
 
     this.orderIdSearch =
@@ -866,6 +894,8 @@ export class BillPage
 
     this.invoiceStatus =
       'ALL';
+
+    this.gstFilter = 'ALL';
 
     this.sortBy =
       'Created Date Desc';
@@ -1281,11 +1311,9 @@ export class BillPage
 
   get settlementBalanceAmount():
     number {
-
     if (
       this.settlementOrder
     ) {
-
       return Number(
         this.settlementOrder
           .balanceAmount ?? 0
@@ -1299,62 +1327,31 @@ export class BillPage
   }
 
   addPayment(): void {
-
-    if (
-      !this.settlementInvoice
-    ) {
-
+    if (!this.settlementInvoice ) {
       return;
     }
 
-    const amount =
-      Number(
-        this.paymentAmount
-      );
-
-    const balance =
-      this.settlementBalanceAmount;
-
-    if (
-      !amount ||
-      amount <= 0
-    ) {
-
-      this.paymentError =
-        'Enter a valid payment amount';
-
+    const amount = Number(this.paymentAmount);
+    const balance = this.settlementBalanceAmount;
+    if ( !amount || amount <= 0 ) {
+      this.paymentError = 'Enter a valid payment amount';
       return;
     }
 
-    if (
-      amount > balance
-    ) {
-
-      this.paymentError =
-        'Payment amount cannot be greater than balance';
-
+    if ( amount > balance ) {
+      this.paymentError = 'Payment amount cannot be greater than balance';
       return;
     }
 
-    const request:
-      PaymentRequest = {
-
+    const request: PaymentRequest = {
         amount,
-
-        paymentMethod:
-          this.paymentMethod,
-
-        referenceNumber:
-          this.referenceNumber
+        paymentMethod: this.paymentMethod,
+        referenceNumber: this.referenceNumber
             .trim() || null
       };
 
-    this.paymentSubmitting =
-      true;
-
-    this.paymentError =
-      '';
-
+    this.paymentSubmitting = true;
+    this.paymentError ='';
     this.apiService
       .addSettlementPayment(
         this.settlementInvoice
@@ -1364,12 +1361,8 @@ export class BillPage
       .subscribe({
 
         next: () => {
-
-          this.paymentSubmitting =
-            false;
-
+          this.paymentSubmitting = false;
           this.closeSettlement();
-
           this.loadInvoices();
         },
 
@@ -1403,7 +1396,6 @@ export class BillPage
       ? status.split('_').join(' ')
       : '';
   }
-
 
   private resetPagination(): void {
     this.currentCursor = null;
@@ -1477,6 +1469,4 @@ export class BillPage
       day
     );
   }
-
-
 }

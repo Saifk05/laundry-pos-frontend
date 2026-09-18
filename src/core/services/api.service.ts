@@ -12,6 +12,25 @@ import {
 } from '../models/walk-in.model';
 
 import {
+  CustomFeatureSettings,
+  RetagSecurityRequest,
+  SetRetagPinRequest,
+  VerifyRetagPinRequest,
+  VerifyRetagPinResponse,
+  ChangeRetagPinRequest,
+  ResetRetagPinRequest,
+  RetagWhatsappRequest
+} from '../models/custom-feature.model';
+
+import {
+  PickupDelivery,
+  PickupDeliveryRequest,
+  PickupDeliveryStatus,
+  PickupDeliveryPageResponse,
+  MapLocationResponse
+} from '../models/pickup-delivery.model';
+
+import {
   TaxSetting,
   TaxSettingRequest
 } from '../models/tax-setting.model';
@@ -108,6 +127,20 @@ export class ApiService {
 
     return this.http.get<CustomerResponse>(
       `${this.baseUrl}/customers/phone/${phone}`
+    );
+  }
+
+
+  createCustomer(
+    request: {
+      name: string;
+      phone: string;
+    }
+  ): Observable<CustomerResponse> {
+
+    return this.http.post<CustomerResponse>(
+      `${this.baseUrl}/customers`,
+      request
     );
   }
 
@@ -543,16 +576,21 @@ getB2COrders(
 getBills(
   fromDate?: string,
   toDate?: string,
+  withGst?: boolean,
   cursor?: string | null,
   limit = 10
 ): Observable<BillListResponse> {
 
-  const params = {
+  const params: any = {
     fromDate: fromDate ?? '',
     toDate: toDate ?? '',
     cursor: cursor ?? '',
     limit
   };
+
+  if (withGst !== undefined) {
+    params.withGst = withGst;
+  }
 
   return this.http.get<BillListResponse>(
     `${this.baseUrl}/bills`,
@@ -560,14 +598,6 @@ getBills(
   );
 }
 
-
-//   getBills():
-//   Observable<BillListResponse> {
-
-//   return this.http.get<BillListResponse>(
-//     `${this.baseUrl}/bills`
-//   );
-// }
 
 downloadBillReceipt(
   orderId: string
@@ -702,5 +732,189 @@ updateTermsConditions(
     );
   }
 
+  /* =========================================
+     PICKUP / DELIVERY
+  ========================================= */
+
+  createPickupDelivery(
+    request: PickupDeliveryRequest
+  ): Observable<PickupDelivery> {
+    return this.http.post<PickupDelivery>(
+      `${this.baseUrl}/v1/pickup-deliveries`,
+      request
+    );
+  }
+
+  getPickupDeliveries(
+    filter: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL',
+    date?: string | null,
+    status?: PickupDeliveryStatus | null,
+    timeSlot?: string | null,
+    search?: string | null,
+    cursor: string | null = null,
+    limit = 10
+  ): Observable<PickupDeliveryPageResponse> {
+    const params: any = {
+      filter,
+      cursor: cursor ?? '',
+      limit
+    };
+
+    if (date) params.date = date;
+    if (status) params.status = status;
+    if (timeSlot?.trim()) params.timeSlot = timeSlot.trim();
+    if (search?.trim()) params.search = search.trim();
+
+    return this.http.get<PickupDeliveryPageResponse>(
+      `${this.baseUrl}/v1/pickup-deliveries`,
+      { params }
+    );
+  }
+
+  getPickupDeliveryById(
+    id: string
+  ): Observable<PickupDelivery> {
+    return this.http.get<PickupDelivery>(
+      `${this.baseUrl}/v1/pickup-deliveries/${id}`
+    );
+  }
+
+  updatePickupDeliveryStatus(
+    id: string,
+    status: PickupDeliveryStatus
+  ): Observable<PickupDelivery> {
+    return this.http.patch<PickupDelivery>(
+      `${this.baseUrl}/v1/pickup-deliveries/${id}/status`,
+      { status }
+    );
+  }
+
+
+  /* =========================================
+     MAPS
+  ========================================= */
+
+  autocompleteLocation(
+    query: string
+  ): Observable<MapLocationResponse[]> {
+
+    return this.http.get<MapLocationResponse[]>(
+      `${this.baseUrl}/v1/maps/autocomplete`,
+      {
+        params: { q: query }
+      }
+    );
+  }
+
+
+  geocodeAddress(
+    address: string
+  ): Observable<any> {
+
+    return this.http.get<any>(
+      `${this.baseUrl}/v1/maps/geocode`,
+      {
+        params: { address }
+      }
+    );
+  }
+
+
+  reverseGeocode(
+    latitude: number,
+    longitude: number
+  ): Observable<any> {
+
+    return this.http.get<any>(
+      `${this.baseUrl}/v1/maps/reverse-geocode`,
+      {
+        params: {
+          lat: latitude,
+          lng: longitude
+        }
+      }
+    );
+  }
+
+
+  resolveGoogleMapsLink(
+    url: string
+  ): Observable<MapLocationResponse> {
+
+    return this.http.get<MapLocationResponse>(
+      `${this.baseUrl}/v1/maps/resolve-link`,
+      {
+        params: { url }
+      }
+    );
+  }
+
+  getCustomFeatures():
+  Observable<CustomFeatureSettings> {
+
+  return this.http.get<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features`
+  );
+}
+
+updateRetagSecurity(
+  request: RetagSecurityRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-security`,
+    request
+  );
+}
+
+setRetagPin(
+  request: SetRetagPinRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.post<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-pin`,
+    request
+  );
+}
+
+verifyRetagPin(
+  request: VerifyRetagPinRequest
+): Observable<VerifyRetagPinResponse> {
+
+  return this.http.post<VerifyRetagPinResponse>(
+    `${this.baseUrl}/custom-features/retag-pin/verify`,
+    request
+  );
+}
+
+changeRetagPin(
+  request: ChangeRetagPinRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-pin/change`,
+    request
+  );
+}
+
+resetRetagPin(
+  request: ResetRetagPinRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-pin/reset`,
+    request
+  );
+}
+
+updateRetagWhatsapp(
+  request: RetagWhatsappRequest
+): Observable<CustomFeatureSettings> {
+
+  return this.http.put<CustomFeatureSettings>(
+    `${this.baseUrl}/custom-features/retag-whatsapp`,
+    request
+  );
+}
 
 }

@@ -35,17 +35,10 @@ export const routes: Routes = [
       },
 
       {
-        path: 'payments',
+        path: 'schedule-service',
         loadComponent: () =>
-          import('./pages/payments/payments.page')
-            .then((m) => m.PaymentsPage),
-      },
-
-      {
-        path: 'settlement',
-        loadComponent: () =>
-          import('./pages/settlement/settlement.page')
-            .then((m) => m.SettlementPage),
+          import('./pages/schedule-service/schedule-service.page')
+            .then((m) => m.ScheduleServicePage),
       },
 
       {
@@ -56,10 +49,10 @@ export const routes: Routes = [
       },
 
       {
-        path: 'bill',
+        path: 'pickup',
         loadComponent: () =>
-          import('./pages/bill/bill.page')
-            .then((m) => m.BillPage),
+          import('./pages/pickup/pickup.page')
+            .then((m) => m.PickupPage),
       },
 
       {
@@ -116,6 +109,34 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/inventory/tax/tax.component')
             .then((m) => m.TaxComponent),
+      },
+
+      {
+        path: 'inventory/custom-features',
+        loadComponent: () =>
+          import('./pages/inventory/custom-features/custom-features.page')
+            .then((m) => m.CustomFeaturesPage),
+      },
+
+      {
+        path: 'bill',
+        loadComponent: () =>
+          import('./pages/bill/bill.page')
+            .then((m) => m.BillPage),
+      },
+
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./pages/payments/payments.page')
+            .then((m) => m.PaymentsPage),
+      },
+
+      {
+        path: 'settlement',
+        loadComponent: () =>
+          import('./pages/settlement/settlement.page')
+            .then((m) => m.SettlementPage),
       },
 
       {

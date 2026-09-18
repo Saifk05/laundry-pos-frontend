@@ -5,7 +5,8 @@
 
 export const environment = {
   production: false,
-  clientUrl: 'http://localhost:8080'
+  clientUrl: 'http://localhost:8080',
+  olaMapsApiKey:'N8pGV0VyfOkNzA75tIvjXDTD2bK07G9XVWo0kwfe'
     // clientUrl: 'https://laundry-pos-backend.onrender.com'
 
 };

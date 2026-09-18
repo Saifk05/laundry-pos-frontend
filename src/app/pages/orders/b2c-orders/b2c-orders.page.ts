@@ -214,28 +214,45 @@ export class B2cOrdersPage implements OnInit {
   callModalOpen = false;
   selectedCallOrder: B2cOrderView | null = null;
   numberCopied = false;
-  businessName = 'Venkateshwara Fabric Works';
+  businessName = 'Fabric Works';
+  secureRetagEnabled = false;
+  retagPinConfigured = false;
+  retagWhatsappEnabled = false;
+
+  retagPinModalOpen = false;
+  retagPin = '';
+  retagPinError = '';
+  retagPinLoading = false;
+
+  selectedRetagOrder: B2cOrderView | null = null;
 
   constructor(
     private readonly apiService: ApiService,
     private readonly router: Router
   ) {}
 
-  ngOnInit(): void {
-    this.loadOrders();
-    this.loadBusinessSettings();
-  }
+ngOnInit(): void {
+  this.loadBusinessSettings();
+  this.loadOrders();
+}
 
-  loadBusinessSettings(): void {
-    this.apiService.getBusinessSettings().subscribe({
-      next: (response: any) => {
-        this.businessName = response?.businessName || 'Venkateshwara Fabric Works';
-      },
-      error: (error: any) => {
-        console.error('Settings load error', error);
-      }
-    });
-  }
+private loadBusinessSettings(): void {
+  this.apiService.getBusinessSettings().subscribe({
+    next: (response: any) => {
+      this.businessName = response?.businessName || 'Fabric Works';
+      this.secureRetagEnabled = Boolean(response?.customFeatures?.secureRetagEnabled);
+      this.retagPinConfigured = Boolean(response?.customFeatures?.retagPinConfigured);
+      this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
+    },
+    error: (error: any) => {
+      console.error('Unable to load business settings:', error);
+      this.secureRetagEnabled = false;
+      this.retagPinConfigured = false;
+      this.retagWhatsappEnabled = false;
+    }
+  });
+}
+
 
   loadOrders(cursor: string | null = null): void {
     this.loading = true;
@@ -273,27 +290,30 @@ export class B2cOrdersPage implements OnInit {
       });
   }
 
-  private toViewOrder(order: B2COrder): B2cOrderView {
-    return {
-      id: order.id,
-      orderNumber: order.orderNumber,
-      status: order.status,
-      customerName: order.customerName,
-      mobile: order.mobile,
-      storageLabel: order.storageLabel ?? '-',
-      pickupDate: order.pickupDate ?? '-',
-      pickupSlot: order.pickupTime ?? '-',
-      deliveryDate: order.deliveryDate ?? '-',
-      deliverySlot: order.deliveryTime ?? '-',
-      amount: Number(order.totalAmount ?? 0),
-      homeDelivery: order.homeDelivery,
-      expressDelivery: order.expressDelivery,
-      settled: order.settled,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-      moreOpen: false
-    };
-  }
+private toViewOrder(
+  order: B2COrder
+): B2cOrderView {
+
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    status: order.status,
+    customerName: order.customerName,
+    mobile: order.mobile,
+    storageLabel: order.storageLabel ?? '-',
+    pickupDate: order.pickupDate ?? '-',
+    pickupSlot: order.pickupTime ?? '-',
+    deliveryDate: order.deliveryDate ?? '-',
+    deliverySlot: order.deliveryTime ?? '-',
+    amount: Number(order.totalAmount ?? 0),
+    homeDelivery: order.homeDelivery,
+    expressDelivery: order.expressDelivery,
+    settled: order.settled,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    moreOpen: false
+  };
+}
 
   get filteredOrders(): B2cOrderView[] {
     return this.orders.filter((order: B2cOrderView) => {
@@ -534,12 +554,36 @@ export class B2cOrdersPage implements OnInit {
         this.updateLocalOrder(storageResponse);
         this.apiService.markB2COrderReady(orderId).subscribe({
           next: (readyResponse: B2COrder) => {
+            const readyOrder: B2cOrderView = {
+              id: readyResponse.id,
+              orderNumber: readyResponse.orderNumber,
+              status: readyResponse.status,
+              customerName: readyResponse.customerName,
+              mobile: readyResponse.mobile,
+              storageLabel: readyResponse.storageLabel ?? '-',
+              pickupDate: readyResponse.pickupDate ?? '-',
+              pickupSlot: readyResponse.pickupTime ?? '-',
+              deliveryDate: readyResponse.deliveryDate ?? '-',
+              deliverySlot: readyResponse.deliveryTime ?? '-',
+              amount: Number(readyResponse.totalAmount ?? 0),
+              homeDelivery: readyResponse.homeDelivery,
+              expressDelivery: readyResponse.expressDelivery,
+              settled: readyResponse.settled,
+              createdAt: readyResponse.createdAt,
+              updatedAt: readyResponse.updatedAt,
+              moreOpen: false
+            };
+
             this.updateLocalOrder(readyResponse);
             this.actionLoading = false;
             this.readyStorageModalOpen = false;
             this.selectedReadyOrder = null;
             this.readyStorageLabel = '';
             this.readyStorageError = '';
+
+            this.openReadyWhatsApp(
+              readyOrder
+            );
           },
           error: (error: any) => {
             this.actionLoading = false;
@@ -550,6 +594,117 @@ export class B2cOrdersPage implements OnInit {
         this.actionLoading = false;
         this.readyStorageError = error?.error?.message || error?.error?.error || 'Unable to update storage label';
       }});
+  }
+
+private openReadyWhatsApp(
+  order: B2cOrderView
+): void {
+
+  const phone =
+    this.formatWhatsAppPhone(
+      order.mobile
+    );
+
+  if (!phone) {
+    this.errorMessage =
+      'Customer WhatsApp number is invalid';
+
+    return;
+  }
+
+  this.apiService
+    .getB2COrderById(order.id)
+    .subscribe({
+
+      next: (details: any) => {
+
+        const totalQuantity =
+          details.items?.reduce(
+            (total: number, item: any) => {
+
+              if (item.unit === 'KG') {
+                return total +
+                  Number(
+                    item.garmentCount ?? 0
+                  );
+              }
+
+              if (item.unit === 'PC') {
+                return total +
+                  Number(
+                    item.quantity ?? 0
+                  );
+              }
+
+              return total;
+            },
+            0
+          ) ?? 0;
+
+        const quantityLabel = totalQuantity === 1
+            ? 'Pc'
+            : 'Pcs';
+
+        const message = `Dear ${order.customerName},
+
+Your laundry order ${order.orderNumber} is ready for collection.
+
+Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
+Quantity: ${totalQuantity} ${quantityLabel}
+
+Kindly collect your order within 2 days.
+
+Thank you,
+`;
+
+        const whatsappUrl =
+          `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+        window.open(
+          whatsappUrl,
+          '_blank'
+        );
+      },
+
+      error: (error: any) => {
+
+        console.error(
+          'Unable to load order details',
+          error
+        );
+
+        this.errorMessage =
+          'Unable to load order details';
+      }
+    });
+}
+
+  private formatWhatsAppPhone(
+    phone: string
+  ): string {
+
+    if (!phone) {
+      return '';
+    }
+
+    let digits =
+      phone.replace(
+        /\D/g,
+        ''
+      );
+
+    if (digits.length === 10) {
+      digits = `91${digits}`;
+    }
+
+    if (
+      digits.length !== 12 ||
+      !digits.startsWith('91')
+    ) {
+      return '';
+    }
+
+    return digits;
   }
 
   markDelivered(order: B2cOrderView): void {
@@ -757,13 +912,66 @@ export class B2cOrdersPage implements OnInit {
 
   retagOrder(order: B2cOrderView): void {
     this.closeAllMoreMenus();
+    this.errorMessage = '';
+    if (!this.secureRetagEnabled) { this.openRetag(order); return; }
+    if (!this.retagPinConfigured) {
+      this.errorMessage = 'Secure Retag is enabled, but Retag PIN is not configured.';
+      return;
+    }
+    this.selectedRetagOrder = order;
+    this.retagPin = '';
+    this.retagPinError = '';
+    this.retagPinModalOpen = true;
+  }
 
-    this.router.navigate(['/app/new-walk-in'], {
-      queryParams: {
-        mode: 'retag',
-        orderId: order.id
+  closeRetagPinModal(): void {
+    if (this.retagPinLoading) return;
+    this.retagPinModalOpen = false;
+    this.selectedRetagOrder = null;
+    this.retagPin = '';
+    this.retagPinError = '';
+  }
+
+  onRetagPinInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, '').slice(0, 6);
+    input.value = value;
+    this.retagPin = value;
+    this.retagPinError = '';
+  }
+
+  verifyRetagPin(): void {
+    if (!this.selectedRetagOrder) return;
+    if (!/^\d{6}$/.test(this.retagPin)) {
+      this.retagPinError = 'Enter your 6-digit Retag PIN.';
+      return;
+    }
+    this.retagPinLoading = true;
+    this.retagPinError = '';
+    this.apiService.verifyRetagPin({ pin: this.retagPin }).subscribe({
+      next: (response: any) => {
+        this.retagPinLoading = false;
+        const verified = response === true || response?.verified === true || response?.valid === true;
+        if (!verified) { this.retagPinError = 'Incorrect Retag PIN.'; this.retagPin = ''; return; }
+        const order = this.selectedRetagOrder;
+        this.retagPinModalOpen = false;
+        this.selectedRetagOrder = null;
+        this.retagPin = '';
+        this.retagPinError = '';
+        if (order) this.openRetag(order);
+      },
+      error: (error: any) => {
+        this.retagPinLoading = false;
+        this.retagPin = '';
+        this.retagPinError = error?.status === 400 || error?.status === 401 || error?.status === 403
+          ? 'Incorrect Retag PIN.'
+          : error?.error?.message || error?.error?.error || 'Unable to verify Retag PIN.';
       }
     });
+  }
+
+  private openRetag(order: B2cOrderView): void {
+    this.router.navigate(['/app/new-walk-in'], { queryParams: { mode: 'retag', orderId: order.id } });
   }
 
   callCustomer(order: B2cOrderView): void {
@@ -899,238 +1107,300 @@ private printReceipt(order: B2COrderDetails): void {
   }
 
   printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>${order.orderNumber}</title>
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>${order.orderNumber}</title>
 
-        <style>
-          * {
-            box-sizing: border-box;
+      <style>
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          padding: 12px;
+          font-family: Arial, sans-serif;
+          color: #111;
+          background: #fff;
+        }
+
+        .receipt {
+          width: 80mm;
+          margin: 0 auto;
+          font-size: 12px;
+        }
+
+        .center {
+          text-align: center;
+        }
+
+        .shop-name {
+          font-size: 18px;
+          font-weight: 700;
+        }
+
+        .divider {
+          margin: 8px 0;
+          border-top: 1px dashed #000;
+        }
+
+        .row {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          margin: 4px 0;
+        }
+
+        .tax-row {
+          font-size: 11px;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+
+        th,
+        td {
+          padding: 5px 2px;
+          border-bottom: 1px dashed #bbb;
+          vertical-align: top;
+        }
+
+        th {
+          text-align: left;
+          font-size: 11px;
+        }
+
+        td {
+          font-size: 11px;
+        }
+
+        small {
+          font-size: 10px;
+        }
+
+        .grand-total {
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px solid #000;
+          font-size: 15px;
+          font-weight: 700;
+        }
+
+        .terms-section {
+          margin-top: 12px;
+          padding-top: 8px;
+          border-top: 1px dashed #000;
+        }
+
+        .terms-title {
+          margin-bottom: 6px;
+          font-size: 11px;
+          font-weight: 700;
+        }
+
+        .term-line {
+          margin: 4px 0;
+          font-size: 9px;
+          line-height: 1.4;
+          text-align: left;
+        }
+
+        @media print {
+          @page {
+            size: 80mm auto;
+            margin: 0;
           }
 
           body {
-            margin: 0;
-            padding: 12px;
-            font-family: Arial, sans-serif;
-            color: #111;
-            background: #fff;
+            padding: 4mm;
           }
+        }
+      </style>
+    </head>
 
-          .receipt {
-            width: 80mm;
-            margin: 0 auto;
-            font-size: 12px;
-          }
+    <body>
+      <div class="receipt">
 
-          .center {
-            text-align: center;
-          }
-
-          .shop-name {
-            font-size: 18px;
-            font-weight: 700;
-          }
-
-          .divider {
-            margin: 8px 0;
-            border-top: 1px dashed #000;
-          }
-
-          .row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin: 4px 0;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-          }
-
-          th,
-          td {
-            padding: 5px 2px;
-            border-bottom: 1px dashed #bbb;
-            vertical-align: top;
-          }
-
-          th {
-            text-align: left;
-            font-size: 11px;
-          }
-
-          td {
-            font-size: 11px;
-          }
-
-          small {
-            font-size: 10px;
-          }
-
-          .grand-total {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #000;
-            font-size: 15px;
-            font-weight: 700;
-          }
-
-          .terms-section {
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px dashed #000;
-          }
-
-          .terms-title {
-            margin-bottom: 6px;
-            font-size: 11px;
-            font-weight: 700;
-          }
-
-          .term-line {
-            margin: 4px 0;
-            font-size: 9px;
-            line-height: 1.4;
-            text-align: left;
-          }
-
-          @media print {
-            @page {
-              size: 80mm auto;
-              margin: 0;
-            }
-
-            body {
-              padding: 4mm;
-            }
-          }
-        </style>
-      </head>
-
-      <body>
-        <div class="receipt">
-
-          <div class="center">
-            <div class="shop-name">
-              ${this.businessName}
-            </div>
-
-            <div>
-              Bill Receipt
-            </div>
+        <div class="center">
+          <div class="shop-name">
+            ${this.businessName}
           </div>
 
-          <div class="divider"></div>
-
-          <div class="row">
-            <span>Order</span>
-            <strong>${order.orderNumber}</strong>
+          <div>
+            Bill Receipt
           </div>
-
-          <div class="row">
-            <span>Customer</span>
-            <strong>${order.customer.name}</strong>
-          </div>
-
-          <div class="row">
-            <span>Mobile</span>
-            <strong>${order.customer.phone}</strong>
-          </div>
-
-          <div class="row">
-            <span>Created At </span>
-            <strong>
-              ${new Date(order.createdAt).toLocaleDateString('en-GB')}
-            </strong>
-          </div>
-
-          <div class="row">
-            <span>Delivered Date</span>
-            <strong>
-              ${
-                order.deliveryDate
-                  ? new Date(order.deliveryDate + 'T00:00:00').toLocaleDateString('en-GB')
-                  : '-'
-              }
-            </strong>
-          </div>
-
-          <div class="divider"></div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th style="text-align:center;">Qty</th>
-                <th style="text-align:right;">Rate</th>
-                <th style="text-align:right;">Total</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-          </table>
-
-          <div class="divider"></div>
-
-          <div class="row">
-            <span>Subtotal</span>
-            <strong>
-              ₹${Number(order.subtotal).toFixed(2)}
-            </strong>
-          </div>
-
-          <div class="row">
-            <span>Discount</span>
-            <strong>
-              -₹${Number(order.discountAmount).toFixed(2)}
-            </strong>
-          </div>
-
-          <div class="row">
-            <span>Express</span>
-            <strong>
-              ₹${Number(order.expressChargeAmount).toFixed(2)}
-            </strong>
-          </div>
-
-          <div class="row grand-total">
-            <span>Total</span>
-            <strong>
-              ₹${Number(order.totalAmount).toFixed(2)}
-            </strong>
-          </div>
-
-          ${
-            escapedTermsAndConditions
-              ? `
-                <div class="terms-section">
-                  <div class="terms-title">
-                    Terms & Conditions
-                  </div>
-                  ${escapedTermsAndConditions}
-                </div>
-              `
-              : ''
-          }
         </div>
 
-        <script>
-          window.onload = function () {
-            setTimeout(function () {
+        <div class="divider"></div>
+
+        <div class="row">
+          <span>Order</span>
+          <strong>${order.orderNumber}</strong>
+        </div>
+
+        <div class="row">
+          <span>Customer</span>
+          <strong>${order.customer.name}</strong>
+        </div>
+
+        <div class="row">
+          <span>Mobile</span>
+          <strong>${order.customer.phone}</strong>
+        </div>
+
+        <div class="row">
+          <span>Created At</span>
+          <strong>
+            ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+          </strong>
+        </div>
+
+        <div class="row">
+          <span>Delivered Date</span>
+          <strong>
+            ${
+              order.deliveryDate
+                ? new Date(
+                    order.deliveryDate + 'T00:00:00'
+                  ).toLocaleDateString('en-GB')
+                : '-'
+            }
+          </strong>
+        </div>
+
+        <div class="divider"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th style="text-align:center;">Qty</th>
+              <th style="text-align:right;">Rate</th>
+              <th style="text-align:right;">Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <span>Subtotal</span>
+          <strong>
+            ₹${Number(order.subtotal ?? 0).toFixed(2)}
+          </strong>
+        </div>
+
+        ${
+          Number(order.discountAmount ?? 0) > 0
+            ? `
+              <div class="row">
+                <span>Discount</span>
+                <strong>
+                  -₹${Number(order.discountAmount ?? 0).toFixed(2)}
+                </strong>
+              </div>
+            `
+            : ''
+        }
+
+        ${
+          Number(order.expressChargeAmount ?? 0) > 0
+            ? `
+              <div class="row">
+                <span>Express</span>
+                <strong>
+                  ₹${Number(order.expressChargeAmount ?? 0).toFixed(2)}
+                </strong>
+              </div>
+            `
+            : ''
+        }
+
+        ${
+          Number(order.taxAmount ?? 0) > 0
+            ? `
+              <div class="divider"></div>
+              <div class="row tax-row">
+                <span>
+                  CGST (${Number(order.cgstPercentage ?? 0).toFixed(2)}%)
+                </span>
+                <strong>
+                  ₹${Number(order.cgstAmount ?? 0).toFixed(2)}
+                </strong>
+              </div>
+              <div class="row tax-row">
+                <span>
+                  SGST (${Number(order.sgstPercentage ?? 0).toFixed(2)}%)
+                </span>
+                <strong>
+                  ₹${Number(order.sgstAmount ?? 0).toFixed(2)}
+                </strong>
+              </div>
+
+              <div class="row tax-row">
+                <span>Total GST</span>
+
+                <strong>
+                  ₹${Number(order.taxAmount ?? 0).toFixed(2)}
+                </strong>
+              </div>
+            `
+            : ''
+        }
+
+        <div class="row grand-total">
+          <span>Total</span>
+
+          <strong>
+            ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+          </strong>
+        </div>
+
+        ${
+          escapedTermsAndConditions
+            ? `
+              <div class="terms-section">
+
+                <div class="terms-title">
+                  Terms & Conditions
+                </div>
+
+                ${escapedTermsAndConditions}
+
+              </div>
+            `
+            : ''
+        }
+
+      </div>
+
+      <script>
+        window.onload = function () {
+
+          setTimeout(
+            function () {
+
               window.focus();
               window.print();
-            }, 500);
-          };
-        </script>
-      </body>
-    </html>
-  `);
 
+            },
+            500
+          );
+
+        };
+      </script>
+
+    </body>
+  </html>
+`);
   printWindow.document.close();
   printWindow.focus();
 }
@@ -1214,9 +1484,7 @@ private printQrTags(order: B2COrderDetails ): void {
     };
 
     if ( serviceCodeMap[ normalized]) {
-      return serviceCodeMap[
-        normalized
-      ];
+      return serviceCodeMap[ normalized ];
     }
 
     return serviceName
@@ -1225,69 +1493,35 @@ private printQrTags(order: B2COrderDetails ): void {
         word =>
           word.trim()
       )
-      .map(
-        word =>
-          word
+      .map( word => word
             .charAt(0)
             .toUpperCase()
-      )
-      .join('');
+      ) .join('');
   };
 
   let tagsHtml = '';
 
-  for (
-    const item
-    of groupedOrderItems
-  ) {
-
-    const typeName =
-      item.typeName &&
-      item.typeName
-        .toLowerCase() !==
-        'default'
+  for ( const item of groupedOrderItems ) {
+    const typeName = item.typeName && item.typeName
+        .toLowerCase() !== 'default'
         ? item.typeName
         : '';
 
-    const productDisplay =
-      typeName
+    const productDisplay = typeName
         ? `${item.productName} (${typeName})`
         : item.productName;
 
-    const serviceCode =
-      item.serviceNames
-        .map(
-          serviceName =>
-            getServiceCode(
-              serviceName
-            )
-        )
-        .join(
-          '<span class="service-divider">|</span>'
-        );
+    const serviceCode = item.serviceNames
+        .map( serviceName => getServiceCode( serviceName ))
+        .join('<span class="service-divider">|</span>');
 
-    const tagCount =
-      item.unit === 'KG'
-        ? Math.max(
-            1,
-            Number(
-              item.garmentCount ?? 1
-            )
-          )
-        : Math.max(
-            1,
-            Math.floor(
-              Number(
-                item.quantity ?? 1
-              )
-            )
-          );
+    const tagCount = item.unit === 'KG'
+        ? Math.max( 1, Number( item.garmentCount ?? 1 ))
+        : Math.max( 1, Math.floor( Number( item.quantity ?? 1 )));
 
-    const isShoes =
-      item.productName
+    const isShoes = item.productName
         .trim()
-        .toLowerCase() ===
-      'shoes';
+        .toLowerCase() === 'shoes';
 
     if (isShoes) {
 
@@ -1633,14 +1867,9 @@ private printQrTags(order: B2COrderDetails ): void {
   printWindow.document.close();
   printWindow.focus();
 }
-
-
   private updateLocalOrder(response: B2COrder): void {
     this.orders = this.orders.map((order: B2cOrderView) => {
-      if (order.id !== response.id) {
-        return order;
-      }
-
+      if (order.id !== response.id) { return order; }
       return {
         ...order,
         orderNumber: response.orderNumber,

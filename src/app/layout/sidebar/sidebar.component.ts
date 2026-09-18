@@ -1,35 +1,20 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
-
-import {
-  RouterLink,
-  RouterLinkActive
-} from '@angular/router';
-
-import {
-  IonIcon
-} from '@ionic/angular/standalone';
-
-import {
-  addIcons
-} from 'ionicons';
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
 
 import {
   homeOutline,
   walkOutline,
+  calendarOutline,
   bicycleOutline,
   cartOutline,
-  cartSharp,
-  personAddOutline,
-  walletOutline,
-  checkmarkDoneOutline,
   receiptOutline,
   cardOutline,
   cubeOutline,
+  barChartOutline,
   person,
-  barChartOutline
+  star
 } from 'ionicons/icons';
 
 import {
@@ -39,7 +24,6 @@ import {
 import {
   BusinessSettingsService
 } from '../../../core/services/business-settings.service';
-
 
 @Component({
   selector: 'app-sidebar',
@@ -52,83 +36,58 @@ import {
     IonIcon
   ]
 })
-export class SidebarComponent
-  implements OnInit {
+export class SidebarComponent implements OnInit {
 
-  settings:
-    BusinessSettings = {
+  settings: BusinessSettings = {
+    id: 0,
+    businessName: '',
+    whatsappDisplayName: '',
+    headerSubtitle: '',
+    adminName: 'Admin',
+    adminSubtitle: 'Laundry',
+    logoUrl: null,
+    cgstPercentage: 0,
+    sgstPercentage: 0,
+    taxEnabled: false,
+    taxIncluded: false,
 
-      id: 0,
-
-      businessName:
-        '',
-
-      whatsappDisplayName:
-        '',
-
-      headerSubtitle:
-        '',
-
-      adminName:
-        'Admin',
-
-      adminSubtitle:
-        'Laundry',
-
-      logoUrl:
-        null,
-
-      cgstPercentage:
-        0,
-
-      sgstPercentage:
-        0,
-
-      taxIncluded:
-        false
-    };
-
+    customFeatures: {
+      secureRetagEnabled: false,
+      retagPinConfigured: false,
+      retagWhatsappEnabled: false
+    }
+  };
 
   constructor(
     private readonly businessSettingsService:
       BusinessSettingsService
   ) {
-
     addIcons({
       homeOutline,
       walkOutline,
+      calendarOutline,
       bicycleOutline,
       cartOutline,
-      cartSharp,
-      personAddOutline,
-      walletOutline,
-      checkmarkDoneOutline,
       receiptOutline,
       cardOutline,
       cubeOutline,
       barChartOutline,
-      person
+      person,
+      star
     });
   }
-
 
   ngOnInit(): void {
 
     this.businessSettingsService
       .settings$
-      .subscribe(
-        (
-          settings:
-            BusinessSettings | null
-        ) => {
+      .subscribe(settings => {
 
-          if (settings) {
-
-            this.settings =
-              settings;
-          }
+        if (settings) {
+          this.settings = settings;
         }
-      );
+
+      });
 
     this.businessSettingsService
       .loadSettings();

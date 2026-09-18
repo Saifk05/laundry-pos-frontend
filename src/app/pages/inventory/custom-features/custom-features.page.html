@@ -1,0 +1,366 @@
+<div class="custom-features-page">
+
+  <div class="page-header">
+    <div>
+      <button type="button" class="back-btn" (click)="goBack()">←</button>
+      <div>
+        <h1>Custom Features</h1>
+        <p>Enable and configure additional features for your business workflow</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-container" *ngIf="!loading">
+
+    <div class="section-title">
+      <h2>Retag Management</h2>
+      <p>Control security and customer notifications for order retagging.</p>
+    </div>
+
+    <div class="feature-card">
+
+      <div class="feature-row">
+        <div class="feature-icon">🔐</div>
+
+        <div class="feature-info">
+          <div class="feature-title">
+            <h3>Secure Retag</h3>
+            <span class="status" [class.enabled]="secureRetagEnabled">
+              {{ secureRetagEnabled ? 'Enabled' : 'Disabled' }}
+            </span>
+          </div>
+
+          <p>Require a 6-digit security PIN before an order can be retagged.</p>
+
+          <div class="pin-management" *ngIf="retagPinConfigured">
+            <span class="pin-configured">✓ PIN configured</span>
+
+            <div class="pin-actions">
+              <button type="button" class="pin-action-btn" (click)="openChangePin()">
+                Change PIN
+              </button>
+
+              <button type="button" class="pin-action-btn forgot" (click)="openForgotPin()">
+                Forgot PIN?
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <label class="switch">
+          <input
+            type="checkbox"
+            [(ngModel)]="secureRetagEnabled"
+            [disabled]="updatingSecureRetag"
+            (change)="onSecureRetagChange()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="feature-row">
+        <div class="feature-icon whatsapp">💬</div>
+
+        <div class="feature-info">
+          <div class="feature-title">
+            <h3>WhatsApp Retag Update</h3>
+            <span class="status" [class.enabled]="whatsappUpdateEnabled">
+              {{ whatsappUpdateEnabled ? 'Enabled' : 'Disabled' }}
+            </span>
+          </div>
+
+          <p>Send the customer a WhatsApp notification after an order is successfully retagged.</p>
+        </div>
+
+        <label class="switch">
+          <input
+            type="checkbox"
+            [(ngModel)]="whatsappUpdateEnabled"
+            [disabled]="updatingWhatsapp"
+            (change)="onWhatsappChange()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon">💡</div>
+      <div>
+        <h3>How Retag Security Works</h3>
+        <p>When Secure Retag is enabled, staff must enter the configured 6-digit PIN before accessing Retag from B2C Orders.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="features-container" *ngIf="loading">
+    <div class="info-card">
+      <div>
+        <h3>Loading Custom Features...</h3>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SET PIN -->
+
+  <div class="modal-backdrop" *ngIf="showPinModal">
+    <div class="pin-modal">
+
+      <button
+        type="button"
+        class="close-btn"
+        [disabled]="savingPin"
+        (click)="cancelPinSetup()">×</button>
+
+      <div class="modal-icon">🔐</div>
+
+      <h2>Set Retag PIN</h2>
+      <p class="modal-description">Create a 6-digit PIN to secure Retag actions.</p>
+
+      <div class="form-group">
+        <label for="newRetagPin">New PIN</label>
+
+        <input
+          id="newRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Enter 6-digit PIN"
+          [(ngModel)]="newPin"
+          (input)="onPinInput('newPin', $event)"
+          [disabled]="savingPin">
+      </div>
+
+      <div class="form-group">
+        <label for="confirmRetagPin">Confirm PIN</label>
+
+        <input
+          id="confirmRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Confirm 6-digit PIN"
+          [(ngModel)]="confirmPin"
+          (input)="onPinInput('confirmPin', $event)"
+          [disabled]="savingPin">
+      </div>
+
+      <p class="error-message" *ngIf="pinError">{{ pinError }}</p>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          [disabled]="savingPin"
+          (click)="cancelPinSetup()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          [disabled]="savingPin || newPin.length !== 6 || confirmPin.length !== 6"
+          (click)="savePin()">
+          {{ savingPin ? 'Saving...' : 'Set PIN' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- CHANGE PIN -->
+
+  <div class="modal-backdrop" *ngIf="showChangePinModal">
+    <div class="pin-modal">
+
+      <button
+        type="button"
+        class="close-btn"
+        [disabled]="changingPin"
+        (click)="closeChangePin()">×</button>
+
+      <div class="modal-icon">🔑</div>
+
+      <h2>Change Retag PIN</h2>
+      <p class="modal-description">Enter your current PIN and create a new 6-digit PIN.</p>
+
+      <div class="form-group">
+        <label for="currentRetagPin">Current PIN</label>
+
+        <input
+          id="currentRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Enter current PIN"
+          [value]="currentPin"
+          (input)="onPinInput('currentPin', $event)"
+          [disabled]="changingPin">
+      </div>
+
+      <div class="form-group">
+        <label for="changeNewRetagPin">New PIN</label>
+
+        <input
+          id="changeNewRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Enter new PIN"
+          [value]="changeNewPin"
+          (input)="onPinInput('changeNewPin', $event)"
+          [disabled]="changingPin">
+      </div>
+
+      <div class="form-group">
+        <label for="changeConfirmRetagPin">Confirm New PIN</label>
+
+        <input
+          id="changeConfirmRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Confirm new PIN"
+          [value]="changeConfirmPin"
+          (input)="onPinInput('changeConfirmPin', $event)"
+          [disabled]="changingPin">
+      </div>
+
+      <p class="error-message" *ngIf="changePinError">
+        {{ changePinError }}
+      </p>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          [disabled]="changingPin"
+          (click)="closeChangePin()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn"
+          [disabled]="
+            changingPin ||
+            currentPin.length !== 6 ||
+            changeNewPin.length !== 6 ||
+            changeConfirmPin.length !== 6
+          "
+          (click)="changePin()">
+          {{ changingPin ? 'Changing...' : 'Change PIN' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- FORGOT / RESET PIN -->
+
+  <div class="modal-backdrop" *ngIf="showForgotPinModal">
+    <div class="pin-modal">
+
+      <button
+        type="button"
+        class="close-btn"
+        [disabled]="resettingPin"
+        (click)="closeForgotPin()">×</button>
+
+      <div class="modal-icon reset">🔓</div>
+
+      <h2>Reset Retag PIN</h2>
+
+      <p class="modal-description">
+        Forgot your Retag PIN? Create a new 6-digit security PIN.
+      </p>
+
+      <div class="reset-warning">
+        <span>⚠️</span>
+        <p>Resetting the PIN will replace your currently configured Retag PIN.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="resetNewRetagPin">New PIN</label>
+
+        <input
+          id="resetNewRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Enter new PIN"
+          [value]="resetNewPin"
+          (input)="onPinInput('resetNewPin', $event)"
+          [disabled]="resettingPin">
+      </div>
+
+      <div class="form-group">
+        <label for="resetConfirmRetagPin">Confirm New PIN</label>
+
+        <input
+          id="resetConfirmRetagPin"
+          class="pin-input"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Confirm new PIN"
+          [value]="resetConfirmPin"
+          (input)="onPinInput('resetConfirmPin', $event)"
+          [disabled]="resettingPin">
+      </div>
+
+      <p class="error-message" *ngIf="resetPinError">
+        {{ resetPinError }}
+      </p>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          [disabled]="resettingPin"
+          (click)="closeForgotPin()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="primary-btn reset-btn"
+          [disabled]="
+            resettingPin ||
+            resetNewPin.length !== 6 ||
+            resetConfirmPin.length !== 6
+          "
+          (click)="resetPin()">
+          {{ resettingPin ? 'Resetting...' : 'Reset PIN' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

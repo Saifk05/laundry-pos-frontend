@@ -8,7 +8,10 @@ export interface TaxSetting {
 
   sgstPercentage: number;
 
+  taxEnabled: boolean;
+
   taxIncluded: boolean;
+
 }
 
 
@@ -20,5 +23,8 @@ export interface TaxSettingRequest {
 
   sgstPercentage: number;
 
+  taxEnabled: boolean;
+
   taxIncluded: boolean;
+
 }

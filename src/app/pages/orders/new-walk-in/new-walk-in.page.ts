@@ -55,6 +55,10 @@ export class NewWalkInPage
   customerName = '';
   customerPhone = '';
   customerId: string | null = null;
+  pickupId: string | null = null;
+  pickupAddress = '';
+  pickupLatitude: number | null = null;
+  pickupLongitude: number | null = null;
   customerExists = false;
   checkingCustomer = false;
   customerMessage = '';
@@ -123,13 +127,12 @@ export class NewWalkInPage
   loadingRetagOrder = false;
   isRescheduleMode = false;
   rescheduleOrderId: string | null = null;
-  businessName = 'Venkateshwara Fabric Works';
-
+  businessName = ' Fabric Works';
   cgstPercentage = 0;
-
   sgstPercentage = 0;
-
+  taxEnabled = false;
   taxIncluded = false;
+  retagWhatsappEnabled = false;
 
   constructor(
     private readonly apiService: ApiService,
@@ -140,64 +143,63 @@ export class NewWalkInPage
 
   ngOnInit(): void {
     this.initializeOrderMode();
+    this.initializePickupOrder();
     this.generateDeliveryDates();
     this.setDefaultDeliveryDate();
     this.loadWalkInSetup();
     this.loadBusinessSettings();
   }
+
+  private initializePickupOrder(): void {
+    const pickupId = this.route.snapshot.queryParamMap.get('pickupId');
+
+    if (!pickupId) {
+      return;
+    }
+
+    this.pickupId = pickupId;
+    this.homeDelivery = true;
+
+    this.apiService.getPickupDeliveryById(pickupId).subscribe({
+      next: pickup => {
+        this.customerName = pickup.customerName;
+        this.customerPhone = pickup.phoneNumber;
+        this.pickupAddress = pickup.address;
+        this.pickupLatitude = pickup.latitude;
+        this.pickupLongitude = pickup.longitude;
+
+        this.customerExists = true;
+        this.customerMessage = 'Pickup customer loaded';
+
+        this.checkCustomer();
+      },
+      error: error => {
+        console.error('Unable to load pickup:', error);
+        this.errorMessage = 'Unable to load pickup customer';
+      }
+    });
+  }
   
   loadBusinessSettings(): void {
-
-    this.apiService
-      .getBusinessSettings()
-      .subscribe({
-
-        next: (
-          response
-        ) => {
-
-          this.businessName =
-            response?.businessName ||
-            'Venkateshwara Fabric Works';
-
-          this.cgstPercentage =
-            Number(
-              response?.cgstPercentage ?? 0
-            );
-
-          this.sgstPercentage =
-            Number(
-              response?.sgstPercentage ?? 0
-            );
-
-          this.taxIncluded =
-            Boolean(
-              response?.taxIncluded
-            );
-        },
-
-        error: (
-          error
-        ) => {
-
-          console.error(
-            'Unable to load business settings:',
-            error
-          );
-
-          this.cgstPercentage =
-            0;
-
-          this.sgstPercentage =
-            0;
-
-          this.taxIncluded =
-            false;
-        }
-
-      });
+    this.apiService.getBusinessSettings().subscribe({
+      next: response => {
+        this.businessName = response?.businessName || 'Fabric Works';
+        this.cgstPercentage = Number(response?.cgstPercentage ?? 0);
+        this.sgstPercentage = Number(response?.sgstPercentage ?? 0);
+        this.taxEnabled = Boolean(response?.taxEnabled);
+        this.taxIncluded = Boolean(response?.taxIncluded);
+        this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
+      },
+      error: error => {
+        console.error('Unable to load business settings:', error);
+        this.cgstPercentage = 0;
+        this.sgstPercentage = 0;
+        this.taxEnabled = false;
+        this.taxIncluded = false;
+        this.retagWhatsappEnabled = false;
+      }
+    });
   }
-
   loadWalkInSetup(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -1052,16 +1054,13 @@ get totalPieces(): number {
   }
 
 
-  get taxableAmount():
+  get amountBeforeTax():
     number {
 
-    const amount =
+    return Math.max(
       this.grossTotal -
       this.totalDiscount +
-      this.expressAmount;
-
-    return Math.max(
-      amount,
+      this.expressAmount,
       0
     );
   }
@@ -1071,7 +1070,7 @@ get totalPieces(): number {
     number {
 
     if (
-      !this.taxIncluded
+      !this.taxEnabled
     ) {
 
       return 0;
@@ -1088,11 +1087,33 @@ get totalPieces(): number {
   }
 
 
+  get taxableAmount():
+    number {
+
+    if (
+      !this.taxEnabled ||
+      !this.taxIncluded ||
+      this.totalTaxPercentage <= 0
+    ) {
+
+      return this.amountBeforeTax;
+    }
+
+    return (
+      this.amountBeforeTax /
+      (
+        1 +
+        this.totalTaxPercentage / 100
+      )
+    );
+  }
+
+
   get cgstAmount():
     number {
 
     if (
-      !this.taxIncluded ||
+      !this.taxEnabled ||
       this.taxableAmount <= 0
     ) {
 
@@ -1112,7 +1133,7 @@ get totalPieces(): number {
     number {
 
     if (
-      !this.taxIncluded ||
+      !this.taxEnabled ||
       this.taxableAmount <= 0
     ) {
 
@@ -1131,6 +1152,13 @@ get totalPieces(): number {
   get taxAmount():
     number {
 
+    if (
+      !this.taxEnabled
+    ) {
+
+      return 0;
+    }
+
     return (
       this.cgstAmount +
       this.sgstAmount
@@ -1141,12 +1169,27 @@ get totalPieces(): number {
   get grandTotal():
     number {
 
+    if (
+      !this.taxEnabled
+    ) {
+
+      return this.amountBeforeTax;
+    }
+
+    if (
+      this.taxIncluded
+    ) {
+
+      return this.amountBeforeTax;
+    }
+
     return Math.max(
-      this.taxableAmount +
+      this.amountBeforeTax +
       this.taxAmount,
       0
     );
   }
+
 
 get minimumDeliveryDate(): string {
 
@@ -1359,10 +1402,8 @@ private formatLocalDate(
   toggleCouponDropdown():
     void {
 
-    this.couponDropdownOpen =
-      !this.couponDropdownOpen;
+    this.couponDropdownOpen = !this.couponDropdownOpen;
   }
-
 
   selectCoupon(
     coupon:
@@ -1452,6 +1493,37 @@ private formatLocalDate(
       false;
   }
 
+  private createDeliveryFromPickup(): void {
+  if (
+    !this.pickupId ||
+    !this.deliveryDate ||
+    !this.deliveryTime
+  ) {
+    this.creatingOrder = false;
+    return;
+  }
+
+  this.apiService.createPickupDelivery({
+    customerName: this.customerName.trim(),
+    phoneNumber: this.customerPhone.trim(),
+    address: this.pickupAddress,
+    latitude: this.pickupLatitude,
+    longitude: this.pickupLongitude,
+    type: 'DELIVERY',
+    scheduledDate: this.deliveryDate,
+    timeSlot: this.deliveryTime
+  }).subscribe({
+    next: () => {
+      this.creatingOrder = false;
+    },
+    error: error => {
+      this.creatingOrder = false;
+      console.error('Unable to create delivery:', error);
+      this.errorMessage =
+        'Order created successfully, but delivery could not be created';
+    }
+  });
+}
 
   createOrder():
     void {
@@ -1625,22 +1697,16 @@ const request:
       )
       .subscribe({
 
-        next: (
-          response:
-            OrderResponse
-        ) => {
+        next: (response: OrderResponse) => {
+          this.createdOrder = response;
+          this.createdOrderNumber = response.orderNumber;
+          this.orderCreated = true;
 
-          this.creatingOrder =
-            false;
-
-          this.createdOrder =
-            response;
-
-          this.createdOrderNumber =
-            response.orderNumber;
-
-          this.orderCreated =
-            true;
+          if (this.pickupId) {
+            this.createDeliveryFromPickup();
+          } else {
+            this.creatingOrder = false;
+          }
         },
 
         error: (
@@ -1745,102 +1811,90 @@ const request:
   }
 
 
-  private updateRetagOrder():
-    void {
+private updateRetagOrder(): void {
+  if (!this.retagOrderId) {
+    this.errorMessage = 'Re-tag order id is missing';
+    return;
+  }
 
-    if (
-      !this.retagOrderId
-    ) {
+  if (this.orderItems.length === 0) {
+    this.errorMessage = 'At least one item must remain in the order';
+    return;
+  }
 
-      this.errorMessage =
-        'Re-tag order id is missing';
+  const items: RetagOrderRequest['items'] = [];
 
-      return;
-    }
-
-    if (
-      this.orderItems.length === 0
-    ) {
-
-      this.errorMessage =
-        'At least one item must remain in the order';
-
-      return;
-    }
-
-    const items:
-      RetagOrderRequest['items'] =
-      [];
-
-    for (
-      const item
-      of this.orderItems
-    ) {
-
-      for (
-        const service
-        of item.services
-      ) {
-
-        items.push({
-
-          productId:
-            item.productId,
-
-          typeId:
-            item.typeId,
-
-          serviceId:
-            service.id,
-
-          quantity:
-            item.quantity,
-
-          garmentCount:
-            item.unit === 'KG'
-              ? item.garmentCount
-              : null
-
-        });
-      }
-    }
-
-const request: RetagOrderRequest = {
-  items: items,
-  couponId: this.selectedCouponId
-};
-
-    this.creatingOrder = true;
-    this.errorMessage = '';
-    this.apiService.retagB2COrder(
-        this.retagOrderId,
-        request
-      )
-      .subscribe({next: (  response: B2COrderDetails ) => {
-          this.creatingOrder = false;
-          this.createdOrderNumber = response.orderNumber;
-          this.router.navigate(
-            ['/app/b2c-orders']
-          );
-        },
-
-        error: ( error: any ) => {
-          this.creatingOrder = false;
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to update re-tag order';
-        }
+  for (const item of this.orderItems) {
+    for (const service of item.services) {
+      items.push({
+        productId: item.productId,
+        typeId: item.typeId,
+        serviceId: service.id,
+        quantity: item.quantity,
+        garmentCount: item.unit === 'KG' ? item.garmentCount : null
       });
+    }
   }
 
+  const request: RetagOrderRequest = {
+    items,
+    couponId: this.selectedCouponId
+  };
 
-  closeOrderModal(): void {
-    this.startNewOrder();
+  this.creatingOrder = true;
+  this.errorMessage = '';
+
+  this.apiService.retagB2COrder(this.retagOrderId, request).subscribe({
+    next: (response: B2COrderDetails) => {
+      this.creatingOrder = false;
+      this.createdOrderNumber = response.orderNumber;
+
+      if (this.retagWhatsappEnabled) {
+        this.openRetagWhatsApp(response);
+      }
+
+      this.router.navigate(['/app/b2c-orders']);
+    },
+      error: (error: any) => {
+        this.creatingOrder = false;
+        this.errorMessage =
+          error?.error?.message ||
+          error?.error?.error ||
+          'Unable to update re-tag order';
+      }
+    });
   }
 
-  printReceipt(): void {
+  private openRetagWhatsApp(order: B2COrderDetails): void {
+  const phone = this.formatWhatsAppPhone(order.customer?.phone || this.customerPhone);
 
+  if (!phone) {
+    console.warn('Customer WhatsApp number is unavailable');
+    return;
+  }
+
+  const customerName = order.customer?.name || this.customerName || 'Customer';
+  const orderNumber = order.orderNumber || this.retagOrderNumber;
+  const totalAmount = Number(order.totalAmount ?? 0).toFixed(2);
+
+  const message = `Dear ${customerName},
+
+Your invoice for Order ${orderNumber} has been updated after store inspection.
+
+Updated Total Amount: ₹${totalAmount}
+
+Thank you,
+`;
+
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+    '_blank'
+  );
+}
+
+closeOrderModal(): void {  this.startNewOrder();}
+
+printReceipt(): void {
   if (!this.createdOrder) {
     return;
   }
@@ -1848,437 +1902,153 @@ const request: RetagOrderRequest = {
   const order = this.createdOrder;
 
   const termsAndConditions =
-    localStorage.getItem(
-      'receiptTermsAndConditions'
-    ) ?? '';
+    localStorage.getItem('receiptTermsAndConditions') ?? '';
 
-  const termsHtml =
-    termsAndConditions.trim()
-      ? `
-        <div class="divider"></div>
-
-        <div class="terms">
-
-          <div class="terms-title">
-            Terms & Conditions
-          </div>
-
-          <div class="terms-content">
-            ${termsAndConditions
-              .split('\n')
-              .filter( line => line.trim())
-              .map( line =>`<div>${line}</div>`)
-              .join('')}
-          </div>
-        </div>
-      `
-      : '';
-
-const itemsHtml = order.items
-    .map(item => `
-        <tr>
-          <td>
-            ${item.productName}
-            ${item.typeName ? ` (${item.typeName})` : ''}
-            <br>
-            <small> ${item.serviceName} </small>
-            ${item.unit === 'KG' && item.garmentCount ? `
-                  <br>
-                  <small> Garments: ${item.garmentCount} </small>
-                `
-                : ''
-            }
-          </td>
-          <td style="text-align:center;">  ${item.quantity} </td>
-          <td style="text-align:right;"> ₹${Number(item.unitPrice).toFixed(2)} </td>
-          <td style="text-align:right;">
-            ₹${Number(item.lineTotal).toFixed(2)}
-          </td>
-        </tr>
-      `
-    )
-    .join('');
-
-const receiptSubtotal =
-  Number(
-    order.subtotal ?? 0
-  );
-
-const receiptDiscount =
-  Number(
-    order.discountAmount ?? 0
-  );
-
-const receiptExpress =
-  Number(
-    order.expressChargeAmount ?? 0
-  );
-
-const receiptTaxableAmount =
-  Math.max(
-    receiptSubtotal -
-    receiptDiscount +
-    receiptExpress,
-    0
-  );
-
-const receiptCgst =
-  this.taxIncluded
-    ? (
-        receiptTaxableAmount *
-        Number(
-          this.cgstPercentage || 0
-        )
-      ) / 100
-    : 0;
-
-const receiptSgst =
-  this.taxIncluded
-    ? (
-        receiptTaxableAmount *
-        Number(
-          this.sgstPercentage || 0
-        )
-      ) / 100
-    : 0;
-
-const receiptTax =
-  receiptCgst +
-  receiptSgst;
-
-const receiptTotal =
-  receiptTaxableAmount +
-  receiptTax;
-
-const receiptTotalTaxPercentage =
-  Number(
-    this.cgstPercentage || 0
-  ) +
-  Number(
-    this.sgstPercentage || 0
-  );
-
-const taxHtml =
-  this.taxIncluded &&
-  receiptTotalTaxPercentage > 0
+  const termsHtml = termsAndConditions.trim()
     ? `
-        <div class="total-row">
+      <div class="divider"></div>
 
-          <span>
-            CGST (${this.cgstPercentage}%)
-          </span>
+      <div class="terms">
 
-          <strong>
-            +₹${receiptCgst.toFixed(2)}
-          </strong>
-
+        <div class="terms-title">
+          Terms & Conditions
         </div>
 
-        <div class="total-row">
-
-          <span>
-            SGST (${this.sgstPercentage}%)
-          </span>
-
-          <strong>
-            +₹${receiptSgst.toFixed(2)}
-          </strong>
-
+        <div class="terms-content">
+          ${termsAndConditions
+            .split('\n')
+            .filter(line => line.trim())
+            .map(line => `<div>${line}</div>`)
+            .join('')}
         </div>
 
-        <div class="total-row">
-
-          <span>
-            Tax (${receiptTotalTaxPercentage}%)
-          </span>
-
-          <strong>
-            +₹${receiptTax.toFixed(2)}
-          </strong>
-
-        </div>
-      `
+      </div>
+    `
     : '';
 
-const printWindow = window.open(
-    '',
-    '_blank',
-    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
-  );
+  const itemsHtml = order.items
+    .map(item => `
+      <tr>
 
-  if (!printWindow) {
-    return;
-  }
-  
-printWindow.document.write(`
-  <!DOCTYPE html>
-  <html>
+        <td>
 
-    <head>
+          ${item.productName}
 
-      <title>
-        Receipt
-      </title>
-
-      <style>
-
-        * {
-          box-sizing: border-box;
-        }
-
-        body {
-          margin: 0;
-          padding: 12px;
-          font-family: Arial, sans-serif;
-          color: #111;
-          background: #fff;
-        }
-
-        .receipt {
-          width: 80mm;
-          margin: 0 auto;
-          font-size: 12px;
-        }
-
-        .center {
-          text-align: center;
-        }
-
-        .shop-name {
-          font-size: 18px;
-          font-weight: 700;
-        }
-
-        .muted {
-          color: #555;
-          font-size: 11px;
-        }
-
-        .divider {
-          margin: 8px 0;
-          border-top: 1px dashed #000;
-        }
-
-        .info-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          margin: 3px 0;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 8px;
-        }
-
-        th,
-        td {
-          padding: 5px 2px;
-          vertical-align: top;
-          border-bottom: 1px dashed #bbb;
-        }
-
-        th {
-          text-align: left;
-          font-size: 11px;
-        }
-
-        td {
-          font-size: 11px;
-        }
-
-        .total-row {
-          display: flex;
-          justify-content: space-between;
-          margin: 4px 0;
-        }
-
-        .grand-total {
-          margin-top: 8px;
-          padding-top: 8px;
-          border-top: 1px solid #000;
-          font-size: 15px;
-          font-weight: 700;
-        }
-
-        .terms {
-          margin-top: 6px;
-          font-size: 8px;
-          line-height: 1.4;
-        }
-
-        .terms-title {
-          margin-bottom: 4px;
-          font-size: 9px;
-          font-weight: 700;
-          text-align: left;
-        }
-
-        .terms-content {
-          text-align: left;
-          color: #333;
-        }
-
-        .terms-content div {
-          margin-bottom: 2px;
-        }
-
-        .footer {
-          margin-top: 14px;
-          text-align: center;
-          font-size: 11px;
-        }
-
-        @media print {
-
-          @page {
-            size: 80mm auto;
-            margin: 0;
+          ${
+            item.typeName &&
+            item.typeName.toLowerCase() !== 'default'
+              ? ` (${item.typeName})`
+              : ''
           }
 
-          body {
-            padding: 4mm;
+          <br>
+
+          <small>
+            ${item.serviceName}
+          </small>
+
+          ${
+            item.unit === 'KG' && item.garmentCount
+              ? `
+                <br>
+                <small>
+                  Garments: ${item.garmentCount}
+                </small>
+              `
+              : ''
           }
 
-        }
+        </td>
 
-      </style>
+        <td style="text-align:center;">
+          ${item.quantity}
+        </td>
 
-    </head>
+        <td style="text-align:right;">
+          ₹${Number(item.unitPrice).toFixed(2)}
+        </td>
 
-    <body>
+        <td style="text-align:right;">
+          ₹${Number(item.lineTotal).toFixed(2)}
+        </td>
 
-      <div class="receipt">
+      </tr>
+    `)
+    .join('');
 
-        <div class="center">
+  const receiptSubtotal =
+    Number(order.subtotal ?? 0);
 
-          <div class="shop-name">
-            ${this.businessName}
-          </div>
+  const receiptDiscount =
+    Number(order.discountAmount ?? 0);
 
-          <div class="muted">
-            Laundry Service Receipt
-          </div>
+  const receiptExpress =
+    Number(order.expressChargeAmount ?? 0);
 
-        </div>
+  const receiptAmountBeforeTax =
+    Math.max(
+      receiptSubtotal -
+      receiptDiscount +
+      receiptExpress,
+      0
+    );
 
-        <div class="divider"></div>
+  const receiptTotalTaxPercentage =
+    this.taxEnabled
+      ? (
+          Number(this.cgstPercentage || 0) +
+          Number(this.sgstPercentage || 0)
+        )
+      : 0;
 
-        <div class="info-row">
+  const receiptTaxableAmount =
+    this.taxEnabled &&
+    this.taxIncluded &&
+    receiptTotalTaxPercentage > 0
+      ? (
+          receiptAmountBeforeTax /
+          (
+            1 +
+            receiptTotalTaxPercentage / 100
+          )
+        )
+      : receiptAmountBeforeTax;
 
-          <span>
-            Order
-          </span>
+  const receiptCgst =
+    this.taxEnabled
+      ? (
+          receiptTaxableAmount *
+          Number(this.cgstPercentage || 0)
+        ) / 100
+      : 0;
 
-          <strong>
-            #${order.orderNumber}
-          </strong>
+  const receiptSgst =
+    this.taxEnabled
+      ? (
+          receiptTaxableAmount *
+          Number(this.sgstPercentage || 0)
+        ) / 100
+      : 0;
 
-        </div>
+  const receiptTax =
+    receiptCgst +
+    receiptSgst;
 
-        <div class="info-row">
+  const receiptTotal =
+    !this.taxEnabled
+      ? receiptAmountBeforeTax
+      : this.taxIncluded
+        ? receiptAmountBeforeTax
+        : receiptAmountBeforeTax + receiptTax;
 
-          <span>
-            Customer
-          </span>
+  const taxModeLabel =
+    this.taxIncluded
+      ? 'Inclusive'
+      : 'Exclusive';
 
-          <strong>
-            ${order.customer.name}
-          </strong>
-
-        </div>
-
-        <div class="info-row">
-
-          <span>
-            Mobile
-          </span>
-
-          <strong>
-            ${order.customer.phone}
-          </strong>
-
-        </div>
-
-        <div class="info-row">
-
-          <span>
-            Created At
-          </span>
-
-          <strong>
-            ${new Date(order.createdAt).toLocaleDateString('en-GB')}
-          </strong>
-
-        </div>
-
-        <div class="info-row">
-
-          <span>
-            Delivered Date 
-          </span>
-
-          <strong>
-            ${
-              order.deliveryDate
-                ? new Date(
-                    order.deliveryDate + 'T00:00:00'
-                  ).toLocaleDateString('en-GB')
-                : '-'
-            }
-          </strong>
-
-        </div>
-
-        <div class="divider"></div>
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Item
-              </th>
-
-              <th style="text-align:center;">
-                Qty
-              </th>
-
-              <th style="text-align:right;">
-                Rate
-              </th>
-
-              <th style="text-align:right;">
-                Total
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-
-        </table>
-
-        <div class="divider"></div>
-
-        <div class="total-row">
-
-          <span>
-            Subtotal
-          </span>
-
-          <strong>
-            ₹${Number(order.subtotal).toFixed(2)}
-          </strong>
-
-        </div>
-
+  const discountHtml =
+    receiptDiscount > 0
+      ? `
         <div class="total-row">
 
           <span>
@@ -2286,11 +2056,16 @@ printWindow.document.write(`
           </span>
 
           <strong>
-            -₹${Number(order.discountAmount).toFixed(2)}
+            -₹${receiptDiscount.toFixed(2)}
           </strong>
 
         </div>
+      `
+      : '';
 
+  const expressHtml =
+    receiptExpress > 0
+      ? `
         <div class="total-row">
 
           <span>
@@ -2302,50 +2077,460 @@ printWindow.document.write(`
           </strong>
 
         </div>
+      `
+      : '';
 
-        ${taxHtml}
-
-        <div class="total-row grand-total">
+  const taxHtml =
+    this.taxEnabled &&
+    receiptTotalTaxPercentage > 0
+      ? `
+        <div class="total-row">
 
           <span>
-            Total
+            Taxable Amount
           </span>
 
           <strong>
-            ₹${receiptTotal.toFixed(2)}
+            ₹${receiptTaxableAmount.toFixed(2)}
           </strong>
 
         </div>
 
-        ${termsHtml}
+        <div class="total-row">
 
-        <div class="footer">
+          <span>
+            CGST (${this.cgstPercentage}%)
+          </span>
 
-          Thank you!
-
-          <br>
-
-          Please keep this receipt
-          until collection.
+          <strong>
+            ₹${receiptCgst.toFixed(2)}
+          </strong>
 
         </div>
 
-      </div>
+        <div class="total-row">
 
-      <script>
+          <span>
+            SGST (${this.sgstPercentage}%)
+          </span>
 
-        window.onload = function () {
-          window.print();
-        };
+          <strong>
+            ₹${receiptSgst.toFixed(2)}
+          </strong>
 
-      </script>
+        </div>
 
-    </body>
+        <div class="total-row">
 
-  </html>
-`);
+          <span>
+            Tax (${receiptTotalTaxPercentage}%) - ${taxModeLabel}
+          </span>
+
+          <strong>
+            ₹${receiptTax.toFixed(2)}
+          </strong>
+
+        </div>
+      `
+      : '';
+
+  const printWindow = window.open(
+    '',
+    '_blank',
+    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+  );
+
+  if (!printWindow) {
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+
+    <html>
+
+      <head>
+
+        <title>
+          Receipt
+        </title>
+
+        <style>
+
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            padding: 12px;
+            font-family: Arial, sans-serif;
+            color: #111;
+            background: #fff;
+          }
+
+          .receipt {
+            width: 80mm;
+            margin: 0 auto;
+            font-size: 12px;
+          }
+
+          .center {
+            text-align: center;
+          }
+
+          .shop-name {
+            font-size: 18px;
+            font-weight: 700;
+          }
+
+          .muted {
+            color: #555;
+            font-size: 11px;
+          }
+
+          .divider {
+            margin: 8px 0;
+            border-top: 1px dashed #000;
+          }
+
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 3px 0;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+          }
+
+          th,
+          td {
+            padding: 5px 2px;
+            vertical-align: top;
+            border-bottom: 1px dashed #bbb;
+          }
+
+          th {
+            text-align: left;
+            font-size: 11px;
+          }
+
+          td {
+            font-size: 11px;
+          }
+
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+          }
+
+          .grand-total {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #000;
+            font-size: 15px;
+            font-weight: 700;
+          }
+
+          .terms {
+            margin-top: 6px;
+            font-size: 8px;
+            line-height: 1.4;
+          }
+
+          .terms-title {
+            margin-bottom: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+          }
+
+          .terms-content {
+            text-align: left;
+            color: #333;
+          }
+
+          .terms-content div {
+            margin-bottom: 2px;
+          }
+
+          .footer {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 11px;
+          }
+
+          @media print {
+
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+
+            body {
+              padding: 4mm;
+            }
+
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="receipt">
+
+          <div class="center">
+
+            <div class="shop-name">
+              ${this.businessName}
+            </div>
+
+            <div class="muted">
+              Laundry Service Receipt
+            </div>
+
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="info-row">
+
+            <span>
+              Order
+            </span>
+
+            <strong>
+              #${order.orderNumber}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Customer
+            </span>
+
+            <strong>
+              ${order.customer.name}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Mobile
+            </span>
+
+            <strong>
+              ${order.customer.phone}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Created At
+            </span>
+
+            <strong>
+              ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+            </strong>
+
+          </div>
+
+          <div class="info-row">
+
+            <span>
+              Delivered Date
+            </span>
+
+            <strong>
+              ${
+                order.deliveryDate
+                  ? new Date(
+                      order.deliveryDate + 'T00:00:00'
+                    ).toLocaleDateString('en-GB')
+                  : '-'
+              }
+            </strong>
+
+          </div>
+
+          <div class="divider"></div>
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Item
+                </th>
+
+                <th style="text-align:center;">
+                  Qty
+                </th>
+
+                <th style="text-align:right;">
+                  Rate
+                </th>
+
+                <th style="text-align:right;">
+                  Total
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+
+          </table>
+
+          <div class="divider"></div>
+
+          <div class="total-row">
+
+            <span>
+              Subtotal
+            </span>
+
+            <strong>
+              ₹${receiptSubtotal.toFixed(2)}
+            </strong>
+
+          </div>
+
+          ${discountHtml}
+
+          ${expressHtml}
+
+          ${taxHtml}
+
+          <div class="total-row grand-total">
+
+            <span>
+              Total
+            </span>
+
+            <strong>
+              ₹${receiptTotal.toFixed(2)}
+            </strong>
+
+          </div>
+
+          ${termsHtml}
+
+          <div class="footer">
+
+            Thank you!
+
+            <br>
+
+            Please keep this receipt until collection.
+
+          </div>
+
+        </div>
+
+        <script>
+
+          window.onload = function () {
+            window.print();
+          };
+
+        </script>
+
+      </body>
+
+    </html>
+  `);
 
   printWindow.document.close();
+}
+
+
+openWhatsApp(): void {
+  if (!this.createdOrder) {
+    return;
+  }
+
+  const order = this.createdOrder;
+  const phone = this.formatWhatsAppPhone(
+    order.customer.phone
+  );
+
+  const totalQuantity = order.items?.reduce(
+      (total: number, item: any) => {
+
+        if (item.unit === 'KG') {
+          return total + Number(item.garmentCount ?? 0);
+        }
+
+        if (item.unit === 'PC') {
+          return total + Number(item.quantity ?? 0);
+        }
+
+        return total;
+      },
+      0
+    ) ?? 0;
+
+  const quantityLabel =
+    totalQuantity === 1
+      ? 'Pc'
+      : 'Pcs';
+
+  const message = `Dear ${order.customer.name},
+
+We have received your laundry for order ${order.orderNumber}.
+
+Total Amount: ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+Quantity: ${totalQuantity} ${quantityLabel}
+
+We will inform you if there are any updates to your order after store inspection.
+
+We'll notify you once your laundry is ready for collection.
+
+Thank you, `;
+
+  const whatsappUrl =
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+  window.open(
+    whatsappUrl,
+    '_blank'
+  );
+}
+
+private formatWhatsAppPhone(
+  phone: string
+): string {
+
+  const digits =
+    phone.replace(
+      /\D/g,
+      ''
+    );
+
+  if (digits.length === 10) {
+    return `91${digits}`;
+  }
+
+  return digits;
 }
 
 printTag(): void {
@@ -2367,7 +2552,6 @@ printTag(): void {
           })
       : '-';
 
-  //sdsd    
 const groupedOrderItems = this.orderItems.map(item => ({
   productName: item.productName,
   typeName: item.typeName ?? '',
@@ -2741,57 +2925,30 @@ printWindow.document.write(`
   private setDefaultDeliveryDate(): void {
     const date = new Date();
     date.setDate( date.getDate() + 2 );
-    this.deliveryDate = this.formatLocalDate(
-        date
-      );
+    this.deliveryDate = this.formatLocalDate( date );
   }
 
   editOrderItem( item: SelectedOrderItem ): void {
-    const product = this.products.find(
-        (
-          currentProduct: WalkInProduct
-        ) =>
-          currentProduct.id === item.productId
-      );
-
-    if ( !product ) {
-      return;
-    }
-
+    const product = this.products.find(( currentProduct: WalkInProduct ) => currentProduct.id === item.productId );
+    if ( !product ) { return; }
     const productType = product.types.find(
-        ( type: WalkInProductType ) =>
-          type.id === item.typeId
-      );
+        ( type: WalkInProductType ) => type.id === item.typeId );
 
-    if ( !productType ) {
-      return;
-    }
-
+    if ( !productType ) { return; }
     this.editingOrderItemId = item.id;
     this.selectedProduct = product;
     this.selectedProductType = productType;
-    this.selectedServiceIds = [
-      ...item.serviceIds
-    ];
-
-    this.selectedPreferences = [
-      ...item.preferences
-    ];
-
+    this.selectedServiceIds = [...item.serviceIds];
+    this.selectedPreferences = [...item.preferences ];
     this.productComment = item.comment;
-
     this.modalQuantity = item.quantity;
-
-    this.modalGarmentCount =
-      item.unit === 'KG'
+    this.modalGarmentCount = item.unit === 'KG'
         ? Math.max(1, Number(item.garmentCount ?? 1))
         : Math.max(1, Number(item.quantity));
-
     this.productModalOpen = true;
   }
 
-  normalizeModalQuantity(): void {
-  const value = Number(this.modalQuantity);
+  normalizeModalQuantity(): void { const value = Number(this.modalQuantity);
 
   if (this.selectedProduct?.unit === 'KG') {
     this.modalQuantity = !value || value < 0.1 ? 0.1 : Number(value.toFixed(2));
@@ -2804,4 +2961,7 @@ normalizeGarmentCount(): void {
   const value = Number(this.modalGarmentCount);
   this.modalGarmentCount = !value || value < 1 ? 1 : Math.floor(value);
 }
+
+
+
 }

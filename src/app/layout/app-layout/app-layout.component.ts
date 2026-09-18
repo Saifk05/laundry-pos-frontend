@@ -1,237 +1,148 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
-
-import {
-  RouterOutlet
-} from '@angular/router';
-
-import {
-  SidebarComponent
-} from '../sidebar/sidebar.component';
-
-import {
-  BusinessSettings
-} from '../../../core/models/business-settings.model';
-
-import {
-  BusinessSettingsService
-} from '../../../core/services/business-settings.service';
-
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { BusinessSettings } from '../../../core/models/business-settings.model';
+import { BusinessSettingsService } from '../../../core/services/business-settings.service';
 
 @Component({
   selector: 'app-app-layout',
   standalone: true,
   templateUrl: './app-layout.component.html',
   styleUrls: ['./app-layout.component.scss'],
-  imports: [
-    RouterOutlet,
-    SidebarComponent
-  ]
+  imports: [RouterOutlet, SidebarComponent]
 })
-export class AppLayoutComponent
-  implements OnInit {
+export class AppLayoutComponent implements OnInit {
 
-  settings:
-    BusinessSettings = {
-
-      id: 0,
-
-      businessName:
-        'Venkateshwara Fabric Works',
-
-      whatsappDisplayName:
-        'Fabric Luxury Shine',
-
-      headerSubtitle:
-        'Operations',
-
-      adminName:
-        'Admin',
-
-      adminSubtitle:
-        'Laundry',
-
-      logoUrl:
-        null,
-
-      cgstPercentage:
-        0,
-
-      sgstPercentage:
-        0,
-
-      taxIncluded:
-        false
-    };
-
+  settings: BusinessSettings = {
+    id: 0,
+    businessName: 'Fabric Works',
+    whatsappDisplayName: 'Fabric Luxury Shine',
+    headerSubtitle: 'Operations',
+    adminName: 'Admin',
+    adminSubtitle: 'Laundry',
+    logoUrl: null,
+    cgstPercentage: 0,
+    sgstPercentage: 0,
+    taxEnabled: false,
+    taxIncluded: false,
+    customFeatures: {
+      secureRetagEnabled: false,
+      retagPinConfigured: false,
+      retagWhatsappEnabled: false
+    }
+  };
 
   zoomLevel = 1;
+  isDarkMode = false;
 
   readonly minZoom = 0.7;
-
   readonly maxZoom = 1.3;
-
   readonly zoomStep = 0.1;
 
-
   constructor(
-    private readonly businessSettingsService:
-      BusinessSettingsService
+    private readonly businessSettingsService: BusinessSettingsService
   ) {}
 
-
   ngOnInit(): void {
-
+    this.loadTheme();
     this.loadZoom();
 
-    this.businessSettingsService
-      .settings$
-      .subscribe(
-        (
-          settings:
-            BusinessSettings | null
-        ) => {
-
-          if (
-            settings
-          ) {
-
-            this.settings =
-              settings;
-          }
+    this.businessSettingsService.settings$.subscribe(
+      (settings: BusinessSettings | null) => {
+        if (settings) {
+          this.settings = settings;
         }
-      );
-  }
-
-
-  get zoomPercentage():
-    number {
-
-    return Math.round(
-      this.zoomLevel * 100
+      }
     );
   }
 
-
-  zoomIn():
-    void {
-
-    if (
-      this.zoomLevel >=
-      this.maxZoom
-    ) {
-
-      return;
-    }
-
-    this.zoomLevel =
-      Math.min(
-        this.maxZoom,
-        Number(
-          (
-            this.zoomLevel +
-            this.zoomStep
-          ).toFixed(1)
-        )
-      );
-
-    this.saveZoom();
+  get zoomPercentage(): number {
+    return Math.round(this.zoomLevel * 100);
   }
 
+  toggleTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
 
-  zoomOut():
-    void {
-
-    if (
-      this.zoomLevel <=
-      this.minZoom
-    ) {
-
-      return;
-    }
-
-    this.zoomLevel =
-      Math.max(
-        this.minZoom,
-        Number(
-          (
-            this.zoomLevel -
-            this.zoomStep
-          ).toFixed(1)
-        )
-      );
-
-    this.saveZoom();
-  }
-
-
-  resetZoom():
-    void {
-
-    this.zoomLevel =
-      1;
-
-    this.saveZoom();
-  }
-
-
-  private saveZoom():
-    void {
+    document.documentElement.classList.toggle(
+      'dark',
+      this.isDarkMode
+    );
 
     localStorage.setItem(
-      'appZoomLevel',
-      String(
-        this.zoomLevel
-      )
+      'appTheme',
+      this.isDarkMode ? 'dark' : 'light'
     );
   }
 
-
-  private loadZoom():
-    void {
-
-    const savedZoom =
-      localStorage.getItem(
-        'appZoomLevel'
-      );
-
-    if (
-      !savedZoom
-    ) {
-
+  zoomIn(): void {
+    if (this.zoomLevel >= this.maxZoom) {
       return;
     }
 
-    const zoom =
-      Number(
-        savedZoom
-      );
+    this.zoomLevel = Math.min(
+      this.maxZoom,
+      Number((this.zoomLevel + this.zoomStep).toFixed(1))
+    );
 
-    if (
-      Number.isNaN(
-        zoom
-      )
-    ) {
-
-      return;
-    }
-
-    this.zoomLevel =
-      Math.min(
-        this.maxZoom,
-        Math.max(
-          this.minZoom,
-          zoom
-        )
-      );
+    this.saveZoom();
   }
 
+  zoomOut(): void {
+    if (this.zoomLevel <= this.minZoom) {
+      return;
+    }
+
+    this.zoomLevel = Math.max(
+      this.minZoom,
+      Number((this.zoomLevel - this.zoomStep).toFixed(1))
+    );
+
+    this.saveZoom();
+  }
+
+  resetZoom(): void {
+    this.zoomLevel = 1;
+    this.saveZoom();
+  }
 
   reloadPage(): void {
-
     window.location.reload();
   }
 
+  private loadTheme(): void {
+    const savedTheme = localStorage.getItem('appTheme');
+
+    this.isDarkMode = savedTheme === 'dark';
+
+    document.documentElement.classList.toggle(
+      'dark',
+      this.isDarkMode
+    );
+  }
+
+  private saveZoom(): void {
+    localStorage.setItem(
+      'appZoomLevel',
+      String(this.zoomLevel)
+    );
+  }
+
+  private loadZoom(): void {
+    const savedZoom = localStorage.getItem('appZoomLevel');
+
+    if (!savedZoom) {
+      return;
+    }
+
+    const zoom = Number(savedZoom);
+
+    if (Number.isNaN(zoom)) {
+      return;
+    }
+
+    this.zoomLevel = Math.min(
+      this.maxZoom,
+      Math.max(this.minZoom, zoom)
+    );
+  }
 }
