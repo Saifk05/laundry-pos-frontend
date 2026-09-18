@@ -2,13 +2,10 @@ export type PickupDeliveryType = 'PICKUP' | 'DELIVERY';
 
 export type PickupDeliveryStatus =
   | 'PENDING'
-  | 'ASSIGNED_FOR_PICKUP'
-  | 'OUT_FOR_PICKUP'
   | 'PICKED_UP'
-  | 'RECEIVED_AT_STORE'
-  | 'ASSIGNED_FOR_DELIVERY'
   | 'OUT_FOR_DELIVERY'
-  | 'DELIVERED';
+  | 'DELIVERED'
+  | 'COMPLETED';
 
 export interface PickupDelivery {
   id: string;
@@ -34,6 +31,12 @@ export interface PickupDeliveryRequest {
   type: PickupDeliveryType;
   scheduledDate: string;
   timeSlot: string;
+}
+
+export interface PickupDeliveryPageResponse {
+  items: PickupDelivery[];
+  nextCursor: string | null;
+  hasMore: boolean;
 }
 
 export interface MapLocation {

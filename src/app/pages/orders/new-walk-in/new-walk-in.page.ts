@@ -55,6 +55,10 @@ export class NewWalkInPage
   customerName = '';
   customerPhone = '';
   customerId: string | null = null;
+  pickupId: string | null = null;
+  pickupAddress = '';
+  pickupLatitude: number | null = null;
+  pickupLongitude: number | null = null;
   customerExists = false;
   checkingCustomer = false;
   customerMessage = '';
@@ -139,10 +143,40 @@ export class NewWalkInPage
 
   ngOnInit(): void {
     this.initializeOrderMode();
+    this.initializePickupOrder();
     this.generateDeliveryDates();
     this.setDefaultDeliveryDate();
     this.loadWalkInSetup();
     this.loadBusinessSettings();
+  }
+
+  private initializePickupOrder(): void {
+    const pickupId = this.route.snapshot.queryParamMap.get('pickupId');
+
+    if (!pickupId) {
+      return;
+    }
+
+    this.pickupId = pickupId;
+
+    this.apiService.getPickupDeliveryById(pickupId).subscribe({
+      next: pickup => {
+        this.customerName = pickup.customerName;
+        this.customerPhone = pickup.phoneNumber;
+        this.pickupAddress = pickup.address;
+        this.pickupLatitude = pickup.latitude;
+        this.pickupLongitude = pickup.longitude;
+
+        this.customerExists = true;
+        this.customerMessage = 'Pickup customer loaded';
+
+        this.checkCustomer();
+      },
+      error: error => {
+        console.error('Unable to load pickup:', error);
+        this.errorMessage = 'Unable to load pickup customer';
+      }
+    });
   }
   
   loadBusinessSettings(): void {
@@ -1458,6 +1492,37 @@ private formatLocalDate(
       false;
   }
 
+  private createDeliveryFromPickup(): void {
+  if (
+    !this.pickupId ||
+    !this.deliveryDate ||
+    !this.deliveryTime
+  ) {
+    this.creatingOrder = false;
+    return;
+  }
+
+  this.apiService.createPickupDelivery({
+    customerName: this.customerName.trim(),
+    phoneNumber: this.customerPhone.trim(),
+    address: this.pickupAddress,
+    latitude: this.pickupLatitude,
+    longitude: this.pickupLongitude,
+    type: 'DELIVERY',
+    scheduledDate: this.deliveryDate,
+    timeSlot: this.deliveryTime
+  }).subscribe({
+    next: () => {
+      this.creatingOrder = false;
+    },
+    error: error => {
+      this.creatingOrder = false;
+      console.error('Unable to create delivery:', error);
+      this.errorMessage =
+        'Order created successfully, but delivery could not be created';
+    }
+  });
+}
 
   createOrder():
     void {
@@ -1631,22 +1696,16 @@ const request:
       )
       .subscribe({
 
-        next: (
-          response:
-            OrderResponse
-        ) => {
+        next: (response: OrderResponse) => {
+          this.createdOrder = response;
+          this.createdOrderNumber = response.orderNumber;
+          this.orderCreated = true;
 
-          this.creatingOrder =
-            false;
-
-          this.createdOrder =
-            response;
-
-          this.createdOrderNumber =
-            response.orderNumber;
-
-          this.orderCreated =
-            true;
+          if (this.pickupId) {
+            this.createDeliveryFromPickup();
+          } else {
+            this.creatingOrder = false;
+          }
         },
 
         error: (
@@ -2865,57 +2924,30 @@ printWindow.document.write(`
   private setDefaultDeliveryDate(): void {
     const date = new Date();
     date.setDate( date.getDate() + 2 );
-    this.deliveryDate = this.formatLocalDate(
-        date
-      );
+    this.deliveryDate = this.formatLocalDate( date );
   }
 
   editOrderItem( item: SelectedOrderItem ): void {
-    const product = this.products.find(
-        (
-          currentProduct: WalkInProduct
-        ) =>
-          currentProduct.id === item.productId
-      );
-
-    if ( !product ) {
-      return;
-    }
-
+    const product = this.products.find(( currentProduct: WalkInProduct ) => currentProduct.id === item.productId );
+    if ( !product ) { return; }
     const productType = product.types.find(
-        ( type: WalkInProductType ) =>
-          type.id === item.typeId
-      );
+        ( type: WalkInProductType ) => type.id === item.typeId );
 
-    if ( !productType ) {
-      return;
-    }
-
+    if ( !productType ) { return; }
     this.editingOrderItemId = item.id;
     this.selectedProduct = product;
     this.selectedProductType = productType;
-    this.selectedServiceIds = [
-      ...item.serviceIds
-    ];
-
-    this.selectedPreferences = [
-      ...item.preferences
-    ];
-
+    this.selectedServiceIds = [...item.serviceIds];
+    this.selectedPreferences = [...item.preferences ];
     this.productComment = item.comment;
-
     this.modalQuantity = item.quantity;
-
-    this.modalGarmentCount =
-      item.unit === 'KG'
+    this.modalGarmentCount = item.unit === 'KG'
         ? Math.max(1, Number(item.garmentCount ?? 1))
         : Math.max(1, Number(item.quantity));
-
     this.productModalOpen = true;
   }
 
-  normalizeModalQuantity(): void {
-  const value = Number(this.modalQuantity);
+  normalizeModalQuantity(): void { const value = Number(this.modalQuantity);
 
   if (this.selectedProduct?.unit === 'KG') {
     this.modalQuantity = !value || value < 0.1 ? 0.1 : Number(value.toFixed(2));

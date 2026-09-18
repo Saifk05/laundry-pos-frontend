@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { OlaMaps } from 'olamaps-web-sdk';
 import { ApiService } from '../../../core/services/api.service';
@@ -57,7 +58,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   private zoomListenerRegistered = false;
   private renderTimer: any = null;
 
-  constructor(private readonly apiService: ApiService) {}
+  constructor(private readonly apiService: ApiService, private readonly router: Router) {}
 
   ngOnInit(): void {
     this.loadPickupDeliveries();
@@ -79,10 +80,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
   setActiveTab(tab: PickupViewTab): void {
     if (this.activeTab === tab) return;
-
     this.activeTab = tab;
     this.statusMenuPickup = null;
-
     if (tab !== 'MAP') return;
 
     setTimeout(() => {
@@ -146,7 +145,6 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
   private registerMapEvents(): void {
     if (!this.map || this.zoomListenerRegistered) return;
-
     this.zoomListenerRegistered = true;
 
     this.map.on?.('zoomend', () => {
@@ -158,24 +156,29 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   loadPickupDeliveries(): void {
     this.loading = true;
 
-    this.apiService.getPickupDeliveries(this.selectedType).subscribe({
-      next: response => {
-        this.pickups = response ?? [];
-        this.applyFilters(false);
-        this.loading = false;
+    this.apiService
+      .getPickupDeliveries(this.selectedType, null, 10)
+      .subscribe({
+        next: response => {
+          this.pickups = response.items ?? [];
+          this.applyFilters(false);
+          this.loading = false;
 
-        if (this.activeTab === 'MAP') {
-          setTimeout(() => this.renderMarkers(), 100);
+          if (this.activeTab === 'MAP') {
+            setTimeout(() => {
+              this.renderMarkers();
+              this.fitAllMarkers();
+            }, 100);
+          }
+        },
+        error: () => {
+          this.pickups = [];
+          this.filteredPickups = [];
+          this.selectedPickup = null;
+          this.loading = false;
+          this.renderMarkers();
         }
-      },
-      error: () => {
-        this.pickups = [];
-        this.filteredPickups = [];
-        this.selectedPickup = null;
-        this.loading = false;
-        this.renderMarkers();
-      }
-    });
+      });
   }
 
   applyFilters(refreshMap = true): void {
@@ -195,7 +198,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       return matchesSearch && matchesDate && matchesSlot && matchesStatus;
     });
 
-    if (this.selectedPickup && !this.filteredPickups.some(p => p.id === this.selectedPickup?.id)) {
+    if (this.selectedPickup && !this.filteredPickups.some(item => item.id === this.selectedPickup?.id)) {
       this.selectedPickup = null;
     }
 
@@ -216,6 +219,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   changeType(): void {
     this.statusMenuPickup = null;
     this.selectedStatus = '';
+    this.selectedPickup = null;
     this.loadPickupDeliveries();
   }
 
@@ -235,15 +239,11 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   getStatusLabel(status: PickupDeliveryStatus): string {
     const labels: Record<PickupDeliveryStatus, string> = {
       PENDING: 'Pending',
-      ASSIGNED_FOR_PICKUP: 'Assigned for Pickup',
-      OUT_FOR_PICKUP: 'Out for Pickup',
       PICKED_UP: 'Picked Up',
-      RECEIVED_AT_STORE: 'Received at Store',
-      ASSIGNED_FOR_DELIVERY: 'Assigned for Delivery',
       OUT_FOR_DELIVERY: 'Out for Delivery',
-      DELIVERED: 'Delivered'
+      DELIVERED: 'Delivered',
+      COMPLETED: 'Completed'
     };
-
     return labels[status];
   }
 
@@ -251,19 +251,61 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     return status.toLowerCase().replace(/_/g, '-');
   }
 
+  getNextStatus(pickup: PickupDelivery): PickupDeliveryStatus | null {
+    if (pickup.type === 'PICKUP') {
+      if (pickup.status === 'PENDING') return 'PICKED_UP';
+      if (pickup.status === 'PICKED_UP') return 'COMPLETED';
+      return null;
+    }
+
+    if (pickup.status === 'PENDING') return 'OUT_FOR_DELIVERY';
+    if (pickup.status === 'OUT_FOR_DELIVERY') return 'DELIVERED';
+    if (pickup.status === 'DELIVERED') return 'COMPLETED';
+    return null;
+  }
+
+  getNextStatusLabel(pickup: PickupDelivery): string {
+    const status = this.getNextStatus(pickup);
+    if (!status) return '';
+
+    if (pickup.type === 'PICKUP') {
+      if (status === 'PICKED_UP') return 'Mark Picked Up';
+      if (status === 'COMPLETED') return 'Mark Completed';
+    }
+
+    if (status === 'OUT_FOR_DELIVERY') return 'Mark Out for Delivery';
+    if (status === 'DELIVERED') return 'Mark Delivered';
+    if (status === 'COMPLETED') return 'Mark Completed';
+
+    return this.getStatusLabel(status);
+  }
+
+  advanceStatus(pickup: PickupDelivery): void {
+    const status = this.getNextStatus(pickup);
+    if (status) this.updateStatus(pickup, status);
+  }
+
+  canCreateOrder(pickup: PickupDelivery): boolean {
+    return pickup.type === 'PICKUP' && pickup.status === 'COMPLETED';
+  }
+
+  createOrder(pickup: PickupDelivery): void {
+    if (!this.canCreateOrder(pickup)) return;
+
+    this.router.navigate(['/app/new-walk-in'], {
+      queryParams: { pickupId: pickup.id }
+    });
+  }
+
   private getMappedRecords(): PickupDelivery[] {
-    return this.filteredPickups.filter(p => {
-      if (p.latitude === null || p.longitude === null) return false;
+    return this.filteredPickups.filter(pickup => {
+      if (pickup.latitude === null || pickup.longitude === null) return false;
 
-      const lat = Number(p.latitude);
-      const lng = Number(p.longitude);
+      const lat = Number(pickup.latitude);
+      const lng = Number(pickup.longitude);
 
-      return Number.isFinite(lat) &&
-        Number.isFinite(lng) &&
-        lat >= -90 &&
-        lat <= 90 &&
-        lng >= -180 &&
-        lng <= 180;
+      return Number.isFinite(lat) && Number.isFinite(lng) &&
+        lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
     });
   }
 
@@ -279,11 +321,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     const clusters = this.createClusters(records, zoom);
 
     for (const cluster of clusters) {
-      if (cluster.pickups.length === 1) {
-        this.addCustomerMarker(cluster.pickups[0]);
-      } else {
-        this.addClusterMarker(cluster);
-      }
+      if (cluster.pickups.length === 1) this.addCustomerMarker(cluster.pickups[0]);
+      else this.addClusterMarker(cluster);
     }
 
     this.updateMarkerSelection();
@@ -291,10 +330,10 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
   private createClusters(records: PickupDelivery[], zoom: number): MapCluster[] {
     if (zoom >= 14) {
-      return records.map(p => ({
-        pickups: [p],
-        latitude: Number(p.latitude),
-        longitude: Number(p.longitude)
+      return records.map(pickup => ({
+        pickups: [pickup],
+        latitude: Number(pickup.latitude),
+        longitude: Number(pickup.longitude)
       }));
     }
 
@@ -304,7 +343,6 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     for (const pickup of records) {
       const lat = Number(pickup.latitude);
       const lng = Number(pickup.longitude);
-
       let nearest: MapCluster | null = null;
       let nearestDistance = Infinity;
 
@@ -318,24 +356,13 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (!nearest) {
-        clusters.push({
-          pickups: [pickup],
-          latitude: lat,
-          longitude: lng
-        });
-
+        clusters.push({ pickups: [pickup], latitude: lat, longitude: lng });
         continue;
       }
 
       nearest.pickups.push(pickup);
-
-      nearest.latitude =
-        nearest.pickups.reduce((sum, p) => sum + Number(p.latitude), 0) /
-        nearest.pickups.length;
-
-      nearest.longitude =
-        nearest.pickups.reduce((sum, p) => sum + Number(p.longitude), 0) /
-        nearest.pickups.length;
+      nearest.latitude = nearest.pickups.reduce((sum, item) => sum + Number(item.latitude), 0) / nearest.pickups.length;
+      nearest.longitude = nearest.pickups.reduce((sum, item) => sum + Number(item.longitude), 0) / nearest.pickups.length;
     }
 
     return clusters;
@@ -380,7 +407,6 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const element = document.createElement('button');
-
     element.type = 'button';
     element.className = 'customer-cluster-marker';
     element.setAttribute('aria-label', `${cluster.pickups.length} locations`);
@@ -454,10 +480,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
     element.addEventListener('click', event => {
       event.stopPropagation();
-
       this.selectedPickup = pickup;
       this.closeAllPopups();
-
       popup.setLngLat([lng, lat]).addTo(this.map);
 
       this.map.flyTo?.({
@@ -476,11 +500,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
   private createMarkerElement(pickup: PickupDelivery): HTMLElement {
     const marker = document.createElement('button');
-
     marker.type = 'button';
-    marker.className =
-      `customer-map-pin ${pickup.type === 'PICKUP' ? 'pickup-pin' : 'delivery-pin'}`;
-
+    marker.className = `customer-map-pin ${pickup.type === 'PICKUP' ? 'pickup-pin' : 'delivery-pin'}`;
     marker.dataset['pickupId'] = pickup.id;
     marker.setAttribute('aria-label', `${pickup.type}: ${pickup.customerName}`);
 
@@ -530,9 +551,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
       <div class="popup-status-row">
         <span>Status</span>
-        <strong class="popup-status ${this.getStatusClass(pickup.status)}">
-          ${this.escapeHtml(status)}
-        </strong>
+        <strong class="popup-status ${this.getStatusClass(pickup.status)}">${this.escapeHtml(status)}</strong>
       </div>
     `;
 
@@ -659,17 +678,18 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
         if (index !== -1) this.pickups[index] = updated;
         if (this.selectedPickup?.id === updated.id) this.selectedPickup = updated;
 
+        this.statusMenuPickup = null;
         this.applyFilters();
       }
     });
   }
 
   get pickupCount(): number {
-    return this.filteredPickups.filter(p => p.type === 'PICKUP').length;
+    return this.filteredPickups.filter(item => item.type === 'PICKUP').length;
   }
 
   get deliveryCount(): number {
-    return this.filteredPickups.filter(p => p.type === 'DELIVERY').length;
+    return this.filteredPickups.filter(item => item.type === 'DELIVERY').length;
   }
 
   get mappedCount(): number {

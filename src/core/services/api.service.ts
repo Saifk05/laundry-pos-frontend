@@ -26,6 +26,7 @@ import {
   PickupDelivery,
   PickupDeliveryRequest,
   PickupDeliveryStatus,
+  PickupDeliveryPageResponse,
   MapLocationResponse
 } from '../models/pickup-delivery.model';
 
@@ -731,39 +732,48 @@ updateTermsConditions(
     );
   }
 
-    /* =========================================
+  /* =========================================
      PICKUP / DELIVERY
   ========================================= */
 
   createPickupDelivery(
     request: PickupDeliveryRequest
   ): Observable<PickupDelivery> {
-
     return this.http.post<PickupDelivery>(
       `${this.baseUrl}/v1/pickup-deliveries`,
       request
     );
   }
 
-
   getPickupDeliveries(
-    filter: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL'
-  ): Observable<PickupDelivery[]> {
-
-    return this.http.get<PickupDelivery[]>(
+    filter: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL',
+    cursor: string | null = null,
+    limit = 10
+  ): Observable<PickupDeliveryPageResponse> {
+    return this.http.get<PickupDeliveryPageResponse>(
       `${this.baseUrl}/v1/pickup-deliveries`,
       {
-        params: { filter }
+        params: {
+          filter,
+          cursor: cursor ?? '',
+          limit
+        }
       }
     );
   }
 
+  getPickupDeliveryById(
+    id: string
+  ): Observable<PickupDelivery> {
+    return this.http.get<PickupDelivery>(
+      `${this.baseUrl}/v1/pickup-deliveries/${id}`
+    );
+  }
 
   updatePickupDeliveryStatus(
     id: string,
     status: PickupDeliveryStatus
   ): Observable<PickupDelivery> {
-
     return this.http.patch<PickupDelivery>(
       `${this.baseUrl}/v1/pickup-deliveries/${id}/status`,
       { status }

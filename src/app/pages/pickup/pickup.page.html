@@ -1,6 +1,5 @@
 <ion-content [fullscreen]="true">
   <div class="pickup-page">
-
     <div class="page-header">
       <div class="page-title">
         <h1>Pickup / Delivery</h1>
@@ -8,20 +7,12 @@
       </div>
 
       <div class="view-toggle">
-        <button
-          type="button"
-          [class.active]="activeTab === 'MAP'"
-          (click)="setActiveTab('MAP')">
-          <span class="tab-icon">⌖</span>
-          Map
+        <button type="button" [class.active]="activeTab === 'MAP'" (click)="setActiveTab('MAP')">
+          <span class="tab-icon">⌖</span> Map
         </button>
 
-        <button
-          type="button"
-          [class.active]="activeTab === 'ORDERS'"
-          (click)="setActiveTab('ORDERS')">
-          <span class="tab-icon">▤</span>
-          Orders
+        <button type="button" [class.active]="activeTab === 'ORDERS'" (click)="setActiveTab('ORDERS')">
+          <span class="tab-icon">▤</span> Orders
         </button>
       </div>
     </div>
@@ -53,7 +44,6 @@
         [(ngModel)]="selectedTimeSlot"
         (change)="applyFilters()">
         <option value="">All Time Slots</option>
-
         @for (slot of timeSlots; track slot) {
           <option [value]="slot">{{ slot }}</option>
         }
@@ -64,13 +54,10 @@
         (change)="applyFilters()">
         <option value="">All Status</option>
         <option value="PENDING">Pending</option>
-        <option value="ASSIGNED_FOR_PICKUP">Assigned for Pickup</option>
-        <option value="OUT_FOR_PICKUP">Out for Pickup</option>
         <option value="PICKED_UP">Picked Up</option>
-        <option value="RECEIVED_AT_STORE">Received at Store</option>
-        <option value="ASSIGNED_FOR_DELIVERY">Assigned for Delivery</option>
         <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
         <option value="DELIVERED">Delivered</option>
+        <option value="COMPLETED">Completed</option>
       </select>
 
       <button
@@ -82,7 +69,6 @@
     </div>
 
     <div class="location-summary">
-
       <div class="summary-item">
         <span class="summary-marker pickup"></span>
         <div>
@@ -114,7 +100,6 @@
           <span>Total</span>
         </div>
       </div>
-
     </div>
 
     <div
@@ -122,7 +107,6 @@
       [class.tab-hidden]="activeTab !== 'MAP'">
 
       <div class="map-card">
-
         <div class="map-header">
           <div class="map-title">
             <strong>Customer Locations</strong>
@@ -152,7 +136,6 @@
         </div>
 
         <div class="map-container">
-
           <div
             id="pickupOlaMap"
             class="ola-map">
@@ -181,7 +164,6 @@
               <p>Customer locations with coordinates will appear here.</p>
             </div>
           }
-
         </div>
 
         <div class="map-footer">
@@ -191,7 +173,6 @@
 
           @if (selectedPickup) {
             <div class="selected-map-customer">
-
               <span
                 class="selected-dot"
                 [class.pickup]="selectedPickup.type === 'PICKUP'"
@@ -200,22 +181,16 @@
 
               <div>
                 <strong>{{ selectedPickup.customerName }}</strong>
-                <span>
-                  {{ selectedPickup.type }} · {{ selectedPickup.timeSlot }}
-                </span>
+                <span>{{ selectedPickup.type }} · {{ selectedPickup.timeSlot }}</span>
               </div>
-
             </div>
           }
         </div>
-
       </div>
     </div>
 
     @if (activeTab === 'ORDERS') {
-
       <div class="orders-card">
-
         <div class="orders-header">
           <div>
             <h2>Pickup / Delivery Orders</h2>
@@ -224,14 +199,11 @@
         </div>
 
         <div class="table-scroll">
-
           <table>
-
             <thead>
               <tr>
                 <th>#</th>
                 <th>Customer</th>
-                <th>Address</th>
                 <th>Type</th>
                 <th>Schedule</th>
                 <th>Status</th>
@@ -240,24 +212,14 @@
             </thead>
 
             <tbody>
-
               @for (pickup of filteredPickups; track pickup.id; let i = $index) {
-
                 <tr>
-
                   <td>{{ i + 1 }}</td>
 
                   <td>
                     <div class="customer">
                       <strong>{{ pickup.customerName }}</strong>
                       <span>{{ pickup.phoneNumber }}</span>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div class="address-cell">
-                      <span>📍</span>
-                      <span>{{ pickup.address }}</span>
                     </div>
                   </td>
 
@@ -286,18 +248,28 @@
                   </td>
 
                   <td class="action-cell">
+                    @if (canCreateOrder(pickup)) {
+                      <button
+                        type="button"
+                        class="update-btn"
+                        (click)="createOrder(pickup)">
+                        Create Order
+                      </button>
+                    } @else if (getNextStatus(pickup)) {
+                      <button
+                        type="button"
+                        class="update-btn"
+                        (click)="openStatusMenu(pickup)">
+                        Update
+                      </button>
+                    } @else {
+                      <span class="status-badge completed">
+                        Completed
+                      </span>
+                    }
 
-                    <button
-                      type="button"
-                      class="update-btn"
-                      (click)="openStatusMenu(pickup)">
-                      Update
-                    </button>
-
-                    @if (statusMenuPickup?.id === pickup.id) {
-
+                    @if (statusMenuPickup?.id === pickup.id && getNextStatus(pickup)) {
                       <div class="status-menu">
-
                         <div class="status-menu-header">
                           <div>
                             <strong>Update Status</strong>
@@ -314,134 +286,62 @@
 
                         <button
                           type="button"
-                          [class.current]="pickup.status === 'PENDING'"
-                          (click)="selectStatus(pickup, 'PENDING')">
+                          (click)="advanceStatus(pickup)">
 
-                          <span class="status-option-dot pending"></span>
+                          <span
+                            class="status-option-dot"
+                            [ngClass]="getStatusClass(getNextStatus(pickup)!)">
+                          </span>
 
                           <div>
-                            <strong>Pending</strong>
-                            <span>Service is scheduled</span>
-                          </div>
+                            <strong>{{ getNextStatusLabel(pickup) }}</strong>
 
-                        </button>
-
-                        @if (pickup.type === 'PICKUP') {
-
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'ASSIGNED_FOR_PICKUP'"
-                            (click)="selectStatus(pickup, 'ASSIGNED_FOR_PICKUP')">
-
-                            <span class="status-option-dot assigned"></span>
-
-                            <div>
-                              <strong>Assigned for Pickup</strong>
-                              <span>Pickup has been assigned</span>
-                            </div>
-
-                          </button>
-
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'OUT_FOR_PICKUP'"
-                            (click)="selectStatus(pickup, 'OUT_FOR_PICKUP')">
-
-                            <span class="status-option-dot out"></span>
-
-                            <div>
-                              <strong>Out for Pickup</strong>
-                              <span>Pickup is on the way</span>
-                            </div>
-
-                          </button>
-
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'PICKED_UP'"
-                            (click)="selectStatus(pickup, 'PICKED_UP')">
-
-                            <span class="status-option-dot picked"></span>
-
-                            <div>
-                              <strong>Picked Up</strong>
+                            @if (
+                              pickup.type === 'PICKUP' &&
+                              getNextStatus(pickup) === 'PICKED_UP'
+                            ) {
                               <span>Laundry collected from customer</span>
-                            </div>
+                            }
 
-                          </button>
+                            @if (
+                              pickup.type === 'PICKUP' &&
+                              getNextStatus(pickup) === 'COMPLETED'
+                            ) {
+                              <span>Laundry reached the store</span>
+                            }
 
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'RECEIVED_AT_STORE'"
-                            (click)="selectStatus(pickup, 'RECEIVED_AT_STORE')">
+                            @if (
+                              pickup.type === 'DELIVERY' &&
+                              getNextStatus(pickup) === 'OUT_FOR_DELIVERY'
+                            ) {
+                              <span>Laundry left the store</span>
+                            }
 
-                            <span class="status-option-dot received"></span>
+                            @if (
+                              pickup.type === 'DELIVERY' &&
+                              getNextStatus(pickup) === 'DELIVERED'
+                            ) {
+                              <span>Laundry reached the customer</span>
+                            }
 
-                            <div>
-                              <strong>Received at Store</strong>
-                              <span>Laundry received at the store</span>
-                            </div>
-
-                          </button>
-                        }
-
-                        @if (pickup.type === 'DELIVERY') {
-
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'ASSIGNED_FOR_DELIVERY'"
-                            (click)="selectStatus(pickup, 'ASSIGNED_FOR_DELIVERY')">
-
-                            <span class="status-option-dot assigned"></span>
-
-                            <div>
-                              <strong>Assigned for Delivery</strong>
-                              <span>Delivery has been assigned</span>
-                            </div>
-
-                          </button>
-
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'OUT_FOR_DELIVERY'"
-                            (click)="selectStatus(pickup, 'OUT_FOR_DELIVERY')">
-
-                            <span class="status-option-dot out"></span>
-
-                            <div>
-                              <strong>Out for Delivery</strong>
-                              <span>Order is on the way</span>
-                            </div>
-
-                          </button>
-
-                          <button
-                            type="button"
-                            [class.current]="pickup.status === 'DELIVERED'"
-                            (click)="selectStatus(pickup, 'DELIVERED')">
-
-                            <span class="status-option-dot delivered"></span>
-
-                            <div>
-                              <strong>Delivered</strong>
-                              <span>Laundry delivered to customer</span>
-                            </div>
-
-                          </button>
-                        }
-
+                            @if (
+                              pickup.type === 'DELIVERY' &&
+                              getNextStatus(pickup) === 'COMPLETED'
+                            ) {
+                              <span>Complete delivery service</span>
+                            }
+                          </div>
+                        </button>
                       </div>
                     }
-
                   </td>
-
                 </tr>
               }
 
               @if (!filteredPickups.length && !loading) {
                 <tr>
                   <td
-                    colspan="7"
+                    colspan="6"
                     class="empty">
                     <strong>No records found</strong>
                   </td>
@@ -451,20 +351,16 @@
               @if (loading) {
                 <tr>
                   <td
-                    colspan="7"
+                    colspan="6"
                     class="empty">
                     Loading...
                   </td>
                 </tr>
               }
-
             </tbody>
-
           </table>
-
         </div>
       </div>
     }
-
   </div>
 </ion-content>
