@@ -264,143 +264,74 @@
    DARK THEME
    Black + Neon Green
 ========================================================= */
-
 html.dark {
+  --app-primary: #ffd600;
+  --app-primary-hover: #ffe033;
+  --app-primary-dark: #e6bd00;
+  --app-primary-light: #3a3105;
+  --app-primary-soft: #211d08;
 
-  /* =========================
-     BRAND COLORS
-  ========================= */
+  --app-secondary: #ffc400;
+  --app-secondary-dark: #d9a700;
+  --app-secondary-light: #332906;
 
-  --app-primary: #00e676;
+  --app-background: #080808;
+  --app-background-soft: #0d0d0d;
 
-  --app-primary-hover: #00ff85;
+  --app-background-blue: #11100a;
+  --app-background-yellow: #161407;
 
-  --app-primary-dark: #00c853;
+  --app-surface: #121212;
+  --app-surface-soft: #181818;
 
-  --app-primary-light: #123d29;
+  --app-card-background: #121212;
 
-  --app-primary-soft: #0d2519;
+  --app-input-background: #0b0b0b;
 
+  --app-sidebar-background: #090909;
+  --app-header-background: #090909;
 
-  --app-secondary: #00e676;
+  --app-hover-background: #1d1b10;
+  --app-selected-background: #292307;
 
-  --app-secondary-dark: #00c853;
-
-  --app-secondary-light: #102c20;
-
-
-  /* =========================
-     BACKGROUNDS
-  ========================= */
-
-  --app-background: #080b0a;
-
-  --app-background-soft: #0d1210;
-
-  --app-background-blue: #0b1711;
-
-  --app-background-yellow: #0c1812;
-
-
-  /* =========================
-     SURFACES
-  ========================= */
-
-  --app-surface: #111916;
-
-  --app-surface-soft: #161f1c;
-
-  --app-card-background: #111916;
-
-  --app-input-background: #0d1512;
-
-  --app-sidebar-background: #090d0b;
-
-  --app-header-background: #090d0b;
-
-  --app-hover-background: #17211d;
-
-  --app-selected-background: #10291d;
-
-
-  /* =========================
-     TEXT
-  ========================= */
-
-  --app-text-primary: #f5f7f6;
-
-  --app-text-secondary: #aab6b0;
-
-  --app-text-muted: #77827d;
-
-  --app-text-disabled: #56615c;
+  --app-text-primary: #f7f7f5;
+  --app-text-secondary: #b7b5ac;
+  --app-text-muted: #85837b;
+  --app-text-disabled: #5f5e59;
 
   --app-text-light: #ffffff;
 
-  /*
-   * Neon green is bright enough that black text gives
-   * better contrast than white on primary buttons.
-   */
-  --app-text-on-primary: #041009;
+  --app-text-on-primary: #090900;
 
+  --app-border: #2b2a24;
+  --app-border-soft: #20201d;
+  --app-border-strong: #3b3930;
 
-  /* =========================
-     BORDERS
-  ========================= */
+  --app-input-border: #34332c;
 
-  --app-border: #26302c;
+  --app-success: #22c55e;
+  --app-success-soft: #10291a;
 
-  --app-border-soft: #1c2521;
-
-  --app-border-strong: #35423c;
-
-  --app-input-border: #2a3630;
-
-
-  /* =========================
-     STATUS COLORS
-  ========================= */
-
-  --app-success: #00e676;
-
-  --app-success-soft: #103522;
-
-
-  --app-warning: #fbbf24;
-
-  --app-warning-soft: #382b0c;
-
+  --app-warning: #ffd600;
+  --app-warning-soft: #332b05;
 
   --app-danger: #f87171;
-
-  --app-danger-soft: #3a1717;
-
+  --app-danger-soft: #351515;
 
   --app-info: #38bdf8;
-
-  --app-info-soft: #102c3b;
-
-
-  /* =========================
-     SHADOWS
-  ========================= */
+  --app-info-soft: #102b38;
 
   --app-shadow-xs:
-    0 1px 3px rgba(0, 0, 0, 0.2);
+    0 1px 3px rgba(0, 0, 0, 0.25);
 
   --app-shadow-sm:
-    0 2px 10px rgba(0, 0, 0, 0.25);
+    0 3px 12px rgba(0, 0, 0, 0.3);
 
   --app-shadow-md:
-    0 10px 30px rgba(0, 0, 0, 0.35);
+    0 12px 32px rgba(0, 0, 0, 0.4);
 
   --app-shadow-lg:
-    0 20px 60px rgba(0, 0, 0, 0.5);
-
-
-  /* =========================
-     NATIVE COLOR SCHEME
-  ========================= */
+    0 24px 65px rgba(0, 0, 0, 0.55);
 
   color-scheme: dark;
 }

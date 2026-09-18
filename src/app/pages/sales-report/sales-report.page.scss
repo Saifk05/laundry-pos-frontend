@@ -90,7 +90,7 @@
 }
 
 .date-field input:hover {
-  border-color: #cbd5ce;
+  border-color: var(--app-border-strong);
 }
 
 .date-field input:focus {
@@ -99,7 +99,7 @@
   background: var(--app-surface);
 
   box-shadow:
-    0 0 0 3px rgba(22, 163, 74, 0.08);
+    0 0 0 3px color-mix(in srgb, var(--app-primary) 12%, transparent);
 }
 
 .quick-actions {
@@ -156,7 +156,7 @@
   border-radius: 8px;
 
   background: var(--app-primary);
-  color: #ffffff;
+  color: var(--app-text-on-primary);
 
   font-size: 11px;
   font-weight: 800;
@@ -208,7 +208,7 @@
   background: var(--app-surface);
 
   box-shadow:
-    0 3px 12px rgba(17, 24, 20, 0.04);
+    0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
 .summary-card span {
@@ -235,8 +235,8 @@
   background:
     linear-gradient(
       135deg,
-      #ffffff 0%,
-      #f4fff7 100%
+      var(--app-surface) 0%,
+      var(--app-primary-soft) 100%
     );
 }
 
@@ -245,18 +245,18 @@
 }
 
 .express-orders-card {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--app-warning);
 
   background:
     linear-gradient(
       135deg,
-      #ffffff 0%,
-      #fffaf0 100%
+      var(--app-surface) 0%,
+      var(--app-warning-soft) 100%
     );
 }
 
 .express-orders-card strong {
-  color: #d97706;
+  color: var(--app-warning);
 }
 
 .report-grid {
@@ -278,7 +278,7 @@
   background: var(--app-surface);
 
   box-shadow:
-    0 3px 12px rgba(17, 24, 20, 0.04);
+    0 3px 12px rgba(0, 0, 0, 0.08);
 
   overflow: hidden;
 }
@@ -474,7 +474,7 @@
 }
 
 .express-value {
-  color: #d97706;
+  color: var(--app-warning);
 
   font-size: 9px;
   font-weight: 800;
@@ -504,13 +504,13 @@
 }
 
 .status-tagged {
-  background: #f1f4f2;
-  color: #64748b;
+  background: var(--app-surface-soft);
+  color: var(--app-text-secondary);
 }
 
 .status-processing {
-  background: #fff7df;
-  color: #b77900;
+  background: var(--app-warning-soft);
+  color: var(--app-warning);
 }
 
 .status-ready {
@@ -519,12 +519,12 @@
 }
 
 .status-delivered {
-  background: #eaf8ee;
+  background: var(--app-success-soft);
   color: var(--app-success);
 }
 
 .status-cancelled {
-  background: #fff1f1;
+  background: var(--app-danger-soft);
   color: var(--app-danger);
 }
 
@@ -620,9 +620,9 @@
 
   padding: 14px;
 
-  background: #ffffff;
+  background: var(--app-surface);
 
-  border: 1px solid #e3e9e6;
+  border: 1px solid var(--app-border);
   border-radius: 12px;
 }
 
@@ -645,7 +645,7 @@
 .compact-date-filter > label {
   padding-left: 2px;
 
-  color: #25332c;
+  color: var(--app-text-primary);
 
   font-size: 10px;
   font-weight: 700;
@@ -677,7 +677,7 @@
 
   padding: 0 6px 0 10px;
 
-  background: #f8faf9;
+  background: var(--app-surface-soft);
 
   border-radius: 7px;
 }
@@ -714,7 +714,7 @@
   font-size: 11px;
   font-weight: 600;
 
-  color: #25332c;
+  color: var(--app-text-primary);
 }
 
 
@@ -734,7 +734,7 @@
 .mat-date-range-input-separator {
   margin: 0 7px;
 
-  color: #77827c;
+  color: var(--app-text-muted);
 }
 
 
@@ -756,7 +756,7 @@
   width: 18px;
   height: 18px;
 
-  color: #617069;
+  color: var(--app-text-secondary);
 }
 
 
@@ -768,7 +768,7 @@
 .mdc-notched-outline__notch,
 .compact-date-range ::ng-deep
 .mdc-notched-outline__trailing {
-  border-color: #dce4e0 !important;
+  border-color: var(--app-input-border) !important;
   border-width: 1px !important;
 }
 
@@ -781,7 +781,7 @@
 .mdc-notched-outline__notch,
 .compact-date-range.mat-focused ::ng-deep
 .mdc-notched-outline__trailing {
-  border-color: #16a34a !important;
+  border-color: var(--app-primary) !important;
 }
 
 
@@ -802,12 +802,12 @@
 
   padding: 0 16px;
 
-  background: #ffffff;
+  background: var(--app-surface);
 
-  border: 1px solid #dce4e0;
+  border: 1px solid var(--app-input-border);
   border-radius: 8px;
 
-  color: #46534d;
+  color: var(--app-text-secondary);
 
   font-size: 12px;
   font-weight: 700;
@@ -819,20 +819,20 @@
 
 
 .quick-actions button:hover {
-  border-color: #22c55e;
+  border-color: var(--app-primary);
 
-  background: #f5fbf7;
+  background: var(--app-hover-background);
 
-  color: #15803d;
+  color: var(--app-primary-dark);
 }
 
 
 .quick-actions button.active {
-  border-color: #22c55e;
+  border-color: var(--app-primary);
 
-  background: #dcfce7;
+  background: var(--app-primary-light);
 
-  color: #15803d;
+  color: var(--app-primary-dark);
 }
 
 
@@ -850,9 +850,9 @@
   border: 0;
   border-radius: 8px;
 
-  background: #16a34a;
+  background: var(--app-primary);
 
-  color: #ffffff;
+  color: var(--app-text-on-primary);
 
   font-size: 12px;
   font-weight: 700;
@@ -862,7 +862,7 @@
 
 
 .refresh-button:hover:not(:disabled) {
-  background: #15803d;
+  background: var(--app-primary-dark);
 }
 
 
@@ -1010,3 +1010,40 @@
 
   text-align: center;
 }
+
+.sales-report-page{background:var(--app-background-soft);color:var(--app-text-primary)}
+.filter-bar{background:var(--app-surface);border-color:var(--app-border)}
+.compact-date-filter>label{color:var(--app-text-secondary)}
+.compact-date-range ::ng-deep .mat-mdc-text-field-wrapper{background:var(--app-input-background)}
+.compact-date-range ::ng-deep .mat-date-range-input-container{color:var(--app-text-primary)}
+.compact-date-range ::ng-deep input{color:var(--app-text-primary)!important;caret-color:var(--app-primary)!important}
+.compact-date-range ::ng-deep input::placeholder{color:var(--app-text-muted)!important}
+.compact-date-range ::ng-deep .mat-date-range-input-separator{color:var(--app-text-muted)}
+.compact-date-range ::ng-deep .mat-datepicker-toggle-default-icon{color:var(--app-text-secondary)}
+.compact-date-range ::ng-deep .mdc-notched-outline__leading,
+.compact-date-range ::ng-deep .mdc-notched-outline__notch,
+.compact-date-range ::ng-deep .mdc-notched-outline__trailing{border-color:var(--app-input-border)!important}
+.compact-date-range.mat-focused ::ng-deep .mdc-notched-outline__leading,
+.compact-date-range.mat-focused ::ng-deep .mdc-notched-outline__notch,
+.compact-date-range.mat-focused ::ng-deep .mdc-notched-outline__trailing{border-color:var(--app-primary)!important}
+.quick-actions button{background:var(--app-surface);border-color:var(--app-border);color:var(--app-text-secondary)}
+.quick-actions button:hover{background:var(--app-hover-background);border-color:var(--app-primary);color:var(--app-primary)}
+.quick-actions button.active{background:var(--app-primary-light);border-color:var(--app-primary);color:var(--app-primary)}
+.refresh-button{background:var(--app-primary);color:var(--app-text-on-primary)}
+.refresh-button:hover:not(:disabled){background:var(--app-primary-hover)}
+.summary-card{background:var(--app-surface);border-color:var(--app-border);box-shadow:var(--app-shadow-xs)}
+.summary-card.highlight{background:linear-gradient(135deg,var(--app-surface) 0%,var(--app-primary-soft) 100%)}
+.summary-card.highlight strong{color:var(--app-primary)}
+.express-orders-card{border-left-color:var(--app-warning);background:linear-gradient(135deg,var(--app-surface) 0%,var(--app-warning-soft) 100%)}
+.express-orders-card strong,.express-value{color:var(--app-warning)}
+.report-card,.orders-card{background:var(--app-surface);border-color:var(--app-border);box-shadow:var(--app-shadow-xs)}
+.card-header{background:var(--app-surface);border-color:var(--app-border)}
+.table-header,.orders-table thead{background:var(--app-surface-soft)}
+.table-row:hover,.orders-table tbody tr:hover{background:var(--app-hover-background)}
+.orders-table{background:var(--app-surface)}
+.money,.order-number{color:var(--app-primary)!important}
+.status-tagged{background:var(--app-surface-soft);color:var(--app-text-secondary)}
+.status-processing{background:var(--app-warning-soft);color:var(--app-warning)}
+.status-ready{background:var(--app-primary-light);color:var(--app-primary)}
+.status-delivered{background:var(--app-success-soft);color:var(--app-success)}
+.status-cancelled{background:var(--app-danger-soft);color:var(--app-danger)}

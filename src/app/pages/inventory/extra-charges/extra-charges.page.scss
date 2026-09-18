@@ -13,7 +13,6 @@ input {
   font: inherit;
 }
 
-
 /* =====================================================
    PAGE
 ===================================================== */
@@ -21,13 +20,13 @@ input {
 .extra-charges-page {
   width: 100%;
   min-height: calc(100vh - 70px);
-
   padding: 30px 32px 50px;
-
-  background: #ffffff;
-  color: #111827;
+  background: var(--app-background-soft);
+  color: var(--app-text-primary);
+  transition:
+    background var(--app-transition),
+    color var(--app-transition);
 }
-
 
 /* =====================================================
    PAGE HEADER
@@ -35,35 +34,29 @@ input {
 
 .page-header {
   width: 100%;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 20px;
-
   margin-bottom: 24px;
 }
 
 .page-header h1 {
   margin: 0;
-
+  font-family: var(--app-font-heading);
   font-size: 28px;
   line-height: 1.2;
   font-weight: 700;
-
-  color: #111111;
+  letter-spacing: var(--app-letter-spacing-tight);
+  color: var(--app-text-primary);
 }
 
 .page-header p {
   margin: 6px 0 0;
-
   font-size: 14px;
   line-height: 1.5;
-
-  color: #68737d;
+  color: var(--app-text-secondary);
 }
-
 
 /* =====================================================
    PRIMARY BUTTON
@@ -72,37 +65,33 @@ input {
 .primary-button {
   min-width: 130px;
   height: 44px;
-
   padding: 0 18px;
-
-  border: 1px solid #16a34a;
+  border: 1px solid var(--app-primary);
   border-radius: 7px;
-
-  background: #16a34a;
-  color: #ffffff;
-
+  background: var(--app-primary);
+  color: var(--app-text-on-primary);
   font-size: 13px;
   font-weight: 600;
-
   cursor: pointer;
-
-  box-shadow:
-    0 4px 12px rgba(22, 163, 74, 0.14);
-
+  box-shadow: var(--app-shadow-sm);
   transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    background var(--app-transition),
+    border-color var(--app-transition),
+    box-shadow var(--app-transition),
+    transform var(--app-transition);
 }
 
-.primary-button:hover {
-  background: #15803d;
-  border-color: #15803d;
-
-  box-shadow:
-    0 5px 14px rgba(22, 163, 74, 0.18);
+.primary-button:hover:not(:disabled) {
+  background: var(--app-primary-hover);
+  border-color: var(--app-primary-hover);
+  box-shadow: var(--app-shadow-md);
+  transform: translateY(-1px);
 }
 
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* =====================================================
    SUMMARY
@@ -110,46 +99,38 @@ input {
 
 .summary-row {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 240px));
-
+  grid-template-columns: repeat(2, minmax(0, 240px));
   gap: 14px;
-
   margin-bottom: 22px;
 }
 
 .summary-card {
   min-height: 88px;
-
   padding: 16px;
-
   display: flex;
   align-items: center;
-
   gap: 13px;
-
-  border: 1px solid #e0e6e9;
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-
-  background: #ffffff;
+  background: var(--app-card-background);
+  color: var(--app-text-primary);
+  box-shadow: var(--app-shadow-xs);
+  transition:
+    background var(--app-transition),
+    border-color var(--app-transition),
+    color var(--app-transition);
 }
 
 .summary-icon {
   width: 42px;
   height: 42px;
-
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 9px;
-
-  background: #ecfdf3;
-  color: #16a34a;
-
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
   font-size: 17px;
   font-weight: 700;
 }
@@ -157,24 +138,21 @@ input {
 .summary-card > div:last-child {
   display: flex;
   flex-direction: column;
-
   gap: 3px;
 }
 
 .summary-card span {
-  color: #7b858b;
-
+  color: var(--app-text-muted);
   font-size: 11px;
   font-weight: 500;
 }
 
 .summary-card strong {
-  color: #252c31;
-
+  color: var(--app-text-primary);
+  font-family: var(--app-font-heading);
   font-size: 22px;
   font-weight: 700;
 }
-
 
 /* =====================================================
    CHARGES SECTION
@@ -182,41 +160,36 @@ input {
 
 .charges-section {
   width: 100%;
-
   overflow: hidden;
-
   margin-bottom: 20px;
-
-  border: 1px solid #dfe6e9;
+  border: 1px solid var(--app-border);
   border-radius: 11px;
-
-  background: #ffffff;
+  background: var(--app-card-background);
+  transition:
+    background var(--app-transition),
+    border-color var(--app-transition);
 }
 
 .section-header {
   padding: 20px 22px;
-
-  border-bottom: 1px solid #e7ecee;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-card-background);
 }
 
 .section-header h2 {
   margin: 0;
-
-  color: #171c1f;
-
+  color: var(--app-text-primary);
+  font-family: var(--app-font-heading);
   font-size: 18px;
   font-weight: 700;
 }
 
 .section-header p {
   margin: 5px 0 0;
-
-  color: #78838a;
-
+  color: var(--app-text-secondary);
   font-size: 12px;
   line-height: 1.5;
 }
-
 
 /* =====================================================
    TABLE
@@ -224,50 +197,39 @@ input {
 
 .charges-table {
   width: 100%;
+  background: var(--app-card-background);
 }
 
 .table-header,
 .charge-row {
   display: grid;
-
   grid-template-columns:
     minmax(260px, 1.5fr)
     minmax(140px, 0.7fr)
     minmax(190px, 0.8fr)
     100px;
-
   gap: 18px;
-
   align-items: center;
 }
 
 .table-header {
   min-height: 45px;
-
   padding: 0 20px;
-
-  border-bottom: 1px solid #e8edef;
-
-  background: #f8fafb;
-
-  color: #6f7980;
-
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface-soft);
+  color: var(--app-text-secondary);
   font-size: 11px;
   font-weight: 600;
-
   text-transform: uppercase;
-
   letter-spacing: 0.02em;
 }
 
 .charge-row {
   min-height: 78px;
-
   padding: 14px 20px;
-
-  border-bottom: 1px solid #edf0f2;
-
-  transition: background 0.2s ease;
+  border-bottom: 1px solid var(--app-border-soft);
+  background: var(--app-card-background);
+  transition: background var(--app-transition-fast);
 }
 
 .charge-row:last-child {
@@ -275,9 +237,8 @@ input {
 }
 
 .charge-row:hover {
-  background: #fbfdfd;
+  background: var(--app-hover-background);
 }
-
 
 /* =====================================================
    CHARGE NAME
@@ -285,57 +246,44 @@ input {
 
 .charge-name {
   min-width: 0;
-
   display: flex;
   align-items: center;
-
   gap: 12px;
 }
 
 .charge-icon {
   width: 40px;
   height: 40px;
-
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 8px;
-
-  background: #ecfdf3;
-
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
   font-size: 16px;
 }
 
 .charge-name > div:last-child {
   min-width: 0;
-
   display: flex;
   flex-direction: column;
-
   gap: 3px;
 }
 
 .charge-name strong {
   overflow: hidden;
-
-  color: #293136;
-
+  color: var(--app-text-primary);
   font-size: 13px;
   font-weight: 600;
-
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .charge-name span {
-  color: #879198;
-
+  color: var(--app-text-muted);
   font-size: 11px;
 }
-
 
 /* =====================================================
    PERCENTAGE
@@ -348,22 +296,17 @@ input {
 
 .percentage-value {
   min-width: 66px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   padding: 7px 10px;
-
+  border: 1px solid var(--app-primary-light);
   border-radius: 7px;
-
-  background: #ecfdf3;
-  color: #15803d;
-
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
   font-size: 14px;
   font-weight: 700;
 }
-
 
 /* =====================================================
    STATUS
@@ -372,35 +315,29 @@ input {
 .status-column {
   display: flex;
   align-items: center;
-
   gap: 12px;
 }
 
 .status-badge {
   min-width: 58px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   padding: 5px 9px;
-
   border-radius: 20px;
-
   font-size: 10px;
   font-weight: 600;
 }
 
 .status-badge.active {
-  background: #e9f8ef;
-  color: #228b4b;
+  background: var(--app-success-soft);
+  color: var(--app-success);
 }
 
 .status-badge.inactive {
-  background: #f1f3f4;
-  color: #777f84;
+  background: var(--app-surface-soft);
+  color: var(--app-text-muted);
 }
-
 
 /* =====================================================
    TOGGLE
@@ -408,51 +345,39 @@ input {
 
 .toggle-switch {
   position: relative;
-
   width: 42px;
   height: 23px;
-
   flex-shrink: 0;
-
   padding: 0;
-
-  border: none;
+  border: 1px solid var(--app-border-strong);
   border-radius: 20px;
-
-  background: #cbd2d6;
-
+  background: var(--app-border-strong);
   cursor: pointer;
-
-  transition: background 0.2s ease;
+  transition:
+    background var(--app-transition-fast),
+    border-color var(--app-transition-fast);
 }
 
 .toggle-switch.enabled {
-  background: #16a34a;
+  background: var(--app-primary);
+  border-color: var(--app-primary);
 }
 
 .toggle-knob {
   position: absolute;
-
-  top: 3px;
-  left: 3px;
-
+  top: 2px;
+  left: 2px;
   width: 17px;
   height: 17px;
-
   border-radius: 50%;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.18);
-
-  transition: transform 0.2s ease;
+  background: var(--app-text-light);
+  box-shadow: var(--app-shadow-sm);
+  transition: transform var(--app-transition-fast);
 }
 
 .toggle-switch.enabled .toggle-knob {
   transform: translateX(19px);
 }
-
 
 /* =====================================================
    ACTION
@@ -466,33 +391,30 @@ input {
 
 .edit-button {
   height: 33px;
-
   padding: 0 13px;
-
-  border: 1px solid #d8e0e3;
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-
-  background: #ffffff;
-  color: #59636a;
-
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
   font-size: 11px;
   font-weight: 600;
-
   cursor: pointer;
-
   transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
+    border-color var(--app-transition-fast),
+    background var(--app-transition-fast),
+    color var(--app-transition-fast);
 }
 
-.edit-button:hover {
-  border-color: #16a34a;
-
-  background: #f0fdf4;
-  color: #15803d;
+.edit-button:hover:not(:disabled) {
+  border-color: var(--app-primary);
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
 }
 
+.edit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* =====================================================
    INFO CARD
@@ -500,65 +422,50 @@ input {
 
 .info-card {
   padding: 16px 18px;
-
   display: flex;
   align-items: flex-start;
-
   gap: 13px;
-
-  border: 1px solid #ccebd7;
+  border: 1px solid var(--app-primary-light);
   border-radius: 9px;
-
-  background: #f0fdf4;
+  background: var(--app-primary-soft);
 }
 
 .info-icon {
   width: 28px;
   height: 28px;
-
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 50%;
-
-  background: #dcfce7;
-  color: #15803d;
-
+  background: var(--app-primary-light);
+  color: var(--app-primary);
   font-size: 13px;
   font-weight: 700;
 }
 
 .info-card strong {
-  color: #2f3a3f;
-
+  color: var(--app-text-primary);
   font-size: 12px;
   font-weight: 600;
 }
 
 .info-card p {
   margin: 4px 0 7px;
-
-  color: #68777e;
-
+  color: var(--app-text-secondary);
   font-size: 11px;
   line-height: 1.5;
 }
 
 .example {
-  color: #718087;
-
+  color: var(--app-text-muted);
   font-size: 11px;
 }
 
 .example strong {
   margin-left: 4px;
-
-  color: #15803d;
+  color: var(--app-primary);
 }
-
 
 /* =====================================================
    EMPTY STATE
@@ -566,52 +473,40 @@ input {
 
 .empty-state {
   min-height: 280px;
-
   padding: 30px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   text-align: center;
+  background: var(--app-card-background);
 }
 
 .empty-icon {
   width: 52px;
   height: 52px;
-
   margin-bottom: 14px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 50%;
-
-  background: #ecfdf3;
-  color: #16a34a;
-
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
   font-size: 20px;
   font-weight: 700;
 }
 
 .empty-state h3 {
   margin: 0 0 6px;
-
-  color: #333b40;
-
+  color: var(--app-text-primary);
   font-size: 16px;
 }
 
 .empty-state p {
   margin: 0 0 18px;
-
-  color: #7c868c;
-
+  color: var(--app-text-muted);
   font-size: 12px;
 }
-
 
 /* =====================================================
    MODAL BACKDROP
@@ -619,22 +514,15 @@ input {
 
 .modal-backdrop {
   position: fixed;
-
   inset: 0;
-
   z-index: 1000;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 24px;
-
   overflow-y: auto;
-
-  background: rgba(20, 29, 34, 0.42);
+  background: rgba(0, 0, 0, 0.62);
 }
-
 
 /* =====================================================
    MODAL
@@ -643,19 +531,29 @@ input {
 .charge-modal {
   width: 100%;
   max-width: 560px;
-
   max-height: calc(100vh - 48px);
-
   overflow-y: auto;
-
+  border: 1px solid var(--app-border);
   border-radius: 12px;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.18);
+  background: var(--app-card-background);
+  color: var(--app-text-primary);
+  box-shadow: var(--app-shadow-lg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-border-strong) var(--app-surface);
 }
 
+.charge-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.charge-modal::-webkit-scrollbar-track {
+  background: var(--app-surface);
+}
+
+.charge-modal::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--app-border-strong);
+}
 
 /* =====================================================
    MODAL HEADER
@@ -663,30 +561,25 @@ input {
 
 .modal-header {
   padding: 21px 24px;
-
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
   gap: 20px;
-
-  border-bottom: 1px solid #e7ecee;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-card-background);
 }
 
 .modal-header h2 {
   margin: 0;
-
-  color: #151a1d;
-
+  color: var(--app-text-primary);
+  font-family: var(--app-font-heading);
   font-size: 19px;
   font-weight: 700;
 }
 
 .modal-header p {
   margin: 5px 0 0;
-
-  color: #78838a;
-
+  color: var(--app-text-secondary);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -694,31 +587,29 @@ input {
 .close-button {
   width: 34px;
   height: 34px;
-
   flex-shrink: 0;
-
   padding: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border: 1px solid #e0e5e8;
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-
-  background: #ffffff;
-  color: #69747a;
-
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
   font-size: 21px;
   line-height: 1;
-
   cursor: pointer;
+  transition:
+    background var(--app-transition-fast),
+    border-color var(--app-transition-fast),
+    color var(--app-transition-fast);
 }
 
-.close-button:hover {
-  background: #f6f8f9;
+.close-button:hover:not(:disabled) {
+  border-color: var(--app-primary);
+  background: var(--app-hover-background);
+  color: var(--app-primary);
 }
-
 
 /* =====================================================
    FORM
@@ -726,60 +617,51 @@ input {
 
 .charge-form {
   padding: 24px;
+  background: var(--app-card-background);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-
   gap: 7px;
-
   margin-bottom: 19px;
 }
 
 .form-group label {
-  color: #323a3f;
-
+  color: var(--app-text-primary);
   font-size: 12px;
   font-weight: 600;
 }
 
 .required {
-  color: #dc3545;
+  color: var(--app-danger);
 }
 
 .form-group > input {
   width: 100%;
   height: 46px;
-
   padding: 0 13px;
-
-  border: 1px solid #d5dde1;
+  border: 1px solid var(--app-input-border);
   border-radius: 7px;
-
   outline: none;
-
-  background: #ffffff;
-  color: #252c31;
-
+  background: var(--app-input-background);
+  color: var(--app-text-primary);
   font-size: 13px;
-
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color var(--app-transition-fast),
+    background var(--app-transition-fast),
+    box-shadow var(--app-transition-fast);
 }
 
 .form-group > input::placeholder {
-  color: #a1a9ae;
+  color: var(--app-text-muted);
 }
 
 .form-group > input:focus {
-  border-color: #16a34a;
-
-  box-shadow:
-    0 0 0 3px rgba(22, 163, 74, 0.08);
+  border-color: var(--app-primary);
+  background: var(--app-input-background);
+  box-shadow: 0 0 0 3px var(--app-primary-soft);
 }
-
 
 /* =====================================================
    PERCENTAGE INPUT
@@ -788,64 +670,50 @@ input {
 .percentage-input {
   width: 100%;
   height: 46px;
-
   display: flex;
   align-items: center;
-
   overflow: hidden;
-
-  border: 1px solid #d5dde1;
+  border: 1px solid var(--app-input-border);
   border-radius: 7px;
-
-  background: #ffffff;
-
+  background: var(--app-input-background);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color var(--app-transition-fast),
+    box-shadow var(--app-transition-fast);
 }
 
 .percentage-input:focus-within {
-  border-color: #16a34a;
-
-  box-shadow:
-    0 0 0 3px rgba(22, 163, 74, 0.08);
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 3px var(--app-primary-soft);
 }
 
 .percentage-input input {
   width: 100%;
   height: 100%;
-
   min-width: 0;
-
   padding: 0 13px;
-
   border: none;
   outline: none;
-
-  background: #ffffff;
-  color: #252c31;
-
+  background: var(--app-input-background);
+  color: var(--app-text-primary);
   font-size: 13px;
+}
+
+.percentage-input input::placeholder {
+  color: var(--app-text-muted);
 }
 
 .percentage-input > span {
   height: 100%;
-
   min-width: 48px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-left: 1px solid #e1e6e8;
-
-  background: #f5f8f9;
-  color: #59636a;
-
+  border-left: 1px solid var(--app-border);
+  background: var(--app-surface-soft);
+  color: var(--app-text-secondary);
   font-size: 13px;
   font-weight: 600;
 }
-
 
 /* =====================================================
    ERROR / HELP
@@ -853,20 +721,16 @@ input {
 
 .error-text {
   display: block;
-
-  color: #dc3545;
-
+  color: var(--app-danger);
   font-size: 11px;
   line-height: 1.4;
 }
 
 .helper-text {
-  color: #89939a;
-
+  color: var(--app-text-muted);
   font-size: 11px;
   line-height: 1.45;
 }
-
 
 /* =====================================================
    STATUS SETTING
@@ -874,41 +738,30 @@ input {
 
 .status-setting {
   min-height: 72px;
-
   padding: 14px 16px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 20px;
-
-  border: 1px solid #e0e6e9;
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-
-  background: #fafcfc;
+  background: var(--app-surface-soft);
 }
 
 .status-setting strong {
   display: block;
-
   margin-bottom: 4px;
-
-  color: #323a3f;
-
+  color: var(--app-text-primary);
   font-size: 12px;
   font-weight: 600;
 }
 
 .status-setting p {
   margin: 0;
-
-  color: #838d93;
-
+  color: var(--app-text-muted);
   font-size: 11px;
   line-height: 1.4;
 }
-
 
 /* =====================================================
    MODAL ACTIONS
@@ -917,60 +770,62 @@ input {
 .modal-actions {
   margin-top: 24px;
   padding-top: 18px;
-
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   gap: 10px;
-
-  border-top: 1px solid #edf0f2;
+  border-top: 1px solid var(--app-border);
 }
 
 .cancel-button,
 .save-button {
   min-width: 110px;
   height: 43px;
-
   padding: 0 18px;
-
   border-radius: 7px;
-
   font-size: 12px;
   font-weight: 600;
-
   cursor: pointer;
+  transition:
+    background var(--app-transition-fast),
+    border-color var(--app-transition-fast),
+    color var(--app-transition-fast);
 }
 
 .cancel-button {
-  border: 1px solid #d5dde1;
-
-  background: #ffffff;
-  color: #515b62;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-primary);
 }
 
-.cancel-button:hover {
-  background: #f6f8f9;
+.cancel-button:hover:not(:disabled) {
+  border-color: var(--app-primary);
+  background: var(--app-hover-background);
+  color: var(--app-primary);
 }
 
 .save-button {
-  border: 1px solid #16a34a;
-
-  background: #16a34a;
-  color: #ffffff;
+  border: 1px solid var(--app-primary);
+  background: var(--app-primary);
+  color: var(--app-text-on-primary);
 }
 
-.save-button:hover {
-  background: #15803d;
+.save-button:hover:not(:disabled) {
+  background: var(--app-primary-hover);
+  border-color: var(--app-primary-hover);
 }
 
+.cancel-button:disabled,
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* =====================================================
    TABLET
 ===================================================== */
 
 @media (max-width: 900px) {
-
   .extra-charges-page {
     padding: 24px 20px 40px;
   }
@@ -982,19 +837,15 @@ input {
       110px
       160px
       80px;
-
     gap: 12px;
   }
-
 }
-
 
 /* =====================================================
    MOBILE
 ===================================================== */
 
 @media (max-width: 700px) {
-
   .extra-charges-page {
     padding: 20px 14px 35px;
   }
@@ -1004,8 +855,7 @@ input {
   }
 
   .summary-row {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .table-header {
@@ -1014,9 +864,7 @@ input {
 
   .charge-row {
     grid-template-columns: 1fr;
-
     gap: 15px;
-
     padding: 18px;
   }
 
@@ -1029,12 +877,9 @@ input {
   .action-column {
     justify-content: flex-start;
   }
-
 }
 
-
 @media (max-width: 520px) {
-
   .extra-charges-page {
     padding: 18px 12px 30px;
   }
@@ -1086,5 +931,4 @@ input {
   .save-button {
     width: 100%;
   }
-
 }
