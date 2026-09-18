@@ -1817,14 +1817,22 @@ private updateRetagOrder(): void {
   const orderNumber = order.orderNumber || this.retagOrderNumber;
   const totalAmount = Number(order.totalAmount ?? 0).toFixed(2);
 
-  const message = `Dear ${customerName},
+//   const message = `Dear ${customerName},
 
-Your invoice for Order ${orderNumber} has been updated after store inspection.
+// Your invoice for Order ${orderNumber} has been updated after store inspection.
 
-Updated Total Amount: ₹${totalAmount}
+// Updated Total Amount: ₹${totalAmount}
 
-Thank you,
-`;
+// Thank you,
+// `;
+
+const message = `Dear ${order.customer.name},
+
+Your invoice for Order ${order.orderNumber} has been updated.
+
+Updated Total Amount: ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+
+Thank you.`;
 
   window.open(
     `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
@@ -2434,18 +2442,28 @@ openWhatsApp(): void {
       ? 'Pc'
       : 'Pcs';
 
-  const message = `Dear ${order.customer.name},
+//   const message = `Dear ${order.customer.name},
+
+// We have received your laundry for order ${order.orderNumber}.
+
+// Total Amount: ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+// Quantity: ${totalQuantity} ${quantityLabel}
+
+// We will inform you if there are any updates to your order after store inspection.
+
+// We'll notify you once your laundry is ready for collection.
+
+// Thank you, `;
+
+const message = `Dear ${order.customer.name},
 
 We have received your laundry for order ${order.orderNumber}.
 
 Total Amount: ₹${Number(order.totalAmount ?? 0).toFixed(2)}
+
 Quantity: ${totalQuantity} ${quantityLabel}
 
-We will inform you if there are any updates to your order after store inspection.
-
-We'll notify you once your laundry is ready for collection.
-
-Thank you, `;
+Thank you.`;
 
   const whatsappUrl =
     `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;

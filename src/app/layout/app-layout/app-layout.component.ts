@@ -36,7 +36,7 @@ export class AppLayoutComponent implements OnInit {
     id: 0,
 
     businessName:
-      'Venkateshwara Fabric Works',
+      'Fabric Works',
 
     whatsappDisplayName:
       'Fabric Luxury Shine',
