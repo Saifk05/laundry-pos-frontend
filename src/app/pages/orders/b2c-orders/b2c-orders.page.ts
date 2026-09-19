@@ -1,50 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule
-} from '@angular/forms';
-
+import { FormControl, FormGroup,FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-import {
-  DateAdapter,
-  MAT_DATE_FORMATS,
-  MAT_DATE_LOCALE,
-  MatNativeDateModule,
-  NativeDateAdapter
-} from '@angular/material/core';
-
-import { Router } from '@angular/router';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule, NativeDateAdapter } from '@angular/material/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
-import {
-  B2COrder,
-  B2COrderDetails,
-  B2COrderListResponse,
-  B2COrderStatus
-} from '../../../../core/models/b2c-order.model';
-import {
-  PaymentMethod,
-  PaymentRequest,
-  SettlementOrder
-} from '../../../../core/models/settlement.model';
-
+import { B2COrder,B2COrderDetails, B2COrderListResponse, B2COrderStatus } from '../../../../core/models/b2c-order.model';
+import { PaymentMethod,PaymentRequest, SettlementOrder } from '../../../../core/models/settlement.model';
 const B2C_DATE_FORMATS = {
-  parse: {
-    dateInput: 'DD/MM/YYYY'
-  },
-  display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'DD/MM/YYYY',
-    monthYearA11yLabel: 'MMMM YYYY'
-  }
-};
+  parse: { dateInput: 'DD/MM/YYYY' },
+  display: { dateInput: 'DD/MM/YYYY', monthYearLabel: 'MMM YYYY', dateA11yLabel: 'DD/MM/YYYY', monthYearA11yLabel: 'MMMM YYYY' }};
 
 class B2cDateAdapter extends NativeDateAdapter {
-
   override parse(value: any): Date | null {
     if (value == null || value === '') {
       return null;
@@ -55,59 +23,28 @@ class B2cDateAdapter extends NativeDateAdapter {
     }
 
     const text = String(value).trim();
-
-    const match = text.match(
-      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-    );
-
-    if (!match) {
-      return null;
-    }
-
+    const match = text.match( /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/ );
+    if (!match) { return null; }
     const day = Number(match[1]);
     const month = Number(match[2]) - 1;
     const year = Number(match[3]);
-
-    const date = new Date(
-      year,
-      month,
-      day
-    );
-
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month ||
-      date.getDate() !== day
-    ) {
+    const date = new Date( year, month, day );
+    if ( date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day ) {
       return null;
     }
-
     return date;
   }
 
-  override format(
-    date: Date,
-    displayFormat: any
-  ): string {
-
+  override format( date: Date, displayFormat: any ): string {
     if (!this.isValid(date)) {
-      throw Error(
-        'B2cDateAdapter: Cannot format invalid date.'
-      );
+      throw Error( 'B2cDateAdapter: Cannot format invalid date.' );
     }
 
-    const day = String(
-      date.getDate()
-    ).padStart(2, '0');
-
-    const month = String(
-      date.getMonth() + 1
-    ).padStart(2, '0');
-
+    const day = String( date.getDate() ).padStart(2, '0');
+    const month = String( date.getMonth() + 1 ).padStart(2, '0');
     const year = date.getFullYear();
-
     return `${day}/${month}/${year}`;
-  }
+  } 
 }
 
 interface B2cOrderView {
@@ -135,14 +72,7 @@ interface B2cOrderView {
   standalone: true,
   templateUrl: './b2c-orders.page.html',
   styleUrls: ['./b2c-orders.page.scss'],
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    MatInputModule,
-    MatNativeDateModule
-  ],
+  imports: [ FormsModule, ReactiveFormsModule, MatFormFieldModule, MatDatepickerModule, MatInputModule,MatNativeDateModule ],
   providers: [
     {
       provide: DateAdapter,
@@ -218,46 +148,58 @@ export class B2cOrdersPage implements OnInit {
   secureRetagEnabled = false;
   retagPinConfigured = false;
   retagWhatsappEnabled = false;
-
   retagPinModalOpen = false;
   retagPin = '';
   retagPinError = '';
   retagPinLoading = false;
-
   selectedRetagOrder: B2cOrderView | null = null;
 
   constructor(
-    private readonly apiService: ApiService,
-    private readonly router: Router
-  ) {}
+    private readonly apiService:ApiService,
+    private readonly router:Router,
+    private readonly route:ActivatedRoute
+  ){}
 
-ngOnInit(): void {
-  this.loadBusinessSettings();
-  this.loadOrders();
-}
+  ngOnInit():void{
+    this.loadBusinessSettings();
 
-private loadBusinessSettings(): void {
-  this.apiService.getBusinessSettings().subscribe({
-    next: (response: any) => {
-      this.businessName = response?.businessName || 'Fabric Works';
-      this.secureRetagEnabled = Boolean(response?.customFeatures?.secureRetagEnabled);
-      this.retagPinConfigured = Boolean(response?.customFeatures?.retagPinConfigured);
-      this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
-    },
-    error: (error: any) => {
-      console.error('Unable to load business settings:', error);
-      this.secureRetagEnabled = false;
-      this.retagPinConfigured = false;
-      this.retagWhatsappEnabled = false;
+    const orderNo=this.route.snapshot.queryParamMap.get('orderNo')?.trim();
+
+    if(orderNo){
+      this.orderNumberSearch=orderNo;
+      this.customerNameSearch='';
+      this.mobileSearch='';
+      this.selectedStatus='All';
+
+      this.fromDate='';
+      this.toDate='';
+      this.range.setValue({start:null,end:null});
     }
-  });
-}
+
+    this.loadOrders();
+  }
+
+  private loadBusinessSettings(): void {
+    this.apiService.getBusinessSettings().subscribe({
+      next: (response: any) => {
+        this.businessName = response?.businessName || 'Fabric Works';
+        this.secureRetagEnabled = Boolean(response?.customFeatures?.secureRetagEnabled);
+        this.retagPinConfigured = Boolean(response?.customFeatures?.retagPinConfigured);
+        this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
+      },
+      error: (error: any) => {
+        console.error('Unable to load business settings:', error);
+        this.secureRetagEnabled = false;
+        this.retagPinConfigured = false;
+        this.retagWhatsappEnabled = false;
+      }
+    });
+  }
 
 
   loadOrders(cursor: string | null = null): void {
     this.loading = true;
     this.errorMessage = '';
-
     this.apiService
       .getB2COrders(
         this.getBackendStatus(),
@@ -280,20 +222,12 @@ private loadBusinessSettings(): void {
         },
 
         error: (error: any) => {
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to load orders';
-
+          this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to load orders';
           this.loading = false;
-        }
-      });
+        }});
   }
 
-private toViewOrder(
-  order: B2COrder
-): B2cOrderView {
-
+private toViewOrder( order: B2COrder ): B2cOrderView {
   return {
     id: order.id,
     orderNumber: order.orderNumber,
@@ -423,10 +357,10 @@ private toViewOrder(
     );
   }
 
-  private getSearchValue(): string {
-    return (
-      this.orderNumberSearch.trim() ||
-      this.mobileSearch.trim() ||
+  private getSearchValue():string{
+    return(
+      this.orderNumberSearch.trim()||
+      this.mobileSearch.trim()||
       this.customerNameSearch.trim()
     );
   }
@@ -596,114 +530,53 @@ private toViewOrder(
       }});
   }
 
-private openReadyWhatsApp(
-  order: B2cOrderView
-): void {
-
-  const phone =
-    this.formatWhatsAppPhone(
-      order.mobile
-    );
-
-  if (!phone) {
-    this.errorMessage =
-      'Customer WhatsApp number is invalid';
-
+private openReadyWhatsApp( order: B2cOrderView ): void {
+  const phone = this.formatWhatsAppPhone( order.mobile );
+  if (!phone) { this.errorMessage = 'Customer WhatsApp number is invalid';
     return;
   }
 
   this.apiService
     .getB2COrderById(order.id)
     .subscribe({
-
       next: (details: any) => {
-
-        const totalQuantity =
-          details.items?.reduce(
+        const totalQuantity = details.items?.reduce(
             (total: number, item: any) => {
-
               if (item.unit === 'KG') {
-                return total +
-                  Number(
-                    item.garmentCount ?? 0
-                  );
+                return total + Number( item.garmentCount ?? 0 );
               }
 
               if (item.unit === 'PC') {
-                return total +
-                  Number(
-                    item.quantity ?? 0
-                  );
-              }
-
-              return total;
-            },
-            0
-          ) ?? 0;
+                return total + Number( item.quantity ?? 0 );
+              } return total; },0) ?? 0;
 
         const quantityLabel = totalQuantity === 1
             ? 'Pc'
             : 'Pcs';
 
         const message = `Dear ${order.customerName},
+          Your laundry order ${order.orderNumber} is ready for collection.
+          Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
+          Quantity: ${totalQuantity} ${quantityLabel}
+          Kindly collect your order within 2 days.
+          Thank you, `;
 
-Your laundry order ${order.orderNumber} is ready for collection.
-
-Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
-Quantity: ${totalQuantity} ${quantityLabel}
-
-Kindly collect your order within 2 days.
-
-Thank you,
-`;
-
-        const whatsappUrl =
-          `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-
-        window.open(
-          whatsappUrl,
-          '_blank'
-        );
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        window.open( whatsappUrl, '_blank');
       },
-
       error: (error: any) => {
+        console.error( 'Unable to load order details', error );
+        this.errorMessage ='Unable to load order details';
+      }});
+    }
 
-        console.error(
-          'Unable to load order details',
-          error
-        );
-
-        this.errorMessage =
-          'Unable to load order details';
-      }
-    });
-}
-
-  private formatWhatsAppPhone(
-    phone: string
-  ): string {
-
-    if (!phone) {
+  private formatWhatsAppPhone( phone: string): string {
+    if (!phone) { return ''; }
+    let digits = phone.replace( /\D/g, '' );
+    if (digits.length === 10) { digits = `91${digits}`; }
+    if ( digits.length !== 12 || !digits.startsWith('91') ) {
       return '';
     }
-
-    let digits =
-      phone.replace(
-        /\D/g,
-        ''
-      );
-
-    if (digits.length === 10) {
-      digits = `91${digits}`;
-    }
-
-    if (
-      digits.length !== 12 ||
-      !digits.startsWith('91')
-    ) {
-      return '';
-    }
-
     return digits;
   }
 
@@ -868,13 +741,12 @@ Thank you,
     this.readyStorageModalOpen = true;
   }
 
-  saveStorageLabel(): void {
-    if (!this.selectedReadyOrder) {
-      return;
-    }
+    saveStorageLabel(): void {
+      if (!this.selectedReadyOrder) {
+        return;
+      }
 
     const storageLabel = this.readyStorageLabel.trim();
-
     if (!storageLabel) {
       this.readyStorageError = 'Storage label is required';
       return;
@@ -883,9 +755,7 @@ Thank you,
     this.readyStorageError = '';
     this.errorMessage = '';
     this.actionLoading = true;
-
     const orderId = this.selectedReadyOrder.id;
-
     this.apiService.updateB2CStorageLabel(orderId, storageLabel).subscribe({
       next: (response: B2COrder) => {
         this.updateLocalOrder(response);
@@ -1433,14 +1303,11 @@ private printQrTags(order: B2COrderDetails ): void {
       item.typeName ?? '',
       item.unit,
       Number(item.quantity)].join('|');
-
     const existingItem = groupedItems.get(key);
-
     if (existingItem) {
       if ( !existingItem.serviceNames.includes(item.serviceName)) {
         existingItem.serviceNames.push( item.serviceName);
-      }
-      continue;
+      } continue;
     }
 
     groupedItems.set(key,
@@ -1500,7 +1367,6 @@ private printQrTags(order: B2COrderDetails ): void {
   };
 
   let tagsHtml = '';
-
   for ( const item of groupedOrderItems ) {
     const typeName = item.typeName && item.typeName
         .toLowerCase() !== 'default'
@@ -1560,12 +1426,7 @@ private printQrTags(order: B2COrderDetails ): void {
           `; }} continue;
     }
 
-    for (
-      let index = 1;
-      index <= tagCount;
-      index++
-    ) {
-
+    for ( let index = 1; index <= tagCount; index++ ) {
       tagsHtml += `
         <section class="tag">
           <div class="business-name">

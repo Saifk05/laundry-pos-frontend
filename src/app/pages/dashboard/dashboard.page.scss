@@ -1089,3 +1089,49 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+/* =========================================================
+   CLICKABLE ORDER NUMBER
+========================================================= */
+
+.order-number-link{
+  position:relative;
+  flex-shrink:0;
+  padding:2px 3px;
+  border-radius:3px;
+  color:#075ee5;
+  font:inherit;
+  font-weight:700;
+  line-height:1;
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:2px;
+  cursor:pointer;
+  transition:color .15s ease,background .15s ease;
+}
+
+.order-number-link:hover{
+  background:#eaf2ff;
+  color:#0347b8;
+}
+
+.order-number-link:focus-visible{
+  outline:2px solid #075ee5;
+  outline-offset:2px;
+}
+
+.ready-row .order-number-link{
+  color:#0645ad;
+}
+
+.ready-row .order-number-link:hover{
+  background:rgba(255,255,255,.55);
+  color:#032f7a;
+}
+
+@media(max-width:600px){
+  .order-number-link{
+    font-size:12px;
+  }
+}

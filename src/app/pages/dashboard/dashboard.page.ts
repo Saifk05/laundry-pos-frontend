@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { ApiService } from '../../../core/services/api.service';
 import { NotificationService } from '../../../core/services/notification.service';
-
-import {
-  DashboardDeliveryDate,
-  DashboardOrder,
-  DashboardResponse
-} from '../../../core/models/dashboard.model';
+import { DashboardDeliveryDate, DashboardOrder, DashboardResponse } from '../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,21 +19,17 @@ import {
 export class DashboardPage implements OnInit {
 
   loading = false;
-
   dashboard: DashboardResponse | null = null;
-
   deliveryDays: DashboardDeliveryDate[] = [];
-
   selectedOrder: DashboardOrder | null = null;
-
   confirmReadyOrder: DashboardOrder | null = null;
-
   updatingOrderId: string | null = null;
 
   constructor(
-    private readonly apiService: ApiService,
-    private readonly notificationService: NotificationService
-  ) {}
+    private readonly apiService:ApiService,
+    private readonly notificationService:NotificationService,
+    private readonly router:Router
+  ){}
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -45,7 +37,6 @@ export class DashboardPage implements OnInit {
 
   loadDashboard(): void {
     this.loading = true;
-
     this.apiService
       .getDashboard()
       .subscribe({
@@ -64,15 +55,9 @@ export class DashboardPage implements OnInit {
           this.dashboard = null;
           this.deliveryDays = [];
           this.loading = false;
-
           void this.notificationService.error(
-            this.getErrorMessage(
-              error,
-              'Unable to load dashboard'
-            )
-          );
-        }
-      });
+            this.getErrorMessage( error, 'Unable to load dashboard' ));
+        }});
   }
 
   get totalOrders(): number {
@@ -87,21 +72,15 @@ export class DashboardPage implements OnInit {
     return this.dashboard?.readyOrders ?? 0;
   }
 
-  isReadyOrder(
-    order: DashboardOrder
-  ): boolean {
+  isReadyOrder( order: DashboardOrder ): boolean {
     return order.status === 'READY_ORDER';
   }
 
-  isProcessingOrder(
-    order: DashboardOrder
-  ): boolean {
+  isProcessingOrder( order: DashboardOrder ): boolean {
     return order.status === 'PROCESSING_AT_STORE';
   }
 
-  getStatusLabel(
-    order: DashboardOrder
-  ): string {
+  getStatusLabel( order: DashboardOrder ): string {
     switch (order.status) {
       case 'NEW_ORDER':
         return 'New Order';
@@ -123,11 +102,8 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  formatPieces(
-    pieces: number
-  ): string {
-    const value =
-      Number(
+  formatPieces( pieces: number ): string {
+    const value = Number(
         pieces ?? 0
       );
 
@@ -136,17 +112,11 @@ export class DashboardPage implements OnInit {
       : value.toFixed(2);
   }
 
-  formatAmount(
-    amount: number
-  ): string {
-    return Number(
-      amount ?? 0
-    ).toFixed(2);
+  formatAmount( amount: number ): string {
+    return Number( amount ?? 0 ).toFixed(2);
   }
 
-  openCallPopup(
-    order: DashboardOrder
-  ): void {
+  openCallPopup( order: DashboardOrder ): void {
     this.selectedOrder = order;
   }
 
@@ -167,32 +137,29 @@ export class DashboardPage implements OnInit {
       return;
     }
 
-    window.location.href =
-      `tel:${this.selectedOrder.mobile}`;
+    window.location.href =  `tel:${this.selectedOrder.mobile}`;
   }
 
-  markReady(
-    order: DashboardOrder,
-    event: Event
-  ): void {
+  openOrder(order:DashboardOrder,event:Event):void{
     event.stopPropagation();
+    void this.router.navigate(['/app/b2c-orders'],{
+      queryParams:{orderNo:order.orderNumber}
+    });
+  }
 
+  markReady( order: DashboardOrder, event: Event ): void {
+    event.stopPropagation();
     if (
       order.status !== 'PROCESSING_AT_STORE' ||
       this.updatingOrderId
-    ) {
-      return;
-    }
+    ) { return; }
 
     this.updateOrderToReady(
       order
     );
   }
 
-  openReadyConfirmation(
-    order: DashboardOrder,
-    event: Event
-  ): void {
+  openReadyConfirmation( order: DashboardOrder, event: Event ): void {
     event.stopPropagation();
 
     if (

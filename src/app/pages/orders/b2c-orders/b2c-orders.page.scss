@@ -2131,3 +2131,34 @@
     left: 0 !important;
   }
 }
+
+/* =========================================================
+   MORE MENU — PREVENT VERTICAL CLIPPING
+========================================================= */
+
+.orders-table-wrapper {
+  min-height: 245px !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.orders-table tbody tr {
+  position: relative;
+}
+
+.actions-cell {
+  overflow: visible !important;
+}
+
+.more-wrapper {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.more-menu {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  right: 0 !important;
+  bottom: auto !important;
+  z-index: 100000 !important;
+}
