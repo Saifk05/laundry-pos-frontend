@@ -22,8 +22,6 @@ import {
 } from 'src/core/models/pickup-delivery.model';
 import { environment } from 'src/environments/environment';
 
-type PickupViewTab = 'MAP' | 'ORDERS';
-
 interface MapCluster {
   pickups: PickupDelivery[];
   latitude: number;
@@ -111,8 +109,6 @@ const DD_MM_YYYY_FORMATS: MatDateFormats = {
 ]
 })
 export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
-  activeTab: PickupViewTab = 'MAP';
-
   searchText = '';
   selectedDate = new FormControl<Date | null>(new Date());
   selectedTimeSlot = '';
@@ -176,13 +172,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     this.loadPickupDeliveries();
   }
 
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      if (this.activeTab === 'MAP') {
-        this.initializeMap();
-      }
-    }, 200);
-  }
+  ngAfterViewInit():void{setTimeout(()=>this.initializeMap(),200);}
 
   ngOnDestroy(): void {
     if (this.renderTimer) {
@@ -197,35 +187,6 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     this.mapReady = false;
   }
 
-  setActiveTab(tab: PickupViewTab): void {
-    if (this.activeTab === tab) return;
-
-    this.activeTab = tab;
-    this.statusMenuPickup = null;
-
-    if (tab !== 'MAP') return;
-
-    setTimeout(() => {
-      if (!this.mapReady || !this.map) {
-        this.initializeMap();
-        return;
-      }
-
-      this.map.resize?.();
-
-      requestAnimationFrame(() => {
-        this.map.resize?.();
-        this.map.triggerRepaint?.();
-      });
-
-      setTimeout(() => {
-        this.map.resize?.();
-        this.map.triggerRepaint?.();
-        this.renderMarkers();
-      }, 250);
-    }, 100);
-  }
-
   private async initializeMap(): Promise<void> {
     if (this.mapReady && this.map) {
       this.map.resize?.();
@@ -236,15 +197,12 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     try {
       this.mapLoading = true;
       this.mapError = '';
-
-      this.map = await this.olaMaps.init({
-        style:
-          'https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json',
-        container: 'pickupOlaMap',
-        center: [77.5946, 12.9716],
-        zoom: 11
-      });
-
+        this.map=await this.olaMaps.init({
+          style:'https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json',
+          container:'pickupOlaMap',
+          center:[77.5946,12.9716],
+          zoom:11
+        });
       this.mapReady = true;
       this.mapLoading = false;
 
@@ -318,12 +276,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
 
           this.loading = false;
 
-          if (this.activeTab === 'MAP') {
-            setTimeout(() => {
-              this.renderMarkers();
-              this.fitAllMarkers();
-            }, 100);
-          }
+          setTimeout(()=>{this.map?.resize?.();this.renderMarkers();this.fitAllMarkers();},100);
         },
         error: error => {
           console.error(
@@ -447,13 +400,8 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
     this.selectedPickup = null;
   }
 
-  if (
-    refreshMap &&
-    this.activeTab === 'MAP'
-) {
-    this.renderMarkers();
+  if(refreshMap&&this.mapReady){this.renderMarkers();}
   }
-}
 
   private parseLocalDate(
     value: string

@@ -1719,14 +1719,52 @@
   font-weight: 700;
 }
 
-.receipt-modal{background:#0b110e!important;border:1px solid #26302c!important}
-.receipt-modal-header,.receipt-modal-footer{background:#0b110e!important;border-color:#26302c!important}
-.receipt-modal-header h2{color:#fff!important}
-.receipt-modal-header p{color:#aab6b0!important}
-.receipt-close-button{background:#0b110e!important;border-color:#35423c!important;color:#d7dedb!important}
-.receipt-close-button:hover{background:#161f1c!important;color:#fff!important}
 
-.receipt-print-area{background:#0b110e!important;color:#fff!important;color-scheme:dark}
+
+/* =========================================================
+   RECEIPT MODAL - CLEAN LIGHT RECEIPT
+========================================================= */
+
+.receipt-modal {
+  background: #ffffff !important;
+  border: 1px solid #dfe5e2 !important;
+  color-scheme: light !important;
+}
+
+.receipt-modal-header,
+.receipt-modal-footer {
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+.receipt-modal-header h2 {
+  color: #111827 !important;
+}
+
+.receipt-modal-header p {
+  color: #6b7280 !important;
+}
+
+.receipt-close-button {
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
+
+.receipt-close-button:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* RECEIPT PAPER */
+
+.receipt-print-area {
+  background: #ffffff !important;
+  color: #111111 !important;
+  color-scheme: light !important;
+}
+
+/* Main dark text */
 
 .receipt-print-area .print-store-header h1,
 .receipt-print-area .receipt-section h3,
@@ -1736,9 +1774,11 @@
 .receipt-print-area .receipt-total-row strong,
 .receipt-print-area .receipt-footer strong,
 .receipt-print-area .receipt-terms h3,
-.receipt-print-area .receipt-terms strong{
-  color:#fff!important;
+.receipt-print-area .receipt-terms strong {
+  color: #111111 !important;
 }
+
+/* Secondary text */
 
 .receipt-print-area .print-store-header p,
 .receipt-print-area .receipt-info-grid span,
@@ -1750,177 +1790,77 @@
 .receipt-print-area .receipt-terms,
 .receipt-print-area .receipt-terms p,
 .receipt-print-area .receipt-terms li,
-.receipt-print-area .receipt-terms span{
-  color:#b9c1bd!important;
+.receipt-print-area .receipt-terms span {
+  color: #6b7280 !important;
 }
 
-.receipt-print-area .receipt-divider{border-top-color:#7c8781!important}
+/* Dividers */
+
+.receipt-print-area .receipt-divider {
+  border-top-color: #d1d5db !important;
+}
 
 .receipt-print-area .receipt-items-table th,
-.receipt-print-area .receipt-items-table td{
-  border-bottom-color:#59635e!important;
+.receipt-print-area .receipt-items-table td {
+  border-bottom-color: #e5e7eb !important;
 }
 
-.receipt-print-area .receipt-grand-total{border-top-color:#d5dbd8!important}
+.receipt-print-area .receipt-grand-total {
+  border-top-color: #111827 !important;
+}
 
 .receipt-print-area .receipt-grand-total span,
-.receipt-print-area .receipt-grand-total strong,
-.receipt-print-area .receipt-discount,
-.receipt-print-area .receipt-paid,
-.receipt-print-area .receipt-balance-due{
-  color:#fff!important;
+.receipt-print-area .receipt-grand-total strong {
+  color: #111111 !important;
 }
 
-.receipt-cancel-button{background:#0b110e!important;border-color:#35423c!important;color:#fff!important}
-.receipt-cancel-button:hover{background:#161f1c!important}
-.receipt-print-button{color:#041009!important}
+/* Keep semantic amount colors */
 
-.receipt-print-area{scrollbar-color:#9aa39f #151c18}
-.receipt-print-area::-webkit-scrollbar{width:9px}
-.receipt-print-area::-webkit-scrollbar-track{background:#151c18}
-.receipt-print-area::-webkit-scrollbar-thumb{background:#9aa39f;border-radius:999px}
-@media print {
-  @page {
-    margin: 8mm;
-    background: #ffffff;
-  }
+.receipt-print-area .receipt-discount {
+  color: #dc2626 !important;
+}
 
-  html,
-  body,
-  app-root,
-  ion-app,
-  ion-router-outlet,
-  .app-shell,
-  .app-main,
-  .app-content,
-  .bill-page {
-    background: #ffffff !important;
-  }
+.receipt-print-area .receipt-paid {
+  color: #16a34a !important;
+}
 
-  html,
-  body {
-    width: 100% !important;
-    min-height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    color: #000000 !important;
-    color-scheme: light !important;
-  }
+.receipt-print-area .receipt-balance-due {
+  color: #d97706 !important;
+}
 
-  body * {
-    visibility: hidden !important;
-  }
+/* Footer buttons */
 
-  .receipt-print-area,
-  .receipt-print-area * {
-    visibility: visible !important;
-  }
+.receipt-cancel-button {
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
 
-  .receipt-overlay {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    background: #ffffff !important;
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-  }
+.receipt-cancel-button:hover {
+  background: #f3f4f6 !important;
+}
 
-  .receipt-modal {
-    position: static !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    max-width: none !important;
-    max-height: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    background: #ffffff !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-  }
+.receipt-print-button {
+  background: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+  color: #ffffff !important;
+}
 
-  .receipt-print-area {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    color-scheme: light !important;
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-  }
+/* Receipt scrollbar */
 
-  .receipt-modal-header,
-  .receipt-modal-footer,
-  .no-print {
-    display: none !important;
-  }
+.receipt-print-area {
+  scrollbar-color: #b8c0bd #f3f4f6;
+}
 
-  .receipt-print-area .print-store-header h1,
-  .receipt-print-area .receipt-section h3,
-  .receipt-print-area .receipt-info-grid strong,
-  .receipt-print-area .receipt-customer-row strong,
-  .receipt-print-area .receipt-items-table td,
-  .receipt-print-area .receipt-total-row strong,
-  .receipt-print-area .receipt-grand-total span,
-  .receipt-print-area .receipt-grand-total strong,
-  .receipt-print-area .receipt-footer strong,
-  .receipt-print-area .receipt-terms h3,
-  .receipt-print-area .receipt-terms strong {
-    color: #000000 !important;
-  }
+.receipt-print-area::-webkit-scrollbar {
+  width: 9px;
+}
 
-  .receipt-print-area .print-store-header p,
-  .receipt-print-area .receipt-info-grid span,
-  .receipt-print-area .receipt-customer-row span,
-  .receipt-print-area .receipt-items-table th,
-  .receipt-print-area .receipt-items-table td small,
-  .receipt-print-area .receipt-total-row span,
-  .receipt-print-area .receipt-footer p,
-  .receipt-print-area .receipt-terms,
-  .receipt-print-area .receipt-terms p,
-  .receipt-print-area .receipt-terms li,
-  .receipt-print-area .receipt-terms span {
-    color: #444444 !important;
-  }
+.receipt-print-area::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
 
-  .receipt-print-area .receipt-divider {
-    border-top-color: #777777 !important;
-  }
-
-  .receipt-print-area .receipt-items-table th,
-  .receipt-print-area .receipt-items-table td {
-    border-bottom-color: #cccccc !important;
-  }
-
-  .receipt-print-area .receipt-grand-total {
-    border-top-color: #000000 !important;
-  }
-
-  .receipt-print-area .receipt-discount,
-  .receipt-print-area .receipt-paid,
-  .receipt-print-area .receipt-balance-due {
-    color: #000000 !important;
-  }
-
-  .receipt-items-table,
-  .receipt-totals,
-  .receipt-footer,
-  .receipt-terms {
-    page-break-inside: avoid;
-  }
+.receipt-print-area::-webkit-scrollbar-thumb {
+  background: #b8c0bd;
+  border-radius: 999px;
 }
