@@ -114,7 +114,7 @@ export class PickupPage implements OnInit, AfterViewInit, OnDestroy {
   selectedTimeSlot = '';
   selectedStatus = '';
   selectedType: 'ALL' | 'PICKUP' | 'DELIVERY' = 'ALL';
-
+  hoveredPickupId: string | null = null;
   loading = false;
   mapLoading = true;
   mapError = '';
@@ -643,12 +643,8 @@ private getMappedRecords(): PickupDelivery[] {
         zoom
 );
 
-    for (
-      const cluster of clusters
-) {
-      if (
-        cluster.pickups.length === 1
-) {
+    for (const cluster of clusters) {
+      if ( cluster.pickups.length === 1) {
         this.addCustomerMarker(
           cluster.pickups[0]
 );
@@ -656,58 +652,29 @@ private getMappedRecords(): PickupDelivery[] {
         this.addClusterMarker(
           cluster
 );
-      }
-    }
-
+      }}
     this.updateMarkerSelection();
   }
 
-  private createClusters(
-    records: PickupDelivery[],
-    zoom: number
-): MapCluster[] {
+  private createClusters(records: PickupDelivery[], zoom: number): MapCluster[] {
     if (zoom >= 14) {
       return records.map(
-        pickup => ({
-          pickups: [pickup],
-          latitude:
-            Number(
-              pickup.latitude
-),
-          longitude:
-            Number(
-              pickup.longitude
-)
+        pickup => ({ pickups: [pickup],
+          latitude: Number( pickup.latitude),
+          longitude:Number( pickup.longitude)
         })
 );
     }
 
-    const clusters:
-      MapCluster[] = [];
+    const clusters: MapCluster[] = [];
+    const threshold = this.getClusterThreshold(zoom);
+    for (const pickup of records) {
+      const lat = Number(pickup.latitude);
+      const lng = Number(pickup.longitude);
+      let nearest: MapCluster | null = null;
+      let nearestDistance =  Infinity;
 
-    const threshold =
-      this.getClusterThreshold(
-        zoom
-);
-
-    for (
-      const pickup of records
-) {
-      const lat =
-        Number(pickup.latitude);
-
-      const lng =
-        Number(pickup.longitude);
-
-      let nearest:
-        MapCluster | null = null;
-
-      let nearestDistance =
-        Infinity;
-
-      for (
-        const cluster of clusters
-) {
+      for (const cluster of clusters) {
         const distance =
           this.distance(
             lat,
@@ -718,12 +685,9 @@ private getMappedRecords(): PickupDelivery[] {
 
         if (
           distance <= threshold &&
-          distance <
-            nearestDistance
-) {
+          distance < nearestDistance) {
           nearest = cluster;
-          nearestDistance =
-            distance;
+          nearestDistance = distance;
         }
       }
 
@@ -733,43 +697,20 @@ private getMappedRecords(): PickupDelivery[] {
           latitude: lat,
           longitude: lng
         });
-
         continue;
       }
 
-      nearest.pickups.push(
-        pickup
-);
-
-      nearest.latitude =
-        nearest.pickups.reduce(
-          (sum, item) =>
-            sum +
-            Number(
-              item.latitude
-),
-          0
-) /
+      nearest.pickups.push(pickup);
+      nearest.latitude = nearest.pickups.reduce(
+          (sum, item) =>  sum +  Number(item.latitude), 0) /
         nearest.pickups.length;
-
-      nearest.longitude =
-        nearest.pickups.reduce(
-          (sum, item) =>
-            sum +
-            Number(
-              item.longitude
-),
-          0
-) /
+      nearest.longitude = nearest.pickups.reduce(
+          (sum, item) => sum + Number(item.longitude), 0) /
         nearest.pickups.length;
     }
-
     return clusters;
   }
-
-  private getClusterThreshold(
-    zoom: number
-): number {
+  private getClusterThreshold( zoom: number): number {
     if (zoom <= 4) return 900;
     if (zoom <= 5) return 600;
     if (zoom <= 6) return 350;
@@ -780,57 +721,20 @@ private getMappedRecords(): PickupDelivery[] {
     if (zoom <= 11) return 15;
     if (zoom <= 12) return 7;
     if (zoom <= 13) return 3;
-
     return 0;
   }
 
-  private distance(
-    lat1: number,
-    lng1: number,
-    lat2: number,
-    lng2: number
-): number {
+  private distance( lat1: number,lng1: number, lat2: number, lng2: number ): number {
     const r = 6371;
-
-    const dLat =
-      this.toRadians(
-        lat2 - lat1
-);
-
-    const dLng =
-      this.toRadians(
-        lng2 - lng1
-);
-
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(
-        this.toRadians(lat1)
-) *
-        Math.cos(
-          this.toRadians(lat2)
-) *
-        Math.sin(
-          dLng / 2
-) ** 2;
-
-    return (
-      r *
-      2 *
-      Math.atan2(
-        Math.sqrt(a),
-        Math.sqrt(1 - a)
-)
-);
+    const dLat = this.toRadians( lat2 - lat1 );
+    const dLng = this.toRadians( lng2 - lng1 );
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos( this.toRadians(lat1) ) * Math.cos( this.toRadians(lat2)) * Math.sin( dLng / 2) ** 2;
+    return ( r * 2 * Math.atan2( Math.sqrt(a), Math.sqrt(1 - a)));
   }
 
-  private toRadians(
-    value: number
-): number {
-    return (
-      value *
-      (Math.PI / 180)
-);
+  private toRadians( value: number ): number {
+    return ( value *(Math.PI / 180));
   }
 
   private addClusterMarker(
@@ -974,31 +878,27 @@ private getMappedRecords(): PickupDelivery[] {
 ])
         .addTo(this.map);
 
-    element.addEventListener(
-      'mouseenter',
-      () => {
-        this.closeAllPopups();
+    element.addEventListener('mouseenter', () => {
+    this.hoveredPickupId = pickup.id;
+    this.highlightHoveredRow();
 
-        popup
-          .setLngLat([
-            lng,
-            lat
-])
-          .addTo(this.map);
-      }
-);
+    this.closeAllPopups();
 
-    element.addEventListener(
-      'mouseleave',
-      () => {
-        if (
-          this.selectedPickup?.id !==
-          pickup.id
-) {
-          popup.remove?.();
-        }
-      }
-);
+    popup
+      .setLngLat([lng, lat])
+      .addTo(this.map);
+  });
+
+  element.addEventListener('mouseleave', () => {
+    this.hoveredPickupId = null;
+    this.highlightHoveredRow();
+
+    if (this.selectedPickup?.id !== pickup.id) {
+      popup.remove?.();
+    }
+  });
+
+  
 
     element.addEventListener(
       'click',
@@ -1236,6 +1136,24 @@ private getMappedRecords(): PickupDelivery[] {
         const marker = element as HTMLElement;
         marker.classList.toggle( 'selected', marker.dataset['pickupId' ] === this.selectedPickup?.id );
       });
+  }
+
+  private highlightHoveredRow(): void {
+    document.querySelectorAll<HTMLElement>('[data-pickup-row-id]').forEach(row => {
+      const active = row.dataset['pickupRowId'] === this.hoveredPickupId;
+      row.classList.toggle('map-pin-hovered', active);
+      row.classList.toggle('map-pin-hovered-pickup', active && row.dataset['pickupType'] === 'PICKUP');
+      row.classList.toggle('map-pin-hovered-delivery', active && row.dataset['pickupType'] === 'DELIVERY');
+    });
+
+    if (!this.hoveredPickupId) return;
+
+    document.querySelector<HTMLElement>(
+      `[data-pickup-row-id="${this.hoveredPickupId}"]`
+    )?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest'
+    });
   }
 
   private closeAllPopups(): void {

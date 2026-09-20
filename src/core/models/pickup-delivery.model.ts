@@ -10,6 +10,7 @@ export type PickupDeliveryStatus =
 
 export interface PickupDelivery {
   id: string;
+  orderId: string | null;
   customerName: string;
   phoneNumber: string;
   address: string;

@@ -116,9 +116,12 @@ table{width:100%;min-width:880px;border-collapse:collapse;table-layout:fixed}
 thead{position:sticky;z-index:3;top:0;background:var(--app-surface-soft)}
 th{padding:9px 9px;border-bottom:1px solid var(--app-border);color:var(--app-text-muted);font-size:7.5px;font-weight:750;text-align:left;text-transform:uppercase;white-space:nowrap}
 td{height:47px;padding:8px 9px;border-bottom:1px solid var(--app-border-soft);color:var(--app-text-secondary);font-size:8.5px;vertical-align:middle;box-sizing:border-box}
-tbody tr{transition:background .15s ease;
+tbody tr{transition:background .15s ease,box-shadow .15s ease;
   &:hover{background:var(--app-hover-background)}
 }
+tbody tr.map-pin-hovered-pickup{background:color-mix(in srgb,var(--app-success) 10%,var(--app-surface))!important;box-shadow:inset 4px 0 0 var(--app-success)}
+tbody tr.map-pin-hovered-delivery{background:color-mix(in srgb,var(--app-danger) 9%,var(--app-surface))!important;box-shadow:inset 4px 0 0 var(--app-danger)}
+tbody tr.map-pin-hovered-pickup td,tbody tr.map-pin-hovered-delivery td{background:transparent!important}
 th:nth-child(1),td:nth-child(1){width:35px}
 th:nth-child(2),td:nth-child(2){width:125px}
 th:nth-child(3),td:nth-child(3){width:100px}

@@ -2,7 +2,7 @@
 
   <section class="order-panel">
 
-@if (isRetagMode || isRescheduleMode) {
+@if (isRetagMode || isRescheduleMode || isEditMode) {
 
   <div class="retag-header">
 
@@ -10,18 +10,22 @@
 
       <h2>
         {{
-          isRescheduleMode
-            ? 'Reschedule Order'
-            : 'Re-Tag Order'
+          isEditMode
+            ? 'Edit Order'
+            : isRescheduleMode
+              ? 'Reschedule Order'
+              : 'Re-Tag Order'
         }}
       </h2>
 
       <p>
 
         {{
-          isRescheduleMode
-            ? 'Update delivery date and timeslot for'
-            : 'Update garment quantities for'
+          isEditMode
+            ? 'Modify products and delivery details for'
+            : isRescheduleMode
+              ? 'Update delivery date and timeslot for'
+              : 'Update garment quantities for'
         }}
 
         <strong>
@@ -61,8 +65,8 @@
             maxlength="10"
             inputmode="numeric"
             placeholder="Mobile"
-            [readonly]="isRetagMode || isRescheduleMode"
-            (blur)="!isRetagMode && !isRescheduleMode && checkCustomer()">
+            [readonly]="isRetagMode || isRescheduleMode || isEditMode"
+            (blur)="!isRetagMode && !isRescheduleMode && !isEditMode && checkCustomer()">
 
         </div>
 
@@ -76,7 +80,7 @@
             type="text"
             [(ngModel)]="customerName"
             placeholder="Name"
-            [readonly]="customerExists || isRetagMode || isRescheduleMode">
+            [readonly]="customerExists || isRetagMode || isRescheduleMode || isEditMode">
 
         </div>
 
@@ -475,7 +479,8 @@
 
             <input
               type="checkbox"
-              [(ngModel)]="homeDelivery">
+              [(ngModel)]="homeDelivery"
+              (ngModelChange)="onHomeDeliveryChange()">
 
             <span class="switch-slider"></span>
 
@@ -486,6 +491,93 @@
           </span>
 
         </div>
+
+        @if (homeDelivery) {
+          <div class="delivery-location-section">
+
+            <div class="delivery-location-field">
+              <label>Delivery Address</label>
+
+              <div class="delivery-location-input-wrap">
+                <input
+                  type="text"
+                  [(ngModel)]="pickupAddress"
+                  placeholder="Search area, street or landmark"
+                  autocomplete="off"
+                  (input)="searchDeliveryAddress()">
+
+                @if (searchingLocation) {
+                  <span class="delivery-location-loading">Searching...</span>
+                }
+              </div>
+
+              @if (locationSuggestions.length > 0) {
+                <div class="delivery-location-suggestions">
+                  @for (
+                    location of locationSuggestions;
+                    track location.placeId
+                  ) {
+                    <button
+                      type="button"
+                      class="delivery-location-suggestion"
+                      (click)="selectDeliveryLocation(location)">
+
+                      <span class="delivery-location-pin">⌖</span>
+
+                      <span class="delivery-location-suggestion-text">
+                        <strong>{{ location.name || 'Location' }}</strong>
+                        <small>{{ location.formattedAddress }}</small>
+                      </span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="delivery-location-divider">
+              <span>OR</span>
+            </div>
+
+            <div class="delivery-location-field">
+              <label>Google Maps Link</label>
+
+              <div class="delivery-map-link-row">
+                <input
+                  type="text"
+                  [(ngModel)]="googleMapsLink"
+                  placeholder="Paste Google Maps link">
+
+                <button
+                  type="button"
+                  class="delivery-use-location-button"
+                  [disabled]="!googleMapsLink.trim() || resolvingLink"
+                  (click)="resolveDeliveryGoogleMapsLink()">
+
+                  {{
+                    resolvingLink
+                      ? 'Resolving...'
+                      : 'Use Location'
+                  }}
+                </button>
+              </div>
+            </div>
+
+            @if (
+              pickupLatitude !== null &&
+              pickupLongitude !== null
+            ) {
+              <div class="delivery-location-selected">
+                <strong>✓ Location selected</strong>
+                <span>{{ pickupAddress }}</span>
+              </div>
+            } @else {
+              <div class="delivery-location-coordinates">
+                <span>Select the delivery location to continue</span>
+              </div>
+            }
+
+          </div>
+        }
 
         <div class="delivery-option-row express-row">
 
@@ -727,7 +819,28 @@
           }}
 
         </button>
-      }@else {
+      } @else if (isEditMode) {
+        <button
+          type="button"
+          class="create-order-button"
+          [disabled]="
+            creatingOrder ||
+            loadingRetagOrder ||
+            orderItems.length === 0 ||
+            !deliveryDate ||
+            !deliveryTime ||
+            (homeDelivery && (!pickupAddress.trim() || pickupLatitude == null || pickupLongitude == null))
+          "
+          (click)="createOrder()">
+
+          {{
+            creatingOrder
+              ? 'Updating Order...'
+              : 'Update Order'
+          }}
+
+        </button>
+      } @else {
 
         <button
           type="button"

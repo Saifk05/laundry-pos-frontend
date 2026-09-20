@@ -1,16 +1,17 @@
-export type PricingUnit =
-  | 'PC'
-  | 'KG';
-
-export type DiscountType =
-  | 'FLAT'
-  | 'PERCENTAGE';
+export type PricingUnit = 'PC' | 'KG';
+export type DiscountType = 'FLAT' | 'PERCENTAGE';
 
 export type OrderStatus =
+  | 'TAGGED'
   | 'PROCESSING_AT_STORE'
   | 'READY_ORDER'
   | 'DELIVERED'
   | 'CANCELLED';
+
+export type PaymentStatus =
+  | 'PENDING'
+  | 'PARTIALLY_PAID'
+  | 'SETTLED';
 
 export interface WalkInServicePrice {
   id: string;
@@ -85,6 +86,9 @@ export interface WalkInOrderRequest {
   deliveryDate: string;
   deliveryTime: string;
   homeDelivery: boolean;
+  deliveryAddress: string | null;
+  deliveryLatitude: number | null;
+  deliveryLongitude: number | null;
 }
 
 export interface OrderCustomerResponse {
@@ -116,15 +120,28 @@ export interface OrderResponse {
   subtotal: number;
   discountAmount: number;
   couponCode: string | null;
+  expressDelivery: boolean;
   expressChargePercentage: number | null;
   expressChargeAmount: number;
+  cgstPercentage: number;
+  sgstPercentage: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  taxAmount: number;
+  taxIncluded: boolean;
   totalAmount: number;
-  pickupDate: string;
-  pickupTime: string;
-  deliveryDate: string;
-  deliveryTime: string;
+  paidAmount: number;
+  balanceAmount: number;
+  paymentStatus: PaymentStatus;
+  pickupDate: string | null;
+  pickupTime: string | null;
+  deliveryDate: string | null;
+  deliveryTime: string | null;
   storageLabel: string | null;
   homeDelivery: boolean;
+  deliveryAddress: string | null;
+  deliveryLatitude: number | null;
+  deliveryLongitude: number | null;
   settled: boolean;
   status: OrderStatus;
   createdAt: string;

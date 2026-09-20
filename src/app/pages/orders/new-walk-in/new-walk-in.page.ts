@@ -22,6 +22,8 @@ import {
   RescheduleOrderRequest
 } from '../../../../core/models/b2c-order.model';
 
+import { MapLocationResponse } from '../../../../core/models/pickup-delivery.model';
+
 
 interface SelectedOrderItem {
   id: string;
@@ -59,6 +61,10 @@ export class NewWalkInPage
   pickupAddress = '';
   pickupLatitude: number | null = null;
   pickupLongitude: number | null = null;
+  googleMapsLink = '';
+  locationSuggestions: MapLocationResponse[] = [];
+  searchingLocation = false;
+  resolvingLink = false;
   customerExists = false;
   checkingCustomer = false;
   customerMessage = '';
@@ -127,6 +133,8 @@ export class NewWalkInPage
   loadingRetagOrder = false;
   isRescheduleMode = false;
   rescheduleOrderId: string | null = null;
+  isEditMode = false;
+  editOrderId: string | null = null;
   businessName = ' Fabric Works';
   cgstPercentage = 0;
   sgstPercentage = 0;
@@ -211,14 +219,15 @@ export class NewWalkInPage
           this.coupons =  response.coupons ?? [];
           this.expressCharges = response.expressCharges ?? [];
           this.loading = false;
-          if ( this.isRetagMode && this.retagOrderId ) {
+          if (this.isEditMode && this.editOrderId) {
+            this.loadEditOrder();
+            return;
+          }
+          if (this.isRetagMode && this.retagOrderId) {
             this.loadRetagOrder();
             return;
           }
-
-          if ( this.isRescheduleMode && this.rescheduleOrderId ) {
-            this.loadRescheduleOrder();
-          }
+          if (this.isRescheduleMode && this.rescheduleOrderId) this.loadRescheduleOrder();
         },
         error: (error: any) => {
           this.errorMessage = 'Unable to load walk-in setup';
@@ -227,20 +236,34 @@ export class NewWalkInPage
   }
 
   private initializeOrderMode(): void {
-    const mode = this.route.snapshot
-        .queryParamMap
-        .get('mode');
-    const orderId = this.route.snapshot
-        .queryParamMap
-        .get('orderId');
+    const mode = this.route.snapshot.queryParamMap.get('mode');
+    const orderId = this.route.snapshot.queryParamMap.get('orderId');
     this.isRetagMode = mode === 'retag' && !!orderId;
     this.isRescheduleMode = mode === 'reschedule' && !!orderId;
-    this.retagOrderId = this.isRetagMode
-        ? orderId
-        : null;
-    this.rescheduleOrderId = this.isRescheduleMode
-        ? orderId
-        : null;
+    this.isEditMode = mode === 'edit' && !!orderId;
+    this.retagOrderId = this.isRetagMode ? orderId : null;
+    this.rescheduleOrderId = this.isRescheduleMode ? orderId : null;
+    this.editOrderId = this.isEditMode ? orderId : null;
+  }
+
+  private loadEditOrder(): void {
+    if (!this.editOrderId) return;
+    this.loadingRetagOrder = true;
+    this.errorMessage = '';
+    this.apiService.getB2COrderById(this.editOrderId).subscribe({
+      next: (order: B2COrderDetails) => {
+        this.populateRetagOrder(order);
+        this.pickupAddress = order.deliveryAddress ?? '';
+        this.pickupLatitude = order.deliveryLatitude ?? null;
+        this.pickupLongitude = order.deliveryLongitude ?? null;
+        this.customerMessage = 'Existing order loaded for editing';
+        this.loadingRetagOrder = false;
+      },
+      error: (error: any) => {
+        this.loadingRetagOrder = false;
+        this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to load order for editing';
+      }
+    });
   }
 
   private loadRetagOrder(): void {
@@ -283,9 +306,11 @@ private populateRetagOrder( order: B2COrderDetails): void {
   this.customerName = order.customer.name;
   this.customerPhone = order.customer.phone;
   this.customerExists = true;
-  this.customerMessage =this.isRescheduleMode
-      ? 'Existing order loaded for reschedule'
-      : 'Existing order loaded for re-tag';
+  this.customerMessage = this.isEditMode
+      ? 'Existing order loaded for editing'
+      : this.isRescheduleMode
+        ? 'Existing order loaded for reschedule'
+        : 'Existing order loaded for re-tag';
   this.deliveryDate = order.deliveryDate ?? '';
   this.deliveryTime = order.deliveryTime ?? '';
   this.homeDelivery = order.homeDelivery;
@@ -1286,6 +1311,161 @@ private formatLocalDate(
   }
 
 
+  onHomeDeliveryChange(): void {
+    if (!this.homeDelivery) {
+      this.pickupAddress = '';
+      this.pickupLatitude = null;
+      this.pickupLongitude = null;
+      this.googleMapsLink = '';
+      this.locationSuggestions = [];
+      this.searchingLocation = false;
+      this.resolvingLink = false;
+    }
+  }
+
+  searchDeliveryAddress(): void {
+    this.errorMessage = '';
+
+    const query = this.pickupAddress.trim();
+
+    this.pickupLatitude = null;
+    this.pickupLongitude = null;
+
+    if (query.length < 3) {
+      this.locationSuggestions = [];
+      return;
+    }
+
+    this.searchingLocation = true;
+
+    this.apiService.autocompleteLocation(query).subscribe({
+      next: (response) => {
+        this.searchingLocation = false;
+        this.locationSuggestions = response || [];
+      },
+      error: () => {
+        this.searchingLocation = false;
+        this.locationSuggestions = [];
+        this.errorMessage = 'Unable to search location.';
+      }
+    });
+  }
+
+  selectDeliveryLocation(location: MapLocationResponse): void {
+    this.pickupAddress =
+      location.formattedAddress ||
+      location.name ||
+      this.pickupAddress;
+
+    this.pickupLatitude = location.latitude ?? null;
+    this.pickupLongitude = location.longitude ?? null;
+
+    this.googleMapsLink = '';
+    this.locationSuggestions = [];
+
+    if (
+      this.pickupLatitude === null ||
+      this.pickupLongitude === null
+    ) {
+      this.geocodeDeliveryAddress();
+    }
+  }
+
+  private geocodeDeliveryAddress(): void {
+    if (!this.pickupAddress.trim()) {
+      return;
+    }
+
+    this.apiService
+      .geocodeAddress(this.pickupAddress.trim())
+      .subscribe({
+        next: (response: any) => {
+          const result =
+            response?.geocodingResults?.[0] ||
+            response?.results?.[0];
+
+          const location = result?.geometry?.location;
+
+          if (location) {
+            this.pickupLatitude = location.lat ?? null;
+            this.pickupLongitude = location.lng ?? null;
+          }
+        }
+      });
+  }
+
+  resolveDeliveryGoogleMapsLink(): void {
+    this.errorMessage = '';
+
+    if (!this.googleMapsLink.trim()) {
+      this.errorMessage = 'Paste a Google Maps link first.';
+      return;
+    }
+
+    this.resolvingLink = true;
+
+    this.apiService
+      .resolveGoogleMapsLink(this.googleMapsLink.trim())
+      .subscribe({
+        next: (response) => {
+          this.resolvingLink = false;
+
+          this.pickupLatitude = response.latitude ?? null;
+          this.pickupLongitude = response.longitude ?? null;
+
+          if (response.formattedAddress) {
+            this.pickupAddress = response.formattedAddress;
+          } else if (response.name) {
+            this.pickupAddress = response.name;
+          }
+
+          this.locationSuggestions = [];
+
+          if (
+            this.pickupLatitude !== null &&
+            this.pickupLongitude !== null &&
+            !this.pickupAddress
+          ) {
+            this.reverseGeocodeDeliveryLocation();
+          }
+        },
+        error: (error: any) => {
+          this.resolvingLink = false;
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to resolve Google Maps link.';
+        }
+      });
+  }
+
+  private reverseGeocodeDeliveryLocation(): void {
+    if (
+      this.pickupLatitude === null ||
+      this.pickupLongitude === null
+    ) {
+      return;
+    }
+
+    this.apiService
+      .reverseGeocode(
+        this.pickupLatitude,
+        this.pickupLongitude
+      )
+      .subscribe({
+        next: (response: any) => {
+          const result =
+            response?.results?.[0] ||
+            response?.geocodingResults?.[0];
+
+          if (result?.formatted_address) {
+            this.pickupAddress = result.formatted_address;
+          } else if (result?.formattedAddress) {
+            this.pickupAddress = result.formattedAddress;
+          }
+        }
+      });
+  }
+
   onExpressDeliveryChange():
     void {
 
@@ -1531,6 +1711,11 @@ private formatLocalDate(
     this.errorMessage =
       '';
 
+    if (this.isEditMode) {
+      this.updateExistingOrder();
+      return;
+    }
+
     if (
       this.isRescheduleMode
     ) {
@@ -1684,7 +1869,16 @@ const request:
     this.deliveryTime,
 
   homeDelivery:
-    this.homeDelivery
+    this.homeDelivery,
+
+  deliveryAddress:
+    this.homeDelivery ? this.pickupAddress.trim() : null,
+
+  deliveryLatitude:
+    this.homeDelivery ? this.pickupLatitude : null,
+
+  deliveryLongitude:
+    this.homeDelivery ? this.pickupLongitude : null
 
 };
 
@@ -1726,6 +1920,74 @@ const request:
       });
   }
 
+
+  private updateExistingOrder(): void {
+    if (!this.editOrderId) {
+      this.errorMessage = 'Edit order id is missing';
+      return;
+    }
+    if (this.orderItems.length === 0) {
+      this.errorMessage = 'At least one product is required';
+      return;
+    }
+    if (!this.deliveryDate || !this.deliveryTime) {
+      this.errorMessage = 'Delivery date and time are required';
+      return;
+    }
+    if (this.homeDelivery) {
+      if (!this.pickupAddress.trim()) {
+        this.errorMessage = 'Delivery address is required';
+        return;
+      }
+      if (this.pickupLatitude == null || this.pickupLongitude == null) {
+        this.errorMessage = 'Select the delivery location';
+        return;
+      }
+    }
+    if (this.expressDelivery && !this.selectedExpressChargeId) {
+      this.errorMessage = 'Select an express charge';
+      return;
+    }
+
+    const items: WalkInOrderRequest['items'] = [];
+    for (const item of this.orderItems) {
+      for (const service of item.services) {
+        items.push({
+          productId: item.productId,
+          typeId: item.typeId,
+          serviceId: service.id,
+          quantity: item.quantity,
+          garmentCount: item.unit === 'KG' ? item.garmentCount : null
+        });
+      }
+    }
+
+    const request: WalkInOrderRequest = {
+      customer: { name: this.customerName.trim(), phone: this.customerPhone.trim() },
+      items,
+      couponId: this.selectedCouponId,
+      expressChargeId: this.expressDelivery ? this.selectedExpressChargeId : null,
+      deliveryDate: this.deliveryDate,
+      deliveryTime: this.deliveryTime,
+      homeDelivery: this.homeDelivery,
+      deliveryAddress: this.homeDelivery ? this.pickupAddress.trim() : null,
+      deliveryLatitude: this.homeDelivery ? this.pickupLatitude : null,
+      deliveryLongitude: this.homeDelivery ? this.pickupLongitude : null
+    };
+
+    this.creatingOrder = true;
+    this.errorMessage = '';
+    this.apiService.updateB2COrder(this.editOrderId, request).subscribe({
+      next: () => {
+        this.creatingOrder = false;
+        void this.router.navigate(['/app/b2c-orders']);
+      },
+      error: (error: any) => {
+        this.creatingOrder = false;
+        this.errorMessage = error?.error?.message || error?.error?.error || 'Unable to update order';
+      }
+    });
+  }
 
   private updateRescheduleOrder():
     void {
@@ -2879,7 +3141,7 @@ printWindow.document.write(`
 }
 
   startNewOrder(): void {
-  if ( this.isRetagMode || this.isRescheduleMode ) {
+  if ( this.isRetagMode || this.isRescheduleMode || this.isEditMode ) {
     this.router.navigate(
       ['/app/new-walk-in']
     ); 
@@ -2960,8 +3222,4 @@ printWindow.document.write(`
 normalizeGarmentCount(): void {
   const value = Number(this.modalGarmentCount);
   this.modalGarmentCount = !value || value < 1 ? 1 : Math.floor(value);
-}
-
-
-
-}
+}}

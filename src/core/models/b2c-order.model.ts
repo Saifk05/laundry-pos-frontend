@@ -5,6 +5,8 @@ export type B2COrderStatus =
   | 'DELIVERED'
   | 'CANCELLED';
 
+export type PricingUnit = 'PC' | 'KG';
+
 export interface B2COrder {
   id: string;
   orderNumber: string;
@@ -47,10 +49,6 @@ export interface B2COrderCustomer {
   phone: string;
 }
 
-export type PricingUnit =
-  | 'PC'
-  | 'KG';
-
 export interface B2COrderItem {
   id: string;
   productId: string;
@@ -71,42 +69,33 @@ export interface B2COrderDetails {
   orderNumber: string;
   customer: B2COrderCustomer;
   items: B2COrderItem[];
-
   subtotal: number;
   discountAmount: number;
   couponCode: string | null;
-
-
   expressDelivery: boolean;
   expressChargePercentage: number | null;
   expressChargeAmount: number;
-
   cgstPercentage: number;
   sgstPercentage: number;
   cgstAmount: number;
   sgstAmount: number;
   taxAmount: number;
   taxIncluded: boolean;
-
   totalAmount: number;
   paidAmount: number;
   balanceAmount: number;
-
-  paymentStatus:
-    | 'PENDING'
-    | 'PARTIALLY_PAID'
-    | 'SETTLED';
-
+  paymentStatus: 'PENDING' | 'PARTIALLY_PAID' | 'SETTLED';
   pickupDate: string | null;
   pickupTime: string | null;
   deliveryDate: string | null;
   deliveryTime: string | null;
-
   storageLabel: string | null;
   homeDelivery: boolean;
+  deliveryAddress: string | null;
+  deliveryLatitude: number | null;
+  deliveryLongitude: number | null;
   settled: boolean;
   status: B2COrderStatus;
-
   createdAt: string;
   updatedAt: string;
   message: string;

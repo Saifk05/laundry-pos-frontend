@@ -1,7 +1,7 @@
 <div class="b2c-page">
   <div class="page-header">
     <div class="page-heading">
-      <h1>B2C Orders</h1>
+      <h1> Orders</h1>
       <p>Manage processing, delivery and customer orders</p>
     </div>
     <button
@@ -256,6 +256,18 @@
                         (click)="reprintQr(order)">
                         ▣ Re-print QR
                       </button>
+
+                      @if (
+                        order.status !== 'DELIVERED' &&
+                        order.status !== 'CANCELLED'
+                      ) {
+                        <button
+                          type="button"
+                          [disabled]="actionLoading"
+                          (click)="editOrder(order)">
+                          ✎ Edit Order
+                        </button>
+                      }
 
                       @if (
                         !order.settled &&

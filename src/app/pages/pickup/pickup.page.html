@@ -38,7 +38,9 @@
         <label>Time Slot</label>
         <select [(ngModel)]="selectedTimeSlot" (change)="applyFilters()">
           <option value="">All Time Slots</option>
-          @for (slot of timeSlots; track slot) { <option [value]="slot">{{ slot }}</option> }
+          @for (slot of timeSlots; track slot) {
+            <option [value]="slot">{{ slot }}</option>
+          }
         </select>
       </div>
 
@@ -64,23 +66,37 @@
     <div class="location-summary">
       <div class="summary-item">
         <span class="summary-marker pickup"></span>
-        <div><strong>{{ pickupCount }}</strong><span>Pickups</span></div>
+        <div>
+          <strong>{{ pickupCount }}</strong>
+          <span>Pickups</span>
+        </div>
       </div>
+
       <div class="summary-item">
         <span class="summary-marker delivery"></span>
-        <div><strong>{{ deliveryCount }}</strong><span>Deliveries</span></div>
+        <div>
+          <strong>{{ deliveryCount }}</strong>
+          <span>Deliveries</span>
+        </div>
       </div>
+
       <div class="summary-item">
         <span class="summary-marker mapped"></span>
-        <div><strong>{{ mappedCount }}</strong><span>Mapped Locations</span></div>
+        <div>
+          <strong>{{ mappedCount }}</strong>
+          <span>Mapped Locations</span>
+        </div>
       </div>
+
       <div class="summary-item">
         <span class="summary-marker total"></span>
-        <div><strong>{{ filteredPickups.length }}</strong><span>Total Orders</span></div>
+        <div>
+          <strong>{{ filteredPickups.length }}</strong>
+          <span>Total Orders</span>
+        </div>
       </div>
     </div>
 
-    <!-- MAP + ORDERS SIDE BY SIDE -->
     <div class="pickup-workspace">
       <section class="map-card">
         <div class="map-header">
@@ -94,6 +110,7 @@
               <span><i class="legend-dot pickup"></i>Pickup</span>
               <span><i class="legend-dot delivery"></i>Delivery</span>
             </div>
+
             <button type="button" class="fit-map-btn" (click)="resetMapView()">View All</button>
           </div>
         </div>
@@ -128,9 +145,15 @@
 
         <div class="map-footer">
           <span class="map-help">Hover a pin to view customer details</span>
+
           @if (selectedPickup) {
             <div class="selected-map-customer">
-              <span class="selected-dot" [class.pickup]="selectedPickup.type === 'PICKUP'" [class.delivery]="selectedPickup.type === 'DELIVERY'"></span>
+              <span
+                class="selected-dot"
+                [class.pickup]="selectedPickup.type === 'PICKUP'"
+                [class.delivery]="selectedPickup.type === 'DELIVERY'">
+              </span>
+
               <div>
                 <strong>{{ selectedPickup.customerName }}</strong>
                 <span>{{ selectedPickup.type }} · {{ selectedPickup.timeSlot }}</span>
@@ -165,26 +188,75 @@
 
             <tbody>
               @for (pickup of filteredPickups; track pickup.id; let i = $index) {
-                <tr>
+                <tr
+                  [attr.data-pickup-row-id]="pickup.id"
+                  [attr.data-pickup-type]="pickup.type"
+                  [class.map-pin-hovered]="hoveredPickupId === pickup.id"
+                  [class.map-pin-hovered-pickup]="hoveredPickupId === pickup.id && pickup.type === 'PICKUP'"
+                  [class.map-pin-hovered-delivery]="hoveredPickupId === pickup.id && pickup.type === 'DELIVERY'">
+
                   <td>{{ ((currentPage - 1) * pageSize) + i + 1 }}</td>
-                  <td><strong class="customer-name">{{ pickup.customerName }}</strong></td>
-                  <td><span class="phone-number">{{ pickup.phoneNumber }}</span></td>
+
                   <td>
-                    <span class="type-badge" [class.pickup-type]="pickup.type === 'PICKUP'" [class.delivery-type]="pickup.type === 'DELIVERY'">{{ pickup.type }}</span>
+                    <strong class="customer-name">{{ pickup.customerName }}</strong>
                   </td>
-                  <td><strong class="schedule-date">{{ pickup.scheduledDate }}</strong></td>
-                  <td><span class="time-slot">{{ pickup.timeSlot }}</span></td>
-                  <td><span class="status-badge" [ngClass]="getStatusClass(pickup.status)">{{ getStatusLabel(pickup.status) }}</span></td>
+
+                  <td>
+                    <span class="phone-number">{{ pickup.phoneNumber }}</span>
+                  </td>
+
+                  <td>
+                    <span
+                      class="type-badge"
+                      [class.pickup-type]="pickup.type === 'PICKUP'"
+                      [class.delivery-type]="pickup.type === 'DELIVERY'">
+                      {{ pickup.type }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <strong class="schedule-date">{{ pickup.scheduledDate }}</strong>
+                  </td>
+
+                  <td>
+                    <span class="time-slot">{{ pickup.timeSlot }}</span>
+                  </td>
+
+                  <td>
+                    <span
+                      class="status-badge"
+                      [ngClass]="getStatusClass(pickup.status)">
+                      {{ getStatusLabel(pickup.status) }}
+                    </span>
+                  </td>
+
                   <td class="action-cell">
                     <div class="order-action-buttons">
                       @if (canCreateOrder(pickup)) {
-                        <button type="button" class="order-action-btn primary" (click)="createOrder(pickup)">CREATE ORDER</button>
+                        <button
+                          type="button"
+                          class="order-action-btn primary"
+                          (click)="createOrder(pickup)">
+                          CREATE ORDER
+                        </button>
                       }
+
                       @if (getNextStatus(pickup)) {
-                        <button type="button" class="order-action-btn primary" (click)="advanceStatus(pickup)">{{ getNextStatusButtonLabel(pickup) }}</button>
+                        <button
+                          type="button"
+                          class="order-action-btn primary"
+                          (click)="advanceStatus(pickup)">
+                          {{ getNextStatusButtonLabel(pickup) }}
+                        </button>
                       }
+
                       @if (canCancelPickup(pickup)) {
-                        <button type="button" class="order-action-btn danger" (click)="cancelPickup(pickup)">CANCEL</button>
+                        <button
+                          type="button"
+                          class="order-action-btn danger"
+                          (click)="cancelPickup(pickup)">
+                          CANCEL
+                        </button>
                       }
                     </div>
                   </td>
@@ -192,11 +264,17 @@
               }
 
               @if (!filteredPickups.length && !loading) {
-                <tr><td colspan="8" class="empty"><strong>No records found</strong></td></tr>
+                <tr>
+                  <td colspan="8" class="empty">
+                    <strong>No records found</strong>
+                  </td>
+                </tr>
               }
 
               @if (loading) {
-                <tr><td colspan="8" class="empty">Loading...</td></tr>
+                <tr>
+                  <td colspan="8" class="empty">Loading...</td>
+                </tr>
               }
             </tbody>
           </table>
@@ -205,6 +283,7 @@
         <div class="table-pagination">
           <div class="rows-per-page">
             <label>Rows per page</label>
+
             <select [(ngModel)]="pageSize" (change)="changePageSize()">
               <option [ngValue]="5">5</option>
               <option [ngValue]="10">10</option>
@@ -215,9 +294,23 @@
           </div>
 
           <div class="pagination-actions">
-            <button type="button" class="pagination-btn" [disabled]="currentPage === 1 || loading" (click)="previousPage()">Previous</button>
+            <button
+              type="button"
+              class="pagination-btn"
+              [disabled]="currentPage === 1 || loading"
+              (click)="previousPage()">
+              Previous
+            </button>
+
             <span class="page-label">Page {{ currentPage }}</span>
-            <button type="button" class="pagination-btn" [disabled]="!hasMore || loading" (click)="nextPage()">Next</button>
+
+            <button
+              type="button"
+              class="pagination-btn"
+              [disabled]="!hasMore || loading"
+              (click)="nextPage()">
+              Next
+            </button>
           </div>
         </div>
       </section>

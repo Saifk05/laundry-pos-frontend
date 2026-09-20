@@ -407,6 +407,17 @@ getB2COrders(
   }
 
 
+  updateB2COrder(
+  orderId: string,
+  request: WalkInOrderRequest
+): Observable<OrderResponse> {
+  return this.http.put<OrderResponse>(
+    `${this.baseUrl}/orders/${orderId}`,
+    request
+  );
+}
+
+
   getB2COrderByNumber(
     orderNumber: string
   ): Observable<B2COrderDetails> {

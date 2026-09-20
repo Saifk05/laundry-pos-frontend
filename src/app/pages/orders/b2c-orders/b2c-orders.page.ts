@@ -161,16 +161,12 @@ export class B2cOrdersPage implements OnInit {
   ){}
 
   ngOnInit():void{
-    this.loadBusinessSettings();
-
     const orderNo=this.route.snapshot.queryParamMap.get('orderNo')?.trim();
-
     if(orderNo){
       this.orderNumberSearch=orderNo;
       this.customerNameSearch='';
       this.mobileSearch='';
       this.selectedStatus='All';
-
       this.fromDate='';
       this.toDate='';
       this.range.setValue({start:null,end:null});
@@ -178,24 +174,6 @@ export class B2cOrdersPage implements OnInit {
 
     this.loadOrders();
   }
-
-  private loadBusinessSettings(): void {
-    this.apiService.getBusinessSettings().subscribe({
-      next: (response: any) => {
-        this.businessName = response?.businessName || 'Fabric Works';
-        this.secureRetagEnabled = Boolean(response?.customFeatures?.secureRetagEnabled);
-        this.retagPinConfigured = Boolean(response?.customFeatures?.retagPinConfigured);
-        this.retagWhatsappEnabled = Boolean(response?.customFeatures?.retagWhatsappEnabled);
-      },
-      error: (error: any) => {
-        console.error('Unable to load business settings:', error);
-        this.secureRetagEnabled = false;
-        this.retagPinConfigured = false;
-        this.retagWhatsappEnabled = false;
-      }
-    });
-  }
-
 
   loadOrders(cursor: string | null = null): void {
     this.loading = true;
@@ -206,8 +184,7 @@ export class B2cOrdersPage implements OnInit {
         this.getSearchValue(),
         this.fromDate || undefined,
         this.toDate || undefined,
-        cursor,
-        this.pageLimit
+        cursor, this.pageLimit
       )
       .subscribe({
         next: (response: B2COrderListResponse) => {
@@ -717,6 +694,20 @@ private openReadyWhatsApp( order: B2cOrderView ): void {
       error: (error: any) => {
         this.paymentError = error?.error?.message || error?.error?.error || 'Unable to add payment';
         this.actionLoading = false;
+      }
+    });
+  }
+
+
+
+  editOrder(order: B2cOrderView): void {
+    this.closeAllMoreMenus();
+    this.errorMessage = '';
+
+    this.router.navigate(['/app/new-walk-in'], {
+      queryParams: {
+        mode: 'edit',
+        orderId: order.id
       }
     });
   }
