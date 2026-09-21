@@ -372,16 +372,17 @@ export class ApiService {
      B2C ORDERS
   ========================================= */
 
-getB2COrders(
+  getB2COrders(
   status?: B2COrderStatus | null,
   search?: string,
   fromDate?: string,
   toDate?: string,
+  expressDelivery?: boolean | null,
   cursor?: string | null,
   limit = 10
 ): Observable<B2COrderListResponse> {
 
-  const params = {
+  const params: any = {
     status: status ?? '',
     search: search?.trim() ?? '',
     fromDate: fromDate ?? '',
@@ -389,6 +390,10 @@ getB2COrders(
     cursor: cursor ?? '',
     limit
   };
+
+  if (expressDelivery !== undefined && expressDelivery !== null) {
+    params.expressDelivery = expressDelivery;
+  }
 
   return this.http.get<B2COrderListResponse>(
     `${this.baseUrl}/orders`,

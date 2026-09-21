@@ -119,7 +119,8 @@ export class B2cOrdersPage implements OnInit {
     'Processing At Store',
     'Ready Order',
     'Delivered',
-    'Cancelled'
+    '⚡ Express',
+    // 'Cancelled'
   ];
 
   orders: B2cOrderView[] = [];
@@ -184,7 +185,9 @@ export class B2cOrdersPage implements OnInit {
         this.getSearchValue(),
         this.fromDate || undefined,
         this.toDate || undefined,
-        cursor, this.pageLimit
+        this.getExpressDeliveryFilter(),
+        cursor,
+        this.pageLimit
       )
       .subscribe({
         next: (response: B2COrderListResponse) => {
@@ -228,7 +231,14 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
 
   get filteredOrders(): B2cOrderView[] {
     return this.orders.filter((order: B2cOrderView) => {
-      const matchesStatus = this.selectedStatus === 'All' || this.getStatusLabel(order.status) === this.selectedStatus;
+      const matchesStatus =
+        this.selectedStatus === 'All' ||
+        this.selectedStatus === '⚡ Express' ||
+        this.getStatusLabel(order.status) === this.selectedStatus;
+
+      const matchesExpress =
+        this.selectedStatus !== '⚡ Express' ||
+        order.expressDelivery;
       const orderSearch = this.orderNumberSearch.trim().toLowerCase();
       const customerSearch = this.customerNameSearch.trim().toLowerCase();
       const mobileSearch = this.mobileSearch.trim();
@@ -236,7 +246,7 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
       const matchesCustomerName =  !customerSearch || (order.customerName ?? '').toLowerCase().includes(customerSearch);
       const matchesMobile = !mobileSearch || order.mobile.includes(mobileSearch);
       return (
-        matchesStatus && matchesOrderNumber && matchesCustomerName && matchesMobile
+        matchesStatus && matchesExpress && matchesOrderNumber && matchesCustomerName && matchesMobile
       );
     });
   }
@@ -370,11 +380,15 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
         return 'READY_ORDER';
       case 'Delivered':
         return 'DELIVERED';
-      case 'Cancelled':
-        return 'CANCELLED';
+      // case 'Cancelled':
+      //   return 'CANCELLED';
       default:
         return null;
     }
+  }
+
+  private getExpressDeliveryFilter(): boolean | null {
+    return this.selectedStatus === '⚡ Express' ? true : null;
   }
 
   getStatusLabel(status: B2COrderStatus): string {
@@ -492,9 +506,8 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
             this.readyStorageLabel = '';
             this.readyStorageError = '';
 
-            this.openReadyWhatsApp(
-              readyOrder
-            );
+            // WhatsApp ready template is sent automatically by the backend.
+            // this.openReadyWhatsApp(readyOrder);
           },
           error: (error: any) => {
             this.actionLoading = false;
@@ -507,55 +520,55 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
       }});
   }
 
-private openReadyWhatsApp( order: B2cOrderView ): void {
-  const phone = this.formatWhatsAppPhone( order.mobile );
-  if (!phone) { this.errorMessage = 'Customer WhatsApp number is invalid';
-    return;
-  }
+// private openReadyWhatsApp( order: B2cOrderView ): void {
+//   const phone = this.formatWhatsAppPhone( order.mobile );
+//   if (!phone) { this.errorMessage = 'Customer WhatsApp number is invalid';
+//     return;
+//   }
+//
+//   this.apiService
+//     .getB2COrderById(order.id)
+//     .subscribe({
+//       next: (details: any) => {
+//         const totalQuantity = details.items?.reduce(
+//             (total: number, item: any) => {
+//               if (item.unit === 'KG') {
+//                 return total + Number( item.garmentCount ?? 0 );
+//               }
+//
+//               if (item.unit === 'PC') {
+//                 return total + Number( item.quantity ?? 0 );
+//               } return total; },0) ?? 0;
+//
+//         const quantityLabel = totalQuantity === 1
+//             ? 'Pc'
+//             : 'Pcs';
+//
+//         const message = `Dear ${order.customerName},
+//           Your laundry order ${order.orderNumber} is ready for collection.
+//           Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
+//           Quantity: ${totalQuantity} ${quantityLabel}
+//           Kindly collect your order within 2 days.
+//           Thank you, `;
+//
+//         const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+//         window.open( whatsappUrl, '_blank');
+//       },
+//       error: (error: any) => {
+//         console.error( 'Unable to load order details', error );
+//         this.errorMessage ='Unable to load order details';
+//       }});
+//     }
 
-  this.apiService
-    .getB2COrderById(order.id)
-    .subscribe({
-      next: (details: any) => {
-        const totalQuantity = details.items?.reduce(
-            (total: number, item: any) => {
-              if (item.unit === 'KG') {
-                return total + Number( item.garmentCount ?? 0 );
-              }
-
-              if (item.unit === 'PC') {
-                return total + Number( item.quantity ?? 0 );
-              } return total; },0) ?? 0;
-
-        const quantityLabel = totalQuantity === 1
-            ? 'Pc'
-            : 'Pcs';
-
-        const message = `Dear ${order.customerName},
-          Your laundry order ${order.orderNumber} is ready for collection.
-          Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
-          Quantity: ${totalQuantity} ${quantityLabel}
-          Kindly collect your order within 2 days.
-          Thank you, `;
-
-        const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-        window.open( whatsappUrl, '_blank');
-      },
-      error: (error: any) => {
-        console.error( 'Unable to load order details', error );
-        this.errorMessage ='Unable to load order details';
-      }});
-    }
-
-  private formatWhatsAppPhone( phone: string): string {
-    if (!phone) { return ''; }
-    let digits = phone.replace( /\D/g, '' );
-    if (digits.length === 10) { digits = `91${digits}`; }
-    if ( digits.length !== 12 || !digits.startsWith('91') ) {
-      return '';
-    }
-    return digits;
-  }
+  // private formatWhatsAppPhone( phone: string): string {
+  //   if (!phone) { return ''; }
+  //   let digits = phone.replace( /\D/g, '' );
+  //   if (digits.length === 10) { digits = `91${digits}`; }
+  //   if ( digits.length !== 12 || !digits.startsWith('91') ) {
+  //     return '';
+  //   }
+  //   return digits;
+  // }
 
   markDelivered(order: B2cOrderView): void {
     this.errorMessage = '';
@@ -572,20 +585,20 @@ private openReadyWhatsApp( order: B2cOrderView ): void {
     });
   }
 
-  cancelOrder(order: B2cOrderView): void {
-    this.errorMessage = '';
-    this.actionLoading = true;
-    this.closeAllMoreMenus();
-    this.apiService.cancelB2COrder(order.id).subscribe({
-      next: (response: B2COrder) => {
-        this.updateLocalOrder(response);
-        this.actionLoading = false;
-      },
-      error: (error: any) => {
-        this.handleActionError(error, 'Unable to cancel order');
-      }
-    });
-  }
+  // cancelOrder(order: B2cOrderView): void {
+  //   this.errorMessage = '';
+  //   this.actionLoading = true;
+  //   this.closeAllMoreMenus();
+  //   this.apiService.cancelB2COrder(order.id).subscribe({
+  //     next: (response: B2COrder) => {
+  //       this.updateLocalOrder(response);
+  //       this.actionLoading = false;
+  //     },
+  //     error: (error: any) => {
+  //       this.handleActionError(error, 'Unable to cancel order');
+  //     }
+  //   });
+  // }
 
   settleOrder(order: B2cOrderView): void {
     this.closeAllMoreMenus();

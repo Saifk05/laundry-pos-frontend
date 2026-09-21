@@ -221,8 +221,8 @@
                 }
 
                 @if (
-                  order.status !== 'DELIVERED' &&
-                  order.status !== 'CANCELLED'
+                  order.status === 'TAGGED' ||
+                  order.status === 'PROCESSING_AT_STORE'
                 ) {
                   <button
                     type="button"
@@ -281,7 +281,7 @@
                         </button>
                       }
 
-                      @if (
+                      <!-- @if (
                         order.status !== 'DELIVERED' &&
                         order.status !== 'CANCELLED'
                       ) {
@@ -292,7 +292,7 @@
                           (click)="cancelOrder(order)">
                           Cancel Order
                         </button>
-                      }
+                      } -->
 
                     </div>
                   }

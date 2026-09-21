@@ -2156,245 +2156,651 @@ Thank you,
 
 closeOrderModal(): void {  this.startNewOrder();}
 
+// printReceipt(): void {
+//   if (!this.createdOrder) {
+//     return;
+//   }
+
+//   const order = this.createdOrder;
+
+//   const termsAndConditions =
+//     localStorage.getItem('receiptTermsAndConditions') ?? '';
+
+//   const termsHtml = termsAndConditions.trim()
+//     ? `
+//       <div class="divider"></div>
+
+//       <div class="terms">
+
+//         <div class="terms-title">
+//           Terms & Conditions
+//         </div>
+
+//         <div class="terms-content">
+//           ${termsAndConditions
+//             .split('\n')
+//             .filter(line => line.trim())
+//             .map(line => `<div>${line}</div>`)
+//             .join('')}
+//         </div>
+
+//       </div>
+//     `
+//     : '';
+
+//   const itemsHtml = order.items
+//     .map(item => `
+//       <tr>
+
+//         <td>
+
+//           ${item.productName}
+
+//           ${
+//             item.typeName &&
+//             item.typeName.toLowerCase() !== 'default'
+//               ? ` (${item.typeName})`
+//               : ''
+//           }
+
+//           <br>
+
+//           <small>
+//             ${item.serviceName}
+//           </small>
+
+//           ${
+//             item.unit === 'KG' && item.garmentCount
+//               ? `
+//                 <br>
+//                 <small>
+//                   Garments: ${item.garmentCount}
+//                 </small>
+//               `
+//               : ''
+//           }
+
+//         </td>
+
+//         <td style="text-align:center;">
+//           ${item.quantity}
+//         </td>
+
+//         <td style="text-align:right;">
+//           ₹${Number(item.unitPrice).toFixed(2)}
+//         </td>
+
+//         <td style="text-align:right;">
+//           ₹${Number(item.lineTotal).toFixed(2)}
+//         </td>
+
+//       </tr>
+//     `)
+//     .join('');
+
+//   const receiptSubtotal =
+//     Number(order.subtotal ?? 0);
+
+//   const receiptDiscount =
+//     Number(order.discountAmount ?? 0);
+
+//   const receiptExpress =
+//     Number(order.expressChargeAmount ?? 0);
+
+//   const receiptAmountBeforeTax =
+//     Math.max(
+//       receiptSubtotal -
+//       receiptDiscount +
+//       receiptExpress,
+//       0
+//     );
+
+//   const receiptTotalTaxPercentage =
+//     this.taxEnabled
+//       ? (
+//           Number(this.cgstPercentage || 0) +
+//           Number(this.sgstPercentage || 0)
+//         )
+//       : 0;
+
+//   const receiptTaxableAmount =
+//     this.taxEnabled &&
+//     this.taxIncluded &&
+//     receiptTotalTaxPercentage > 0
+//       ? (
+//           receiptAmountBeforeTax /
+//           (
+//             1 +
+//             receiptTotalTaxPercentage / 100
+//           )
+//         )
+//       : receiptAmountBeforeTax;
+
+//   const receiptCgst =
+//     this.taxEnabled
+//       ? (
+//           receiptTaxableAmount *
+//           Number(this.cgstPercentage || 0)
+//         ) / 100
+//       : 0;
+
+//   const receiptSgst =
+//     this.taxEnabled
+//       ? (
+//           receiptTaxableAmount *
+//           Number(this.sgstPercentage || 0)
+//         ) / 100
+//       : 0;
+
+//   const receiptTax =
+//     receiptCgst +
+//     receiptSgst;
+
+//   const receiptTotal =
+//     !this.taxEnabled
+//       ? receiptAmountBeforeTax
+//       : this.taxIncluded
+//         ? receiptAmountBeforeTax
+//         : receiptAmountBeforeTax + receiptTax;
+
+//   const taxModeLabel =
+//     this.taxIncluded
+//       ? 'Inclusive'
+//       : 'Exclusive';
+
+//   const discountHtml =
+//     receiptDiscount > 0
+//       ? `
+//         <div class="total-row">
+
+//           <span>
+//             Discount
+//           </span>
+
+//           <strong>
+//             -₹${receiptDiscount.toFixed(2)}
+//           </strong>
+
+//         </div>
+//       `
+//       : '';
+
+//   const expressHtml =
+//     receiptExpress > 0
+//       ? `
+//         <div class="total-row">
+
+//           <span>
+//             Express Charge
+//           </span>
+
+//           <strong>
+//             +₹${receiptExpress.toFixed(2)}
+//           </strong>
+
+//         </div>
+//       `
+//       : '';
+
+//   const taxHtml =
+//     this.taxEnabled &&
+//     receiptTotalTaxPercentage > 0
+//       ? `
+//         <div class="total-row">
+
+//           <span>
+//             Taxable Amount
+//           </span>
+
+//           <strong>
+//             ₹${receiptTaxableAmount.toFixed(2)}
+//           </strong>
+
+//         </div>
+
+//         <div class="total-row">
+
+//           <span>
+//             CGST (${this.cgstPercentage}%)
+//           </span>
+
+//           <strong>
+//             ₹${receiptCgst.toFixed(2)}
+//           </strong>
+
+//         </div>
+
+//         <div class="total-row">
+
+//           <span>
+//             SGST (${this.sgstPercentage}%)
+//           </span>
+
+//           <strong>
+//             ₹${receiptSgst.toFixed(2)}
+//           </strong>
+
+//         </div>
+
+//         <div class="total-row">
+
+//           <span>
+//             Tax (${receiptTotalTaxPercentage}%) - ${taxModeLabel}
+//           </span>
+
+//           <strong>
+//             ₹${receiptTax.toFixed(2)}
+//           </strong>
+
+//         </div>
+//       `
+//       : '';
+
+//   const printWindow = window.open(
+//     '',
+//     '_blank',
+//     `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+//   );
+
+//   if (!printWindow) {
+//     return;
+//   }
+
+//   printWindow.document.write(`
+//     <!DOCTYPE html>
+
+//     <html>
+
+//       <head>
+
+//         <title>
+//           Receipt
+//         </title>
+
+//         <style>
+
+//           * {
+//             box-sizing: border-box;
+//           }
+
+//           body {
+//             margin: 0;
+//             padding: 12px;
+//             font-family: Arial, sans-serif;
+//             color: #111;
+//             background: #fff;
+//           }
+
+//           .receipt {
+//             width: 80mm;
+//             margin: 0 auto;
+//             font-size: 12px;
+//           }
+
+//           .center {
+//             text-align: center;
+//           }
+
+//           .shop-name {
+//             font-size: 18px;
+//             font-weight: 700;
+//           }
+
+//           .muted {
+//             color: #555;
+//             font-size: 11px;
+//           }
+
+//           .divider {
+//             margin: 8px 0;
+//             border-top: 1px dashed #000;
+//           }
+
+//           .info-row {
+//             display: flex;
+//             justify-content: space-between;
+//             gap: 10px;
+//             margin: 3px 0;
+//           }
+
+//           table {
+//             width: 100%;
+//             border-collapse: collapse;
+//             margin-top: 8px;
+//           }
+
+//           th,
+//           td {
+//             padding: 5px 2px;
+//             vertical-align: top;
+//             border-bottom: 1px dashed #bbb;
+//           }
+
+//           th {
+//             text-align: left;
+//             font-size: 11px;
+//           }
+
+//           td {
+//             font-size: 11px;
+//           }
+
+//           .total-row {
+//             display: flex;
+//             justify-content: space-between;
+//             margin: 4px 0;
+//           }
+
+//           .grand-total {
+//             margin-top: 8px;
+//             padding-top: 8px;
+//             border-top: 1px solid #000;
+//             font-size: 15px;
+//             font-weight: 700;
+//           }
+
+//           .terms {
+//             margin-top: 6px;
+//             font-size: 8px;
+//             line-height: 1.4;
+//           }
+
+//           .terms-title {
+//             margin-bottom: 4px;
+//             font-size: 9px;
+//             font-weight: 700;
+//             text-align: left;
+//           }
+
+//           .terms-content {
+//             text-align: left;
+//             color: #333;
+//           }
+
+//           .terms-content div {
+//             margin-bottom: 2px;
+//           }
+
+//           .footer {
+//             margin-top: 14px;
+//             text-align: center;
+//             font-size: 11px;
+//           }
+
+//           @media print {
+
+//             @page {
+//               size: 80mm auto;
+//               margin: 0;
+//             }
+
+//             body {
+//               padding: 4mm;
+//             }
+
+//           }
+
+//         </style>
+
+//       </head>
+
+//       <body>
+
+//         <div class="receipt">
+
+//           <div class="center">
+
+//             <div class="shop-name">
+//               ${this.businessName}
+//             </div>
+
+//             <div class="muted">
+//               Laundry Service Receipt
+//             </div>
+
+//           </div>
+
+//           <div class="divider"></div>
+
+//           <div class="info-row">
+
+//             <span>
+//               Order
+//             </span>
+
+//             <strong>
+//               #${order.orderNumber}
+//             </strong>
+
+//           </div>
+
+//           <div class="info-row">
+
+//             <span>
+//               Customer
+//             </span>
+
+//             <strong>
+//               ${order.customer.name}
+//             </strong>
+
+//           </div>
+
+//           <div class="info-row">
+
+//             <span>
+//               Mobile
+//             </span>
+
+//             <strong>
+//               ${order.customer.phone}
+//             </strong>
+
+//           </div>
+
+//           <div class="info-row">
+
+//             <span>
+//               Created At
+//             </span>
+
+//             <strong>
+//               ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+//             </strong>
+
+//           </div>
+
+//           <div class="info-row">
+
+//             <span>
+//               Delivered Date
+//             </span>
+
+//             <strong>
+//               ${
+//                 order.deliveryDate
+//                   ? new Date(
+//                       order.deliveryDate + 'T00:00:00'
+//                     ).toLocaleDateString('en-GB')
+//                   : '-'
+//               }
+//             </strong>
+
+//           </div>
+
+//           <div class="divider"></div>
+
+//           <table>
+
+//             <thead>
+
+//               <tr>
+
+//                 <th>
+//                   Item
+//                 </th>
+
+//                 <th style="text-align:center;">
+//                   Qty
+//                 </th>
+
+//                 <th style="text-align:right;">
+//                   Rate
+//                 </th>
+
+//                 <th style="text-align:right;">
+//                   Total
+//                 </th>
+
+//               </tr>
+
+//             </thead>
+
+//             <tbody>
+//               ${itemsHtml}
+//             </tbody>
+
+//           </table>
+
+//           <div class="divider"></div>
+
+//           <div class="total-row">
+
+//             <span>
+//               Subtotal
+//             </span>
+
+//             <strong>
+//               ₹${receiptSubtotal.toFixed(2)}
+//             </strong>
+
+//           </div>
+
+//           ${discountHtml}
+
+//           ${expressHtml}
+
+//           ${taxHtml}
+
+//           <div class="total-row grand-total">
+
+//             <span>
+//               Total
+//             </span>
+
+//             <strong>
+//               ₹${receiptTotal.toFixed(2)}
+//             </strong>
+
+//           </div>
+
+//           ${termsHtml}
+
+//           <div class="footer">
+
+//             Thank you!
+
+//             <br>
+
+//             Please keep this receipt until collection.
+
+//           </div>
+
+//         </div>
+
+//         <script>
+
+//           window.onload = function () {
+//             window.print();
+//           };
+
+//         </script>
+
+//       </body>
+
+//     </html>
+//   `);
+
+//   printWindow.document.close();
+// }
+
 printReceipt(): void {
-  if (!this.createdOrder) {
-    return;
-  }
+  if (!this.createdOrder) return;
 
   const order = this.createdOrder;
-
-  const termsAndConditions =
-    localStorage.getItem('receiptTermsAndConditions') ?? '';
+  const termsAndConditions = localStorage.getItem('receiptTermsAndConditions') ?? '';
 
   const termsHtml = termsAndConditions.trim()
-    ? `
-      <div class="divider"></div>
-
-      <div class="terms">
-
-        <div class="terms-title">
-          Terms & Conditions
-        </div>
-
-        <div class="terms-content">
-          ${termsAndConditions
-            .split('\n')
-            .filter(line => line.trim())
-            .map(line => `<div>${line}</div>`)
-            .join('')}
-        </div>
-
-      </div>
-    `
+    ? `<div class="divider"></div>
+       <div class="terms">
+         <div class="terms-title">Terms & Conditions</div>
+         <div class="terms-content">
+           ${termsAndConditions.split('\n').filter(line => line.trim()).map(line => `<div>${line}</div>`).join('')}
+         </div>
+       </div>`
     : '';
 
-  const itemsHtml = order.items
-    .map(item => `
-      <tr>
+  const itemsHtml = this.orderItems.map(item => `
+    <tr>
+      <td>
+        ${item.productName}
+        ${item.typeName && item.typeName.toLowerCase() !== 'default' ? ` (${item.typeName})` : ''}
+        <br>
+        <small>${item.serviceNames.join(', ')}</small>
+        ${item.unit === 'KG' && item.garmentCount ? `<br><small>Garments: ${item.garmentCount}</small>` : ''}
+      </td>
+      <td style="text-align:center;">${item.quantity}</td>
+      <td style="text-align:right;">₹${Number(item.unitPrice).toFixed(2)}</td>
+      <td style="text-align:right;">₹${Number(item.total).toFixed(2)}</td>
+    </tr>
+  `).join('');
 
-        <td>
-
-          ${item.productName}
-
-          ${
-            item.typeName &&
-            item.typeName.toLowerCase() !== 'default'
-              ? ` (${item.typeName})`
-              : ''
-          }
-
-          <br>
-
-          <small>
-            ${item.serviceName}
-          </small>
-
-          ${
-            item.unit === 'KG' && item.garmentCount
-              ? `
-                <br>
-                <small>
-                  Garments: ${item.garmentCount}
-                </small>
-              `
-              : ''
-          }
-
-        </td>
-
-        <td style="text-align:center;">
-          ${item.quantity}
-        </td>
-
-        <td style="text-align:right;">
-          ₹${Number(item.unitPrice).toFixed(2)}
-        </td>
-
-        <td style="text-align:right;">
-          ₹${Number(item.lineTotal).toFixed(2)}
-        </td>
-
-      </tr>
-    `)
-    .join('');
-
-  const receiptSubtotal =
-    Number(order.subtotal ?? 0);
-
-  const receiptDiscount =
-    Number(order.discountAmount ?? 0);
-
-  const receiptExpress =
-    Number(order.expressChargeAmount ?? 0);
-
-  const receiptAmountBeforeTax =
-    Math.max(
-      receiptSubtotal -
-      receiptDiscount +
-      receiptExpress,
-      0
-    );
-
-  const receiptTotalTaxPercentage =
-    this.taxEnabled
-      ? (
-          Number(this.cgstPercentage || 0) +
-          Number(this.sgstPercentage || 0)
-        )
-      : 0;
+  const receiptSubtotal = Number(order.subtotal ?? 0);
+  const receiptDiscount = Number(order.discountAmount ?? 0);
+  const receiptExpress = Number(order.expressChargeAmount ?? 0);
+  const receiptAmountBeforeTax = Math.max(receiptSubtotal - receiptDiscount + receiptExpress, 0);
+  const receiptTotalTaxPercentage = this.taxEnabled
+    ? Number(this.cgstPercentage || 0) + Number(this.sgstPercentage || 0)
+    : 0;
 
   const receiptTaxableAmount =
-    this.taxEnabled &&
-    this.taxIncluded &&
-    receiptTotalTaxPercentage > 0
-      ? (
-          receiptAmountBeforeTax /
-          (
-            1 +
-            receiptTotalTaxPercentage / 100
-          )
-        )
+    this.taxEnabled && this.taxIncluded && receiptTotalTaxPercentage > 0
+      ? receiptAmountBeforeTax / (1 + receiptTotalTaxPercentage / 100)
       : receiptAmountBeforeTax;
 
-  const receiptCgst =
-    this.taxEnabled
-      ? (
-          receiptTaxableAmount *
-          Number(this.cgstPercentage || 0)
-        ) / 100
-      : 0;
+  const receiptCgst = this.taxEnabled
+    ? (receiptTaxableAmount * Number(this.cgstPercentage || 0)) / 100
+    : 0;
 
-  const receiptSgst =
-    this.taxEnabled
-      ? (
-          receiptTaxableAmount *
-          Number(this.sgstPercentage || 0)
-        ) / 100
-      : 0;
+  const receiptSgst = this.taxEnabled
+    ? (receiptTaxableAmount * Number(this.sgstPercentage || 0)) / 100
+    : 0;
 
-  const receiptTax =
-    receiptCgst +
-    receiptSgst;
+  const receiptTax = receiptCgst + receiptSgst;
 
-  const receiptTotal =
-    !this.taxEnabled
+  const receiptTotal = !this.taxEnabled
+    ? receiptAmountBeforeTax
+    : this.taxIncluded
       ? receiptAmountBeforeTax
-      : this.taxIncluded
-        ? receiptAmountBeforeTax
-        : receiptAmountBeforeTax + receiptTax;
+      : receiptAmountBeforeTax + receiptTax;
 
-  const taxModeLabel =
-    this.taxIncluded
-      ? 'Inclusive'
-      : 'Exclusive';
+  const taxModeLabel = this.taxIncluded ? 'Inclusive' : 'Exclusive';
 
-  const discountHtml =
-    receiptDiscount > 0
-      ? `
-        <div class="total-row">
+  const discountHtml = receiptDiscount > 0
+    ? `<div class="total-row"><span>Discount</span><strong>-₹${receiptDiscount.toFixed(2)}</strong></div>`
+    : '';
 
-          <span>
-            Discount
-          </span>
+  const expressHtml = receiptExpress > 0
+    ? `<div class="total-row"><span>Express Charge</span><strong>+₹${receiptExpress.toFixed(2)}</strong></div>`
+    : '';
 
-          <strong>
-            -₹${receiptDiscount.toFixed(2)}
-          </strong>
-
-        </div>
-      `
-      : '';
-
-  const expressHtml =
-    receiptExpress > 0
-      ? `
-        <div class="total-row">
-
-          <span>
-            Express Charge
-          </span>
-
-          <strong>
-            +₹${receiptExpress.toFixed(2)}
-          </strong>
-
-        </div>
-      `
-      : '';
-
-  const taxHtml =
-    this.taxEnabled &&
-    receiptTotalTaxPercentage > 0
-      ? `
-        <div class="total-row">
-
-          <span>
-            Taxable Amount
-          </span>
-
-          <strong>
-            ₹${receiptTaxableAmount.toFixed(2)}
-          </strong>
-
-        </div>
-
-        <div class="total-row">
-
-          <span>
-            CGST (${this.cgstPercentage}%)
-          </span>
-
-          <strong>
-            ₹${receiptCgst.toFixed(2)}
-          </strong>
-
-        </div>
-
-        <div class="total-row">
-
-          <span>
-            SGST (${this.sgstPercentage}%)
-          </span>
-
-          <strong>
-            ₹${receiptSgst.toFixed(2)}
-          </strong>
-
-        </div>
-
-        <div class="total-row">
-
-          <span>
-            Tax (${receiptTotalTaxPercentage}%) - ${taxModeLabel}
-          </span>
-
-          <strong>
-            ₹${receiptTax.toFixed(2)}
-          </strong>
-
-        </div>
-      `
-      : '';
+  const taxHtml = this.taxEnabled && receiptTotalTaxPercentage > 0
+    ? `
+      <div class="total-row"><span>Taxable Amount</span><strong>₹${receiptTaxableAmount.toFixed(2)}</strong></div>
+      <div class="total-row"><span>CGST (${this.cgstPercentage}%)</span><strong>₹${receiptCgst.toFixed(2)}</strong></div>
+      <div class="total-row"><span>SGST (${this.sgstPercentage}%)</span><strong>₹${receiptSgst.toFixed(2)}</strong></div>
+      <div class="total-row"><span>Tax (${receiptTotalTaxPercentage}%) - ${taxModeLabel}</span><strong>₹${receiptTax.toFixed(2)}</strong></div>`
+    : '';
 
   const printWindow = window.open(
     '',
@@ -2402,322 +2808,120 @@ printReceipt(): void {
     `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
   );
 
-  if (!printWindow) {
-    return;
-  }
+  if (!printWindow) return;
 
   printWindow.document.write(`
     <!DOCTYPE html>
-
     <html>
-
       <head>
-
-        <title>
-          Receipt
-        </title>
-
+        <meta charset="UTF-8">
+        <title>Receipt</title>
         <style>
-
-          * {
-            box-sizing: border-box;
+          *{box-sizing:border-box}
+          body{margin:0;padding:12px;font-family:Arial,sans-serif;color:#111;background:#fff}
+          .receipt{width:80mm;margin:0 auto;font-size:12px}
+          .center{text-align:center}
+          .shop-name{font-size:18px;font-weight:700}
+          .muted{color:#555;font-size:11px}
+          .divider{margin:8px 0;border-top:1px dashed #000}
+          .info-row{display:flex;justify-content:space-between;gap:10px;margin:3px 0}
+          table{width:100%;border-collapse:collapse;margin-top:8px}
+          th,td{padding:5px 2px;vertical-align:top;border-bottom:1px dashed #bbb}
+          th{text-align:left;font-size:11px}
+          td{font-size:11px}
+          .total-row{display:flex;justify-content:space-between;margin:4px 0}
+          .grand-total{margin-top:8px;padding-top:8px;border-top:1px solid #000;font-size:15px;font-weight:700}
+          .terms{margin-top:6px;font-size:8px;line-height:1.4}
+          .terms-title{margin-bottom:4px;font-size:9px;font-weight:700;text-align:left}
+          .terms-content{text-align:left;color:#333}
+          .terms-content div{margin-bottom:2px}
+          .footer{margin-top:14px;text-align:center;font-size:11px}
+          @media print{
+            @page{size:80mm auto;margin:0}
+            body{padding:4mm}
           }
-
-          body {
-            margin: 0;
-            padding: 12px;
-            font-family: Arial, sans-serif;
-            color: #111;
-            background: #fff;
-          }
-
-          .receipt {
-            width: 80mm;
-            margin: 0 auto;
-            font-size: 12px;
-          }
-
-          .center {
-            text-align: center;
-          }
-
-          .shop-name {
-            font-size: 18px;
-            font-weight: 700;
-          }
-
-          .muted {
-            color: #555;
-            font-size: 11px;
-          }
-
-          .divider {
-            margin: 8px 0;
-            border-top: 1px dashed #000;
-          }
-
-          .info-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin: 3px 0;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-          }
-
-          th,
-          td {
-            padding: 5px 2px;
-            vertical-align: top;
-            border-bottom: 1px dashed #bbb;
-          }
-
-          th {
-            text-align: left;
-            font-size: 11px;
-          }
-
-          td {
-            font-size: 11px;
-          }
-
-          .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 4px 0;
-          }
-
-          .grand-total {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #000;
-            font-size: 15px;
-            font-weight: 700;
-          }
-
-          .terms {
-            margin-top: 6px;
-            font-size: 8px;
-            line-height: 1.4;
-          }
-
-          .terms-title {
-            margin-bottom: 4px;
-            font-size: 9px;
-            font-weight: 700;
-            text-align: left;
-          }
-
-          .terms-content {
-            text-align: left;
-            color: #333;
-          }
-
-          .terms-content div {
-            margin-bottom: 2px;
-          }
-
-          .footer {
-            margin-top: 14px;
-            text-align: center;
-            font-size: 11px;
-          }
-
-          @media print {
-
-            @page {
-              size: 80mm auto;
-              margin: 0;
-            }
-
-            body {
-              padding: 4mm;
-            }
-
-          }
-
         </style>
-
       </head>
-
       <body>
-
         <div class="receipt">
-
           <div class="center">
-
-            <div class="shop-name">
-              ${this.businessName}
-            </div>
-
-            <div class="muted">
-              Laundry Service Receipt
-            </div>
-
+            <div class="shop-name">${this.businessName}</div>
+            <div class="muted">Laundry Service Receipt</div>
           </div>
 
           <div class="divider"></div>
 
           <div class="info-row">
-
-            <span>
-              Order
-            </span>
-
-            <strong>
-              #${order.orderNumber}
-            </strong>
-
+            <span>Order</span>
+            <strong>#${order.orderNumber}</strong>
           </div>
 
           <div class="info-row">
-
-            <span>
-              Customer
-            </span>
-
-            <strong>
-              ${order.customer.name}
-            </strong>
-
+            <span>Customer</span>
+            <strong>${order.customer.name}</strong>
           </div>
 
           <div class="info-row">
-
-            <span>
-              Mobile
-            </span>
-
-            <strong>
-              ${order.customer.phone}
-            </strong>
-
+            <span>Mobile</span>
+            <strong>${order.customer.phone}</strong>
           </div>
 
           <div class="info-row">
-
-            <span>
-              Created At
-            </span>
-
-            <strong>
-              ${new Date(order.createdAt).toLocaleDateString('en-GB')}
-            </strong>
-
+            <span>Created At</span>
+            <strong>${new Date(order.createdAt).toLocaleDateString('en-GB')}</strong>
           </div>
 
           <div class="info-row">
-
-            <span>
-              Delivered Date
-            </span>
-
+            <span>Delivered Date</span>
             <strong>
-              ${
-                order.deliveryDate
-                  ? new Date(
-                      order.deliveryDate + 'T00:00:00'
-                    ).toLocaleDateString('en-GB')
-                  : '-'
-              }
+              ${order.deliveryDate
+                ? new Date(order.deliveryDate + 'T00:00:00').toLocaleDateString('en-GB')
+                : '-'}
             </strong>
-
           </div>
 
           <div class="divider"></div>
 
           <table>
-
             <thead>
-
               <tr>
-
-                <th>
-                  Item
-                </th>
-
-                <th style="text-align:center;">
-                  Qty
-                </th>
-
-                <th style="text-align:right;">
-                  Rate
-                </th>
-
-                <th style="text-align:right;">
-                  Total
-                </th>
-
+                <th>Item</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Rate</th>
+                <th style="text-align:right;">Total</th>
               </tr>
-
             </thead>
-
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-
+            <tbody>${itemsHtml}</tbody>
           </table>
 
           <div class="divider"></div>
 
           <div class="total-row">
-
-            <span>
-              Subtotal
-            </span>
-
-            <strong>
-              ₹${receiptSubtotal.toFixed(2)}
-            </strong>
-
+            <span>Subtotal</span>
+            <strong>₹${receiptSubtotal.toFixed(2)}</strong>
           </div>
 
           ${discountHtml}
-
           ${expressHtml}
-
           ${taxHtml}
 
           <div class="total-row grand-total">
-
-            <span>
-              Total
-            </span>
-
-            <strong>
-              ₹${receiptTotal.toFixed(2)}
-            </strong>
-
+            <span>Total</span>
+            <strong>₹${receiptTotal.toFixed(2)}</strong>
           </div>
 
           ${termsHtml}
 
           <div class="footer">
-
-            Thank you!
-
-            <br>
-
+            Thank you!<br>
             Please keep this receipt until collection.
-
           </div>
-
         </div>
 
         <script>
-
-          window.onload = function () {
-            window.print();
-          };
-
-        </script>
-
+          window.onload=function(){window.print();};
+        <\/script>
       </body>
-
     </html>
   `);
 
@@ -2795,73 +2999,378 @@ private formatWhatsAppPhone(
   return digits;
 }
 
-printTag(): void {
-  if (!this.createdOrder) {
-    return;
-  }
+// printTag(): void {
+//   if (!this.createdOrder) {
+//     return;
+//   }
 
-  const order = this.createdOrder;
-  const deliveryDate =  order.deliveryDate
-      ? new Date(order.deliveryDate + 'T00:00:00')
-      : null;
+//   const order = this.createdOrder;
+//   const deliveryDate =  order.deliveryDate
+//       ? new Date(order.deliveryDate + 'T00:00:00')
+//       : null;
 
-  const formattedDate = deliveryDate ? deliveryDate.toLocaleDateString(
-          'en-GB',
-          {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-          })
+//   const formattedDate = deliveryDate ? deliveryDate.toLocaleDateString(
+//           'en-GB',
+//           {
+//             day: '2-digit',
+//             month: 'short',
+//             year: 'numeric'
+//           })
+//       : '-';
+
+// const groupedOrderItems = this.orderItems.map(item => ({
+//   productName: item.productName,
+//   typeName: item.typeName ?? '',
+//   unit: item.unit,
+//   quantity: Number(item.quantity),
+
+//   garmentCount:
+//     item.unit === 'KG'
+//       ? Math.max(
+//           1,
+//           Number(item.garmentCount ?? 1)
+//         )
+//       : Math.max(
+//           1,
+//           Number(item.quantity)
+//         ),
+
+//   serviceNames:
+//     item.services.map(service => service.name)
+// }));
+
+//   const totalItemCount = groupedOrderItems.reduce(
+//     (total, item) => {
+//       if (item.unit === 'KG') {
+//         return total + Math.max( 1, Number(item.garmentCount ?? 1)
+//         );
+//       }
+
+//       return total + Math.max(
+//         1,Number(item.quantity ?? 1)
+//       );
+//     }, 0
+//   );
+
+//   let tagsHtml = '';
+//   for (const item of groupedOrderItems) {
+//     const typeName =
+//       item.typeName && item.typeName.toLowerCase() !== 'default'
+//         ? item.typeName
+//         : '';
+
+//     const productDisplay = typeName
+//       ? `${item.productName} (${typeName})`
+//       : item.productName;
+
+//     const getServiceCode = (serviceName: string): string => {
+//       const normalized = serviceName.trim().toLowerCase();
+
+//       const serviceCodeMap: Record<string, string> = {
+//         'starching': 'ST',
+//         'dry clean': 'DC',
+//         'steam press': 'SP',
+//         'wash & iron': 'WI',
+//         'wash and iron': 'WI',
+//         'wash & fold': 'WF',
+//         'wash and fold': 'WF'
+//       };
+
+//       if (serviceCodeMap[normalized]) {
+//         return serviceCodeMap[normalized];
+//       }
+
+//       return serviceName
+//         .split(' ')
+//         .filter(word => word.trim())
+//         .map(word => word.charAt(0).toUpperCase())
+//         .join('');
+//     };
+
+//     const serviceCodes = item.serviceNames.map(serviceName =>
+//       getServiceCode(serviceName)
+//     );
+
+//     const serviceCode = serviceCodes.join(
+//       '<span class="service-divider">|</span>'
+//     );
+
+//     const tagCount = item.unit === 'KG'
+//       ? item.garmentCount
+//       : Math.max(1, Math.floor(Number(item.quantity)));
+//     const tagNumber = `T${totalItemCount}`;
+//     const isShoes = item.productName
+//         .trim()
+//         .toLowerCase() === 'shoes';
+
+//     if (isShoes) {
+
+//       for (
+//         let shoeIndex = 1;
+//         shoeIndex <= tagCount;
+//         shoeIndex++
+//       ) {
+
+//         for (
+//           let pieceIndex = 1;
+//           pieceIndex <= 2;
+//           pieceIndex++
+//         ) {
+
+//           tagsHtml += `
+//             <section class="tag">
+//               <div class="business-name">${this.businessName}</div>
+//               <div class="customer-name">${order.customer.name}</div>
+//               <div class="order-number">#${order.orderNumber}</div>
+//               <div class="order-date">${formattedDate}</div>
+//               <div class="service-code">${serviceCode}</div>
+//               <div class="product-name">${productDisplay}</div>
+//               <div class="tag-number">${tagNumber}</div>
+//             </section>
+//           `;
+//         }
+//       }
+
+//       continue;
+//     }
+
+//     for (let index = 1; index <= tagCount; index++) {
+//       tagsHtml += `
+//         <section class="tag">
+//           <div class="business-name">${this.businessName}</div>
+//           <div class="customer-name">${order.customer.name}</div>
+//           <div class="order-number">#${order.orderNumber}</div>
+//           <div class="order-date">${formattedDate}</div>
+//           <div class="service-code">${serviceCode}</div>
+//           <div class="product-name">${productDisplay}</div>
+//           <div class="tag-number">${tagNumber}</div>
+//         </section>
+//       `;
+//     }
+//   }
+
+//   const printWindow = window.open(
+//     '',
+//     '_blank',
+//     `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+//   );
+
+//   if (!printWindow) {
+//     return;
+//   }
+
+// printWindow.document.write(`
+//   <!DOCTYPE html>
+//   <html>
+//     <head>
+//       <meta charset="UTF-8">
+//       <title>Laundry Tags</title>
+
+//       <style>
+//         @page {
+//           size: 50mm 70mm;
+//           margin: 0;
+//         }
+
+//         * {
+//           box-sizing: border-box;
+//         }
+
+//         html,
+//         body {
+//           width: 50mm;
+//           margin: 0;
+//           padding: 0;
+//           background: #ffffff;
+//         }
+
+//         body {
+//           font-family: Arial, Helvetica, sans-serif;
+//           color: #000000;
+//         }
+
+//         .tags {
+//           width: 50mm;
+//           margin: 0;
+//           padding: 0;
+//         }
+
+//         .tag {
+//           width: 50mm;
+//           height: 70mm;
+//           margin: 0;
+//           padding: 3mm 3mm;
+//           display: flex;
+//           flex-direction: column;
+//           align-items: center;
+//           text-align: center;
+//           overflow: hidden;
+//           break-after: page;
+//           page-break-after: always;
+//         }
+
+//         .tag:last-child {
+//           break-after: auto;
+//           page-break-after: auto;
+//         }
+
+//         .business-name {
+//           width: 100%;
+//           font-size: 12px;
+//           line-height: 1.15;
+//           font-weight: 700;
+//           white-space: nowrap;
+//           overflow: hidden;
+//           text-overflow: ellipsis;
+//         }
+
+//         .customer-name {
+//           width: 100%;
+//           margin-top: 3mm;
+//           font-size: 13px;
+//           line-height: 1.15;
+//           font-weight: 700;
+//           white-space: nowrap;
+//           overflow: hidden;
+//           text-overflow: ellipsis;
+//         }
+
+//         .order-number {
+//           margin-top: 1.8mm;
+//           font-size: 19px;
+//           line-height: 1;
+//           font-weight: 800;
+//         }
+
+//         .order-date {
+//           margin-top: 1.8mm;
+//           font-size: 12px;
+//           line-height: 1.1;
+//           font-weight: 700;
+//         }
+
+//         .service-code {
+//           min-width: 20mm;
+//           min-height: 11mm;
+//           margin-top: 3.5mm;
+//           padding: 1.5mm 2mm;
+//           display: flex;
+//           align-items: center;
+//           justify-content: center;
+//           border: 1.5px solid #000000;
+//           font-size: 14px;
+//           line-height: 1;
+//           font-weight: 800;
+//           white-space: nowrap;
+//         }
+
+//         .service-divider {
+//           display: inline-flex;
+//           align-items: center;
+//           justify-content: center;
+//           margin: 0 2mm;
+//           font-size: 22px;
+//           line-height: 1;
+//           font-weight: 500;
+//           transform: scaleY(1.25);
+//         }
+
+//         .product-name {
+//           width: 100%;
+//           margin-top: 4mm;
+//           font-size: 14px;
+//           line-height: 1.25;
+//           font-weight: 700;
+//           text-transform: capitalize;
+//           overflow: visible;
+//           white-space: normal;
+//         }
+
+//         .tag-number {
+//           margin-top: 2.5mm;
+//           font-size: 22px;
+//           line-height: 1;
+//           font-weight: 900;
+//         }
+
+//         .tag::after {
+//           content: '';
+//           width: 90%;
+//           margin-top: 2.5mm;
+//           border-bottom: 1px dashed #000000;
+//         }
+
+//         @media print {
+//           html,
+//           body {
+//             width: 50mm !important;
+//             margin: 0 !important;
+//             padding: 0 !important;
+//           }
+
+//           .tag {
+//             width: 50mm !important;
+//             height: 70mm !important;
+//             margin: 0 !important;
+//             padding: 3mm 3mm !important;
+//             break-after: page;
+//             page-break-after: always;
+//           }
+
+//           .tag:last-child {
+//             break-after: auto;
+//             page-break-after: auto;
+//           }
+//         }
+//       </style>
+//     </head>
+
+//     <body>
+//       <div class="tags">
+//         ${tagsHtml}
+//       </div>
+
+//       <script>
+//         window.onload = function () {
+//           setTimeout(function () {
+//             window.print();
+//           }, 300);
+//         };
+//       </script>
+//     </body>
+//   </html>
+// `);
+
+//   printWindow.document.close();
+// }
+
+  printTag(): void {
+    if (!this.createdOrder) return;
+
+    const order = this.createdOrder;
+    const deliveryDate = order.deliveryDate ? new Date(order.deliveryDate + 'T00:00:00') : null;
+    const formattedDate = deliveryDate
+      ? deliveryDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
       : '-';
 
-const groupedOrderItems = this.orderItems.map(item => ({
-  productName: item.productName,
-  typeName: item.typeName ?? '',
-  unit: item.unit,
-  quantity: Number(item.quantity),
+    const groupedOrderItems = this.orderItems.map(item => ({
+      productName: item.productName,
+      typeName: item.typeName ?? '',
+      unit: item.unit,
+      quantity: Number(item.quantity),
+      garmentCount: item.unit === 'KG'
+        ? Math.max(1, Number(item.garmentCount ?? 1))
+        : Math.max(1, Number(item.quantity)),
+      serviceNames: item.services.map(service => service.name)
+    }));
 
-  garmentCount:
-    item.unit === 'KG'
-      ? Math.max(
-          1,
-          Number(item.garmentCount ?? 1)
-        )
-      : Math.max(
-          1,
-          Number(item.quantity)
-        ),
-
-  serviceNames:
-    item.services.map(service => service.name)
-}));
-
-  const totalItemCount = groupedOrderItems.reduce(
-    (total, item) => {
-      if (item.unit === 'KG') {
-        return total + Math.max( 1, Number(item.garmentCount ?? 1)
-        );
-      }
-
-      return total + Math.max(
-        1,Number(item.quantity ?? 1)
-      );
-    }, 0
-  );
-
-  let tagsHtml = '';
-  for (const item of groupedOrderItems) {
-    const typeName =
-      item.typeName && item.typeName.toLowerCase() !== 'default'
-        ? item.typeName
-        : '';
-
-    const productDisplay = typeName
-      ? `${item.productName} (${typeName})`
-      : item.productName;
+    const totalItemCount = groupedOrderItems.reduce((total, item) =>
+      total + (item.unit === 'KG'
+        ? Math.max(1, Number(item.garmentCount ?? 1))
+        : Math.max(1, Number(item.quantity ?? 1))), 0);
 
     const getServiceCode = (serviceName: string): string => {
       const normalized = serviceName.trim().toLowerCase();
-
       const serviceCodeMap: Record<string, string> = {
         'starching': 'ST',
         'dry clean': 'DC',
@@ -2872,9 +3381,7 @@ const groupedOrderItems = this.orderItems.map(item => ({
         'wash and fold': 'WF'
       };
 
-      if (serviceCodeMap[normalized]) {
-        return serviceCodeMap[normalized];
-      }
+      if (serviceCodeMap[normalized]) return serviceCodeMap[normalized];
 
       return serviceName
         .split(' ')
@@ -2883,55 +3390,23 @@ const groupedOrderItems = this.orderItems.map(item => ({
         .join('');
     };
 
-    const serviceCodes = item.serviceNames.map(serviceName =>
-      getServiceCode(serviceName)
-    );
+    let tagsHtml = '';
 
-    const serviceCode = serviceCodes.join(
-      '<span class="service-divider">|</span>'
-    );
+    for (const item of groupedOrderItems) {
+      const typeName = item.typeName && item.typeName.toLowerCase() !== 'default' ? item.typeName : '';
+      const productDisplay = typeName ? `${item.productName} (${typeName})` : item.productName;
+      const serviceCode = item.serviceNames
+        .map(serviceName => getServiceCode(serviceName))
+        .join('<span class="service-divider">|</span>');
 
-    const tagCount = item.unit === 'KG'
-      ? item.garmentCount
-      : Math.max(1, Math.floor(Number(item.quantity)));
-    const tagNumber = `T${totalItemCount}`;
-    const isShoes = item.productName
-        .trim()
-        .toLowerCase() === 'shoes';
+      const tagCount = item.unit === 'KG'
+        ? item.garmentCount
+        : Math.max(1, Math.floor(Number(item.quantity)));
 
-    if (isShoes) {
+      const tagNumber = `T${totalItemCount}`;
+      const isShoes = item.productName.trim().toLowerCase() === 'shoes';
 
-      for (
-        let shoeIndex = 1;
-        shoeIndex <= tagCount;
-        shoeIndex++
-      ) {
-
-        for (
-          let pieceIndex = 1;
-          pieceIndex <= 2;
-          pieceIndex++
-        ) {
-
-          tagsHtml += `
-            <section class="tag">
-              <div class="business-name">${this.businessName}</div>
-              <div class="customer-name">${order.customer.name}</div>
-              <div class="order-number">#${order.orderNumber}</div>
-              <div class="order-date">${formattedDate}</div>
-              <div class="service-code">${serviceCode}</div>
-              <div class="product-name">${productDisplay}</div>
-              <div class="tag-number">${tagNumber}</div>
-            </section>
-          `;
-        }
-      }
-
-      continue;
-    }
-
-    for (let index = 1; index <= tagCount; index++) {
-      tagsHtml += `
+      const tagHtml = () => `
         <section class="tag">
           <div class="business-name">${this.businessName}</div>
           <div class="customer-name">${order.customer.name}</div>
@@ -2942,203 +3417,98 @@ const groupedOrderItems = this.orderItems.map(item => ({
           <div class="tag-number">${tagNumber}</div>
         </section>
       `;
+
+      if (isShoes) {
+        for (let shoeIndex = 1; shoeIndex <= tagCount; shoeIndex++) {
+          for (let pieceIndex = 1; pieceIndex <= 2; pieceIndex++) {
+            tagsHtml += tagHtml();
+          }
+        }
+        continue;
+      }
+
+      for (let index = 1; index <= tagCount; index++) tagsHtml += tagHtml();
     }
+
+    const printWindow = window.open(
+      '',
+      '_blank',
+      `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+    );
+
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Laundry Tags</title>
+          <style>
+            @page{size:50mm 70mm;margin:0}
+            *{box-sizing:border-box}
+            html,body{width:50mm;margin:0;padding:0;background:#fff}
+            body{font-family:Arial,Helvetica,sans-serif;color:#000}
+            .tags{width:50mm;margin:0;padding:0}
+            .tag{
+              width:50mm;height:70mm;margin:0;padding:3mm;
+              display:flex;flex-direction:column;align-items:center;
+              text-align:center;overflow:hidden;
+              break-after:page;page-break-after:always
+            }
+            .tag:last-child{break-after:auto;page-break-after:auto}
+            .business-name{
+              width:100%;font-size:12px;line-height:1.15;font-weight:700;
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+            }
+            .customer-name{
+              width:100%;margin-top:3mm;font-size:13px;line-height:1.15;
+              font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+            }
+            .order-number{margin-top:1.8mm;font-size:19px;line-height:1;font-weight:800}
+            .order-date{margin-top:1.8mm;font-size:12px;line-height:1.1;font-weight:700}
+            .service-code{
+              min-width:20mm;min-height:11mm;margin-top:3.5mm;padding:1.5mm 2mm;
+              display:flex;align-items:center;justify-content:center;
+              border:1.5px solid #000;font-size:14px;line-height:1;
+              font-weight:800;white-space:nowrap
+            }
+            .service-divider{
+              display:inline-flex;align-items:center;justify-content:center;
+              margin:0 2mm;font-size:22px;line-height:1;font-weight:500;
+              transform:scaleY(1.25)
+            }
+            .product-name{
+              width:100%;margin-top:4mm;font-size:14px;line-height:1.25;
+              font-weight:700;text-transform:capitalize;overflow:visible;white-space:normal
+            }
+            .tag-number{margin-top:2.5mm;font-size:22px;line-height:1;font-weight:900}
+            .tag::after{
+              content:'';width:90%;margin-top:2.5mm;border-bottom:1px dashed #000
+            }
+            @media print{
+              html,body{width:50mm!important;margin:0!important;padding:0!important}
+              .tag{
+                width:50mm!important;height:70mm!important;margin:0!important;
+                padding:3mm!important;break-after:page;page-break-after:always
+              }
+              .tag:last-child{break-after:auto;page-break-after:auto}
+            }
+          </style>
+        </head>
+        <body>
+          <div class="tags">${tagsHtml}</div>
+          <script>
+            window.onload=function(){
+              setTimeout(function(){window.print()},300);
+            };
+          <\/script>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
   }
-
-  const printWindow = window.open(
-    '',
-    '_blank',
-    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
-  );
-
-  if (!printWindow) {
-    return;
-  }
-
-printWindow.document.write(`
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Laundry Tags</title>
-
-      <style>
-        @page {
-          size: 50mm 70mm;
-          margin: 0;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body {
-          width: 50mm;
-          margin: 0;
-          padding: 0;
-          background: #ffffff;
-        }
-
-        body {
-          font-family: Arial, Helvetica, sans-serif;
-          color: #000000;
-        }
-
-        .tags {
-          width: 50mm;
-          margin: 0;
-          padding: 0;
-        }
-
-        .tag {
-          width: 50mm;
-          height: 70mm;
-          margin: 0;
-          padding: 3mm 3mm;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          overflow: hidden;
-          break-after: page;
-          page-break-after: always;
-        }
-
-        .tag:last-child {
-          break-after: auto;
-          page-break-after: auto;
-        }
-
-        .business-name {
-          width: 100%;
-          font-size: 12px;
-          line-height: 1.15;
-          font-weight: 700;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .customer-name {
-          width: 100%;
-          margin-top: 3mm;
-          font-size: 13px;
-          line-height: 1.15;
-          font-weight: 700;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .order-number {
-          margin-top: 1.8mm;
-          font-size: 19px;
-          line-height: 1;
-          font-weight: 800;
-        }
-
-        .order-date {
-          margin-top: 1.8mm;
-          font-size: 12px;
-          line-height: 1.1;
-          font-weight: 700;
-        }
-
-        .service-code {
-          min-width: 20mm;
-          min-height: 11mm;
-          margin-top: 3.5mm;
-          padding: 1.5mm 2mm;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1.5px solid #000000;
-          font-size: 14px;
-          line-height: 1;
-          font-weight: 800;
-          white-space: nowrap;
-        }
-
-        .service-divider {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 2mm;
-          font-size: 22px;
-          line-height: 1;
-          font-weight: 500;
-          transform: scaleY(1.25);
-        }
-
-        .product-name {
-          width: 100%;
-          margin-top: 4mm;
-          font-size: 14px;
-          line-height: 1.25;
-          font-weight: 700;
-          text-transform: capitalize;
-          overflow: visible;
-          white-space: normal;
-        }
-
-        .tag-number {
-          margin-top: 2.5mm;
-          font-size: 22px;
-          line-height: 1;
-          font-weight: 900;
-        }
-
-        .tag::after {
-          content: '';
-          width: 90%;
-          margin-top: 2.5mm;
-          border-bottom: 1px dashed #000000;
-        }
-
-        @media print {
-          html,
-          body {
-            width: 50mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-
-          .tag {
-            width: 50mm !important;
-            height: 70mm !important;
-            margin: 0 !important;
-            padding: 3mm 3mm !important;
-            break-after: page;
-            page-break-after: always;
-          }
-
-          .tag:last-child {
-            break-after: auto;
-            page-break-after: auto;
-          }
-        }
-      </style>
-    </head>
-
-    <body>
-      <div class="tags">
-        ${tagsHtml}
-      </div>
-
-      <script>
-        window.onload = function () {
-          setTimeout(function () {
-            window.print();
-          }, 300);
-        };
-      </script>
-    </body>
-  </html>
-`);
-
-  printWindow.document.close();
-}
 
   startNewOrder(): void {
   if ( this.isRetagMode || this.isRescheduleMode || this.isEditMode ) {
