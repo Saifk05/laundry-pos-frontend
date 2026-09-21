@@ -5,16 +5,18 @@ import { Router } from '@angular/router';
 
 import { ApiService } from '../../../core/services/api.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { DashboardDeliveryDate, DashboardOrder, DashboardResponse } from '../../../core/models/dashboard.model';
+import {
+  DashboardDeliveryDate,
+  DashboardOrder,
+  DashboardResponse
+} from '../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
-  imports: [
-    CommonModule
-  ]
+  imports: [CommonModule]
 })
 export class DashboardPage implements OnInit {
 
@@ -25,20 +27,39 @@ export class DashboardPage implements OnInit {
   confirmReadyOrder: DashboardOrder | null = null;
   updatingOrderId: string | null = null;
 
+  readonly daysPerPage = 6;
+
+  private initialStartDate!: Date;
+  currentStartDate!: Date;
+  currentEndDate!: Date;
+
   constructor(
-    private readonly apiService:ApiService,
-    private readonly notificationService:NotificationService,
-    private readonly router:Router
-  ){}
+    private readonly apiService: ApiService,
+    private readonly notificationService: NotificationService,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
+    const today = this.startOfDay(new Date());
+
+    this.initialStartDate = this.addDays(today, -1);
+    this.currentStartDate = new Date(this.initialStartDate);
+    this.currentEndDate = this.addDays(
+      this.currentStartDate,
+      this.daysPerPage - 1
+    );
+
     this.loadDashboard();
   }
 
   loadDashboard(): void {
     this.loading = true;
+
     this.apiService
-      .getDashboard()
+      .getDashboard(
+        this.formatDate(this.currentStartDate),
+        this.formatDate(this.currentEndDate)
+      )
       .subscribe({
         next: (response: DashboardResponse) => {
           this.dashboard = response;
@@ -47,17 +68,20 @@ export class DashboardPage implements OnInit {
         },
 
         error: (error: HttpErrorResponse) => {
-          console.error(
-            'Dashboard load error:',
-            error
-          );
+          console.error('Dashboard load error:', error);
 
           this.dashboard = null;
           this.deliveryDays = [];
           this.loading = false;
+
           void this.notificationService.error(
-            this.getErrorMessage( error, 'Unable to load dashboard' ));
-        }});
+            this.getErrorMessage(
+              error,
+              'Unable to load dashboard'
+            )
+          );
+        }
+      });
   }
 
   get totalOrders(): number {
@@ -72,15 +96,72 @@ export class DashboardPage implements OnInit {
     return this.dashboard?.readyOrders ?? 0;
   }
 
-  isReadyOrder( order: DashboardOrder ): boolean {
+  get currentPage(): number {
+    const difference =
+      this.daysBetween(
+        this.initialStartDate,
+        this.currentStartDate
+      );
+
+    return Math.floor(difference / this.daysPerPage) + 1;
+  }
+
+  get canGoPrevious(): boolean {
+    return this.currentStartDate > this.initialStartDate;
+  }
+
+  previousDates(): void {
+    if (
+      !this.canGoPrevious ||
+      this.loading ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    this.currentStartDate = this.addDays(
+      this.currentStartDate,
+      -this.daysPerPage
+    );
+
+    this.currentEndDate = this.addDays(
+      this.currentStartDate,
+      this.daysPerPage - 1
+    );
+
+    this.loadDashboard();
+  }
+
+  nextDates(): void {
+    if (
+      this.loading ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    this.currentStartDate = this.addDays(
+      this.currentStartDate,
+      this.daysPerPage
+    );
+
+    this.currentEndDate = this.addDays(
+      this.currentStartDate,
+      this.daysPerPage - 1
+    );
+
+    this.loadDashboard();
+  }
+
+  isReadyOrder(order: DashboardOrder): boolean {
     return order.status === 'READY_ORDER';
   }
 
-  isProcessingOrder( order: DashboardOrder ): boolean {
+  isProcessingOrder(order: DashboardOrder): boolean {
     return order.status === 'PROCESSING_AT_STORE';
   }
 
-  getStatusLabel( order: DashboardOrder ): string {
+  getStatusLabel(order: DashboardOrder): string {
     switch (order.status) {
       case 'NEW_ORDER':
         return 'New Order';
@@ -102,21 +183,19 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  formatPieces( pieces: number ): string {
-    const value = Number(
-        pieces ?? 0
-      );
+  formatPieces(pieces: number): string {
+    const value = Number(pieces ?? 0);
 
     return Number.isInteger(value)
       ? value.toString()
       : value.toFixed(2);
   }
 
-  formatAmount( amount: number ): string {
-    return Number( amount ?? 0 ).toFixed(2);
+  formatAmount(amount: number): string {
+    return Number(amount ?? 0).toFixed(2);
   }
 
-  openCallPopup( order: DashboardOrder ): void {
+  openCallPopup(order: DashboardOrder): void {
     this.selectedOrder = order;
   }
 
@@ -133,33 +212,49 @@ export class DashboardPage implements OnInit {
       void this.notificationService.warning(
         'Customer mobile number is not available'
       );
-
       return;
     }
 
-    window.location.href =  `tel:${this.selectedOrder.mobile}`;
+    window.location.href =
+      `tel:${this.selectedOrder.mobile}`;
   }
 
-  openOrder(order:DashboardOrder,event:Event):void{
+  openOrder(
+    order: DashboardOrder,
+    event: Event
+  ): void {
     event.stopPropagation();
-    void this.router.navigate(['/app/b2c-orders'],{
-      queryParams:{orderNo:order.orderNumber}
-    });
-  }
 
-  markReady( order: DashboardOrder, event: Event ): void {
-    event.stopPropagation();
-    if (
-      order.status !== 'PROCESSING_AT_STORE' ||
-      this.updatingOrderId
-    ) { return; }
-
-    this.updateOrderToReady(
-      order
+    void this.router.navigate(
+      ['/app/b2c-orders'],
+      {
+        queryParams: {
+          orderNo: order.orderNumber
+        }
+      }
     );
   }
 
-  openReadyConfirmation( order: DashboardOrder, event: Event ): void {
+  markReady(
+    order: DashboardOrder,
+    event: Event
+  ): void {
+    event.stopPropagation();
+
+    if (
+      order.status !== 'PROCESSING_AT_STORE' ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    this.updateOrderToReady(order);
+  }
+
+  openReadyConfirmation(
+    order: DashboardOrder,
+    event: Event
+  ): void {
     event.stopPropagation();
 
     if (
@@ -197,8 +292,7 @@ export class DashboardPage implements OnInit {
       return;
     }
 
-    this.updatingOrderId =
-      order.id;
+    this.updatingOrderId = order.id;
 
     this.apiService
       .updateB2COrderStatus(
@@ -244,6 +338,62 @@ export class DashboardPage implements OnInit {
     }
 
     this.loadDashboard();
+  }
+
+  private startOfDay(date: Date): Date {
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+  }
+
+  private addDays(
+    date: Date,
+    days: number
+  ): Date {
+    const result = new Date(date);
+
+    result.setDate(
+      result.getDate() + days
+    );
+
+    return result;
+  }
+
+  private daysBetween(
+    start: Date,
+    end: Date
+  ): number {
+    const startUtc = Date.UTC(
+      start.getFullYear(),
+      start.getMonth(),
+      start.getDate()
+    );
+
+    const endUtc = Date.UTC(
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate()
+    );
+
+    return Math.round(
+      (endUtc - startUtc) / 86400000
+    );
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+
+    const month =
+      String(date.getMonth() + 1)
+        .padStart(2, '0');
+
+    const day =
+      String(date.getDate())
+        .padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private getErrorMessage(

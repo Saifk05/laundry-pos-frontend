@@ -566,28 +566,23 @@ export class ApiService {
     );
   }
 
-    getDashboard():
-    Observable<DashboardResponse> {
-
+  getDashboard( startDate: string, endDate: string ): Observable<DashboardResponse> {
     return this.http.get<DashboardResponse>(
-      `${this.baseUrl}/dashboard`
+      `${this.baseUrl}/dashboard`,
+      {
+        params: { startDate, endDate }
+      }
     );
   }
-  getPaymentReport(
-  fromDate: string,
-  toDate: string
-): Observable<PaymentReportResponse> {
 
-  return this.http.get<PaymentReportResponse>(
-    `${this.baseUrl}/payments/report`,
-    {
-      params: {
-        fromDate,
-        toDate
+  getPaymentReport( fromDate: string, toDate: string ): Observable<PaymentReportResponse> {
+    return this.http.get<PaymentReportResponse>(
+      `${this.baseUrl}/payments/report`,
+      {
+        params: { fromDate, toDate }
       }
-    }
-  );
-}
+    );
+  }
 
 getBills(
   fromDate?: string,

@@ -337,7 +337,7 @@
 }
 
 .matrix-orders {
-  min-height: 540px;
+  min-height: 40px;
 
   background: #ffffff;
 }
@@ -521,7 +521,7 @@
 
   display: block;
 
-  min-height: 360px;
+  min-height: 40px;
 
   background:
     repeating-linear-gradient(
@@ -894,22 +894,23 @@
 
   z-index: 20;
 
-  min-height: 100%;
+  height: 100%;
 
   border-right: 1px solid #858585;
 
   background: #ffffff;
 
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .matrix-label-column::after {
   content: '';
-
   display: block;
-
   width: 100%;
-  min-height: 500px;
+  min-height: 40px;
+  flex: 1;
 
   background:
     repeating-linear-gradient(
@@ -920,6 +921,7 @@
       #858585 40px
     );
 }
+
 
 .matrix-order-label {
   height: 40px;
@@ -936,9 +938,17 @@
   background: #ffffff;
 }
 
-.matrix-orders {
-  min-height: 500px;
+.matrix-date-column {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 
+.matrix-orders {
+  min-height: 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
 }
 
@@ -982,11 +992,9 @@
 
 .matrix-orders::after {
   content: '';
-
   display: block;
-
-  min-height: 500px;
-
+  min-height: 40px;
+  flex: 1;
   background:
     repeating-linear-gradient(
       to bottom,
@@ -996,6 +1004,7 @@
       #858585 40px
     );
 }
+
 
 .matrix-status-tick {
   width: 36px;
@@ -1133,5 +1142,103 @@
 @media(max-width:600px){
   .order-number-link{
     font-size:12px;
+  }
+}
+
+/* =========================================================
+   DASHBOARD DATE PAGINATION
+========================================================= */
+
+.matrix-pagination {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.pagination-button {
+  min-width: 96px;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid #d5dce0;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #078da8;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+  border-color: #078da8;
+  background: #f6fcfd;
+}
+
+.pagination-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.pagination-page {
+  min-width: 72px;
+  color: #444444;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .matrix-pagination {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .pagination-button {
+    min-width: 88px;
+    height: 34px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .pagination-page {
+    min-width: 60px;
+    font-size: 11px;
+  }
+}
+
+.matrix-pagination-wrapper{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.matrix-pagination-wrapper .matrix-pagination{
+  margin-top:14px;
+}
+
+.pagination-info{
+  margin-top:7px;
+  color:#7b8490;
+  font-size:11px;
+  font-weight:500;
+  line-height:1.3;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.pagination-info span{
+  color:#69727d;
+}
+
+@media(max-width:600px){
+  .pagination-info{
+    margin-top:6px;
+    font-size:10px;
   }
 }
