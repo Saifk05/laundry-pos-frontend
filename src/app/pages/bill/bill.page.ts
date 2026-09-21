@@ -1041,6 +1041,54 @@ export class BillPage
       null;
   }
 
+  get groupedReceiptItems(): any[] {
+    if (!this.receiptOrder?.items?.length) return [];
+
+    const grouped = new Map<string, any>();
+
+    for (const item of this.receiptOrder.items) {
+      const key = [
+        item.productId ?? item.productName,
+        item.typeId ?? item.typeName ?? '',
+        item.unit,
+        Number(item.quantity)
+      ].join('|');
+
+      const existing = grouped.get(key);
+
+      if (existing) {
+        if (item.serviceName && !existing.serviceNames.includes(item.serviceName)) {
+          existing.serviceNames.push(item.serviceName);
+          existing.unitPrice += Number(item.unitPrice ?? 0);
+          existing.lineTotal += Number(item.lineTotal ?? 0);
+        }
+
+        if (item.unit === 'KG') {
+          existing.garmentCount = Math.max(
+            existing.garmentCount,
+            Number(item.garmentCount ?? 0)
+          );
+        }
+
+        continue;
+      }
+
+      grouped.set(key, {
+        id: key,
+        productName: item.productName,
+        typeName: item.typeName ?? '',
+        unit: item.unit,
+        quantity: Number(item.quantity ?? 0),
+        garmentCount: Number(item.garmentCount ?? 0),
+        serviceNames: item.serviceName ? [item.serviceName] : [],
+        unitPrice: Number(item.unitPrice ?? 0),
+        lineTotal: Number(item.lineTotal ?? 0)
+      });
+    }
+
+    return Array.from(grouped.values());
+  }
+
   printReceipt(): void {
 
     if (

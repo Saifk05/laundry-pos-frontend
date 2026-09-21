@@ -898,7 +898,7 @@
               <tbody>
 
                 @for (
-                  item of receiptOrder.items;
+                  item of groupedReceiptItems;
                   track item.id
                 ) {
 
@@ -914,9 +914,9 @@
 
                         {{ item.typeName }}
 
-                        @if (item.serviceName) {
+                        @if (item.serviceNames?.length) {
 
-                          • {{ item.serviceName }}
+                           • {{ item.serviceNames.join(', ') }}
 
                         }
 
