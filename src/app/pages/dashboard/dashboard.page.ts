@@ -21,17 +21,19 @@ import {
 export class DashboardPage implements OnInit {
 
   loading = false;
+  loadingMore = false;
+
   dashboard: DashboardResponse | null = null;
   deliveryDays: DashboardDeliveryDate[] = [];
+
   selectedOrder: DashboardOrder | null = null;
   confirmReadyOrder: DashboardOrder | null = null;
   updatingOrderId: string | null = null;
 
-  readonly daysPerPage = 6;
+  readonly daysPerLoad = 6;
 
   private initialStartDate!: Date;
-  currentStartDate!: Date;
-  currentEndDate!: Date;
+  private loadedEndDate!: Date;
 
   constructor(
     private readonly apiService: ApiService,
@@ -43,22 +45,25 @@ export class DashboardPage implements OnInit {
     const today = this.startOfDay(new Date());
 
     this.initialStartDate = this.addDays(today, -1);
-    this.currentStartDate = new Date(this.initialStartDate);
-    this.currentEndDate = this.addDays(
-      this.currentStartDate,
-      this.daysPerPage - 1
+    this.loadedEndDate = this.addDays(
+      this.initialStartDate,
+      this.daysPerLoad - 1
     );
 
     this.loadDashboard();
   }
 
   loadDashboard(): void {
+    if (this.loading || this.loadingMore) {
+      return;
+    }
+
     this.loading = true;
 
     this.apiService
       .getDashboard(
-        this.formatDate(this.currentStartDate),
-        this.formatDate(this.currentEndDate)
+        this.formatDate(this.initialStartDate),
+        this.formatDate(this.loadedEndDate)
       )
       .subscribe({
         next: (response: DashboardResponse) => {
@@ -84,73 +89,98 @@ export class DashboardPage implements OnInit {
       });
   }
 
+  loadMoreDates(): void {
+    if (
+      this.loading ||
+      this.loadingMore ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    const nextStartDate = this.addDays(
+      this.loadedEndDate,
+      1
+    );
+
+    const nextEndDate = this.addDays(
+      nextStartDate,
+      this.daysPerLoad - 1
+    );
+
+    this.loadingMore = true;
+
+    this.apiService
+      .getDashboard(
+        this.formatDate(nextStartDate),
+        this.formatDate(nextEndDate)
+      )
+      .subscribe({
+        next: (response: DashboardResponse) => {
+          const newDates = response?.dates ?? [];
+
+          const existingDates = new Set(
+            this.deliveryDays.map(
+              day => day.deliveryDate
+            )
+          );
+
+          const uniqueNewDates = newDates.filter(
+            day => !existingDates.has(day.deliveryDate)
+          );
+
+          this.deliveryDays = [
+            ...this.deliveryDays,
+            ...uniqueNewDates
+          ];
+
+          this.loadedEndDate = nextEndDate;
+
+          this.recalculateDashboardTotals();
+
+          this.loadingMore = false;
+        },
+
+        error: (error: HttpErrorResponse) => {
+          console.error(
+            'Dashboard load more error:',
+            error
+          );
+
+          this.loadingMore = false;
+
+          void this.notificationService.error(
+            this.getErrorMessage(
+              error,
+              'Unable to load more delivery dates'
+            )
+          );
+        }
+      });
+  }
+
   get totalOrders(): number {
-    return this.dashboard?.totalOrders ?? 0;
+    return this.deliveryDays.reduce(
+      (total, day) =>
+        total + Number(day.totalOrders ?? 0),
+      0
+    );
   }
 
   get processingOrders(): number {
-    return this.dashboard?.processingOrders ?? 0;
+    return this.deliveryDays.reduce(
+      (total, day) =>
+        total + Number(day.processingOrders ?? 0),
+      0
+    );
   }
 
   get readyOrders(): number {
-    return this.dashboard?.readyOrders ?? 0;
-  }
-
-  get currentPage(): number {
-    const difference =
-      this.daysBetween(
-        this.initialStartDate,
-        this.currentStartDate
-      );
-
-    return Math.floor(difference / this.daysPerPage) + 1;
-  }
-
-  get canGoPrevious(): boolean {
-    return this.currentStartDate > this.initialStartDate;
-  }
-
-  previousDates(): void {
-    if (
-      !this.canGoPrevious ||
-      this.loading ||
-      this.updatingOrderId
-    ) {
-      return;
-    }
-
-    this.currentStartDate = this.addDays(
-      this.currentStartDate,
-      -this.daysPerPage
+    return this.deliveryDays.reduce(
+      (total, day) =>
+        total + Number(day.readyOrders ?? 0),
+      0
     );
-
-    this.currentEndDate = this.addDays(
-      this.currentStartDate,
-      this.daysPerPage - 1
-    );
-
-    this.loadDashboard();
-  }
-
-  nextDates(): void {
-    if (
-      this.loading ||
-      this.updatingOrderId
-    ) {
-      return;
-    }
-
-    this.currentStartDate = this.addDays(
-      this.currentStartDate,
-      this.daysPerPage
-    );
-
-    this.currentEndDate = this.addDays(
-      this.currentStartDate,
-      this.daysPerPage - 1
-    );
-
-    this.loadDashboard();
   }
 
   isReadyOrder(order: DashboardOrder): boolean {
@@ -285,6 +315,18 @@ export class DashboardPage implements OnInit {
     );
   }
 
+  refresh(): void {
+    if (
+      this.loading ||
+      this.loadingMore ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    this.loadDashboard();
+  }
+
   private updateOrderToReady(
     order: DashboardOrder
   ): void {
@@ -329,15 +371,18 @@ export class DashboardPage implements OnInit {
       });
   }
 
-  refresh(): void {
-    if (
-      this.loading ||
-      this.updatingOrderId
-    ) {
+  private recalculateDashboardTotals(): void {
+    if (!this.dashboard) {
       return;
     }
 
-    this.loadDashboard();
+    this.dashboard = {
+      ...this.dashboard,
+      dates: this.deliveryDays,
+      totalOrders: this.totalOrders,
+      processingOrders: this.processingOrders,
+      readyOrders: this.readyOrders
+    };
   }
 
   private startOfDay(date: Date): Date {
@@ -361,37 +406,16 @@ export class DashboardPage implements OnInit {
     return result;
   }
 
-  private daysBetween(
-    start: Date,
-    end: Date
-  ): number {
-    const startUtc = Date.UTC(
-      start.getFullYear(),
-      start.getMonth(),
-      start.getDate()
-    );
-
-    const endUtc = Date.UTC(
-      end.getFullYear(),
-      end.getMonth(),
-      end.getDate()
-    );
-
-    return Math.round(
-      (endUtc - startUtc) / 86400000
-    );
-  }
-
   private formatDate(date: Date): string {
     const year = date.getFullYear();
 
-    const month =
-      String(date.getMonth() + 1)
-        .padStart(2, '0');
+    const month = String(
+      date.getMonth() + 1
+    ).padStart(2, '0');
 
-    const day =
-      String(date.getDate())
-        .padStart(2, '0');
+    const day = String(
+      date.getDate()
+    ).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
   }
@@ -400,8 +424,7 @@ export class DashboardPage implements OnInit {
     error: HttpErrorResponse,
     fallback: string
   ): string {
-    const message =
-      error?.error?.message;
+    const message = error?.error?.message;
 
     if (
       typeof message === 'string' &&
@@ -410,8 +433,7 @@ export class DashboardPage implements OnInit {
       return message.trim();
     }
 
-    const legacyMessage =
-      error?.error?.error;
+    const legacyMessage = error?.error?.error;
 
     if (
       typeof legacyMessage === 'string' &&

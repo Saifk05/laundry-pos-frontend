@@ -1,11 +1,7 @@
 <div class="dashboard-page">
 
   <div class="dashboard-toolbar">
-    <button
-      type="button"
-      class="refresh-button"
-      [disabled]="loading"
-      (click)="loadDashboard()">
+    <button type="button" class="refresh-button" [disabled]="loading" (click)="loadDashboard()">
       {{ loading ? 'Loading...' : '↻ Refresh' }}
     </button>
   </div>
@@ -23,36 +19,22 @@
 
   @if (!loading && deliveryDays.length > 0) {
     <div class="delivery-matrix-wrapper">
-      <div
-        class="delivery-matrix"
-        [style.--date-count]="deliveryDays.length">
+      <div class="delivery-matrix" [style.--date-count]="deliveryDays.length + 1">
 
+        <!-- LEFT LABEL COLUMN -->
         <div class="matrix-label-column">
           <div class="matrix-delivery-label">Delivery Date</div>
-
-          <div class="matrix-total-label">
-            Total <span>[{{ totalOrders }}]</span>
-          </div>
-
-          <div class="matrix-processing-label">
-            Processing <span>[{{ processingOrders }}]</span>
-          </div>
-
-          <div class="matrix-ready-label">
-            Ready <span>[{{ readyOrders }}]</span>
-          </div>
-
-          <div class="matrix-order-label">
-            <span class="ready-check">✓</span>
-          </div>
+          <div class="matrix-total-label">Total <span>[{{ totalOrders }}]</span></div>
+          <div class="matrix-processing-label">Processing <span>[{{ processingOrders }}]</span></div>
+          <div class="matrix-ready-label">Ready <span>[{{ readyOrders }}]</span></div>
+          <div class="matrix-order-label"><span class="ready-check">✓</span></div>
         </div>
 
+        <!-- DELIVERY DATE COLUMNS -->
         @for (day of deliveryDays; track day.deliveryDate) {
           <div class="matrix-date-column">
 
-            <div class="matrix-date-header">
-              {{ day.dayLabel }}
-            </div>
+            <div class="matrix-date-header">{{ day.dayLabel }}</div>
 
             <div class="matrix-total-cell">
               {{ day.totalOrders }} - {{ formatPieces(day.totalPieces) }} pc
@@ -80,10 +62,7 @@
                   [class.ready-row]="isReadyOrder(order)"
                   (click)="openCallPopup(order)">
 
-                  <span class="matrix-order-index">
-                    {{ index + 1 }}.
-                  </span>
-
+                  <span class="matrix-order-index">{{ index + 1 }}.</span>
 
                   <span
                     class="matrix-order-number order-number-link"
@@ -96,33 +75,14 @@
                     {{ order.orderNumber }}
                   </span>
 
-                  <span class="matrix-order-number">
-                    {{ order.orderNumber }}
-                  </span>
-
                   <span class="matrix-divider">-</span>
-
-                  <span class="matrix-pieces">
-                    {{ formatPieces(order.totalPieces) }} pc
-                  </span>
-
+                  <span class="matrix-pieces">{{ formatPieces(order.totalPieces) }} pc</span>
                   <span class="matrix-divider">-</span>
-
-                  <span class="matrix-amount">
-                    ₹{{ formatAmount(order.totalAmount) }}
-                  </span>
-
+                  <span class="matrix-amount">₹{{ formatAmount(order.totalAmount) }}</span>
                   <span class="matrix-divider">-</span>
-
-                  <span class="matrix-time">
-                    {{ order.deliveryTime || '-' }}
-                  </span>
-
+                  <span class="matrix-time">{{ order.deliveryTime || '-' }}</span>
                   <span class="matrix-phone-icon">☎</span>
-
-                  <span class="matrix-customer">
-                    {{ order.customerName }}
-                  </span>
+                  <span class="matrix-customer">{{ order.customerName }}</span>
 
                   @if (isProcessingOrder(order)) {
                     <span
@@ -146,64 +106,41 @@
           </div>
         }
 
+        <!-- LOAD DETAIL COLUMN -->
+        <div class="matrix-date-column load-detail-column">
+
+          <div class="matrix-date-header">More</div>
+          <div class="matrix-total-cell"></div>
+          <div class="matrix-processing-cell"></div>
+          <div class="matrix-ready-cell"></div>
+
+          <div class="matrix-orders load-detail-orders">
+            <button
+              type="button"
+              class="load-detail-button"
+              [disabled]="loading"
+              (click)="loadMoreDates()">
+              {{ loading ? 'Loading...' : 'LOAD DETAIL' }}
+            </button>
+          </div>
+
+        </div>
+
       </div>
-    </div>
-
-    <div class="matrix-pagination-wrapper">
-
-      <div class="matrix-pagination">
-        <button
-          type="button"
-          class="pagination-button"
-          [disabled]="!canGoPrevious || loading"
-          (click)="previousDates()">
-          ‹ Previous
-        </button>
-
-        <span class="pagination-page">
-          Page {{ currentPage }}
-        </span>
-
-        <button
-          type="button"
-          class="pagination-button"
-          [disabled]="loading"
-          (click)="nextDates()">
-          Next ›
-        </button>
-      </div>
-
-      <div class="pagination-info">
-        Showing 6 delivery dates
-        @if (currentPage === 1) {
-          <span>(Yesterday + Next 5 days)</span>
-        }
-      </div>
-
     </div>
   }
 
+  <!-- CUSTOMER DETAILS POPUP -->
   @if (selectedOrder) {
-    <div
-      class="call-overlay"
-      (click)="closeCallPopup()">
-
-      <div
-        class="call-popup"
-        (click)="$event.stopPropagation()">
+    <div class="call-overlay" (click)="closeCallPopup()">
+      <div class="call-popup" (click)="$event.stopPropagation()">
 
         <div class="call-popup-header">
           <div>
             <h2>Customer Details</h2>
             <p>{{ selectedOrder.orderNumber }}</p>
           </div>
-
-          <button
-            type="button"
-            class="popup-close"
-            (click)="closeCallPopup()">
-            ×
-          </button>
+          <button type="button" class="popup-close" (click)="closeCallPopup()">×</button>
         </div>
 
         <div class="call-popup-body">
@@ -213,67 +150,38 @@
           </div>
 
           <h3>{{ selectedOrder.customerName }}</h3>
-
-          <p class="call-mobile">
-            {{ selectedOrder.mobile }}
-          </p>
+          <p class="call-mobile">{{ selectedOrder.mobile }}</p>
 
           <div class="call-order-details">
-
             <div>
               <span>Pieces</span>
-              <strong>
-                {{ formatPieces(selectedOrder.totalPieces) }}
-              </strong>
+              <strong>{{ formatPieces(selectedOrder.totalPieces) }}</strong>
             </div>
-
             <div>
               <span>Amount</span>
-              <strong>
-                ₹{{ formatAmount(selectedOrder.totalAmount) }}
-              </strong>
+              <strong>₹{{ formatAmount(selectedOrder.totalAmount) }}</strong>
             </div>
-
             <div>
               <span>Delivery</span>
-              <strong>
-                {{ selectedOrder.deliveryTime || '-' }}
-              </strong>
+              <strong>{{ selectedOrder.deliveryTime || '-' }}</strong>
             </div>
-
           </div>
+
         </div>
 
         <div class="call-popup-footer">
-
-          <button
-            type="button"
-            class="cancel-call-button"
-            (click)="closeCallPopup()">
-            Close
-          </button>
-
-          <button
-            type="button"
-            class="call-now-button"
-            (click)="callNow()">
-            ☎ Call Customer
-          </button>
-
+          <button type="button" class="cancel-call-button" (click)="closeCallPopup()">Close</button>
+          <button type="button" class="call-now-button" (click)="callNow()">☎ Call Customer</button>
         </div>
 
       </div>
     </div>
   }
 
+  <!-- MARK READY CONFIRMATION -->
   @if (confirmReadyOrder) {
-    <div
-      class="confirm-overlay"
-      (click)="closeReadyConfirmation()">
-
-      <div
-        class="confirm-popup"
-        (click)="$event.stopPropagation()">
+    <div class="confirm-overlay" (click)="closeReadyConfirmation()">
+      <div class="confirm-popup" (click)="$event.stopPropagation()">
 
         <h3>Mark Order Ready?</h3>
 
@@ -284,7 +192,6 @@
         </p>
 
         <div class="confirm-actions">
-
           <button
             type="button"
             class="confirm-cancel"
@@ -300,7 +207,6 @@
             (click)="confirmMarkReady()">
             {{ updatingOrderId === confirmReadyOrder.id ? 'Updating...' : 'Yes, Mark Ready' }}
           </button>
-
         </div>
 
       </div>
