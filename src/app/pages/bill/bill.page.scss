@@ -1104,77 +1104,7 @@
 
 }
 
-@media print {
 
-  @page {
-    margin: 8mm;
-  }
-
-  body {
-    margin: 0 !important;
-
-    background: #ffffff !important;
-  }
-
-  body * {
-    visibility: hidden !important;
-  }
-
-  .receipt-print-area,
-  .receipt-print-area * {
-    visibility: visible !important;
-  }
-
-  .receipt-print-area {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    background: #ffffff !important;
-
-    box-shadow: none !important;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .receipt-overlay,
-  .receipt-modal {
-    position: static !important;
-
-    width: auto !important;
-    max-width: none !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    overflow: visible !important;
-
-    background: transparent !important;
-
-    border: 0 !important;
-    border-radius: 0 !important;
-
-    box-shadow: none !important;
-  }
-
-  .receipt-items-table {
-    page-break-inside: avoid;
-  }
-
-  .receipt-totals,
-  .receipt-footer {
-    page-break-inside: avoid;
-  }
-
-}
 
 .payment-overlay {
   position: fixed !important;

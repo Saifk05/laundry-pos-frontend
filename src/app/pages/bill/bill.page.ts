@@ -1089,18 +1089,237 @@ export class BillPage
     return Array.from(grouped.values());
   }
 
-  printReceipt(): void {
+printReceipt(): void {
 
-    if (
-      !this.selectedInvoice ||
-      !this.receiptOrder
-    ) {
-
-      return;
-    }
-
-    window.print();
+  if (
+    !this.selectedInvoice ||
+    !this.receiptOrder
+  ) {
+    return;
   }
+
+  const receipt =
+    document.getElementById('receipt-print-area');
+
+  if (!receipt) {
+    return;
+  }
+
+  const printWindow =
+    window.open('', '_blank', 'width=900,height=900');
+
+  if (!printWindow) {
+    return;
+  }
+
+  printWindow.document.open();
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+
+        <title>
+          ${this.selectedInvoice.invoiceNumber}
+        </title>
+
+        <style>
+
+          @page {
+            size: A4 portrait;
+            margin: 8mm;
+          }
+
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            color: #111111;
+            font-family: Arial, sans-serif;
+          }
+
+          .receipt-print-area {
+            width: 100%;
+            margin: 0;
+            padding: 10px;
+          }
+
+          .print-store-header {
+            text-align: center;
+            margin-bottom: 8px;
+          }
+
+          .print-store-header h1 {
+            margin: 0;
+            font-size: 22px;
+          }
+
+          .print-store-header p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            color: #667085;
+          }
+
+          .receipt-divider {
+            border-top: 1px dashed #d0d5dd;
+            margin: 8px 0;
+          }
+
+          .receipt-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 24px;
+          }
+
+          .receipt-info-grid span {
+            display: block;
+            font-size: 10px;
+            color: #667085;
+          }
+
+          .receipt-info-grid strong {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+          }
+
+          .receipt-section h3 {
+            margin: 0 0 7px;
+            font-size: 13px;
+            text-transform: uppercase;
+          }
+
+          .receipt-customer-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 4px 0;
+            font-size: 11px;
+          }
+
+          .receipt-customer-row span {
+            color: #667085;
+          }
+
+          .receipt-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+          }
+
+          .receipt-items-table th {
+            padding: 5px 4px;
+            border-bottom: 1px solid #d0d5dd;
+            text-align: left;
+            font-size: 9px;
+            color: #667085;
+          }
+
+          .receipt-items-table td {
+            padding: 5px 4px;
+            border-bottom: 1px solid #eaecf0;
+            vertical-align: top;
+          }
+
+          .receipt-items-table th:not(:first-child),
+          .receipt-items-table td:not(:first-child) {
+            text-align: right;
+          }
+
+          .receipt-items-table small {
+            display: block;
+            margin-top: 2px;
+            font-size: 8px;
+            color: #667085;
+          }
+
+          .receipt-totals {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+          }
+
+          .receipt-total-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            font-size: 11px;
+          }
+
+          .receipt-grand-total {
+            margin-top: 3px;
+            padding-top: 6px;
+            border-top: 1px solid #111111;
+            font-size: 17px;
+            font-weight: 800;
+          }
+
+          .receipt-terms {
+            break-inside: avoid;
+          }
+
+          .receipt-terms h3 {
+            margin: 0 0 5px;
+            font-size: 12px;
+          }
+
+          .receipt-terms-text {
+            font-size: 9px !important;
+            line-height: 1.4 !important;
+          }
+
+          .receipt-footer {
+            margin-top: 8px;
+            text-align: center;
+            break-inside: avoid;
+          }
+
+          .receipt-footer strong {
+            font-size: 13px;
+          }
+
+          .receipt-footer p {
+            margin: 2px 0 0;
+            font-size: 9px;
+            color: #667085;
+          }
+
+          tr,
+          .receipt-totals,
+          .receipt-footer {
+            break-inside: avoid;
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="receipt-print-area">
+          ${receipt.innerHTML}
+        </div>
+
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  printWindow.onload = () => {
+
+    printWindow.focus();
+
+    printWindow.print();
+
+    printWindow.close();
+  };
+}
 
   getReceiptQuantity(
     quantity:

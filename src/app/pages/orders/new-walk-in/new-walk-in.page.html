@@ -819,27 +819,26 @@
           }}
 
         </button>
-      } @else if (isEditMode) {
-        <button
-          type="button"
-          class="create-order-button"
-          [disabled]="
-            creatingOrder ||
-            loadingRetagOrder ||
-            orderItems.length === 0 ||
-            !deliveryDate ||
-            !deliveryTime ||
-            (homeDelivery && (!pickupAddress.trim() || pickupLatitude == null || pickupLongitude == null))
-          "
-          (click)="createOrder()">
+        } @else if (isEditMode) {
+  <button
+    type="button"
+    class="create-order-button"
+    [disabled]="
+      creatingOrder ||
+      loadingRetagOrder ||
+      orderItems.length === 0 ||
+      !deliveryDate ||
+      !deliveryTime
+    "
+    (click)="createOrder()">
 
-          {{
-            creatingOrder
-              ? 'Updating Order...'
-              : 'Update Order'
-          }}
+    {{
+      creatingOrder
+        ? 'Updating Order...'
+        : 'Update Order'
+    }}
 
-        </button>
+  </button>
       } @else {
 
         <button
