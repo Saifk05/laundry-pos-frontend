@@ -114,7 +114,7 @@ export class B2cOrdersPage implements OnInit {
   cursorHistory: Array<string | null> = [];
   hasMore = false;
   pageLimit = 10;
-  readonly pageSizeOptions = [5, 10, 15, 25, 50, 100];
+  readonly pageSizeOptions = [5, 10, 15, 25, 50, 100, 125, 150, 200, 250, 300];
   statuses: string[] = [
     'All',
     'Tagged',
@@ -367,7 +367,7 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
 
   private getDefaultFromDate(): string {
     const date = new Date();
-    date.setDate(date.getDate() - 6);
+    date.setMonth(date.getMonth() - 3);
     return this.toLocalDateString(date);
   }
 
