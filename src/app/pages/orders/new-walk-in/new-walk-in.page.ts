@@ -25,6 +25,14 @@ import {
 import { MapLocationResponse } from '../../../../core/models/pickup-delivery.model';
 
 
+interface WeightGarment {
+  productId: string;
+  productName: string;
+  icon: string | null;
+  quantity: number;
+}
+
+
 interface SelectedOrderItem {
   id: string;
   productId: string;
@@ -79,6 +87,7 @@ export class NewWalkInPage
   productComment = '';
   modalQuantity = 1;
   modalGarmentCount = 1;
+  modalWeightGarments: WeightGarment[] = [];
   availablePreferences:
     string[] = [
       'Normal Wash',
@@ -552,7 +561,13 @@ private populateRetagOrder( order: B2COrderDetails): void {
       1;
 
     this.modalGarmentCount =
-      1;
+      product.unit === 'KG' ? 0 : 1;
+
+    if (product.unit === 'KG') {
+      this.initializeWeightGarments();
+    } else {
+      this.modalWeightGarments = [];
+    }
 
     this.productModalOpen =
       true;
@@ -587,6 +602,9 @@ private populateRetagOrder( order: B2COrderDetails): void {
 
     this.modalGarmentCount =
       1;
+
+    this.modalWeightGarments =
+      [];
   }
 
 
@@ -643,6 +661,20 @@ private populateRetagOrder( order: B2COrderDetails): void {
     serviceId: string
   ): void {
 
+    if (
+      this.selectedProduct?.unit === 'KG'
+    ) {
+
+      this.selectedServiceIds =
+        this.selectedServiceIds.includes(
+          serviceId
+        )
+          ? []
+          : [serviceId];
+
+      return;
+    }
+
     const exists =
       this.selectedServiceIds
         .includes(
@@ -670,7 +702,6 @@ private populateRetagOrder( order: B2COrderDetails): void {
       serviceId
     ];
   }
-
 
   isServiceSelected(
     serviceId: string
@@ -780,23 +811,113 @@ decreaseModalQuantity(): void {
   }
 }
 
-  increaseGarmentCount():
+  private initializeWeightGarments():
     void {
 
-    this.modalGarmentCount++;
+    this.modalWeightGarments =
+      this.products
+        .filter(
+          (product: WalkInProduct) =>
+            product.active &&
+            product.unit === 'PC'
+        )
+        .map(
+          (product: WalkInProduct) => ({
+            productId: product.id,
+            productName: product.name,
+            icon: product.icon,
+            quantity: 0
+          })
+        );
   }
 
 
-  decreaseGarmentCount():
-    void {
+  increaseWeightGarment(
+    garment: WeightGarment
+  ): void {
+
+    garment.quantity++;
+    this.updateGarmentCount();
+  }
+
+
+  decreaseWeightGarment(
+    garment: WeightGarment
+  ): void {
 
     if (
-      this.modalGarmentCount > 1
+      garment.quantity > 0
     ) {
 
-      this.modalGarmentCount--;
+      garment.quantity--;
+      this.updateGarmentCount();
     }
   }
+
+
+  normalizeWeightGarment(
+    garment: WeightGarment
+  ): void {
+
+    const value =
+      Number(garment.quantity);
+
+    garment.quantity =
+      !value || value < 0
+        ? 0
+        : Math.floor(value);
+
+    this.updateGarmentCount();
+  }
+
+
+updateGarmentCount(): void {
+
+  this.modalGarmentCount =
+    this.modalWeightGarments.reduce(
+      (
+        total: number,
+        garment: WeightGarment
+      ) =>
+        total +
+        Number(garment.quantity || 0),
+      0
+    );
+}
+
+
+/* ADD THIS METHOD HERE */
+onWeightGarmentQuantityChange(
+  garment: WeightGarment,
+  value: number | string
+): void {
+
+  if (
+    value === '' ||
+    value === null ||
+    value === undefined
+  ) {
+    garment.quantity = 0;
+    this.updateGarmentCount();
+    return;
+  }
+
+  const quantity = Number(value);
+
+  garment.quantity = Math.max(
+    0,
+    Math.min(
+      999,
+      Math.floor(
+        Number.isFinite(quantity)
+          ? quantity
+          : 0
+      )
+    )
+  );
+
+  this.updateGarmentCount();
+}
 
 
   addConfiguredProduct():
@@ -824,66 +945,29 @@ decreaseModalQuantity(): void {
       return;
     }
 
-    const selectedServices =
-      this.availableServices
-        .filter(
-          (
-            service:
-              WalkInServicePrice
-          ) =>
-            this.selectedServiceIds
-              .includes(
-                service.id
-              )
-        );
-
-    if (
-      selectedServices.length === 0
-    ) {
-
+    const selectedServices = this.availableServices
+        .filter((service: WalkInServicePrice) => this.selectedServiceIds
+              .includes(service.id));
+    if ( selectedServices.length === 0 ) { return; }
+    if ( this.selectedProduct.unit === 'KG' && this.modalGarmentCount <= 0 ) {
       return;
     }
 
-    const unitPrice =
-      selectedServices
-        .reduce(
-          (
-            total:
-              number,
-            service:
-              WalkInServicePrice
-          ) =>
-            total +
-            Number(
-              service.price
-            ),
-          0
-        );
+    const unitPrice = selectedServices
+        .reduce(( total: number, service: WalkInServicePrice ) =>
+            total + Number( service.price ), 0 );
 
     const itemId =
       this.editingOrderItemId ??
       `${Date.now()}-${Math.random()}`;
 
-    const item:
-      SelectedOrderItem = {
-
-      id:
-        itemId,
-
-      productId:
-        this.selectedProduct.id,
-
-      productName:
-        this.selectedProduct.name,
-
-      typeId:
-        this.selectedProductType.id,
-
-      typeName:
-        this.selectedProductType.name,
-
-      serviceIds:
-        selectedServices.map(
+    const item: SelectedOrderItem = {
+      id: itemId,
+      productId: this.selectedProduct.id,
+      productName: this.selectedProduct.name,
+      typeId: this.selectedProductType.id,
+      typeName: this.selectedProductType.name,
+      serviceIds: selectedServices.map(
           (
             service:
               WalkInServicePrice
@@ -1934,16 +2018,18 @@ const request:
       this.errorMessage = 'Delivery date and time are required';
       return;
     }
-    if (this.homeDelivery) {
-      if (!this.pickupAddress.trim()) {
-        this.errorMessage = 'Delivery address is required';
-        return;
-      }
-      if (this.pickupLatitude == null || this.pickupLongitude == null) {
-        this.errorMessage = 'Select the delivery location';
-        return;
-      }
-    }
+    // if (this.homeDelivery) {
+    //   if (!this.pickupAddress.trim()) {
+    //     this.errorMessage = 'Delivery address is required';
+    //     return;
+    //   }
+    //   if (this.pickupLatitude == null || this.pickupLongitude == null) {
+    //     this.errorMessage = 'Select the delivery location';
+    //     return;
+    //   }
+    // }
+
+    
     if (this.expressDelivery && !this.selectedExpressChargeId) {
       this.errorMessage = 'Select an express charge';
       return;
@@ -2971,7 +3057,8 @@ We will inform you if there are any updates to your order after store inspection
 
 We'll notify you once your laundry is ready for collection.
 
-Thank you, `;
+Thank you, 
+${this.businessName }`;
 
   const whatsappUrl =
     `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -3538,6 +3625,7 @@ private formatWhatsAppPhone(
   this.productComment = '';
   this.modalQuantity = 1;
   this.modalGarmentCount = 1;
+  this.modalWeightGarments = [];
   this.homeDelivery = false;
   this.expressDelivery = false;
   this.selectedExpressChargeId = null;
@@ -3577,6 +3665,11 @@ private formatWhatsAppPhone(
     this.modalGarmentCount = item.unit === 'KG'
         ? Math.max(1, Number(item.garmentCount ?? 1))
         : Math.max(1, Number(item.quantity));
+    if (item.unit === 'KG') {
+      this.initializeWeightGarments();
+    } else {
+      this.modalWeightGarments = [];
+    }
     this.productModalOpen = true;
   }
 

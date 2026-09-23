@@ -31,7 +31,7 @@ export class BusinessSettingsService {
 
   readonly settings$ =
     this.settingsSubject.asObservable();
-
+    
 
   constructor(
     private readonly apiService:
@@ -69,7 +69,7 @@ export class BusinessSettingsService {
       });
   }
 
-
+  
   getSettings():
     Observable<BusinessSettings> {
 
@@ -118,4 +118,8 @@ export class BusinessSettingsService {
 
       );
   }
+
+  get currentSettings(): BusinessSettings | null {
+  return this.settingsSubject.value;
+}
 }

@@ -1242,3 +1242,147 @@
     font-size:10px;
   }
 }
+
+/* Dashboard dark mode */
+:host-context(html.dark) .dashboard-page {
+  background: var(--app-background);
+  color: var(--app-text-primary);
+  font-family: var(--app-font-body);
+}
+
+:host-context(html.dark) .refresh-button,
+:host-context(html.dark) .pagination-button,
+:host-context(html.dark) .popup-close,
+:host-context(html.dark) .cancel-call-button,
+:host-context(html.dark) .confirm-cancel {
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  border-color: var(--app-border);
+}
+
+:host-context(html.dark) .refresh-button:hover:not(:disabled),
+:host-context(html.dark) .pagination-button:hover:not(:disabled) {
+  background: var(--app-hover-background);
+  border-color: var(--app-primary);
+}
+
+:host-context(html.dark) .dashboard-loading,
+:host-context(html.dark) .dashboard-empty,
+:host-context(html.dark) .delivery-matrix-wrapper,
+:host-context(html.dark) .matrix-label-column,
+:host-context(html.dark) .matrix-date-column,
+:host-context(html.dark) .matrix-order-label,
+:host-context(html.dark) .matrix-orders,
+:host-context(html.dark) .matrix-empty-row {
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  border-color: var(--app-border-strong);
+}
+
+:host-context(html.dark) .dashboard-empty h3,
+:host-context(html.dark) .call-popup-header h2,
+:host-context(html.dark) .call-popup-body h3,
+:host-context(html.dark) .confirm-popup h3 {
+  color: var(--app-text-primary);
+}
+
+:host-context(html.dark) .dashboard-empty p,
+:host-context(html.dark) .call-popup-header p,
+:host-context(html.dark) .call-mobile,
+:host-context(html.dark) .confirm-popup p,
+:host-context(html.dark) .pagination-info,
+:host-context(html.dark) .pagination-info span,
+:host-context(html.dark) .pagination-page {
+  color: var(--app-text-secondary);
+}
+
+:host-context(html.dark) .matrix-order-row,
+:host-context(html.dark) .matrix-order-row.processing-row {
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  border-color: var(--app-border-strong);
+}
+
+:host-context(html.dark) .matrix-order-row.ready-row {
+  background: #2d380e;
+}
+
+:host-context(html.dark) .matrix-order-index,
+:host-context(html.dark) .matrix-order-number,
+:host-context(html.dark) .matrix-divider,
+:host-context(html.dark) .matrix-pieces,
+:host-context(html.dark) .matrix-amount,
+:host-context(html.dark) .matrix-time,
+:host-context(html.dark) .matrix-phone-icon,
+:host-context(html.dark) .matrix-customer {
+  color: var(--app-text-primary);
+}
+
+:host-context(html.dark) .matrix-piece-box {
+  background: var(--app-surface-soft);
+  color: var(--app-text-primary);
+}
+
+:host-context(html.dark) .matrix-orders::after,
+:host-context(html.dark) .matrix-label-column::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--app-surface) 0,
+    var(--app-surface) 39px,
+    var(--app-border-strong) 39px,
+    var(--app-border-strong) 40px
+  );
+}
+
+:host-context(html.dark) .delivery-matrix-wrapper {
+  scrollbar-color: var(--app-border-strong) var(--app-background);
+}
+
+:host-context(html.dark) .delivery-matrix-wrapper::-webkit-scrollbar-track {
+  background: var(--app-background);
+}
+
+:host-context(html.dark) .delivery-matrix-wrapper::-webkit-scrollbar-thumb {
+  background: var(--app-border-strong);
+  border-color: var(--app-background);
+}
+
+:host-context(html.dark) .call-popup,
+:host-context(html.dark) .confirm-popup {
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  border-color: var(--app-border);
+}
+
+:host-context(html.dark) .call-popup-header,
+:host-context(html.dark) .call-popup-footer {
+  border-color: var(--app-border);
+}
+
+:host-context(html.dark) .order-number-link {
+  color: #8bbcff;
+}
+
+:host-context(html.dark) .order-number-link:hover {
+  background: var(--app-hover-background);
+  color: #b8d4ff;
+}
+
+:host-context(html.dark) .ready-row .order-number-link {
+  color: #b8d4ff;
+}
+
+:host-context(html.dark) .dashboard-error {
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+  border-color: var(--app-danger);
+}
+
+:host-context(html.dark) .dashboard-error button {
+  color: var(--app-danger);
+}
+
+:host-context(html.dark) .call-now-button,
+:host-context(html.dark) .confirm-ready {
+  color: var(--app-text-on-primary);
+}

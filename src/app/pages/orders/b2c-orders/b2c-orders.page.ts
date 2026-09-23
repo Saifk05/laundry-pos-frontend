@@ -8,6 +8,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
 import { B2COrder,B2COrderDetails, B2COrderListResponse, B2COrderStatus } from '../../../../core/models/b2c-order.model';
 import { PaymentMethod,PaymentRequest, SettlementOrder } from '../../../../core/models/settlement.model';
+import { BusinessSettingsService } from '../../../../core/services/business-settings.service';
+
 const B2C_DATE_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
   display: { dateInput: 'DD/MM/YYYY', monthYearLabel: 'MMM YYYY', dateA11yLabel: 'DD/MM/YYYY', monthYearA11yLabel: 'MMMM YYYY' }};
@@ -145,7 +147,13 @@ export class B2cOrdersPage implements OnInit {
   callModalOpen = false;
   selectedCallOrder: B2cOrderView | null = null;
   numberCopied = false;
-  businessName = 'Fabric Works';
+  // businessName = '';
+  get businessName(): string {
+  const settings = this.businessSettingsService.currentSettings;
+  return settings?.whatsappDisplayName?.trim()
+    || settings?.businessName?.trim()
+    || '';
+}
   secureRetagEnabled = false;
   retagPinConfigured = false;
   retagWhatsappEnabled = false;
@@ -158,6 +166,7 @@ export class B2cOrdersPage implements OnInit {
   constructor(
     private readonly apiService:ApiService,
     private readonly router:Router,
+    private readonly businessSettingsService: BusinessSettingsService,
     private readonly route:ActivatedRoute
   ){}
 
@@ -520,55 +529,60 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
       }});
   }
 
-// private openReadyWhatsApp( order: B2cOrderView ): void {
-//   const phone = this.formatWhatsAppPhone( order.mobile );
-//   if (!phone) { this.errorMessage = 'Customer WhatsApp number is invalid';
-//     return;
-//   }
-//
-//   this.apiService
-//     .getB2COrderById(order.id)
-//     .subscribe({
-//       next: (details: any) => {
-//         const totalQuantity = details.items?.reduce(
-//             (total: number, item: any) => {
-//               if (item.unit === 'KG') {
-//                 return total + Number( item.garmentCount ?? 0 );
-//               }
-//
-//               if (item.unit === 'PC') {
-//                 return total + Number( item.quantity ?? 0 );
-//               } return total; },0) ?? 0;
-//
-//         const quantityLabel = totalQuantity === 1
-//             ? 'Pc'
-//             : 'Pcs';
-//
-//         const message = `Dear ${order.customerName},
-//           Your laundry order ${order.orderNumber} is ready for collection.
-//           Total Amount: ₹${Number(order.amount ?? 0).toFixed(2)}
-//           Quantity: ${totalQuantity} ${quantityLabel}
-//           Kindly collect your order within 2 days.
-//           Thank you, `;
-//
-//         const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-//         window.open( whatsappUrl, '_blank');
-//       },
-//       error: (error: any) => {
-//         console.error( 'Unable to load order details', error );
-//         this.errorMessage ='Unable to load order details';
-//       }});
-//     }
 
-  // private formatWhatsAppPhone( phone: string): string {
-  //   if (!phone) { return ''; }
-  //   let digits = phone.replace( /\D/g, '' );
-  //   if (digits.length === 10) { digits = `91${digits}`; }
-  //   if ( digits.length !== 12 || !digits.startsWith('91') ) {
-  //     return '';
-  //   }
-  //   return digits;
-  // }
+
+
+
+
+private openReadyWhatsApp(order: B2cOrderView, whatsappTab: Window | null): void {
+  const phone = this.formatWhatsAppPhone(order.mobile);
+  if (!phone) {
+    whatsappTab?.close();
+    this.errorMessage = 'Customer WhatsApp number is invalid';
+    return;
+  }
+
+  this.apiService.getB2COrderById(order.id).subscribe({
+    next: (details: any) => {
+      const quantity = (details.items ?? []).reduce((total: number, item: any) => {
+        return total + Number(item.unit === 'KG'
+          ? item.garmentCount ?? 0
+          : item.quantity ?? 0);
+      }, 0);
+
+      const message = [
+        `Dear ${order.customerName},`,
+        '',
+        `Your laundry order ${order.orderNumber} is ready for collection.`,
+        '',
+        `Total Amount: ₹${Number(order.amount).toFixed(2)}`,
+        `Quantity: ${quantity} ${quantity === 1 ? 'Pc' : 'Pcs'}`,
+        '',
+        'Kindly collect your order at your earliest convenience.',
+        '',
+        'Thank you,',
+        this.businessName
+      ].join('\n');
+
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      if (whatsappTab) whatsappTab.location.href = url;
+    },
+    error: () => {
+      whatsappTab?.close();
+      this.errorMessage = 'Order marked ready, but order details could not be loaded for WhatsApp.';
+    }
+  });
+}
+
+  private formatWhatsAppPhone( phone: string): string {
+    if (!phone) { return ''; }
+    let digits = phone.replace( /\D/g, '' );
+    if (digits.length === 10) { digits = `91${digits}`; }
+    if ( digits.length !== 12 || !digits.startsWith('91') ) {
+      return '';
+    }
+    return digits;
+  }
 
   markDelivered(order: B2cOrderView): void {
     this.errorMessage = '';
@@ -1607,7 +1621,7 @@ private printQrTags(order: B2COrderDetails ): void {
         pickupSlot: response.pickupTime ?? '-',
         deliveryDate: response.deliveryDate ?? '-',
         deliverySlot: response.deliveryTime ?? '-',
-        storageLabel: response.storageLabel ?? '-',
+        // storageLabel: response.storageLabel ?? '-',
         homeDelivery: response.homeDelivery,
         expressDelivery: response.expressDelivery,
         settled: response.settled,

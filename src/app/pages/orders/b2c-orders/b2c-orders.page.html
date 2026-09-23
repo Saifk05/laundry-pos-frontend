@@ -162,7 +162,7 @@
           <th>Customer Name</th>
           <th>Mobile</th>
           <th>Home Delivery</th>
-          <th>Storage Label</th>
+          <!-- <th>Storage Label</th> -->
           <th>Pickup Date</th>
           <th>Pickup Time</th>
           <th>Delivery Date</th>
@@ -778,7 +778,8 @@
     <div class="payment-modal call-customer-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div>
-          <h2>Customer Contact</h2>
+          <h2>
+             Contact</h2>
           <p>{{ selectedCallOrder.orderNumber }}</p>
         </div>
         <button type="button" class="modal-close" (click)="closeCallModal()">×</button>

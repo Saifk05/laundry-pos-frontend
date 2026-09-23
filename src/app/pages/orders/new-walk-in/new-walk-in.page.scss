@@ -2378,3 +2378,192 @@
     width: 100%;
   }
 }
+
+
+/* =========================================================
+   LAUNDRY BY WEIGHT - GARMENT SELECTOR
+========================================================= */
+
+.weight-garment-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.weight-garment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  min-width: 0;
+  min-height: 42px;
+
+  padding: 6px 8px 6px 10px;
+
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+
+  background: var(--app-background-soft);
+}
+
+.weight-garment-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  min-width: 0;
+  flex: 1;
+}
+
+.weight-garment-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 20px;
+  height: 20px;
+
+  flex: 0 0 20px;
+
+  font-size: 15px;
+  line-height: 1;
+}
+
+.weight-garment-name {
+  min-width: 0;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: var(--app-text-primary);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* COMPACT +/- CONTROL */
+
+.weight-garment-row .modal-quantity {
+  display: grid;
+  grid-template-columns: 28px 34px 28px;
+
+  width: 90px;
+  height: 30px;
+
+  flex: 0 0 90px;
+
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+
+  overflow: hidden;
+}
+
+.weight-garment-row .modal-quantity button {
+  width: 28px;
+  height: 30px;
+
+  padding: 0;
+  margin: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  color: var(--app-text-primary);
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.weight-garment-row .modal-quantity button:first-child {
+  border-right: 1px solid var(--app-border);
+}
+
+.weight-garment-row .modal-quantity button:last-child {
+  border-left: 1px solid var(--app-border);
+}
+
+.weight-garment-row .modal-quantity button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.weight-garment-row .quantity-input {
+  width: 34px;
+  height: 30px;
+
+  padding: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--app-text-primary);
+
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.weight-garment-row .quantity-input::-webkit-inner-spin-button,
+.weight-garment-row .quantity-input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+
+/* TOTAL */
+
+.weight-garment-total {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+
+  margin-top: 10px;
+  padding-top: 10px;
+
+  border-top: 1px solid var(--app-border);
+
+  font-size: 12px;
+  color: var(--app-text-muted);
+}
+
+.weight-garment-total strong {
+  min-width: 30px;
+
+  padding: 4px 9px;
+
+  border-radius: 6px;
+
+  background: var(--app-primary);
+  color: #fff;
+
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+  .weight-garment-list {
+    grid-template-columns: 1fr;
+  }
+
+}
