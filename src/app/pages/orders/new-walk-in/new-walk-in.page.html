@@ -1182,75 +1182,43 @@
 
 @if (selectedProduct.unit === 'KG') {
 
-  <div class="modal-section">
+          <div class="modal-section modal-quantity-section">
 
-    <label class="modal-label">
-      Garments
-    </label>
+            <label class="modal-label">
+              Total Garments
+            </label>
 
-    <div class="weight-garment-list">
+            <div class="modal-quantity">
 
-      @for (
-        garment of modalWeightGarments;
-        track garment.productId
-      ) {
+              <button
+                type="button"
+                [disabled]="modalGarmentCount <= 1"
+                (click)="decreaseModalGarmentCount()">
+                −
+              </button>
 
-        <div class="weight-garment-row">
+              <input
+                type="number"
+                [ngModel]="modalGarmentCount"
+                (ngModelChange)="onModalGarmentCountChange($event)"
+                min="1"
+                max="999"
+                step="1"
+                inputmode="numeric"
+                class="quantity-input"
+                (focus)="$any($event.target).select()">
 
-          <div class="weight-garment-info">
+              <button
+                type="button"
+                (click)="increaseModalGarmentCount()">
+                +
+              </button>
 
-            <span class="weight-garment-icon">
-              {{ garment.icon || '👕' }}
-            </span>
-
-            <span class="weight-garment-name">
-              {{ garment.productName }}
-            </span>
-
-          </div>
-
-          <div class="modal-quantity garment-quantity">
-
-            <button
-              type="button"
-              [disabled]="garment.quantity <= 0"
-              (click)="decreaseWeightGarment(garment)">
-              −
-            </button>
-
-            <input
-              type="number"
-              [ngModel]="garment.quantity"
-              (ngModelChange)="onWeightGarmentQuantityChange(garment, $event)"
-              min="0"
-              max="999"
-              step="1"
-              inputmode="numeric"
-              class="quantity-input"
-              (focus)="$any($event.target).select()">
-
-            <button
-              type="button"
-              (click)="increaseWeightGarment(garment)">
-              +
-            </button>
+            </div>
 
           </div>
 
-        </div>
-
-      }
-
-    </div>
-
-    <div class="weight-garment-total">
-      <span>Total Garments</span>
-      <strong>{{ modalGarmentCount }}</strong>
-    </div>
-
-  </div>
-
-}
+        }
 
       </div>
 
@@ -1341,7 +1309,8 @@
 
         </button>
 
-        <button
+        <!-- WhatsApp button temporarily disabled.
+<button
           type="button"
           class="success-print-button"
           (click)="openWhatsApp()">
@@ -1349,6 +1318,7 @@
           WhatsApp
 
         </button>
+        -->
 
       </div>
 

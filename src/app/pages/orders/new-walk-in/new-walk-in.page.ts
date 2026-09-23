@@ -24,15 +24,6 @@ import {
 
 import { MapLocationResponse } from '../../../../core/models/pickup-delivery.model';
 
-
-interface WeightGarment {
-  productId: string;
-  productName: string;
-  icon: string | null;
-  quantity: number;
-}
-
-
 interface SelectedOrderItem {
   id: string;
   productId: string;
@@ -87,7 +78,6 @@ export class NewWalkInPage
   productComment = '';
   modalQuantity = 1;
   modalGarmentCount = 1;
-  modalWeightGarments: WeightGarment[] = [];
   availablePreferences:
     string[] = [
       'Normal Wash',
@@ -560,14 +550,7 @@ private populateRetagOrder( order: B2COrderDetails): void {
     this.modalQuantity =
       1;
 
-    this.modalGarmentCount =
-      product.unit === 'KG' ? 0 : 1;
-
-    if (product.unit === 'KG') {
-      this.initializeWeightGarments();
-    } else {
-      this.modalWeightGarments = [];
-    }
+    this.modalGarmentCount = 1;
 
     this.productModalOpen =
       true;
@@ -602,9 +585,6 @@ private populateRetagOrder( order: B2COrderDetails): void {
 
     this.modalGarmentCount =
       1;
-
-    this.modalWeightGarments =
-      [];
   }
 
 
@@ -811,113 +791,36 @@ decreaseModalQuantity(): void {
   }
 }
 
-  private initializeWeightGarments():
-    void {
-
-    this.modalWeightGarments =
-      this.products
-        .filter(
-          (product: WalkInProduct) =>
-            product.active &&
-            product.unit === 'PC'
-        )
-        .map(
-          (product: WalkInProduct) => ({
-            productId: product.id,
-            productName: product.name,
-            icon: product.icon,
-            quantity: 0
-          })
-        );
-  }
-
-
-  increaseWeightGarment(
-    garment: WeightGarment
-  ): void {
-
-    garment.quantity++;
-    this.updateGarmentCount();
-  }
-
-
-  decreaseWeightGarment(
-    garment: WeightGarment
-  ): void {
-
-    if (
-      garment.quantity > 0
-    ) {
-
-      garment.quantity--;
-      this.updateGarmentCount();
-    }
-  }
-
-
-  normalizeWeightGarment(
-    garment: WeightGarment
-  ): void {
-
-    const value =
-      Number(garment.quantity);
-
-    garment.quantity =
-      !value || value < 0
-        ? 0
-        : Math.floor(value);
-
-    this.updateGarmentCount();
-  }
-
-
-updateGarmentCount(): void {
-
-  this.modalGarmentCount =
-    this.modalWeightGarments.reduce(
-      (
-        total: number,
-        garment: WeightGarment
-      ) =>
-        total +
-        Number(garment.quantity || 0),
-      0
-    );
-}
-
-
-/* ADD THIS METHOD HERE */
-onWeightGarmentQuantityChange(
-  garment: WeightGarment,
-  value: number | string
-): void {
-
-  if (
-    value === '' ||
-    value === null ||
-    value === undefined
-  ) {
-    garment.quantity = 0;
-    this.updateGarmentCount();
-    return;
-  }
-
-  const quantity = Number(value);
-
-  garment.quantity = Math.max(
-    0,
-    Math.min(
+  increaseModalGarmentCount(): void {
+    this.modalGarmentCount = Math.min(
       999,
-      Math.floor(
-        Number.isFinite(quantity)
-          ? quantity
-          : 0
-      )
-    )
-  );
+      Number(this.modalGarmentCount || 0) + 1
+    );
+  }
 
-  this.updateGarmentCount();
-}
+  decreaseModalGarmentCount(): void {
+    this.modalGarmentCount = Math.max(
+      1,
+      Number(this.modalGarmentCount || 1) - 1
+    );
+  }
+
+  onModalGarmentCountChange(value: number | string): void {
+    if (value === '' || value === null || value === undefined) {
+      this.modalGarmentCount = 1;
+      return;
+    }
+
+    const garmentCount = Number(value);
+
+    this.modalGarmentCount = Math.max(
+      1,
+      Math.min(
+        999,
+        Math.floor(Number.isFinite(garmentCount) ? garmentCount : 1)
+      )
+    );
+  }
 
 
   addConfiguredProduct():
@@ -2197,9 +2100,10 @@ private updateRetagOrder(): void {
       this.creatingOrder = false;
       this.createdOrderNumber = response.orderNumber;
 
-      if (this.retagWhatsappEnabled) {
-        this.openRetagWhatsApp(response);
-      }
+      // WhatsApp redirection temporarily disabled.
+      // if (this.retagWhatsappEnabled) {
+      //   this.openRetagWhatsApp(response);
+      // }
 
       this.router.navigate(['/app/b2c-orders']);
     },
@@ -3625,7 +3529,6 @@ private formatWhatsAppPhone(
   this.productComment = '';
   this.modalQuantity = 1;
   this.modalGarmentCount = 1;
-  this.modalWeightGarments = [];
   this.homeDelivery = false;
   this.expressDelivery = false;
   this.selectedExpressChargeId = null;
@@ -3662,14 +3565,8 @@ private formatWhatsAppPhone(
     this.selectedPreferences = [...item.preferences ];
     this.productComment = item.comment;
     this.modalQuantity = item.quantity;
-    this.modalGarmentCount = item.unit === 'KG'
-        ? Math.max(1, Number(item.garmentCount ?? 1))
-        : Math.max(1, Number(item.quantity));
-    if (item.unit === 'KG') {
-      this.initializeWeightGarments();
-    } else {
-      this.modalWeightGarments = [];
-    }
+    this.modalGarmentCount = 1;
+
     this.productModalOpen = true;
   }
 
