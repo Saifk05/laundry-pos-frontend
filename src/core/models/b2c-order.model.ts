@@ -51,6 +51,7 @@ export interface B2COrderCustomer {
 
 export interface B2COrderItem {
   id: string;
+  itemGroupId: string | null;
   productId: string;
   productName: string;
   typeId: string;
@@ -102,6 +103,7 @@ export interface B2COrderDetails {
 }
 
 export interface RetagOrderItemRequest {
+  itemGroupId: string;
   productId: string;
   typeId: string;
   serviceId: string;

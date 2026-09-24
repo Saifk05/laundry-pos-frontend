@@ -30,10 +30,11 @@ export class DashboardPage implements OnInit {
   confirmReadyOrder: DashboardOrder | null = null;
   updatingOrderId: string | null = null;
 
-  readonly daysPerLoad = 6;
+  readonly visibleDays = 6;
+  readonly paginationDays = 2;
 
-  private initialStartDate!: Date;
-  private loadedEndDate!: Date;
+  private windowStartDate!: Date;
+  private windowEndDate!: Date;
 
   constructor(
     private readonly apiService: ApiService,
@@ -44,10 +45,14 @@ export class DashboardPage implements OnInit {
   ngOnInit(): void {
     const today = this.startOfDay(new Date());
 
-    this.initialStartDate = this.addDays(today, -1);
-    this.loadedEndDate = this.addDays(
-      this.initialStartDate,
-      this.daysPerLoad - 1
+    this.windowStartDate = this.addDays(
+      today,
+      -1
+    );
+
+    this.windowEndDate = this.addDays(
+      this.windowStartDate,
+      this.visibleDays - 1
     );
 
     this.loadDashboard();
@@ -62,18 +67,27 @@ export class DashboardPage implements OnInit {
 
     this.apiService
       .getDashboard(
-        this.formatDate(this.initialStartDate),
-        this.formatDate(this.loadedEndDate)
+        this.formatDate(this.windowStartDate),
+        this.formatDate(this.windowEndDate)
       )
       .subscribe({
         next: (response: DashboardResponse) => {
           this.dashboard = response;
-          this.deliveryDays = response?.dates ?? [];
+
+          this.deliveryDays = [
+            ...(response?.dates ?? [])
+          ].reverse();
+
+          this.recalculateDashboardTotals();
+
           this.loading = false;
         },
 
         error: (error: HttpErrorResponse) => {
-          console.error('Dashboard load error:', error);
+          console.error(
+            'Dashboard load error:',
+            error
+          );
 
           this.dashboard = null;
           this.deliveryDays = [];
@@ -89,7 +103,7 @@ export class DashboardPage implements OnInit {
       });
   }
 
-  loadMoreDates(): void {
+  loadFutureDates(): void {
     if (
       this.loading ||
       this.loadingMore ||
@@ -99,42 +113,67 @@ export class DashboardPage implements OnInit {
     }
 
     const nextStartDate = this.addDays(
-      this.loadedEndDate,
-      1
+      this.windowStartDate,
+      this.paginationDays
     );
 
     const nextEndDate = this.addDays(
-      nextStartDate,
-      this.daysPerLoad - 1
+      this.windowEndDate,
+      this.paginationDays
     );
 
+    this.loadDateWindow(
+      nextStartDate,
+      nextEndDate
+    );
+  }
+
+  loadPreviousDates(): void {
+    if (
+      this.loading ||
+      this.loadingMore ||
+      this.updatingOrderId
+    ) {
+      return;
+    }
+
+    const previousStartDate = this.addDays(
+      this.windowStartDate,
+      -this.paginationDays
+    );
+
+    const previousEndDate = this.addDays(
+      this.windowEndDate,
+      -this.paginationDays
+    );
+
+    this.loadDateWindow(
+      previousStartDate,
+      previousEndDate
+    );
+  }
+
+  private loadDateWindow(
+    startDate: Date,
+    endDate: Date
+  ): void {
     this.loadingMore = true;
 
     this.apiService
       .getDashboard(
-        this.formatDate(nextStartDate),
-        this.formatDate(nextEndDate)
+        this.formatDate(startDate),
+        this.formatDate(endDate)
       )
       .subscribe({
         next: (response: DashboardResponse) => {
-          const newDates = response?.dates ?? [];
-
-          const existingDates = new Set(
-            this.deliveryDays.map(
-              day => day.deliveryDate
-            )
-          );
-
-          const uniqueNewDates = newDates.filter(
-            day => !existingDates.has(day.deliveryDate)
-          );
+          this.dashboard = response;
 
           this.deliveryDays = [
-            ...this.deliveryDays,
-            ...uniqueNewDates
-          ];
+            ...(response?.dates ?? [])
+          ].reverse();
 
-          this.loadedEndDate = nextEndDate;
+          this.windowStartDate = startDate;
+          this.windowEndDate = endDate;
 
           this.recalculateDashboardTotals();
 
@@ -143,7 +182,7 @@ export class DashboardPage implements OnInit {
 
         error: (error: HttpErrorResponse) => {
           console.error(
-            'Dashboard load more error:',
+            'Dashboard date load error:',
             error
           );
 
@@ -152,7 +191,7 @@ export class DashboardPage implements OnInit {
           void this.notificationService.error(
             this.getErrorMessage(
               error,
-              'Unable to load more delivery dates'
+              'Unable to load delivery dates'
             )
           );
         }

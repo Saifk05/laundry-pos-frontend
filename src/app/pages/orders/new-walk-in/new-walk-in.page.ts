@@ -23,9 +23,11 @@ import {
 } from '../../../../core/models/b2c-order.model';
 
 import { MapLocationResponse } from '../../../../core/models/pickup-delivery.model';
+import { IonItemGroup } from '@ionic/angular';
 
 interface SelectedOrderItem {
   id: string;
+  itemGroupId: string;
   productId: string;
   productName: string;
   typeId: string;
@@ -299,162 +301,137 @@ export class NewWalkInPage
   }
 
 
-private populateRetagOrder( order: B2COrderDetails): void {
-  this.retagOrderNumber =  order.orderNumber;
+  private generateItemGroupId(): string {
+  return crypto.randomUUID();
+}
+
+private populateRetagOrder(order: B2COrderDetails): void {
+  this.retagOrderNumber = order.orderNumber;
   this.customerId = order.customer.id;
   this.customerName = order.customer.name;
   this.customerPhone = order.customer.phone;
   this.customerExists = true;
   this.customerMessage = this.isEditMode
-      ? 'Existing order loaded for editing'
-      : this.isRescheduleMode
-        ? 'Existing order loaded for reschedule'
-        : 'Existing order loaded for re-tag';
+    ? 'Existing order loaded for editing'
+    : this.isRescheduleMode
+      ? 'Existing order loaded for reschedule'
+      : 'Existing order loaded for re-tag';
+
   this.deliveryDate = order.deliveryDate ?? '';
   this.deliveryTime = order.deliveryTime ?? '';
   this.homeDelivery = order.homeDelivery;
-  const groupedItems = new Map<string, SelectedOrderItem>();
-  for (const item of order.items ?? []) {
-    const product = this.products.find( currentProduct => currentProduct.id === item.productId);
-    const productType = product?.types.find( currentType => currentType.id === item.typeId );
-    const configuredService = productType?.services.find( service => service.id === item.serviceId );
-    const service = configuredService ??({
-        id: item.serviceId,
-        name:item.serviceName,
-        price: Number( item.unitPrice ),
-        active:true } as WalkInServicePrice);
 
-    const key = [ item.productId,
-      item.typeId, item.unit,
-      Number(item.quantity)
-    ].join('|');
+  const groupedItems = new Map<string, SelectedOrderItem>();
+
+  for (const item of order.items ?? []) {
+    const product = this.products.find(product => product.id === item.productId);
+    const productType = product?.types.find(type => type.id === item.typeId);
+    const configuredService = productType?.services.find(service => service.id === item.serviceId);
+
+    const service = configuredService ?? ({
+      id: item.serviceId,
+      name: item.serviceName,
+      price: Number(item.unitPrice),
+      active: true
+    } as WalkInServicePrice);
+
+    const itemGroupId = item.itemGroupId ?? item.id;
+    const key = itemGroupId;
 
     const existingItem = groupedItems.get(key);
+
     if (existingItem) {
-      if ( !existingItem.serviceIds.includes(item.serviceId)
-      ) {
-        existingItem.serviceIds.push( item.serviceId );
-      }
-      if ( !existingItem.serviceNames .includes(item.serviceName)
-      ) { existingItem.serviceNames.push( item.serviceName );
+      if (!existingItem.serviceIds.includes(item.serviceId)) {
+        existingItem.serviceIds.push(item.serviceId);
       }
 
-      if (
-        !existingItem.services.some(
-          currentService =>
-            currentService.id ===
-            service.id
-        )
-      ) {
-        existingItem.services.push(
-          service
+      if (!existingItem.serviceNames.includes(item.serviceName)) {
+        existingItem.serviceNames.push(item.serviceName);
+      }
+
+      if (!existingItem.services.some(currentService => currentService.id === service.id)) {
+        existingItem.services.push(service);
+      }
+
+      existingItem.unitPrice = existingItem.services.reduce(
+        (total, currentService) => total + Number(currentService.price),
+        0
+      );
+
+      existingItem.total = existingItem.unitPrice * existingItem.quantity;
+
+      if (item.unit === 'KG') {
+        existingItem.garmentCount = Math.max(
+          existingItem.garmentCount,
+          Number(item.garmentCount ?? 1)
         );
-      }
-
-      existingItem.unitPrice =
-        existingItem.services.reduce(
-          (
-            total,
-            currentService
-          ) =>
-            total +
-            Number(
-              currentService.price
-            ),
-          0
-        );
-
-      existingItem.total =
-        existingItem.unitPrice *
-        existingItem.quantity;
-
-      if (
-        item.unit === 'KG'
-      ) {
-        existingItem.garmentCount =
-          Math.max(
-            existingItem.garmentCount,
-            Number(
-              item.garmentCount ?? 1
-            )
-          );
       }
 
       continue;
     }
 
-    const quantity =  Number(item.quantity);
-    const garmentCount = item.unit === 'KG'
-        ? Math.max(
-            1, Number(
-              item.garmentCount ?? 1
-            )
-          )
-        : Math.max( 1,quantity);
+    const quantity = Number(item.quantity);
 
-    groupedItems.set(
-      key,
-      {
-        id: item.id,
-        productId: item.productId,
-        productName: item.productName,
-        typeId: item.typeId,
-        typeName: item.typeName,
-        serviceIds: [ item.serviceId ],
-        serviceNames: [ item.serviceName ],
-        services: [ service],
-        unitPrice: Number( service.price ),
-        quantity: quantity,
-        garmentCount: garmentCount,
-        unit: item.unit,
-        preferences: [],
-        comment: '',
-        total: Number(service.price) * quantity } as SelectedOrderItem
-    );
+    const garmentCount = item.unit === 'KG'
+      ? Math.max(1, Number(item.garmentCount ?? 1))
+      : Math.max(1, quantity);
+
+    groupedItems.set(key, {
+      id: item.id,
+      itemGroupId,
+      productId: item.productId,
+      productName: item.productName,
+      typeId: item.typeId,
+      typeName: item.typeName,
+      serviceIds: [item.serviceId],
+      serviceNames: [item.serviceName],
+      services: [service],
+      unitPrice: Number(service.price),
+      quantity,
+      garmentCount,
+      unit: item.unit,
+      preferences: [],
+      comment: '',
+      total: Number(service.price) * quantity
+    });
   }
 
-  this.orderItems = Array.from(
-      groupedItems.values()
-    );
+  this.orderItems = Array.from(groupedItems.values());
 
   this.discountAmount = 0;
   this.couponApplied = false;
   this.selectedCouponId = null;
   this.couponCode = '';
   this.couponDiscount = 0;
-  if ( order.couponCode) {
-    const coupon = this.coupons.find(
-        currentCoupon =>  currentCoupon.code ===
-          order.couponCode);
 
-    this.couponApplied =  true;
-    this.selectedCouponId =  coupon?.id ?? null;
+  if (order.couponCode) {
+    const coupon = this.coupons.find(
+      currentCoupon => currentCoupon.code === order.couponCode
+    );
+
+    this.couponApplied = true;
+    this.selectedCouponId = coupon?.id ?? null;
     this.couponCode = order.couponCode;
-    this.couponDiscount = Number(order.discountAmount ?? 0 );
+    this.couponDiscount = Number(order.discountAmount ?? 0);
   } else {
     this.discountAmount = Number(order.discountAmount ?? 0);
   }
 
-  const expressPercentage =
-    Number(
-      order.expressChargePercentage ??
-      0
-    );
+  const expressPercentage = Number(
+    order.expressChargePercentage ?? 0
+  );
 
   this.expressDelivery = expressPercentage > 0;
-  this.expressPercentage =  expressPercentage;
-  if (this.expressDelivery ) {
-    const expressCharge =
-      this.expressCharges.find(
-        charge =>
-          Number(
-            charge.percentage
-          ) ===
-          expressPercentage
-      );
+  this.expressPercentage = expressPercentage;
+
+  if (this.expressDelivery) {
+    const expressCharge = this.expressCharges.find(
+      charge => Number(charge.percentage) === expressPercentage
+    );
 
     this.selectedExpressChargeId = expressCharge?.id ?? null;
-  } else {this.selectedExpressChargeId = null;
+  } else {
+    this.selectedExpressChargeId = null;
   }
 }
 
@@ -822,128 +799,80 @@ decreaseModalQuantity(): void {
     );
   }
 
+addConfiguredProduct(): void {
+  if (!this.selectedProduct) return;
+  if (!this.selectedProductType) return;
+  if (this.selectedServiceIds.length === 0) return;
 
-  addConfiguredProduct():
-    void {
+  const selectedServices = this.availableServices.filter(
+    (service: WalkInServicePrice) =>
+      this.selectedServiceIds.includes(service.id)
+  );
 
-    if (
-      !this.selectedProduct
-    ) {
+  if (selectedServices.length === 0) return;
 
-      return;
-    }
-
-    if (
-      !this.selectedProductType
-    ) {
-
-      return;
-    }
-
-    if (
-      this.selectedServiceIds
-        .length === 0
-    ) {
-
-      return;
-    }
-
-    const selectedServices = this.availableServices
-        .filter((service: WalkInServicePrice) => this.selectedServiceIds
-              .includes(service.id));
-    if ( selectedServices.length === 0 ) { return; }
-    if ( this.selectedProduct.unit === 'KG' && this.modalGarmentCount <= 0 ) {
-      return;
-    }
-
-    const unitPrice = selectedServices
-        .reduce(( total: number, service: WalkInServicePrice ) =>
-            total + Number( service.price ), 0 );
-
-    const itemId =
-      this.editingOrderItemId ??
-      `${Date.now()}-${Math.random()}`;
-
-    const item: SelectedOrderItem = {
-      id: itemId,
-      productId: this.selectedProduct.id,
-      productName: this.selectedProduct.name,
-      typeId: this.selectedProductType.id,
-      typeName: this.selectedProductType.name,
-      serviceIds: selectedServices.map(
-          (
-            service:
-              WalkInServicePrice
-          ) =>
-            service.id
-        ),
-
-      serviceNames:
-        selectedServices.map(
-          (
-            service:
-              WalkInServicePrice
-          ) =>
-            service.name
-        ),
-
-      services:
-        selectedServices,
-
-      unitPrice:
-        unitPrice,
-
-      quantity:
-        this.modalQuantity,
-
-      garmentCount:
-        this.selectedProduct.unit === 'KG'
-          ? this.modalGarmentCount
-          : this.modalQuantity,
-
-      unit:
-        this.selectedProduct.unit,
-
-      preferences: [
-        ...this.selectedPreferences
-      ],
-
-      comment:
-        this.productComment
-          .trim(),
-
-      total:
-        unitPrice *
-        this.modalQuantity
-    };
-
-    if (
-      this.editingOrderItemId
-    ) {
-
-      this.orderItems =
-        this.orderItems.map(
-          (
-            existingItem:
-              SelectedOrderItem
-          ) =>
-            existingItem.id ===
-            this.editingOrderItemId
-              ? item
-              : existingItem
-        );
-
-    } else {
-
-      this.orderItems = [
-        ...this.orderItems,
-        item
-      ];
-    }
-
-    this.closeProductModal();
+  if (
+    this.selectedProduct.unit === 'KG' &&
+    this.modalGarmentCount <= 0
+  ) {
+    return;
   }
 
+  const unitPrice = selectedServices.reduce(
+    (total: number, service: WalkInServicePrice) =>
+      total + Number(service.price),
+    0
+  );
+
+  const existingItem = this.editingOrderItemId
+    ? this.orderItems.find(item => item.id === this.editingOrderItemId)
+    : null;
+
+  const itemId =
+    this.editingOrderItemId ??
+    `${Date.now()}-${Math.random()}`;
+
+  const itemGroupId =
+    existingItem?.itemGroupId ??
+    this.generateItemGroupId();
+
+  const item: SelectedOrderItem = {
+    id: itemId,
+    itemGroupId,
+    productId: this.selectedProduct.id,
+    productName: this.selectedProduct.name,
+    typeId: this.selectedProductType.id,
+    typeName: this.selectedProductType.name,
+    serviceIds: selectedServices.map(service => service.id),
+    serviceNames: selectedServices.map(service => service.name),
+    services: selectedServices,
+    unitPrice,
+    quantity: this.modalQuantity,
+    garmentCount:
+      this.selectedProduct.unit === 'KG'
+        ? this.modalGarmentCount
+        : this.modalQuantity,
+    unit: this.selectedProduct.unit,
+    preferences: [...this.selectedPreferences],
+    comment: this.productComment.trim(),
+    total: unitPrice * this.modalQuantity
+  };
+
+  if (this.editingOrderItemId) {
+    this.orderItems = this.orderItems.map(existingItem =>
+      existingItem.id === this.editingOrderItemId
+        ? item
+        : existingItem
+    );
+  } else {
+    this.orderItems = [
+      ...this.orderItems,
+      item
+    ];
+  }
+
+  this.closeProductModal();
+}
 
   increaseQuantity(
     item:
@@ -1640,6 +1569,123 @@ private formatLocalDate(
       false;
   }
 
+  createOrder(): void {
+  if (this.isEditMode) {
+    this.updateExistingOrder();
+    return;
+  }
+
+  if (this.isRetagMode) {
+    this.updateRetagOrder();
+    return;
+  }
+
+  if (this.isRescheduleMode) {
+    this.updateRescheduleOrder();
+    return;
+  }
+
+  if (!this.customerName.trim()) {
+    this.errorMessage = 'Customer name is required';
+    return;
+  }
+
+  if (!this.customerPhone.trim()) {
+    this.errorMessage = 'Customer phone is required';
+    return;
+  }
+
+  if (this.customerPhone.trim().length !== 10) {
+    this.errorMessage = 'Enter valid 10 digit mobile number';
+    return;
+  }
+
+  if (this.orderItems.length === 0) {
+    this.errorMessage = 'At least one product is required';
+    return;
+  }
+
+  if (!this.deliveryDate || !this.deliveryTime) {
+    this.errorMessage = 'Delivery date and time are required';
+    return;
+  }
+
+  if (this.expressDelivery && !this.selectedExpressChargeId) {
+    this.errorMessage = 'Select an express charge';
+    return;
+  }
+
+  const items: WalkInOrderRequest['items'] = [];
+
+  for (const item of this.orderItems) {
+    for (const service of item.services) {
+      items.push({
+        itemGroupId: item.itemGroupId,
+        productId: item.productId,
+        typeId: item.typeId,
+        serviceId: service.id,
+        quantity: item.quantity,
+        garmentCount:
+          item.unit === 'KG'
+            ? item.garmentCount
+            : null
+      });
+    }
+  }
+
+  const request: WalkInOrderRequest = {
+    customer: {
+      name: this.customerName.trim(),
+      phone: this.customerPhone.trim()
+    },
+    items,
+    couponId: this.selectedCouponId,
+    expressChargeId:
+      this.expressDelivery
+        ? this.selectedExpressChargeId
+        : null,
+    deliveryDate: this.deliveryDate,
+    deliveryTime: this.deliveryTime,
+    homeDelivery: this.homeDelivery,
+    deliveryAddress:
+      this.homeDelivery
+        ? this.pickupAddress.trim()
+        : null,
+    deliveryLatitude:
+      this.homeDelivery
+        ? this.pickupLatitude
+        : null,
+    deliveryLongitude:
+      this.homeDelivery
+        ? this.pickupLongitude
+        : null
+  };
+
+  this.creatingOrder = true;
+  this.errorMessage = '';
+
+  this.apiService.createWalkInOrder(request).subscribe({
+    next: (response: OrderResponse) => {
+      this.creatingOrder = false;
+      this.createdOrder = response;
+      this.createdOrderNumber = response.orderNumber;
+      this.orderCreated = true;
+
+      if (this.pickupId) {
+        this.createDeliveryFromPickup();
+      }
+    },
+
+    error: (error: any) => {
+      this.creatingOrder = false;
+      this.errorMessage =
+        error?.error?.message ||
+        error?.error?.error ||
+        'Unable to create order';
+    }
+  });
+}
+
 
   removeCoupon():
     void {
@@ -1692,220 +1738,6 @@ private formatLocalDate(
   });
 }
 
-  createOrder():
-    void {
-
-    this.errorMessage =
-      '';
-
-    if (this.isEditMode) {
-      this.updateExistingOrder();
-      return;
-    }
-
-    if (
-      this.isRescheduleMode
-    ) {
-
-      this.updateRescheduleOrder();
-
-      return;
-    }
-
-    if (
-      this.isRetagMode
-    ) {
-
-      this.updateRetagOrder();
-
-      return;
-    }
-
-    if (
-      !this.customerPhone
-        .trim()
-    ) {
-
-      this.errorMessage =
-        'Customer phone is required';
-
-      return;
-    }
-
-    if (
-      this.customerPhone
-        .trim()
-        .length !== 10
-    ) {
-
-      this.errorMessage =
-        'Enter valid 10 digit mobile number';
-
-      return;
-    }
-
-    if (
-      !this.customerName
-        .trim()
-    ) {
-
-      this.errorMessage =
-        'Customer name is required';
-
-      return;
-    }
-
-    if (
-      this.orderItems
-        .length === 0
-    ) {
-
-      this.errorMessage =
-        'Add at least one product';
-
-      return;
-    }
-
-    if (
-      !this.deliveryDate
-    ) {
-
-      this.errorMessage =
-        'Delivery date is required';
-
-      return;
-    }
-
-    if (
-      !this.deliveryTime
-    ) {
-
-      this.errorMessage =
-        'Delivery time is required';
-
-      return;
-    }
-
-    if (
-      this.expressDelivery &&
-      !this.selectedExpressChargeId
-    ) {
-
-      this.errorMessage =
-        'Select an express charge';
-
-      return;
-    }
-
-    const items:
-      WalkInOrderRequest['items'] =
-      [];
-
-    for (
-      const item
-      of this.orderItems
-    ) {
-
-      for (
-        const service
-        of item.services
-      ) {
-
-        items.push({
-          productId: item.productId,
-          typeId: item.typeId,
-          serviceId: service.id,
-          quantity: item.quantity,
-          garmentCount: item.unit === 'KG'
-            ? item.garmentCount
-            : null
-        });
-      }
-    }
-
-const request:
-  WalkInOrderRequest = {
-
-  customer: {
-
-    name:
-      this.customerName
-        .trim(),
-
-    phone:
-      this.customerPhone
-        .trim()
-
-  },
-
-  items:
-    items,
-
-  couponId:
-    this.selectedCouponId,
-
-  expressChargeId:
-    this.expressDelivery
-      ? this.selectedExpressChargeId
-      : null,
-
-  deliveryDate:
-    this.deliveryDate,
-
-  deliveryTime:
-    this.deliveryTime,
-
-  homeDelivery:
-    this.homeDelivery,
-
-  deliveryAddress:
-    this.homeDelivery ? this.pickupAddress.trim() : null,
-
-  deliveryLatitude:
-    this.homeDelivery ? this.pickupLatitude : null,
-
-  deliveryLongitude:
-    this.homeDelivery ? this.pickupLongitude : null
-
-};
-
-    this.creatingOrder =
-      true;
-
-    this.apiService
-      .createWalkInOrder(
-        request
-      )
-      .subscribe({
-
-        next: (response: OrderResponse) => {
-          this.createdOrder = response;
-          this.createdOrderNumber = response.orderNumber;
-          this.orderCreated = true;
-
-          if (this.pickupId) {
-            this.createDeliveryFromPickup();
-          } else {
-            this.creatingOrder = false;
-          }
-        },
-
-        error: (
-          error:
-            any
-        ) => {
-
-          this.creatingOrder =
-            false;
-
-          this.errorMessage =
-            error?.error?.message ||
-            error?.error?.error ||
-            'Unable to create order';
-        }
-
-      });
-  }
 
 
   private updateExistingOrder(): void {
@@ -1938,18 +1770,23 @@ const request:
       return;
     }
 
-    const items: WalkInOrderRequest['items'] = [];
-    for (const item of this.orderItems) {
-      for (const service of item.services) {
-        items.push({
-          productId: item.productId,
-          typeId: item.typeId,
-          serviceId: service.id,
-          quantity: item.quantity,
-          garmentCount: item.unit === 'KG' ? item.garmentCount : null
-        });
-      }
-    }
+const items: WalkInOrderRequest['items'] = [];
+
+for (const item of this.orderItems) {
+  for (const service of item.services) {
+    items.push({
+      itemGroupId: item.itemGroupId,
+      productId: item.productId,
+      typeId: item.typeId,
+      serviceId: service.id,
+      quantity: item.quantity,
+      garmentCount:
+        item.unit === 'KG'
+          ? item.garmentCount
+          : null
+    });
+  }
+}
 
     const request: WalkInOrderRequest = {
       customer: { name: this.customerName.trim(), phone: this.customerPhone.trim() },
@@ -2078,11 +1915,15 @@ private updateRetagOrder(): void {
   for (const item of this.orderItems) {
     for (const service of item.services) {
       items.push({
+        itemGroupId: item.itemGroupId,
         productId: item.productId,
         typeId: item.typeId,
         serviceId: service.id,
         quantity: item.quantity,
-        garmentCount: item.unit === 'KG' ? item.garmentCount : null
+        garmentCount:
+          item.unit === 'KG'
+            ? item.garmentCount
+            : null
       });
     }
   }
@@ -2095,18 +1936,21 @@ private updateRetagOrder(): void {
   this.creatingOrder = true;
   this.errorMessage = '';
 
-  this.apiService.retagB2COrder(this.retagOrderId, request).subscribe({
-    next: (response: B2COrderDetails) => {
-      this.creatingOrder = false;
-      this.createdOrderNumber = response.orderNumber;
+  this.apiService
+    .retagB2COrder(this.retagOrderId, request)
+    .subscribe({
+      next: (response: B2COrderDetails) => {
+        this.creatingOrder = false;
+        this.createdOrderNumber = response.orderNumber;
 
-      // WhatsApp redirection temporarily disabled.
-      // if (this.retagWhatsappEnabled) {
-      //   this.openRetagWhatsApp(response);
-      // }
+        // WhatsApp redirection temporarily disabled.
+        // if (this.retagWhatsappEnabled) {
+        //   this.openRetagWhatsApp(response);
+        // }
 
-      this.router.navigate(['/app/b2c-orders']);
-    },
+        this.router.navigate(['/app/b2c-orders']);
+      },
+
       error: (error: any) => {
         this.creatingOrder = false;
         this.errorMessage =
@@ -2115,7 +1959,7 @@ private updateRetagOrder(): void {
           'Unable to update re-tag order';
       }
     });
-  }
+}
 
   private openRetagWhatsApp(order: B2COrderDetails): void {
   const phone = this.formatWhatsAppPhone(order.customer?.phone || this.customerPhone);

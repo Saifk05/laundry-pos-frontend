@@ -71,6 +71,7 @@ export interface WalkInCustomerRequest {
 }
 
 export interface WalkInOrderItemRequest {
+  itemGroupId: string;
   productId: string;
   typeId: string;
   serviceId: string;
@@ -99,6 +100,7 @@ export interface OrderCustomerResponse {
 
 export interface OrderItemResponse {
   id: string;
+  itemGroupId: string;
   productId: string;
   productName: string;
   typeId: string;
