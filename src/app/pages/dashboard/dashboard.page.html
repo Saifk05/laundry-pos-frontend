@@ -1,9 +1,7 @@
 <div class="dashboard-page">
 
   <div class="dashboard-toolbar">
-    <button
-      type="button"
-      class="refresh-button"
+    <button type="button" class="refresh-button"
       [disabled]="loading || loadingMore"
       (click)="loadDashboard()">
       {{ loading ? 'Loading...' : '↻ Refresh' }}
@@ -24,8 +22,7 @@
   @if (!loading && deliveryDays.length > 0) {
     <div class="delivery-matrix-wrapper">
 
-      <div
-        class="delivery-matrix"
+      <div class="delivery-matrix"
         [style.--date-count]="deliveryDays.length">
 
         <!-- LEFT LABEL COLUMN -->
@@ -53,7 +50,7 @@
 
         </div>
 
-        <!-- FUTURE LOAD DETAIL COLUMN -->
+        <!-- FUTURE -->
         <div class="matrix-date-column load-detail-column">
 
           <div class="matrix-date-header">
@@ -61,21 +58,16 @@
           </div>
 
           <div class="matrix-total-cell"></div>
-
           <div class="matrix-processing-cell"></div>
-
           <div class="matrix-ready-cell"></div>
 
           <div class="matrix-orders load-detail-orders">
-
-            <button
-              type="button"
+            <button type="button"
               class="load-detail-button"
               [disabled]="loading || loadingMore || updatingOrderId"
               (click)="loadFutureDates()">
               {{ loadingMore ? 'Loading...' : 'LOAD DETAIL' }}
             </button>
-
           </div>
 
         </div>
@@ -109,8 +101,7 @@
 
               @for (order of day.orders; track order.id; let index = $index) {
 
-                <button
-                  type="button"
+                <button type="button"
                   class="matrix-order-row"
                   [class.processing-row]="isProcessingOrder(order)"
                   [class.ready-row]="isReadyOrder(order)"
@@ -130,6 +121,14 @@
                     (keydown.space)="openOrder(order, $event)">
                     {{ order.orderNumber }}
                   </span>
+
+                  @if (order.homeDelivery) {
+                    <img
+                      src="assets/icon/delivery-scooter.png"
+                      class="matrix-home-delivery-icon"
+                      alt="Home Delivery"
+                      title="Home Delivery">
+                  }
 
                   <span class="matrix-divider">-</span>
 
@@ -178,7 +177,7 @@
           </div>
         }
 
-        <!-- PREVIOUS LOAD DETAIL COLUMN -->
+        <!-- PREVIOUS -->
         <div class="matrix-date-column load-detail-column">
 
           <div class="matrix-date-header">
@@ -186,21 +185,16 @@
           </div>
 
           <div class="matrix-total-cell"></div>
-
           <div class="matrix-processing-cell"></div>
-
           <div class="matrix-ready-cell"></div>
 
           <div class="matrix-orders load-detail-orders">
-
-            <button
-              type="button"
+            <button type="button"
               class="load-detail-button"
               [disabled]="loading || loadingMore || updatingOrderId"
               (click)="loadPreviousDates()">
               {{ loadingMore ? 'Loading...' : 'LOAD DETAIL' }}
             </button>
-
           </div>
 
         </div>
@@ -212,19 +206,31 @@
 
   <!-- CUSTOMER DETAILS POPUP -->
   @if (selectedOrder) {
-    <div class="call-overlay" (click)="closeCallPopup()">
+    <div class="call-overlay"
+      (click)="closeCallPopup()">
 
-      <div class="call-popup" (click)="$event.stopPropagation()">
+      <div class="call-popup"
+        (click)="$event.stopPropagation()">
 
         <div class="call-popup-header">
 
           <div>
             <h2>Customer Details</h2>
-            <p>{{ selectedOrder.orderNumber }}</p>
+
+            <p>
+              {{ selectedOrder.orderNumber }}
+
+              @if (selectedOrder.homeDelivery) {
+                <span
+                  class="matrix-home-delivery-icon"
+                  title="Home Delivery">
+                  <ion-icon name="bicycle-outline"></ion-icon>
+                </span>
+              }
+            </p>
           </div>
 
-          <button
-            type="button"
+          <button type="button"
             class="popup-close"
             (click)="closeCallPopup()">
             ×
@@ -235,9 +241,11 @@
         <div class="call-popup-body">
 
           <div class="call-customer-avatar">
-            {{ selectedOrder.customerName
-              ? selectedOrder.customerName.charAt(0).toUpperCase()
-              : '?' }}
+            {{
+              selectedOrder.customerName
+                ? selectedOrder.customerName.charAt(0).toUpperCase()
+                : '?'
+            }}
           </div>
 
           <h3>{{ selectedOrder.customerName }}</h3>
@@ -271,19 +279,24 @@
 
           </div>
 
+          @if (selectedOrder.homeDelivery) {
+            <div class="home-delivery-info">
+              <ion-icon name="bicycle-outline"></ion-icon>
+              <span>Home Delivery</span>
+            </div>
+          }
+
         </div>
 
         <div class="call-popup-footer">
 
-          <button
-            type="button"
+          <button type="button"
             class="cancel-call-button"
             (click)="closeCallPopup()">
             Close
           </button>
 
-          <button
-            type="button"
+          <button type="button"
             class="call-now-button"
             (click)="callNow()">
             ☎ Call Customer
@@ -298,12 +311,10 @@
 
   <!-- MARK READY CONFIRMATION -->
   @if (confirmReadyOrder) {
-    <div
-      class="confirm-overlay"
+    <div class="confirm-overlay"
       (click)="closeReadyConfirmation()">
 
-      <div
-        class="confirm-popup"
+      <div class="confirm-popup"
         (click)="$event.stopPropagation()">
 
         <h3>Mark Order Ready?</h3>
@@ -318,16 +329,14 @@
 
         <div class="confirm-actions">
 
-          <button
-            type="button"
+          <button type="button"
             class="confirm-cancel"
             [disabled]="updatingOrderId === confirmReadyOrder.id"
             (click)="closeReadyConfirmation()">
             Cancel
           </button>
 
-          <button
-            type="button"
+          <button type="button"
             class="confirm-ready"
             [disabled]="updatingOrderId === confirmReadyOrder.id"
             (click)="confirmMarkReady()">

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { IonIcon } from '@ionic/angular/standalone';
 
 import { ApiService } from '../../../core/services/api.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -16,7 +17,7 @@ import {
   standalone: true,
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
-  imports: [CommonModule]
+  imports: [CommonModule, IonIcon]
 })
 export class DashboardPage implements OnInit {
 
@@ -45,10 +46,7 @@ export class DashboardPage implements OnInit {
   ngOnInit(): void {
     const today = this.startOfDay(new Date());
 
-    this.windowStartDate = this.addDays(
-      today,
-      -1
-    );
+    this.windowStartDate = this.addDays(today, -1);
 
     this.windowEndDate = this.addDays(
       this.windowStartDate,
@@ -59,9 +57,7 @@ export class DashboardPage implements OnInit {
   }
 
   loadDashboard(): void {
-    if (this.loading || this.loadingMore) {
-      return;
-    }
+    if (this.loading || this.loadingMore) return;
 
     this.loading = true;
 
@@ -73,21 +69,14 @@ export class DashboardPage implements OnInit {
       .subscribe({
         next: (response: DashboardResponse) => {
           this.dashboard = response;
-
-          this.deliveryDays = [
-            ...(response?.dates ?? [])
-          ].reverse();
+          this.deliveryDays = [...(response?.dates ?? [])].reverse();
 
           this.recalculateDashboardTotals();
-
           this.loading = false;
         },
 
         error: (error: HttpErrorResponse) => {
-          console.error(
-            'Dashboard load error:',
-            error
-          );
+          console.error('Dashboard load error:', error);
 
           this.dashboard = null;
           this.deliveryDays = [];
@@ -167,16 +156,12 @@ export class DashboardPage implements OnInit {
       .subscribe({
         next: (response: DashboardResponse) => {
           this.dashboard = response;
-
-          this.deliveryDays = [
-            ...(response?.dates ?? [])
-          ].reverse();
+          this.deliveryDays = [...(response?.dates ?? [])].reverse();
 
           this.windowStartDate = startDate;
           this.windowEndDate = endDate;
 
           this.recalculateDashboardTotals();
-
           this.loadingMore = false;
         },
 
@@ -230,10 +215,17 @@ export class DashboardPage implements OnInit {
     return order.status === 'PROCESSING_AT_STORE';
   }
 
+  isHomeDelivery(order: DashboardOrder): boolean {
+    return order.homeDelivery === true;
+  }
+
   getStatusLabel(order: DashboardOrder): string {
     switch (order.status) {
       case 'NEW_ORDER':
         return 'New Order';
+
+      case 'TAGGED':
+        return 'Tagged';
 
       case 'PROCESSING_AT_STORE':
         return 'Processing';
@@ -273,9 +265,7 @@ export class DashboardPage implements OnInit {
   }
 
   callNow(): void {
-    if (!this.selectedOrder) {
-      return;
-    }
+    if (!this.selectedOrder) return;
 
     if (!this.selectedOrder.mobile) {
       void this.notificationService.warning(
@@ -337,17 +327,13 @@ export class DashboardPage implements OnInit {
   }
 
   closeReadyConfirmation(): void {
-    if (this.updatingOrderId) {
-      return;
-    }
+    if (this.updatingOrderId) return;
 
     this.confirmReadyOrder = null;
   }
 
   confirmMarkReady(): void {
-    if (!this.confirmReadyOrder) {
-      return;
-    }
+    if (!this.confirmReadyOrder) return;
 
     this.updateOrderToReady(
       this.confirmReadyOrder
@@ -369,9 +355,7 @@ export class DashboardPage implements OnInit {
   private updateOrderToReady(
     order: DashboardOrder
   ): void {
-    if (this.updatingOrderId) {
-      return;
-    }
+    if (this.updatingOrderId) return;
 
     this.updatingOrderId = order.id;
 
@@ -411,9 +395,7 @@ export class DashboardPage implements OnInit {
   }
 
   private recalculateDashboardTotals(): void {
-    if (!this.dashboard) {
-      return;
-    }
+    if (!this.dashboard) return;
 
     this.dashboard = {
       ...this.dashboard,
