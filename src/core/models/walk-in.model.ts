@@ -63,6 +63,9 @@ export interface CustomerResponse {
   id: string | null;
   name: string | null;
   phone: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface WalkInCustomerRequest {

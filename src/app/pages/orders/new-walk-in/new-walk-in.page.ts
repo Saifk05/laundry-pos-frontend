@@ -442,43 +442,89 @@ private populateRetagOrder(order: B2COrderDetails): void {
   }
 
   checkCustomer(): void {
-    const phone =  this.customerPhone.trim();
-    if (!phone) { this.resetCustomerLookup();
-      return;
-    }
 
-    if (phone.length !== 10) {
-      this.customerMessage = 'Enter valid 10 digit mobile number';
-      return;
-    }
-    this.checkingCustomer = true;
-    this.customerMessage = '';
-    this.apiService .getCustomerByPhone(phone)
-      .subscribe({ next: ( response: CustomerResponse ) => {
-          this.checkingCustomer = false;
-          this.customerExists = response.exists;
-          this.customerId = response.id;
-          if ( response.exists && response.name) {
-            this.customerName = response.name;
-            this.customerMessage = 'Existing customer found';
-          } else {
-            this.customerId = null;
-            this.customerExists = false;
-            this.customerName = '';
-            this.customerMessage ='New customer';
-          }},
-        error: (error: any) => {
-          this.checkingCustomer = false;
-          this.customerExists = false;
-          this.customerId = null;
-          if ( error.status === 404) {
-            this.customerName = '';
-            this.customerMessage = 'New customer';
-            return;
-          }
-          this.customerMessage ='Unable to check customer';
-        }});
+  const phone = this.customerPhone.trim();
+
+  if (!phone) {
+    this.resetCustomerLookup();
+    return;
   }
+
+  if (phone.length !== 10) {
+    this.customerMessage = 'Enter valid 10 digit mobile number';
+    return;
+  }
+
+  this.checkingCustomer = true;
+  this.customerMessage = '';
+
+  this.apiService
+    .getCustomerByPhone(phone)
+    .subscribe({
+
+      next: (response: CustomerResponse) => {
+
+        this.checkingCustomer = false;
+        this.customerExists = response.exists;
+        this.customerId = response.id;
+
+        if (response.exists && response.name) {
+
+          // Existing customer
+          this.customerName = response.name;
+
+          // Load saved customer address + coordinates
+          this.pickupAddress = response.address ?? '';
+          this.pickupLatitude = response.latitude ?? null;
+          this.pickupLongitude = response.longitude ?? null;
+
+          // Clear old Google Maps input/suggestions
+          this.googleMapsLink = '';
+          this.locationSuggestions = [];
+
+          this.customerMessage = 'Existing customer found';
+
+        } else {
+
+          // New customer
+          this.customerId = null;
+          this.customerExists = false;
+          this.customerName = '';
+
+          // Clear previous customer's location
+          this.pickupAddress = '';
+          this.pickupLatitude = null;
+          this.pickupLongitude = null;
+          this.googleMapsLink = '';
+          this.locationSuggestions = [];
+
+          this.customerMessage = 'New customer';
+        }
+      },
+
+      error: (error: any) => {
+
+        this.checkingCustomer = false;
+        this.customerExists = false;
+        this.customerId = null;
+
+        // Clear previous customer data
+        this.customerName = '';
+        this.pickupAddress = '';
+        this.pickupLatitude = null;
+        this.pickupLongitude = null;
+        this.googleMapsLink = '';
+        this.locationSuggestions = [];
+
+        if (error.status === 404) {
+          this.customerMessage = 'New customer';
+          return;
+        }
+
+        this.customerMessage = 'Unable to check customer';
+      }
+    });
+}
 
   private resetCustomerLookup(): void {
     this.customerId = null;
