@@ -468,68 +468,146 @@ private toViewOrder( order: B2COrder ): B2cOrderView {
     this.storageModalMode = 'MARK_READY';
   }
 
+  // confirmMarkReady(): void {
+  //   if (!this.selectedReadyOrder) {
+  //     return;
+  //   }
+
+  //   const storageLabel = this.readyStorageLabel.trim();
+  //   if (!storageLabel) {
+  //     this.readyStorageError = 'Storage label is required';
+  //     return;
+  //   }
+
+  //   this.readyStorageError = '';
+  //   this.errorMessage = '';
+  //   this.actionLoading = true;
+  //   const orderId = this.selectedReadyOrder.id;
+  //   this.apiService.updateB2CStorageLabel(orderId, storageLabel).subscribe({
+  //     next: (storageResponse: B2COrder) => {
+  //       this.updateLocalOrder(storageResponse);
+  //       this.apiService.markB2COrderReady(orderId).subscribe({
+  //         next: (readyResponse: B2COrder) => {
+  //           const readyOrder: B2cOrderView = {
+  //             id: readyResponse.id,
+  //             orderNumber: readyResponse.orderNumber,
+  //             status: readyResponse.status,
+  //             customerName: readyResponse.customerName,
+  //             mobile: readyResponse.mobile,
+  //             storageLabel: readyResponse.storageLabel ?? '-',
+  //             pickupDate: readyResponse.pickupDate ?? '-',
+  //             pickupSlot: readyResponse.pickupTime ?? '-',
+  //             deliveryDate: readyResponse.deliveryDate ?? '-',
+  //             deliverySlot: readyResponse.deliveryTime ?? '-',
+  //             amount: Number(readyResponse.totalAmount ?? 0),
+  //             homeDelivery: readyResponse.homeDelivery,
+  //             expressDelivery: readyResponse.expressDelivery,
+  //             settled: readyResponse.settled,
+  //             createdAt: readyResponse.createdAt,
+  //             updatedAt: readyResponse.updatedAt,
+  //             moreOpen: false
+  //           };
+
+  //           this.updateLocalOrder(readyResponse);
+  //           this.actionLoading = false;
+  //           this.readyStorageModalOpen = false;
+  //           this.selectedReadyOrder = null;
+  //           this.readyStorageLabel = '';
+  //           this.readyStorageError = '';
+
+  //           // WhatsApp ready template is sent automatically by the backend.
+  //           // this.openReadyWhatsApp(readyOrder);
+  //         },
+  //         error: (error: any) => {
+  //           this.actionLoading = false;
+  //           this.readyStorageError = error?.error?.message || error?.error?.error || 'Storage label saved, but unable to mark order ready';
+  //         }});
+  //     },
+  //     error: (error: any) => {
+  //       this.actionLoading = false;
+  //       this.readyStorageError = error?.error?.message || error?.error?.error || 'Unable to update storage label';
+  //     }});
+  // }
+
+
   confirmMarkReady(): void {
-    if (!this.selectedReadyOrder) {
-      return;
-    }
-
-    const storageLabel = this.readyStorageLabel.trim();
-    if (!storageLabel) {
-      this.readyStorageError = 'Storage label is required';
-      return;
-    }
-
-    this.readyStorageError = '';
-    this.errorMessage = '';
-    this.actionLoading = true;
-    const orderId = this.selectedReadyOrder.id;
-    this.apiService.updateB2CStorageLabel(orderId, storageLabel).subscribe({
-      next: (storageResponse: B2COrder) => {
-        this.updateLocalOrder(storageResponse);
-        this.apiService.markB2COrderReady(orderId).subscribe({
-          next: (readyResponse: B2COrder) => {
-            const readyOrder: B2cOrderView = {
-              id: readyResponse.id,
-              orderNumber: readyResponse.orderNumber,
-              status: readyResponse.status,
-              customerName: readyResponse.customerName,
-              mobile: readyResponse.mobile,
-              storageLabel: readyResponse.storageLabel ?? '-',
-              pickupDate: readyResponse.pickupDate ?? '-',
-              pickupSlot: readyResponse.pickupTime ?? '-',
-              deliveryDate: readyResponse.deliveryDate ?? '-',
-              deliverySlot: readyResponse.deliveryTime ?? '-',
-              amount: Number(readyResponse.totalAmount ?? 0),
-              homeDelivery: readyResponse.homeDelivery,
-              expressDelivery: readyResponse.expressDelivery,
-              settled: readyResponse.settled,
-              createdAt: readyResponse.createdAt,
-              updatedAt: readyResponse.updatedAt,
-              moreOpen: false
-            };
-
-            this.updateLocalOrder(readyResponse);
-            this.actionLoading = false;
-            this.readyStorageModalOpen = false;
-            this.selectedReadyOrder = null;
-            this.readyStorageLabel = '';
-            this.readyStorageError = '';
-
-            // WhatsApp ready template is sent automatically by the backend.
-            // this.openReadyWhatsApp(readyOrder);
-          },
-          error: (error: any) => {
-            this.actionLoading = false;
-            this.readyStorageError = error?.error?.message || error?.error?.error || 'Storage label saved, but unable to mark order ready';
-          }});
-      },
-      error: (error: any) => {
-        this.actionLoading = false;
-        this.readyStorageError = error?.error?.message || error?.error?.error || 'Unable to update storage label';
-      }});
+  if (!this.selectedReadyOrder) {
+    return;
   }
 
+  const storageLabel = this.readyStorageLabel.trim();
 
+  if (!storageLabel) {
+    this.readyStorageError = 'Storage label is required';
+    return;
+  }
+
+  const whatsappTab = window.open('', '_blank');
+
+  this.readyStorageError = '';
+  this.errorMessage = '';
+  this.actionLoading = true;
+
+  const orderId = this.selectedReadyOrder.id;
+
+  this.apiService.updateB2CStorageLabel(orderId, storageLabel).subscribe({
+    next: (storageResponse: B2COrder) => {
+      this.updateLocalOrder(storageResponse);
+
+      this.apiService.markB2COrderReady(orderId).subscribe({
+        next: (readyResponse: B2COrder) => {
+          const readyOrder: B2cOrderView = {
+            id: readyResponse.id,
+            orderNumber: readyResponse.orderNumber,
+            status: readyResponse.status,
+            customerName: readyResponse.customerName,
+            mobile: readyResponse.mobile,
+            storageLabel: readyResponse.storageLabel ?? '-',
+            pickupDate: readyResponse.pickupDate ?? '-',
+            pickupSlot: readyResponse.pickupTime ?? '-',
+            deliveryDate: readyResponse.deliveryDate ?? '-',
+            deliverySlot: readyResponse.deliveryTime ?? '-',
+            amount: Number(readyResponse.totalAmount ?? 0),
+            homeDelivery: readyResponse.homeDelivery,
+            expressDelivery: readyResponse.expressDelivery,
+            settled: readyResponse.settled,
+            createdAt: readyResponse.createdAt,
+            updatedAt: readyResponse.updatedAt,
+            moreOpen: false
+          };
+
+          this.updateLocalOrder(readyResponse);
+          this.actionLoading = false;
+          this.readyStorageModalOpen = false;
+          this.selectedReadyOrder = null;
+          this.readyStorageLabel = '';
+          this.readyStorageError = '';
+
+          // WhatsApp ready template is sent automatically by the backend.
+          // this.openReadyWhatsApp(readyOrder);
+
+          this.openReadyWhatsApp(readyOrder, whatsappTab);
+        },
+        error: (error: any) => {
+          whatsappTab?.close();
+          this.actionLoading = false;
+          this.readyStorageError =
+            error?.error?.message ||
+            error?.error?.error ||
+            'Storage label saved, but unable to mark order ready';
+        }
+      });
+    },
+    error: (error: any) => {
+      whatsappTab?.close();
+      this.actionLoading = false;
+      this.readyStorageError =
+        error?.error?.message ||
+        error?.error?.error ||
+        'Unable to update storage label';
+    }
+  });
+}
 
 
 
@@ -940,6 +1018,7 @@ private openReadyWhatsApp(order: B2cOrderView, whatsappTab: Window | null): void
 
 private printReceipt(order: B2COrderDetails): void {
   const termsAndConditions = localStorage.getItem('receiptTermsAndConditions') ?? '';
+
   const escapedTermsAndConditions = termsAndConditions
     .split(/\r?\n/)
     .map(line => line.trim())
@@ -959,13 +1038,7 @@ private printReceipt(order: B2COrderDetails): void {
   }>();
 
   for (const item of order.items ?? []) {
-    const key = [
-      item.productName,
-      item.typeName ?? '',
-      item.unit,
-      Number(item.quantity)
-    ].join('|');
-
+    const key = item.itemGroupId ?? item.id;
     const existing = groupedItems.get(key);
 
     if (existing) {
@@ -974,12 +1047,14 @@ private printReceipt(order: B2COrderDetails): void {
         existing.unitPrice += Number(item.unitPrice ?? 0);
         existing.lineTotal += Number(item.lineTotal ?? 0);
       }
+
       if (item.unit === 'KG') {
         existing.garmentCount = Math.max(
           existing.garmentCount,
           Number(item.garmentCount ?? 0)
         );
       }
+
       continue;
     }
 
@@ -1061,10 +1136,12 @@ private printReceipt(order: B2COrderDetails): void {
           <div class="row"><span>Order</span><strong>${order.orderNumber}</strong></div>
           <div class="row"><span>Customer</span><strong>${order.customer.name}</strong></div>
           <div class="row"><span>Mobile</span><strong>${order.customer.phone}</strong></div>
+
           <div class="row">
             <span>Created At</span>
             <strong>${new Date(order.createdAt).toLocaleDateString('en-GB')}</strong>
           </div>
+
           <div class="row">
             <span>Delivered Date</span>
             <strong>
@@ -1111,14 +1188,17 @@ private printReceipt(order: B2COrderDetails): void {
 
           ${Number(order.taxAmount ?? 0) > 0 ? `
             <div class="divider"></div>
+
             <div class="row tax-row">
               <span>CGST (${Number(order.cgstPercentage ?? 0).toFixed(2)}%)</span>
               <strong>₹${Number(order.cgstAmount ?? 0).toFixed(2)}</strong>
             </div>
+
             <div class="row tax-row">
               <span>SGST (${Number(order.sgstPercentage ?? 0).toFixed(2)}%)</span>
               <strong>₹${Number(order.sgstAmount ?? 0).toFixed(2)}</strong>
             </div>
+
             <div class="row tax-row">
               <span>Total GST</span>
               <strong>₹${Number(order.taxAmount ?? 0).toFixed(2)}</strong>
@@ -1154,73 +1234,65 @@ private printReceipt(order: B2COrderDetails): void {
   printWindow.focus();
 }
 
-
-private printQrTags(order: B2COrderDetails ): void {
+private printQrTags(order: B2COrderDetails): void {
   const deliveryDate = order.deliveryDate
-      ? new Date(order.deliveryDate + 'T00:00:00')
-      : null;
+    ? new Date(order.deliveryDate + 'T00:00:00')
+    : null;
 
-  const formattedDate = deliveryDate ? deliveryDate.toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-          } )
-      : '-';
+  const formattedDate = deliveryDate
+    ? deliveryDate.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      })
+    : '-';
 
-  const groupedItems = new Map< string, {
-        productName: string;
-        typeName: string;
-        unit: string;
-        quantity: number;
-        garmentCount: number;
-        serviceNames: string[];
-      } >();
+  const groupedItems = new Map<string, {
+    productName: string;
+    typeName: string;
+    unit: string;
+    quantity: number;
+    garmentCount: number;
+    serviceNames: string[];
+  }>();
 
-  for (const item of order.items) {
-
-    const key = [
-      item.productName,
-      item.typeName ?? '',
-      item.unit,
-      Number(item.quantity)].join('|');
+  for (const item of order.items ?? []) {
+    const key = item.itemGroupId ?? item.id;
     const existingItem = groupedItems.get(key);
+
     if (existingItem) {
-      if ( !existingItem.serviceNames.includes(item.serviceName)) {
-        existingItem.serviceNames.push( item.serviceName);
-      } continue;
+      if (!existingItem.serviceNames.includes(item.serviceName)) {
+        existingItem.serviceNames.push(item.serviceName);
+      }
+
+      if (item.unit === 'KG') {
+        existingItem.garmentCount = Math.max(
+          existingItem.garmentCount,
+          Number(item.garmentCount ?? 0)
+        );
+      }
+
+      continue;
     }
 
-    groupedItems.set(key,
-      {
-        productName: item.productName,
-        typeName: item.typeName ?? '',
-        unit: item.unit,
-        quantity: Number(item.quantity),
-        garmentCount:item.unit === 'KG'
-            ? Math.max(1, Number( item.garmentCount ?? 1))
-            : Math.max( 1,Number(item.quantity)),
-        serviceNames: [ item.serviceName ]});
+    groupedItems.set(key, {
+      productName: item.productName,
+      typeName: item.typeName ?? '',
+      unit: item.unit,
+      quantity: Number(item.quantity),
+      garmentCount: item.unit === 'KG'
+        ? Math.max(1, Number(item.garmentCount ?? 1))
+        : Math.max(1, Number(item.quantity)),
+      serviceNames: [item.serviceName]
+    });
   }
 
-  const groupedOrderItems = Array.from( groupedItems.values());
-  const totalItemCount = groupedOrderItems.reduce(( total, item ) => {
-        if ( item.unit === 'KG') {
-          return ( total + Math.max( 1, Number( item.garmentCount ?? 1
-              ))
-          );}
-        return (total + Math.max( 1, Math.floor( Number( item.quantity ?? 1
-              ))
-          ));
-      }, 0
-    );
+  const groupedOrderItems = Array.from(groupedItems.values());
 
-  const getServiceCode = ( serviceName: string ): string => {
-    const normalized = serviceName
-        .trim()
-        .toLowerCase();
+  const getServiceCode = (serviceName: string): string => {
+    const normalized = serviceName.trim().toLowerCase();
 
-    const serviceCodeMap:
-      Record<string, string> = {
+    const serviceCodeMap: Record<string, string> = {
       'starching': 'ST',
       'dry clean': 'DC',
       'steam press': 'SP',
@@ -1230,384 +1302,318 @@ private printQrTags(order: B2COrderDetails ): void {
       'wash and fold': 'WF'
     };
 
-    if ( serviceCodeMap[ normalized]) {
-      return serviceCodeMap[ normalized ];
+    if (serviceCodeMap[normalized]) {
+      return serviceCodeMap[normalized];
     }
 
     return serviceName
       .split(' ')
-      .filter(
-        word =>
-          word.trim()
-      )
-      .map( word => word
-            .charAt(0)
-            .toUpperCase()
-      ) .join('');
+      .filter(word => word.trim())
+      .map(word => word.charAt(0).toUpperCase())
+      .join('');
   };
 
+  const totalItemCount = groupedOrderItems.reduce((total, item) => {
+    const count = item.unit === 'KG'
+      ? Math.max(1, Number(item.garmentCount ?? 1))
+      : Math.max(1, Math.floor(Number(item.quantity ?? 1)));
+
+    return total + count;
+  }, 0);
+
   let tagsHtml = '';
-  for ( const item of groupedOrderItems ) {
-    const typeName = item.typeName && item.typeName
-        .toLowerCase() !== 'default'
+
+  for (const item of groupedOrderItems) {
+    const typeName =
+      item.typeName &&
+      item.typeName.toLowerCase() !== 'default'
         ? item.typeName
         : '';
 
     const productDisplay = typeName
-        ? `${item.productName} (${typeName})`
-        : item.productName;
+      ? `${item.productName} (${typeName})`
+      : item.productName;
 
     const serviceCode = item.serviceNames
-        .map( serviceName => getServiceCode( serviceName ))
-        .join('<span class="service-divider">|</span>');
+      .map(serviceName => getServiceCode(serviceName))
+      .join('<span class="service-divider">|</span>');
 
     const tagCount = item.unit === 'KG'
-        ? Math.max( 1, Number( item.garmentCount ?? 1 ))
-        : Math.max( 1, Math.floor( Number( item.quantity ?? 1 )));
+      ? Math.max(1, Number(item.garmentCount ?? 1))
+      : Math.max(1, Math.floor(Number(item.quantity ?? 1)));
 
-    const isShoes = item.productName
-        .trim()
-        .toLowerCase() === 'shoes';
+    const isShoes =
+      item.productName.trim().toLowerCase() === 'shoes';
 
     if (isShoes) {
+      for (let shoeIndex = 1; shoeIndex <= tagCount; shoeIndex++) {
+        const sideLabels = ['Left', 'Right'];
 
-      for (
-        let shoeIndex = 1;
-        shoeIndex <= tagCount;
-        shoeIndex++
-      ) {
-
-        const sideLabels = [ 'Left', 'Right' ];
-        for ( const sideLabel of sideLabels) {
+        for (const sideLabel of sideLabels) {
           tagsHtml += `
             <section class="tag">
-              <div class="business-name">
-                ${this.businessName}
-              </div>
-              <div class="customer-name">
-                ${order.customer.name}
-              </div>
-              <div class="order-number">
-                #${order.orderNumber}
-              </div>
-              <div class="order-date">
-                ${formattedDate}
-              </div>
+              <div class="business-name">${this.businessName}</div>
+              <div class="customer-name">${order.customer.name}</div>
+              <div class="order-number">#${order.orderNumber}</div>
+              <div class="order-date">${formattedDate}</div>
+
               <div class="service-code">
                 ${serviceCode}
               </div>
+
               <div class="product-name">
                 ${productDisplay}
               </div>
+
+              <div class="shoe-side-label">
+                ${sideLabel}
+              </div>
+
               <div class="tag-number">
                 T${totalItemCount}
               </div>
             </section>
-          `; }} continue;
+          `;
+        }
+      }
+
+      continue;
     }
 
-    for ( let index = 1; index <= tagCount; index++ ) {
+    for (let index = 1; index <= tagCount; index++) {
       tagsHtml += `
         <section class="tag">
-          <div class="business-name">
-            ${this.businessName}
-          </div>
-          <div class="customer-name">
-            ${order.customer.name}
-          </div>
-          <div class="order-number">
-            #${order.orderNumber}
-          </div>
-          <div class="order-date">
-            ${formattedDate}
-          </div>
+          <div class="business-name">${this.businessName}</div>
+          <div class="customer-name">${order.customer.name}</div>
+          <div class="order-number">#${order.orderNumber}</div>
+          <div class="order-date">${formattedDate}</div>
+
           <div class="service-code">
             ${serviceCode}
           </div>
+
           <div class="product-name">
             ${productDisplay}
           </div>
+
           <div class="tag-number">
             T${totalItemCount}
           </div>
         </section>
       `;
-    }}
+    }
+  }
 
   const printWindow = window.open(
-      '',
-      '_blank',
-      `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
-    );
+    '',
+    '_blank',
+    `width=${screen.availWidth},height=${screen.availHeight},left=0,top=0`
+  );
 
-  if (!printWindow) {
-    return;
-  }
+  if (!printWindow) return;
 
   printWindow.document.write(`
     <!DOCTYPE html>
-
     <html>
-
       <head>
-
         <meta charset="UTF-8">
 
-        <title>
-          Re-print Tags
-        </title>
+        <title>Re-print Tags</title>
 
         <style>
-
-          @page {
-            size: 50mm 70mm;
-            margin: 0;
+          @page{
+            size:50mm 70mm;
+            margin:0;
           }
 
-          * {
-            box-sizing: border-box;
+          *{
+            box-sizing:border-box;
           }
 
           html,
-          body {
-            width: 50mm;
-            margin: 0;
-            padding: 0;
-            background: #ffffff;
+          body{
+            width:50mm;
+            margin:0;
+            padding:0;
+            background:#ffffff;
           }
 
-          body {
-            font-family:
-              Arial,
-              Helvetica,
-              sans-serif;
-
-            color: #000000;
+          body{
+            font-family:Arial,Helvetica,sans-serif;
+            color:#000000;
           }
 
-          .tags {
-            width: 50mm;
-            margin: 0;
-            padding: 0;
+          .tags{
+            width:50mm;
+            margin:0;
+            padding:0;
           }
 
-          .tag {
-            width: 50mm;
-            height: 70mm;
-
-            margin: 0;
-            padding: 3mm 3mm;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            text-align: center;
-
-            overflow: hidden;
-
-            break-after: page;
-            page-break-after: always;
+          .tag{
+            width:50mm;
+            height:70mm;
+            margin:0;
+            padding:3mm 3mm;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            text-align:center;
+            overflow:hidden;
+            break-after:page;
+            page-break-after:always;
           }
 
-          .tag:last-child {
-            break-after: auto;
-            page-break-after: auto;
+          .tag:last-child{
+            break-after:auto;
+            page-break-after:auto;
           }
 
-          .business-name {
-            width: 100%;
-
-            font-size: 12px;
-            line-height: 1.15;
-            font-weight: 700;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          .business-name{
+            width:100%;
+            font-size:12px;
+            line-height:1.15;
+            font-weight:700;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
           }
 
-          .customer-name {
-            width: 100%;
-            margin-top: 3mm;
-
-            font-size: 13px;
-            line-height: 1.15;
-            font-weight: 700;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          .customer-name{
+            width:100%;
+            margin-top:3mm;
+            font-size:13px;
+            line-height:1.15;
+            font-weight:700;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
           }
 
-          .order-number {
-            margin-top: 1.8mm;
-
-            font-size: 19px;
-            line-height: 1;
-            font-weight: 800;
+          .order-number{
+            margin-top:1.8mm;
+            font-size:19px;
+            line-height:1;
+            font-weight:800;
           }
 
-          .order-date {
-            margin-top: 1.8mm;
-
-            font-size: 12px;
-            line-height: 1.1;
-            font-weight: 700;
+          .order-date{
+            margin-top:1.8mm;
+            font-size:12px;
+            line-height:1.1;
+            font-weight:700;
           }
 
-          .service-code {
-            min-width: 20mm;
-            min-height: 11mm;
-
-            margin-top: 3.5mm;
-            padding: 1.5mm 2mm;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border:
-              1.5px solid
-              #000000;
-
-            font-size: 14px;
-            line-height: 1;
-            font-weight: 800;
-
-            white-space: nowrap;
+          .service-code{
+            min-width:20mm;
+            min-height:11mm;
+            margin-top:3.5mm;
+            padding:1.5mm 2mm;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:1.5px solid #000000;
+            font-size:14px;
+            line-height:1;
+            font-weight:800;
+            white-space:nowrap;
           }
 
-          .service-divider {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            margin: 0 2mm;
-
-            font-size: 22px;
-            line-height: 1;
-            font-weight: 500;
-
-            transform:
-              scaleY(1.25);
+          .service-divider{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            margin:0 2mm;
+            font-size:22px;
+            line-height:1;
+            font-weight:500;
+            transform:scaleY(1.25);
           }
 
-          .product-name {
-            width: 100%;
-
-            margin-top: 4mm;
-
-            font-size: 14px;
-            line-height: 1.25;
-            font-weight: 700;
-
-            text-transform:
-              capitalize;
-
-            overflow: visible;
-            white-space: normal;
+          .product-name{
+            width:100%;
+            margin-top:4mm;
+            font-size:14px;
+            line-height:1.25;
+            font-weight:700;
+            text-transform:capitalize;
+            overflow:visible;
+            white-space:normal;
           }
 
-          .shoe-side-label {
-            margin-top: 2mm;
-            padding: 1mm 4mm;
-
-            border-radius: 10mm;
-
-            background: #000000;
-            color: #ffffff;
-
-            font-size: 10px;
-            line-height: 1.1;
-            font-weight: 800;
-
-            text-transform: uppercase;
-            white-space: nowrap;
+          .shoe-side-label{
+            margin-top:2mm;
+            padding:1mm 4mm;
+            border-radius:10mm;
+            background:#000000;
+            color:#ffffff;
+            font-size:10px;
+            line-height:1.1;
+            font-weight:800;
+            text-transform:uppercase;
+            white-space:nowrap;
           }
 
-          .tag-number {
-            margin-top: 2.5mm;
-
-            font-size: 22px;
-            line-height: 1;
-            font-weight: 900;
+          .tag-number{
+            margin-top:2.5mm;
+            font-size:22px;
+            line-height:1;
+            font-weight:900;
           }
 
-          .tag::after {
-            content: '';
-
-            width: 90%;
-
-            margin-top: 2.5mm;
-
-            border-bottom:
-              1px dashed
-              #000000;
+          .tag::after{
+            content:'';
+            width:90%;
+            margin-top:2.5mm;
+            border-bottom:1px dashed #000000;
           }
 
-          @media print {
-
+          @media print{
             html,
-            body {
-              width: 50mm !important;
-              margin: 0 !important;
-              padding: 0 !important;
+            body{
+              width:50mm!important;
+              margin:0!important;
+              padding:0!important;
             }
 
-            .tag {
-              width: 50mm !important;
-              height: 70mm !important;
-
-              margin: 0 !important;
-              padding: 3mm 3mm !important;
-
-              break-after: page;
-              page-break-after: always;
+            .tag{
+              width:50mm!important;
+              height:70mm!important;
+              margin:0!important;
+              padding:3mm 3mm!important;
+              break-after:page;
+              page-break-after:always;
             }
 
-            .tag:last-child {
-              break-after: auto;
-              page-break-after: auto;
+            .tag:last-child{
+              break-after:auto;
+              page-break-after:auto;
             }
           }
-
         </style>
-
       </head>
 
       <body>
-
         <div class="tags">
           ${tagsHtml}
         </div>
 
         <script>
-
-          window.onload =
-            function () {
-
-              setTimeout(
-                function () {
-
-                  window.focus();
-                  window.print();
-
-                },
-                500
-              );
-            };
-
+          window.onload=function(){
+            setTimeout(function(){
+              window.focus();
+              window.print();
+            },500);
+          };
         </script>
-
       </body>
-
     </html>
   `);
 
   printWindow.document.close();
   printWindow.focus();
 }
+
+
   private updateLocalOrder(response: B2COrder): void {
     this.orders = this.orders.map((order: B2cOrderView) => {
       if (order.id !== response.id) { return order; }
