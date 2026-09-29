@@ -181,7 +181,7 @@ export class B2cOrdersPage implements OnInit {
       this.toDate='';
       this.range.setValue({start:null,end:null});
     }
-
+    this.loadRetagSettings();
     this.loadOrders();
   }
 
@@ -215,6 +215,27 @@ export class B2cOrdersPage implements OnInit {
           this.loading = false;
         }});
   }
+
+  private loadRetagSettings(): void {
+  this.apiService.getBusinessSettings().subscribe({
+    next: res => {
+      const f = res?.customFeatures;
+
+      this.secureRetagEnabled = !!f?.secureRetagEnabled;
+      this.retagPinConfigured = !!f?.retagPinConfigured;
+      this.retagWhatsappEnabled = !!f?.retagWhatsappEnabled;
+
+      console.log('Retag settings:', f);
+    },
+    error: err => {
+      console.error('Unable to load Retag settings', err);
+
+      this.secureRetagEnabled = false;
+      this.retagPinConfigured = false;
+      this.retagWhatsappEnabled = false;
+    }
+  });
+}
 
 private toViewOrder( order: B2COrder ): B2cOrderView {
   return {

@@ -660,51 +660,62 @@ private populateRetagOrder(order: B2COrderDetails): void {
   }
 
 
-  toggleService(
-    serviceId: string
-  ): void {
-
-    if (
-      this.selectedProduct?.unit === 'KG'
-    ) {
-
-      this.selectedServiceIds =
-        this.selectedServiceIds.includes(
-          serviceId
-        )
-          ? []
-          : [serviceId];
-
-      return;
-    }
-
-    const exists =
-      this.selectedServiceIds
-        .includes(
-          serviceId
-        );
-
-    if (exists) {
-
-      this.selectedServiceIds =
-        this.selectedServiceIds
-          .filter(
-            (
-              id:
-                string
-            ) =>
-              id !==
-              serviceId
-          );
-
-      return;
-    }
-
-    this.selectedServiceIds = [
-      ...this.selectedServiceIds,
-      serviceId
-    ];
+  toggleService(serviceId: string): void {
+  const exists = this.selectedServiceIds.includes(serviceId);
+  if (exists) {
+    this.selectedServiceIds =this.selectedServiceIds.filter(
+        (id: string) => id !== serviceId);
+    return;
   }
+  this.selectedServiceIds = [
+    ...this.selectedServiceIds, serviceId
+  ];
+}
+  // toggleService(
+  //   serviceId: string
+  // ): void {
+
+  //   if (
+  //     this.selectedProduct?.unit === 'KG'
+  //   ) {
+
+  //     this.selectedServiceIds =
+  //       this.selectedServiceIds.includes(
+  //         serviceId
+  //       )
+  //         ? []
+  //         : [serviceId];
+
+  //     return;
+  //   }
+
+  //   const exists =
+  //     this.selectedServiceIds
+  //       .includes(
+  //         serviceId
+  //       );
+
+  //   if (exists) {
+
+  //     this.selectedServiceIds =
+  //       this.selectedServiceIds
+  //         .filter(
+  //           (
+  //             id:
+  //               string
+  //           ) =>
+  //             id !==
+  //             serviceId
+  //         );
+
+  //     return;
+  //   }
+
+  //   this.selectedServiceIds = [
+  //     ...this.selectedServiceIds,
+  //     serviceId
+  //   ];
+  // }
 
   isServiceSelected(
     serviceId: string
@@ -1990,9 +2001,9 @@ private updateRetagOrder(): void {
         this.createdOrderNumber = response.orderNumber;
 
         // WhatsApp redirection temporarily disabled.
-        // if (this.retagWhatsappEnabled) {
-        //   this.openRetagWhatsApp(response);
-        // }
+        if (this.retagWhatsappEnabled) {
+          this.openRetagWhatsApp(response);
+        }
 
         this.router.navigate(['/app/b2c-orders']);
       },
@@ -2851,8 +2862,8 @@ We will inform you if there are any updates to your order after store inspection
 
 We'll notify you once your laundry is ready for collection.
 
-Thank you, 
-${this.businessName }`;
+Thank you `
+// ${this.businessName }`;
 
   const whatsappUrl =
     `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
