@@ -1701,21 +1701,29 @@ private formatLocalDate(
       this.expressDelivery
         ? this.selectedExpressChargeId
         : null,
+    // deliveryDate: this.deliveryDate,
+    // deliveryTime: this.deliveryTime,
+    // homeDelivery: this.homeDelivery,
+    // deliveryAddress:
+    //   this.homeDelivery
+    //     ? this.pickupAddress.trim()
+    //     : null,
+    // deliveryLatitude:
+    //   this.homeDelivery
+    //     ? this.pickupLatitude
+    //     : null,
+    // deliveryLongitude:
+    //   this.homeDelivery
+    //     ? this.pickupLongitude
+    //     : null
+
     deliveryDate: this.deliveryDate,
     deliveryTime: this.deliveryTime,
     homeDelivery: this.homeDelivery,
-    deliveryAddress:
-      this.homeDelivery
-        ? this.pickupAddress.trim()
-        : null,
-    deliveryLatitude:
-      this.homeDelivery
-        ? this.pickupLatitude
-        : null,
-    deliveryLongitude:
-      this.homeDelivery
-        ? this.pickupLongitude
-        : null
+
+    deliveryAddress: null,
+    deliveryLatitude: null,
+    deliveryLongitude: null
   };
 
   this.creatingOrder = true;
@@ -1853,9 +1861,12 @@ for (const item of this.orderItems) {
       deliveryDate: this.deliveryDate,
       deliveryTime: this.deliveryTime,
       homeDelivery: this.homeDelivery,
-      deliveryAddress: this.homeDelivery ? this.pickupAddress.trim() : null,
-      deliveryLatitude: this.homeDelivery ? this.pickupLatitude : null,
-      deliveryLongitude: this.homeDelivery ? this.pickupLongitude : null
+      // deliveryAddress: this.homeDelivery ? this.pickupAddress.trim() : null,
+      // deliveryLatitude: this.homeDelivery ? this.pickupLatitude : null,
+      // deliveryLongitude: this.homeDelivery ? this.pickupLongitude : null
+      deliveryAddress: null,
+      deliveryLatitude: null,
+      deliveryLongitude: null
     };
 
     this.creatingOrder = true;
